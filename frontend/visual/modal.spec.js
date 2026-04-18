@@ -31,7 +31,7 @@ test('preview modal visual snapshot', async ({ page }) => {
   expect(modalVisible).toBe(true);
 
   // take screenshot of the modal region
-  const modal = await page.$('#preview-modal .modal-content');
-  expect(modal).not.toBeNull();
+  const modal = page.locator('#preview-modal .modal-content');
+  await expect(modal).toBeVisible();
   await expect(modal).toHaveScreenshot('preview-modal.png');
 });
