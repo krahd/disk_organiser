@@ -12,6 +12,9 @@ This repository contains the backend API under `backend/` and the frontend in
 `frontend/`.
 
 Website: https://krahd.github.io/disk_organiser/
+Download (release): https://github.com/krahd/disk_organiser/releases/tag/v0.1.0
+
+Website: https://krahd.github.io/disk_organiser/
 
 ## Quick start (macOS / Linux)
 
