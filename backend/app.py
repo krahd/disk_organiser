@@ -84,6 +84,20 @@ except (ImportError, FileNotFoundError):
         traceback.print_exc()
         raise
 
+# Attempt to load the optional model client. If unavailable, `model_client`
+# will be `None` and endpoints should fall back to a safe heuristic.
+try:
+    model_client_mod = _import_local_module('model_client', 'model_client.py')
+    ModelClient = model_client_mod.ModelClient
+    model_client = ModelClient()
+except Exception:
+    try:
+        from backend.model_client import ModelClient  # type: ignore
+
+        model_client = ModelClient()
+    except Exception:
+        model_client = None
+
 app = Flask(__name__)
 CORS(app)
 
@@ -155,6 +169,55 @@ def api_organise():
                 dst = os.path.join(os.path.dirname(keep), "Duplicates", os.path.basename(p))
                 moves.append({"from": p, "to": dst})
             suggestions.append({"keep": keep, "moves": moves})
+    return jsonify({"suggestions": suggestions})
+
+
+@app.route('/api/organise/suggest', methods=['POST'])
+def api_organise_suggest():
+    """Return AI-assisted organise suggestions for provided duplicates.
+
+    POST JSON: {duplicates: [...]}
+    If an external model client is configured it will be used; otherwise a
+    deterministic heuristic fallback is returned so the endpoint remains safe
+    and testable in environments without model integrations.
+    """
+    data = request.get_json(silent=True) or {}
+    duplicates = data.get('duplicates')
+    if not duplicates:
+        return jsonify({"error": "missing duplicates"}), 400
+
+    if model_client is not None:
+        try:
+            suggestions = model_client.suggest_organise(duplicates)
+        except Exception as e:
+            # model failure: fall back to heuristic
+            suggestions = []
+            for group in duplicates:
+                files = group.get('files', [])
+                if len(files) <= 1:
+                    continue
+                keep = files[0]['path'] if isinstance(files[0], dict) else files[0]
+                moves = []
+                for f in files[1:]:
+                    p = f['path'] if isinstance(f, dict) else f
+                    dst = os.path.join(os.path.dirname(keep), "Duplicates", os.path.basename(p))
+                    moves.append({"from": p, "to": dst})
+                suggestions.append({"keep": keep, "moves": moves})
+    else:
+        # deterministic heuristic
+        suggestions = []
+        for group in duplicates:
+            files = group.get('files', [])
+            if len(files) <= 1:
+                continue
+            keep = files[0]['path'] if isinstance(files[0], dict) else files[0]
+            moves = []
+            for f in files[1:]:
+                p = f['path'] if isinstance(f, dict) else f
+                dst = os.path.join(os.path.dirname(keep), "Duplicates", os.path.basename(p))
+                moves.append({"from": p, "to": dst})
+            suggestions.append({"keep": keep, "moves": moves})
+
     return jsonify({"suggestions": suggestions})
 
 
