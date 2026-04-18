@@ -777,9 +777,10 @@ def api_scan_index_rebuild_async():
     min_size = int(data.get("min_size", 1))
     sample_size = int(data.get("sample_size", 4096))
 
-    # attempt to use RQ/Redis if available
+    dry_run = bool(data.get("dry_run", False))
+    # attempt to use RQ/Redis if available and not a dry_run
     # otherwise fallback to thread
-    if _REDIS_AVAILABLE:
+    if _REDIS_AVAILABLE and not dry_run:
         try:
             redis_conn = Redis()
             q = Queue(connection=redis_conn)
@@ -793,11 +794,11 @@ def api_scan_index_rebuild_async():
     job_id = uuid.uuid4().hex
     thread = threading.Thread(
         target=tasks_mod.rebuild_index_job,
-        args=(paths, min_size, sample_size, job_id),
+        args=(paths, min_size, sample_size, job_id, dry_run),
         daemon=True,
     )
     thread.start()
-    return jsonify({"job_id": job_id, "backend": "thread"})
+    return jsonify({"job_id": job_id, "backend": "thread", "dry_run": dry_run})
 
 
 @app.route("/api/scan_index/prune", methods=["POST"])
