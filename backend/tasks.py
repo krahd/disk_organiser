@@ -119,6 +119,7 @@ def rebuild_index_job(
     min_size: int = 1,
     sample_size: int = 4096,
     job_id: str | None = None,
+    dry_run: bool = False,
 ):
     """Run a scan-index rebuild in background and persist job status to disk.
 
@@ -134,12 +135,21 @@ def rebuild_index_job(
         "result": None,
         "progress": {},
     }
-    with open(job_file, "w", encoding="utf-8") as f:
-        json.dump(job, f)
+    # persist initial job file unless dry_run
+    if not dry_run:
+        try:
+            with open(job_file, "w", encoding="utf-8") as f:
+                json.dump(job, f)
+        except Exception:
+            pass
 
     cancel_file = _cancel_path(job_id)
 
     def _write_status(updated: dict):
+        if dry_run:
+            nonlocal job
+            job = updated
+            return
         try:
             with open(job_file, "w", encoding="utf-8") as _f:
                 json.dump(updated, _f, default=str)
@@ -183,8 +193,9 @@ def rebuild_index_job(
         job["status"] = "failed"
         job["error"] = str(e)
     _write_status(job)
+    # cleanup cancel file if present (avoid touching disk in dry_run)
     try:
-        if os.path.exists(cancel_file):
+        if not dry_run and os.path.exists(cancel_file):
             os.remove(cancel_file)
     except Exception:
         pass

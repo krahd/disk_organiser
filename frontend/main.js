@@ -4,6 +4,69 @@
 document.addEventListener('DOMContentLoaded', () => {
     const main = document.getElementById('main-content');
 
+    // Helper: format bytes into human-readable strings
+    function formatBytes(bytes) {
+        try {
+            const b = Number(bytes) || 0;
+            if (b === 0) return '0 B';
+            const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+            let value = b;
+            let i = 0;
+            while (value >= 1024 && i < units.length - 1) {
+                value = value / 1024;
+                i += 1;
+            }
+            if (i === 0) return `${Math.round(value)} ${units[i]}`;
+            return `${value.toFixed(2)} ${units[i]}`;
+        } catch (e) {
+            return String(bytes);
+        }
+    }
+
+    // Preview modal helpers exposed on `window` for testability
+    function openPreviewModal(preview) {
+        const modal = document.getElementById('preview-modal');
+        const title = document.getElementById('preview-modal-title');
+        const body = document.getElementById('preview-modal-body');
+        const footer = document.getElementById('preview-modal-footer');
+        try {
+            title.textContent = `Preview — ${preview && preview.op && preview.op.id ? preview.op.id : ''}`;
+            body.innerHTML = '';
+            const summary = (preview && preview.summary) || {};
+            const sumEl = document.createElement('div');
+            sumEl.textContent = `Actions: ${summary.actions || 0} — Files: ${summary.files || 0} — Bytes: ${formatBytes(summary.bytes || 0)}`;
+            body.appendChild(sumEl);
+            (preview && preview.actions || []).forEach(a => {
+                const d = document.createElement('div');
+                const src = a.src || a.from || a.from_path || a.path || '';
+                const dst = a.dst || a.to || a.to_path || '';
+                d.textContent = `${a.action || a.type || 'op'} ${src} ${dst ? '→ ' + dst : ''}`;
+                body.appendChild(d);
+            });
+            footer.innerHTML = '';
+            const close = document.createElement('button');
+            close.textContent = 'Close';
+            close.onclick = closePreviewModal;
+            footer.appendChild(close);
+            modal.classList.remove('hidden');
+            modal.setAttribute('aria-hidden', 'false');
+        } catch (e) {
+            // best-effort: if modal not present, no-op
+        }
+    }
+
+    function closePreviewModal() {
+        const modal = document.getElementById('preview-modal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    // expose helpers globally for tests and external usage
+    window.formatBytes = formatBytes;
+    window.openPreviewModal = openPreviewModal;
+    window.closePreviewModal = closePreviewModal;
+
     function showAlert(message) {
         let container = document.getElementById('app-alert');
         if (!container) {

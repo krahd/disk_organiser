@@ -93,3 +93,15 @@ Frontend
 Open `frontend/index.html` in a browser. The UI is intentionally minimal and
 targets local development and quick inspections. It assumes the API runs on
 `http://127.0.0.1:5000`.
+
+Screenshots
+-----------
+
+Here are a couple of screenshots showing the main visualisation and the
+duplicate-finder UI (placeholders). When browsing on GitHub the images are
+served from the `frontend/images/` folder:
+
+![](../frontend/images/screenshot-1.svg)
+
+![](../frontend/images/screenshot-2.svg)
+
