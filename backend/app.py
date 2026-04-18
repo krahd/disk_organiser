@@ -12,6 +12,7 @@ import uuid
 import shutil
 import time
 import logging
+import json
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -132,6 +133,7 @@ except Exception:
 app = Flask(__name__)
 CORS(app)
 logger = logging.getLogger(__name__)
+MAINT_FILE = os.path.join(os.path.dirname(__file__), 'maintenance_status.json')
 
 
 @app.route('/')
@@ -678,6 +680,60 @@ def api_scan_index_prune():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/maintenance/status', methods=['GET'])
+def api_maintenance_status():
+    """Return last maintenance run status persisted by the maintenance loop."""
+    try:
+        if os.path.exists(MAINT_FILE):
+            with open(MAINT_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            return jsonify({'status': 'ok', 'maintenance': data})
+        return jsonify({'status': 'unknown', 'maintenance': None})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/maintenance/run', methods=['POST'])
+def api_maintenance_run():
+    """Trigger an immediate maintenance prune run and persist status.
+
+    POST JSON: {retention_days: int, max_entries: int}
+    """
+    if 'scan_index_mod' not in globals() or scan_index_mod is None:
+        return jsonify({'error': 'scan index not available'}), 404
+    data = request.get_json(silent=True) or {}
+    retention_days = data.get('retention_days')
+    max_entries = data.get('max_entries')
+    try:
+        if retention_days is not None:
+            retention_days = int(retention_days)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'invalid retention_days'}), 400
+    try:
+        if max_entries is not None:
+            max_entries = int(max_entries)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'invalid max_entries'}), 400
+
+    try:
+        res = scan_index_mod.prune(retention_days=retention_days, max_entries=max_entries)
+        status = {'timestamp': time.time(), 'status': 'ok', 'result': res}
+        try:
+            with open(MAINT_FILE, 'w', encoding='utf-8') as mf:
+                json.dump(status, mf)
+        except Exception:
+            logger.exception('Failed to persist maintenance status')
+        return jsonify({'status': 'ok', 'result': res})
+    except Exception as e:
+        status = {'timestamp': time.time(), 'status': 'error', 'error': str(e)}
+        try:
+            with open(MAINT_FILE, 'w', encoding='utf-8') as mf:
+                json.dump(status, mf)
+        except Exception:
+            logger.exception('Failed to persist maintenance status')
+        return jsonify({'error': str(e)}), 500
+
+
 def _maintenance_loop():
     """Background maintenance loop that optionally runs index prune.
 
@@ -693,18 +749,32 @@ def _maintenance_loop():
             retention_days = maint.get('prune_days', 30)
             max_entries = maint.get('prune_max_entries')
             interval_hours = float(maint.get('interval_hours', 24))
+            last_result = {'timestamp': time.time(), 'status': 'idle'}
             if enabled and scan_index_mod:
                 try:
                     logger.info(
                         'Running scheduled scan-index prune (retention_days=%s, max_entries=%s)', retention_days, max_entries)
-                    scan_index_mod.prune(retention_days=retention_days, max_entries=max_entries)
-                except Exception:
+                    res = scan_index_mod.prune(retention_days=retention_days, max_entries=max_entries)
+                    last_result = {'timestamp': time.time(), 'status': 'ok', 'result': res}
+                except Exception as exc:
                     logger.exception('Scheduled scan-index prune failed')
+                    last_result = {'timestamp': time.time(), 'status': 'error', 'error': str(exc)}
+            # persist last_result so UI can show maintenance outcome
+            try:
+                with open(MAINT_FILE, 'w', encoding='utf-8') as mf:
+                    json.dump(last_result, mf)
+            except Exception:
+                logger.exception('Failed to write maintenance status')
             # sleep until next run
             time.sleep(max(1.0, interval_hours) * 3600.0)
         except Exception:
             # if something unexpected happens, back off for an hour
             logger.exception('Maintenance loop encountered an error')
+            try:
+                with open(MAINT_FILE, 'w', encoding='utf-8') as mf:
+                    json.dump({'timestamp': time.time(), 'status': 'error', 'error': 'maintenance loop crash'}, mf)
+            except Exception:
+                pass
             time.sleep(3600.0)
 
 

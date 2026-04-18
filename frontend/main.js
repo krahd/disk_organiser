@@ -500,6 +500,19 @@ document.addEventListener('DOMContentLoaded', () => {
                       <button id="index-prune">Prune Index</button>
                     </div>
                     <pre id="index-result" style="margin-top:8px"></pre>
+                                        <h3 style="margin-top:12px">Scheduled Maintenance</h3>
+                                        <label><input id="maint-enabled" type="checkbox"> Enable scheduled maintenance</label>
+                                        <div style="margin-top:6px">
+                                            <label>Prune days: <input id="maint-prune-days" type="number" value="30"></label>
+                                            <label style="margin-left:8px">Max entries: <input id="maint-prune-max" type="number" placeholder="(optional)"></label>
+                                            <label style="margin-left:8px">Interval hours: <input id="maint-interval-hours" type="number" value="24"></label>
+                                        </div>
+                                        <div style="margin-top:6px">
+                                            <button id="maint-save">Save Maintenance Settings</button>
+                                            <button id="maint-run" style="margin-left:8px">Run Now</button>
+                                            <button id="maint-status" style="margin-left:8px">Show Last Run</button>
+                                        </div>
+                                        <pre id="maint-result" style="margin-top:8px"></pre>
                 `;
                 document.getElementById('pref-result').parentNode.appendChild(prefExtra);
                 document.getElementById('index-stats').onclick = async () => {
@@ -555,6 +568,55 @@ document.addEventListener('DOMContentLoaded', () => {
                     const j = await r.json();
                     document.getElementById('index-result').textContent = JSON.stringify(j, null, 2);
                 };
+                document.getElementById('maint-save').onclick = async () => {
+                    try {
+                        const prefsRes = await fetch('/api/preferences');
+                        const pj = await prefsRes.json();
+                        const prefs = pj.preferences || {};
+                        prefs.maintenance = {
+                            enabled: !!document.getElementById('maint-enabled').checked,
+                            prune_days: parseInt(document.getElementById('maint-prune-days').value || '30', 10),
+                            prune_max_entries: parseInt(document.getElementById('maint-prune-max').value || '', 10) || undefined,
+                            interval_hours: parseFloat(document.getElementById('maint-interval-hours').value || '24'),
+                        };
+                        if (Number.isNaN(prefs.maintenance.prune_max_entries)) delete prefs.maintenance.prune_max_entries;
+                        const r = await fetch('/api/preferences', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({preferences: prefs})});
+                        const j = await r.json();
+                        document.getElementById('maint-result').textContent = JSON.stringify(j, null, 2);
+                    } catch (e) {
+                        document.getElementById('maint-result').textContent = String(e);
+                    }
+                };
+                document.getElementById('maint-run').onclick = async () => {
+                    const days = parseInt(document.getElementById('maint-prune-days').value || '30', 10);
+                    const maxEntries = parseInt(document.getElementById('maint-prune-max').value || '', 10);
+                    const body = {retention_days: days};
+                    if (!Number.isNaN(maxEntries)) body.max_entries = maxEntries;
+                    const r = await fetch('/api/maintenance/run', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+                    const j = await r.json();
+                    document.getElementById('maint-result').textContent = JSON.stringify(j, null, 2);
+                };
+                document.getElementById('maint-status').onclick = async () => {
+                    const r = await fetch('/api/maintenance/status');
+                    const j = await r.json();
+                    document.getElementById('maint-result').textContent = JSON.stringify(j, null, 2);
+                };
+                // initialize preferences UI from server
+                (async () => {
+                    try {
+                        const r = await fetch('/api/preferences');
+                        const j = await r.json();
+                        const prefs = j.preferences || {};
+                        if (prefs.model) document.getElementById('pref-model').value = prefs.model;
+                        const maint = prefs.maintenance || {};
+                        document.getElementById('maint-enabled').checked = !!maint.enabled;
+                        document.getElementById('maint-prune-days').value = maint.prune_days || 30;
+                        document.getElementById('maint-prune-max').value = maint.prune_max_entries || '';
+                        document.getElementById('maint-interval-hours').value = maint.interval_hours || 24;
+                    } catch (e) {
+                        // ignore
+                    }
+                })();
                 document.getElementById('pref-save').onclick = async () => {
                     const model = document.getElementById('pref-model').value;
                     const body = {model};
