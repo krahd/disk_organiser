@@ -3,10 +3,11 @@
 Provides a simple, deterministic `suggest_organise` implementation used for
 local development and CI where no real model is available.
 """
+
 from __future__ import annotations
 
 import os
-from typing import List, Dict
+from typing import Dict, List
 
 
 def suggest_organise(duplicates: List[Dict]) -> List[Dict]:
@@ -17,15 +18,17 @@ def suggest_organise(duplicates: List[Dict]) -> List[Dict]:
     """
     suggestions: List[Dict] = []
     for group in duplicates:
-        files = group.get('files', [])
+        files = group.get("files", [])
         if len(files) <= 1:
             continue
         first = files[0]
-        keep = first['path'] if isinstance(first, dict) else first
+        keep = first["path"] if isinstance(first, dict) else first
         moves = []
         for f in files[1:]:
-            src = f['path'] if isinstance(f, dict) else f
-            dst = os.path.join(os.path.dirname(keep), 'AI_Duplicates', os.path.basename(src))
-            moves.append({'from': src, 'to': dst})
-        suggestions.append({'keep': keep, 'moves': moves, 'provider': 'ci_dummy'})
+            src = f["path"] if isinstance(f, dict) else f
+            dst = os.path.join(
+                os.path.dirname(keep), "AI_Duplicates", os.path.basename(src)
+            )
+            moves.append({"from": src, "to": dst})
+        suggestions.append({"keep": keep, "moves": moves, "provider": "ci_dummy"})
     return suggestions

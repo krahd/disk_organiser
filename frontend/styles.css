@@ -66,3 +66,27 @@ main {
     font-size: 0.95rem;
     color: #333;
 }
+
+/* Modal preview styles */
+.modal.hidden { display: none; }
+.modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 2000; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
+.modal-content { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 90%; max-width: 900px; background: #fff; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; max-height: 80vh; }
+.modal-header { display:flex; align-items:center; justify-content:space-between; padding: 12px 16px; border-bottom: 1px solid #eee; background: #f6f7f8; }
+.modal-body { padding: 12px 16px; overflow: auto; }
+.modal-footer { padding: 12px 16px; border-top: 1px solid #eee; display:flex; gap:8px; justify-content:flex-end; }
+.modal-content h3 { margin:0; font-size:1.1rem; }
+.modal-content button { cursor:pointer; }
+
+.preview-actions { width:100%; border-collapse: collapse; }
+.preview-actions th, .preview-actions td { padding:8px 10px; border-bottom:1px solid #f0f0f0; text-align:left; font-size:0.95rem; }
+.preview-actions th { background:#fafafa; font-weight:600; }
+.action-type { width:120px; text-transform:capitalize; }
+.action-path { font-family: monospace; color:#333; }
+.action-size { color:#666; white-space:nowrap; }
+.status-preview { padding:4px 8px; border-radius:4px; font-size:0.85rem; }
+.status-ok { background:#e8f5e9; color:#2e7d32; }
+.status-warn { background:#fff8e1; color:#f57f17; }
+.status-err { background:#ffebee; color:#c62828; }
+
+.small-muted { font-size:0.85rem; color:#666; }
