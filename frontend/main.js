@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <label>Path: <input id="dup-path" type="text" placeholder="/path/to/scan" style="width:60%"></label>
                     <label>Min size (bytes): <input id="dup-min" type="number" value="1"></label>
                     <button id="dup-run">Run</button>
+                    <label style="margin-left:1rem"><input id="use-ai-suggestions" type="checkbox"> Use AI suggestions</label>
                     <div id="dup-actions" style="margin-top:1rem"></div>
                     <div id="dup-result"></div>
                 `;
@@ -50,8 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         const btn = document.createElement('button');
                         btn.textContent = 'Create Preview';
                         btn.onclick = async () => {
-                            // compute suggestions by calling /api/organise
-                            const sres = await fetch('http://127.0.0.1:5000/api/organise', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({duplicates: j.duplicates})});
+                            // choose endpoint: AI suggestions or heuristic
+                            const useAI = document.getElementById('use-ai-suggestions') && document.getElementById('use-ai-suggestions').checked;
+                            const endpoint = useAI ? 'http://127.0.0.1:5000/api/organise/suggest' : 'http://127.0.0.1:5000/api/organise';
+                            const sres = await fetch(endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({duplicates: j.duplicates})});
                             const sj = await sres.json();
                             // create op preview
                             const pres = await fetch('http://127.0.0.1:5000/api/organise/preview', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({suggestions: sj.suggestions})});
