@@ -207,7 +207,7 @@ def _local_sample_hash(path: str, sample_size: int = 4096) -> str:
     return h.hexdigest()
 
 
-def rebuild_index(paths: list, min_size: int = 1, sample_size: int = 4096):
+def rebuild_index(paths: list, min_size: int = 1, sample_size: int = 4096, progress_callback=None):
     """Walk provided paths and (re)populate sample_hash entries in the index.
 
     This operation is synchronous and may take time on large trees.
@@ -239,7 +239,22 @@ def rebuild_index(paths: list, min_size: int = 1, sample_size: int = 4096):
                     except Exception as e:
                         errors.append(str(e))
                     scanned += 1
+                    if progress_callback and scanned % 25 == 0:
+                        try:
+                            progress_callback({
+                                'status': 'rebuilding',
+                                'processed': scanned,
+                                'upserted': upserted,
+                            })
+                        except Exception:
+                            pass
                 except (OSError, PermissionError) as e:
                     errors.append(str(e))
                     continue
+    # final progress update
+    if progress_callback:
+        try:
+            progress_callback({'status': 'finished', 'processed': scanned, 'upserted': upserted})
+        except Exception:
+            pass
     return {'scanned': scanned, 'upserted': upserted, 'errors': errors}

@@ -1,0 +1,1 @@
+{"id": "e606905429ea40c8899e743ba0095bd6", "status": "failed", "created_at": 1776484880.660224, "result": null, "progress": {}, "error": "rebuild_index() got an unexpected keyword argument 'progress_callback'"}

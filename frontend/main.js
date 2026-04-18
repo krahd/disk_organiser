@@ -493,6 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3>Scan Index</h3>
                     <button id="index-stats">Get Index Stats</button>
                     <button id="index-rebuild">Rebuild Index (sample hashes)</button>
+                    <button id="index-rebuild-bg" style="margin-left:8px">Rebuild Index (Background)</button>
                     <div style="margin-top:6px">
                       <label>Prune retention days: <input id="index-prune-days" type="number" value="365"></label>
                       <label style="margin-left:8px">Max entries: <input id="index-prune-max" type="number" placeholder="(optional)"></label>
@@ -511,6 +512,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     const r = await fetch('/api/scan_index/rebuild', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({paths: [window.location.pathname || '/'], min_size:1})});
                     const j = await r.json();
                     document.getElementById('index-result').textContent = JSON.stringify(j, null, 2);
+                };
+
+                document.getElementById('index-rebuild-bg').onclick = async () => {
+                    if (!confirm('Start background rebuild of scan index?')) return;
+                    const r = await fetch('/api/scan_index/rebuild_async', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({paths: [window.location.pathname || '/'], min_size:1})});
+                    const j = await r.json();
+                    const jobId = j.job_id;
+                    const resEl = document.getElementById('index-result');
+                    resEl.innerHTML = `<div class="progress"><div class="progress-bar" id="index-progress-bar" style="width:0%"></div></div><div id="index-progress-text">Job ${jobId} started (backend: ${j.backend})</div>`;
+
+                    // connect to SSE for updates
+                    try { if (window._diskOrganiserEvtSrc && typeof window._diskOrganiserEvtSrc.close === 'function') window._diskOrganiserEvtSrc.close(); } catch (e) {}
+                    const evt = new EventSource(`/api/scan/events/${jobId}`);
+                    window._diskOrganiserEvtSrc = evt;
+                    evt.onmessage = (ev) => {
+                        try {
+                            const data = JSON.parse(ev.data || '{}');
+                            if (data.progress) {
+                                const p = data.progress;
+                                const bar = document.getElementById('index-progress-bar');
+                                const txt = document.getElementById('index-progress-text');
+                                if (typeof p.processed === 'number' && typeof p.upserted === 'number') {
+                                    bar.classList.add('indeterminate');
+                                    if (txt) txt.textContent = `Job ${jobId} ${data.status || ''} — scanned ${p.processed}, upserted ${p.upserted}`;
+                                }
+                            }
+                            if (data.result) {
+                                resEl.innerHTML += `<pre>${JSON.stringify(data.result, null, 2)}</pre>`;
+                                try { evt.close(); } catch (e) {}
+                            }
+                        } catch (e) { /* ignore parse errors */ }
+                    };
+                    evt.onerror = () => { /* ignore errors, SSE will reconnect */ };
                 };
                 document.getElementById('index-prune').onclick = async () => {
                     const days = parseInt(document.getElementById('index-prune-days').value || '365', 10);

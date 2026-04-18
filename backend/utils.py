@@ -190,9 +190,19 @@ def find_duplicates(
             to_hash = list(fpaths)
             total = len(to_hash)
             hashed = 0
-            # respect explicit max_workers if provided, otherwise fallback to heuristic
+            # respect explicit max_workers if provided, otherwise fallback to a
+            # conservative heuristic. Allow overriding via `MAX_HASH_WORKERS`
+            # environment variable for advanced deployments.
             if max_workers is None:
-                computed_workers = min(32, (os.cpu_count() or 1) * 4, total)
+                env_val = os.getenv('MAX_HASH_WORKERS')
+                if env_val:
+                    try:
+                        computed_workers = max(1, min(int(env_val), total))
+                    except Exception:
+                        computed_workers = max(1, min((os.cpu_count() or 1) * 2, total, 32))
+                else:
+                    # default: 2 * cpu_count, capped to 32
+                    computed_workers = max(1, min((os.cpu_count() or 1) * 2, total, 32))
             else:
                 computed_workers = max(1, min(int(max_workers), total))
             with concurrent.futures.ThreadPoolExecutor(max_workers=computed_workers) as exe:

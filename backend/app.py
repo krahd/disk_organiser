@@ -49,6 +49,7 @@ try:
     utils_mod = _import_local_module('utils', 'utils.py')
     tasks_mod = _import_local_module('tasks', 'tasks.py')
     op_store_mod = _import_local_module('op_store', 'op_store.py')
+    fs_ops_mod = _import_local_module('fs_ops', 'fs_ops.py')
     load_config = store_mod.load_config
     save_config = store_mod.save_config
     find_duplicates = utils_mod.find_duplicates
@@ -89,6 +90,7 @@ except (ImportError, FileNotFoundError):
             list_backups,
             delete_op,
         )
+        from backend import fs_ops as fs_ops_mod
         try:
             from backend import scan_index as scan_index_mod
         except Exception:
@@ -307,6 +309,16 @@ def api_organise_execute():
     op = get_op(op_id)
     if not op:
         return jsonify({"error": "op not found"}), 404
+    dry_run = bool(data.get('dry_run', False))
+    if dry_run:
+        # Produce a non-destructive preview of actions without touching disk.
+        try:
+            actions = fs_ops_mod.preview_suggestions(
+                op.get('suggestions', []), op.get('backup_dir'))
+            summary = fs_ops_mod.summarize_actions(actions)
+        except Exception:
+            return jsonify({'error': 'failed to generate preview'}), 500
+        return jsonify({'op_id': op_id, 'dry_run': True, 'preview': actions, 'summary': summary})
     # Execute suggested moves, backing up originals first
     executed = []
     for s in op.get('suggestions', []):
@@ -611,6 +623,36 @@ def api_scan_index_rebuild():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/scan_index/rebuild_async', methods=['POST'])
+def api_scan_index_rebuild_async():
+    """Start a background rebuild of the scan index (returns job id).
+
+    POST JSON: {paths: [...], min_size: int, sample_size: int}
+    """
+    if 'scan_index_mod' not in globals() or scan_index_mod is None:
+        return jsonify({'error': 'scan index not available'}), 404
+    data = request.get_json(silent=True) or {}
+    paths = data.get('paths') or [os.getcwd()]
+    min_size = int(data.get('min_size', 1))
+    sample_size = int(data.get('sample_size', 4096))
+
+    # attempt to use RQ/Redis if available, otherwise fallback to thread
+    if _REDIS_AVAILABLE:
+        try:
+            redis_conn = Redis()
+            q = Queue(connection=redis_conn)
+            job = q.enqueue(tasks_mod.rebuild_index_job, paths, min_size, sample_size, None)
+            return jsonify({"job_id": job.get_id(), "backend": "rq"})
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+
+    job_id = uuid.uuid4().hex
+    thread = threading.Thread(target=tasks_mod.rebuild_index_job, args=(
+        paths, min_size, sample_size, job_id), daemon=True)
+    thread.start()
+    return jsonify({"job_id": job_id, "backend": "thread"})
+
+
 @app.route('/api/scan_index/prune', methods=['POST'])
 def api_scan_index_prune():
     """Prune scan index entries by retention days and/or max entries."""
@@ -634,6 +676,44 @@ def api_scan_index_prune():
         return jsonify(res)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+def _maintenance_loop():
+    """Background maintenance loop that optionally runs index prune.
+
+    Reads configuration via `load_config()` and, when enabled, calls the
+    `scan_index.prune` API at the configured interval. This runs in a
+    daemon thread so it won't block application shutdown in simple setups.
+    """
+    while True:
+        try:
+            cfg = load_config()
+            maint = cfg.get('maintenance', {}) or {}
+            enabled = bool(maint.get('enabled', False))
+            retention_days = maint.get('prune_days', 30)
+            max_entries = maint.get('prune_max_entries')
+            interval_hours = float(maint.get('interval_hours', 24))
+            if enabled and scan_index_mod:
+                try:
+                    logger.info(
+                        'Running scheduled scan-index prune (retention_days=%s, max_entries=%s)', retention_days, max_entries)
+                    scan_index_mod.prune(retention_days=retention_days, max_entries=max_entries)
+                except Exception:
+                    logger.exception('Scheduled scan-index prune failed')
+            # sleep until next run
+            time.sleep(max(1.0, interval_hours) * 3600.0)
+        except Exception:
+            # if something unexpected happens, back off for an hour
+            logger.exception('Maintenance loop encountered an error')
+            time.sleep(3600.0)
+
+
+# start maintenance thread (daemon) so it doesn't block shutdown
+try:
+    maint_thread = threading.Thread(target=_maintenance_loop, daemon=True)
+    maint_thread.start()
+except Exception:
+    logger.exception('Failed to start maintenance thread')
 
 
 if __name__ == '__main__':

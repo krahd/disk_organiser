@@ -96,6 +96,72 @@ def background_scan(
     return job
 
 
+def rebuild_index_job(
+    paths: List[str],
+    min_size: int = 1,
+    sample_size: int = 4096,
+    job_id: str | None = None,
+):
+    """Run a scan-index rebuild in background and persist job status to disk.
+
+    This mirrors the pattern used by `background_scan` so the web UI can
+    consume progress via the existing SSE endpoint.
+    """
+    job_id = job_id or uuid.uuid4().hex
+    job_file = _job_path(job_id)
+    job = {'id': job_id, 'status': 'started', 'created_at': time.time(), 'result': None,
+           'progress': {}}
+    with open(job_file, 'w', encoding='utf-8') as f:
+        json.dump(job, f)
+
+    cancel_file = _cancel_path(job_id)
+
+    def _write_status(updated: dict):
+        try:
+            with open(job_file, 'w', encoding='utf-8') as _f:
+                json.dump(updated, _f, default=str)
+        except Exception:
+            pass
+
+    def progress_cb(data: dict):
+        job['progress'] = data
+        _write_status(job)
+        if os.path.exists(cancel_file):
+            raise RuntimeError('cancelled')
+
+    try:
+        # import scan_index locally to keep function resilient
+        try:
+            from backend import scan_index as scan_index_mod  # type: ignore
+        except Exception:
+            # fallback to local import
+            import importlib.util
+            base = os.path.dirname(__file__)
+            spec = importlib.util.spec_from_file_location(
+                'scan_index', os.path.join(base, 'scan_index.py'))
+            scan_index_mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(scan_index_mod)  # type: ignore
+
+        result = scan_index_mod.rebuild_index(
+            paths, min_size=min_size, sample_size=sample_size, progress_callback=progress_cb)
+        job['status'] = 'finished'
+        job['finished_at'] = time.time()
+        job['result'] = result
+    except RuntimeError as e:
+        job['status'] = 'cancelled'
+        job['error'] = str(e)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        job['status'] = 'failed'
+        job['error'] = str(e)
+    _write_status(job)
+    try:
+        if os.path.exists(cancel_file):
+            os.remove(cancel_file)
+    except Exception:
+        pass
+    return job
+
+
 def job_status(job_id: str):
     """Read job status from disk for given job id."""
     job_file = _job_path(job_id)

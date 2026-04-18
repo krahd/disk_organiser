@@ -92,5 +92,20 @@ See `ABOUT.md` for a brief project description and goals.
 
 ---
 
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+## Documentation
+
+A user manual and contributing guidelines are included in the `docs/` folder:
+
+- [docs/USER_MANUAL.md](docs/USER_MANUAL.md) — user manual and usage examples
+- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) — how to contribute, run tests, and submit PRs
+
+## Disclaimer
+
+This software is provided "AS IS", without warranty of any kind, express or implied. Use at your own risk.
+
 If you'd like a trimmed README (for GitHub About or package metadata), tell me
 which sections to keep and I will produce it.
