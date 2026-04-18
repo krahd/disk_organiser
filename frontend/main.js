@@ -198,54 +198,92 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('vis-bg').onclick = async () => {
                     const path = document.getElementById('vis-path').value || undefined;
                     const body = {paths: path ? [path] : undefined};
-                    const res = await fetch('http://127.0.0.1:5000/api/scan/start', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+                    const res = await fetch('/api/scan/start', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
                     const j = await res.json();
+                    const jobId = j.job_id;
                     const prog = document.getElementById('vis-progress');
-                    prog.innerHTML = `Job <strong>${j.job_id}</strong> started (backend: ${j.backend}) <button id="scan-cancel">Cancel</button>`;
+
+                    // close any previous EventSource
+                    try {
+                        if (window._diskOrganiserEvtSrc && typeof window._diskOrganiserEvtSrc.close === 'function') {
+                            window._diskOrganiserEvtSrc.close();
+                        }
+                    } catch (e) {
+                        // ignore
+                    }
+
+                    // render progress bar + text + cancel
+                    prog.innerHTML = `
+                        <div class="progress"><div class="progress-bar" id="vis-progress-bar" style="width:0%"></div></div>
+                        <div class="progress-text" id="vis-progress-text">Job <strong>${jobId}</strong> started (backend: ${j.backend})</div>
+                        <div style="margin-top:6px"><button id="scan-cancel">Cancel</button></div>
+                    `;
+
                     const cancelBtn = document.getElementById('scan-cancel');
                     cancelBtn.onclick = async () => {
-                        await fetch('http://127.0.0.1:5000/api/scan/cancel', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({job_id: j.job_id})});
+                        if (!confirm('Cancel this scan?')) return;
+                        await fetch('/api/scan/cancel', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({job_id: jobId})});
                         showAlert('Cancel requested');
                     };
 
-                    // connect SSE for live updates
-                    try {
-                        const evtSrc = new EventSource(`http://127.0.0.1:5000/api/scan/events/${j.job_id}`);
-                        const out = document.getElementById('vis-result');
-                        out.innerHTML = '';
-                        evtSrc.onmessage = (ev) => {
-                            try {
-                                const data = JSON.parse(ev.data || '{}');
-                                if (data.progress) {
-                                    prog.textContent = `Job ${j.job_id} ${data.status || ''} - ${JSON.stringify(data.progress)}`;
-                                } else if (data.status) {
-                                    prog.textContent = `Job ${j.job_id} ${data.status}`;
+                    // connect SSE for live updates with automatic reconnect
+                    let evtSrc = null;
+                    let reconnectDelay = 1000;
+                    const out = document.getElementById('vis-result');
+                    out.innerHTML = '';
+
+                    const connect = () => {
+                        try {
+                            evtSrc = new EventSource(`/api/scan/events/${jobId}`);
+                            window._diskOrganiserEvtSrc = evtSrc;
+                            evtSrc.onopen = () => {
+                                reconnectDelay = 1000;
+                                const t = document.getElementById('vis-progress-text');
+                                if (t) t.textContent = `Job ${jobId} connected`;
+                            };
+                            evtSrc.onmessage = (ev) => {
+                                try {
+                                    const data = JSON.parse(ev.data || '{}');
+                                    const bar = document.getElementById('vis-progress-bar');
+                                    const text = document.getElementById('vis-progress-text');
+                                    if (data.progress) {
+                                        const p = data.progress;
+                                        if (typeof p.processed === 'number' && typeof p.total === 'number' && p.total > 0) {
+                                            const pct = Math.min(100, Math.round((p.processed / p.total) * 100));
+                                            if (bar) { bar.style.width = pct + '%'; bar.classList.remove('indeterminate'); }
+                                            if (text) text.textContent = `Job ${jobId} ${data.status || ''} — ${p.processed}/${p.total} (${pct}%)`;
+                                        } else if (typeof p.processed === 'number') {
+                                            if (bar) { bar.classList.add('indeterminate'); }
+                                            if (text) text.textContent = `Job ${jobId} ${data.status || ''} — scanned ${p.processed}`;
+                                        } else if (p.file) {
+                                            if (bar) { bar.classList.add('indeterminate'); }
+                                            if (text) text.textContent = `Job ${jobId} ${data.status || ''} — hashing ${p.file}`;
+                                        } else {
+                                            if (text) text.textContent = `Job ${jobId} ${data.status || ''}`;
+                                        }
+                                    } else if (data.status) {
+                                        if (text) text.textContent = `Job ${jobId} ${data.status}`;
+                                    }
+                                    if (data.result) {
+                                        out.innerHTML = `<pre>${JSON.stringify(data.result, null, 2)}</pre>`;
+                                        const bar = document.getElementById('vis-progress-bar');
+                                        if (bar) { bar.style.width = '100%'; bar.classList.remove('indeterminate'); }
+                                        try { if (evtSrc) evtSrc.close(); } catch (e) {}
+                                    }
+                                } catch (e) {
+                                    // ignore parse errors
                                 }
-                                if (data.result) {
-                                    out.innerHTML = `<pre>${JSON.stringify(data.result, null, 2)}</pre>`;
-                                }
-                            } catch (e) {
-                                // ignore parse errors
-                            }
-                        };
-                        evtSrc.onerror = (e) => {
-                            // keep connection alive; report error
-                            console.error('SSE error', e);
-                        };
-                    } catch (e) {
-                        // fallback to polling if EventSource not available
-                        const interval = setInterval(async () => {
-                            const s = await fetch(`http://127.0.0.1:5000/api/scan/status/${j.job_id}`);
-                            const sj = await s.json();
-                            if (sj.status === 'started') prog.textContent = `Job ${j.job_id} running...`;
-                            if (sj.status === 'finished' || sj.status === 'failed' || sj.status === 'cancelled') {
-                                clearInterval(interval);
-                                prog.textContent = `Job ${j.job_id} ${sj.status}`;
-                                const out = document.getElementById('vis-result');
-                                out.innerHTML = `<pre>${JSON.stringify(sj.result || sj, null, 2)}</pre>`;
-                            }
-                        }, 1000);
-                    }
+                            };
+                            evtSrc.onerror = (e) => {
+                                console.error('SSE error', e);
+                                try { if (evtSrc) evtSrc.close(); } catch (err) {}
+                                setTimeout(() => { reconnectDelay = Math.min(30000, reconnectDelay * 2); connect(); }, reconnectDelay);
+                            };
+                        } catch (e) {
+                            console.error('EventSource failed', e);
+                        }
+                    };
+                    connect();
                 };
                 break;
             case 'organise':

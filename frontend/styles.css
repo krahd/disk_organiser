@@ -37,3 +37,32 @@ main {
     padding: 2rem;
     min-height: 300px;
 }
+
+/* Progress bar for background scans */
+.progress {
+    width: 100%;
+    max-width: 700px;
+    height: 12px;
+    background: #eee;
+    border-radius: 6px;
+    overflow: hidden;
+}
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg,#4caf50,#8bc34a);
+    transition: width 300ms ease;
+}
+.progress-bar.indeterminate {
+    background: linear-gradient(90deg, rgba(76,175,80,0.2) 0%, rgba(139,195,74,0.6) 50%, rgba(76,175,80,0.2) 100%);
+    animation: indeterminate 1.2s linear infinite;
+}
+@keyframes indeterminate {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+.progress-text {
+    margin-top: 6px;
+    font-size: 0.95rem;
+    color: #333;
+}
