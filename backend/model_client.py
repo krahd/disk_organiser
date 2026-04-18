@@ -18,20 +18,54 @@ if TYPE_CHECKING:  # pragma: no cover - static typing only
 
 import importlib
 import importlib.util
+import logging
+from types import ModuleType
 
 
-def _load_model_wrapper():
+logger = logging.getLogger(__name__)
+
+
+def _import_by_name(module_name: str) -> ModuleType | None:
     try:
-        spec = importlib.util.find_spec("model_wrapper")
+        spec = importlib.util.find_spec(module_name)
         if spec is None:
             return None
-        return importlib.import_module("model_wrapper")
-    except Exception:
+        return importlib.import_module(module_name)
+    except Exception as e:
+        logger.debug("Failed to import %s: %s", module_name, e)
         return None
 
 
-model_wrapper = _load_model_wrapper()
-_HAS_EXTERNAL = model_wrapper is not None
+def _load_provider(provider_name: str | None = None) -> ModuleType | None:
+    """Load a provider module by name.
+
+    Resolution order:
+      - If `provider_name` is supplied: try importing it directly.
+      - Try `backend.model_wrappers.<provider_name>`.
+      - If no provider_name: try top-level `model_wrapper`.
+    Returns the module or None.
+    """
+    name = provider_name or os.getenv('MODEL_PROVIDER')
+    if name:
+        # try direct import
+        mod = _import_by_name(name)
+        if mod:
+            return mod
+        # try backend model_wrappers package
+        mod = _import_by_name(f"backend.model_wrappers.{name}")
+        if mod:
+            return mod
+        # try a model_wrappers top-level package
+        mod = _import_by_name(f"model_wrappers.{name}")
+        if mod:
+            return mod
+        return None
+
+    # default: try a top-level `model_wrapper` module
+    return _import_by_name("model_wrapper")
+
+
+_HAS_EXTERNAL = _load_provider() is not None
 
 
 class ModelClient:
@@ -42,8 +76,23 @@ class ModelClient:
       [{"keep": <path>, "moves": [{"from": <path>, "to": <path>}, ...]}, ...]
     """
 
-    def __init__(self) -> None:
-        self._external = model_wrapper if _HAS_EXTERNAL else None
+    def __init__(self, provider_name: str | None = None) -> None:
+        """Create a ModelClient and load the initial provider.
+
+        `provider_name` may be a module name (e.g. `ci_dummy`) or None to use
+        the default provider resolution (env var or top-level `model_wrapper`).
+        """
+        self.provider_name = provider_name or os.getenv('MODEL_PROVIDER')
+        self._external = _load_provider(self.provider_name)
+
+    def reload(self, provider_name: str | None = None) -> bool:
+        """Reload and switch to a new provider. Returns True if a provider
+        module was successfully loaded.
+        """
+        self.provider_name = provider_name or os.getenv('MODEL_PROVIDER')
+        self._external = _load_provider(self.provider_name)
+        return self._external is not None
+
 
     def suggest_organise(self, duplicates: List[Dict]) -> List[Dict]:
         """Return organise suggestions for given duplicate groups.
@@ -54,9 +103,12 @@ class ModelClient:
         """
         if self._external is not None:
             try:
-                return self._external.suggest_organise(duplicates)
-            except Exception:
-                # If external model fails, fall back to heuristic below.
+                fn = getattr(self._external, 'suggest_organise', None)
+                if callable(fn):
+                    return fn(duplicates)
+            except Exception as e:
+                logger.debug('External provider failed: %s', e)
+                # fall through to heuristic fallback
                 pass
 
         # Heuristic fallback (deterministic and safe)

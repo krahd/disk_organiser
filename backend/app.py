@@ -89,14 +89,30 @@ except (ImportError, FileNotFoundError):
 try:
     model_client_mod = _import_local_module('model_client', 'model_client.py')
     ModelClient = model_client_mod.ModelClient
-    model_client = ModelClient()
+    # instantiate with the configured model (if any)
+    try:
+        cfg = load_config()
+        model_client = ModelClient(provider_name=cfg.get('model'))
+    except Exception:
+        model_client = ModelClient()
 except Exception:
     try:
         from backend.model_client import ModelClient  # type: ignore
 
-        model_client = ModelClient()
+        try:
+            cfg = load_config()
+            model_client = ModelClient(provider_name=cfg.get('model'))
+        except Exception:
+            model_client = ModelClient()
     except Exception:
         model_client = None
+# Ensure model_client reflects current saved config if available
+try:
+    if model_client is not None and hasattr(model_client, 'reload'):
+        cfg = load_config()
+        model_client.reload(cfg.get('model'))
+except Exception:
+    pass
 
 app = Flask(__name__)
 CORS(app)
@@ -328,6 +344,13 @@ def api_model():
         if not model:
             return jsonify({"error": "missing model"}), 400
         save_config({"model": model})
+        # reload model client with the newly selected provider
+        try:
+            if model_client is not None and hasattr(model_client, 'reload'):
+                model_client.reload(model)
+        except Exception:
+            # don't fail the request if reload fails
+            pass
         return jsonify({"status": "Model updated", "model": model})
     return jsonify({"model": cfg.get('model', 'ollama')})
 
