@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p>Find duplicate files on your hard drive.</p>
                     <label>Path: <input id="dup-path" type="text" placeholder="/path/to/scan" style="width:60%"></label>
                     <label>Min size (bytes): <input id="dup-min" type="number" value="1"></label>
+                    <label>Max files to process: <input id="dup-max" type="number" placeholder="(optional)"></label>
                     <button id="dup-run">Run</button>
                     <label style="margin-left:1rem"><input id="use-ai-suggestions" type="checkbox"> Use AI suggestions</label>
                     <div id="dup-actions" style="margin-top:1rem"></div>
@@ -40,9 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('dup-run').onclick = async () => {
                     const path = document.getElementById('dup-path').value || undefined;
                     const min = parseInt(document.getElementById('dup-min').value || '1', 10);
+                    const maxFiles = parseInt(document.getElementById('dup-max').value || '', 10);
                     const body = {};
                     if (path) body.paths = [path];
                     body.min_size = min;
+                    if (!Number.isNaN(maxFiles)) body.max_files = maxFiles;
                     const res = await fetch('http://127.0.0.1:5000/api/duplicates', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
                     const j = await res.json();
                     const actions = document.getElementById('dup-actions');
@@ -198,23 +201,113 @@ document.addEventListener('DOMContentLoaded', () => {
                     const res = await fetch('http://127.0.0.1:5000/api/scan/start', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
                     const j = await res.json();
                     const prog = document.getElementById('vis-progress');
-                    prog.textContent = `Job ${j.job_id} started (backend: ${j.backend})`;
-                    // poll status
-                    const interval = setInterval(async () => {
-                        const s = await fetch(`http://127.0.0.1:5000/api/scan/status/${j.job_id}`);
-                        const sj = await s.json();
-                        if (sj.status === 'started') prog.textContent = `Job ${j.job_id} running...`;
-                        if (sj.status === 'finished' || sj.status === 'failed') {
-                            clearInterval(interval);
-                            prog.textContent = `Job ${j.job_id} ${sj.status}`;
-                            const out = document.getElementById('vis-result');
-                            out.innerHTML = `<pre>${JSON.stringify(sj.result || sj, null, 2)}</pre>`;
-                        }
-                    }, 1000);
+                    prog.innerHTML = `Job <strong>${j.job_id}</strong> started (backend: ${j.backend}) <button id="scan-cancel">Cancel</button>`;
+                    const cancelBtn = document.getElementById('scan-cancel');
+                    cancelBtn.onclick = async () => {
+                        await fetch('http://127.0.0.1:5000/api/scan/cancel', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({job_id: j.job_id})});
+                        showAlert('Cancel requested');
+                    };
+
+                    // connect SSE for live updates
+                    try {
+                        const evtSrc = new EventSource(`http://127.0.0.1:5000/api/scan/events/${j.job_id}`);
+                        const out = document.getElementById('vis-result');
+                        out.innerHTML = '';
+                        evtSrc.onmessage = (ev) => {
+                            try {
+                                const data = JSON.parse(ev.data || '{}');
+                                if (data.progress) {
+                                    prog.textContent = `Job ${j.job_id} ${data.status || ''} - ${JSON.stringify(data.progress)}`;
+                                } else if (data.status) {
+                                    prog.textContent = `Job ${j.job_id} ${data.status}`;
+                                }
+                                if (data.result) {
+                                    out.innerHTML = `<pre>${JSON.stringify(data.result, null, 2)}</pre>`;
+                                }
+                            } catch (e) {
+                                // ignore parse errors
+                            }
+                        };
+                        evtSrc.onerror = (e) => {
+                            // keep connection alive; report error
+                            console.error('SSE error', e);
+                        };
+                    } catch (e) {
+                        // fallback to polling if EventSource not available
+                        const interval = setInterval(async () => {
+                            const s = await fetch(`http://127.0.0.1:5000/api/scan/status/${j.job_id}`);
+                            const sj = await s.json();
+                            if (sj.status === 'started') prog.textContent = `Job ${j.job_id} running...`;
+                            if (sj.status === 'finished' || sj.status === 'failed' || sj.status === 'cancelled') {
+                                clearInterval(interval);
+                                prog.textContent = `Job ${j.job_id} ${sj.status}`;
+                                const out = document.getElementById('vis-result');
+                                out.innerHTML = `<pre>${JSON.stringify(sj.result || sj, null, 2)}</pre>`;
+                            }
+                        }, 1000);
+                    }
                 };
                 break;
             case 'organise':
-                main.innerHTML = `<h2>Organise</h2><p>Organise your files and folders with AI assistance.</p>`;
+                main.innerHTML = `
+                    <h2>Organise</h2>
+                    <p>Review created operations, view details, undo or remove backups.</p>
+                    <button id="ops-refresh">Refresh Ops</button>
+                    <div id="ops-list" style="margin-top:1rem"></div>
+                    <div id="ops-detail" style="margin-top:1rem"></div>
+                `;
+                async function loadOps() {
+                    const res = await fetch('http://127.0.0.1:5000/api/ops');
+                    const j = await res.json();
+                    const list = document.getElementById('ops-list');
+                    list.innerHTML = '';
+                    const ops = j.ops || {};
+                    for (const opId of Object.keys(ops)) {
+                        const op = ops[opId];
+                        const card = document.createElement('div');
+                        card.style.border = '1px solid #ddd';
+                        card.style.padding = '8px';
+                        card.style.marginBottom = '8px';
+                        const title = document.createElement('div');
+                        title.innerHTML = `<strong>Op:</strong> ${opId} — <em>${op.status}</em>`;
+                        card.appendChild(title);
+                        const meta = document.createElement('div');
+                        meta.textContent = JSON.stringify(op.metadata || {});
+                        card.appendChild(meta);
+                        const view = document.createElement('button');
+                        view.textContent = 'View Details';
+                        view.onclick = async () => {
+                            const dres = await fetch(`http://127.0.0.1:5000/api/op/${opId}`);
+                            const dj = await dres.json();
+                            const det = document.getElementById('ops-detail');
+                            det.innerHTML = `<pre>${JSON.stringify(dj.op, null, 2)}</pre>`;
+                        };
+                        card.appendChild(view);
+                        const undo = document.createElement('button');
+                        undo.textContent = 'Undo';
+                        undo.style.marginLeft = '8px';
+                        undo.onclick = async () => {
+                            const r = await fetch('http://127.0.0.1:5000/api/organise/undo', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: opId})});
+                            const jr = await r.json();
+                            showAlert(JSON.stringify(jr));
+                            loadOps();
+                        };
+                        card.appendChild(undo);
+                        const del = document.createElement('button');
+                        del.textContent = 'Delete Backup';
+                        del.style.marginLeft = '8px';
+                        del.onclick = async () => {
+                            const r = await fetch('http://127.0.0.1:5000/api/recycle/delete_op', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: opId})});
+                            const jd = await r.json();
+                            showAlert(JSON.stringify(jd));
+                            loadOps();
+                        };
+                        card.appendChild(del);
+                        list.appendChild(card);
+                    }
+                }
+                document.getElementById('ops-refresh').onclick = loadOps;
+                loadOps();
                 break;
             case 'recycle':
                 main.innerHTML = `
