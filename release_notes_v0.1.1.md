@@ -11,12 +11,9 @@
 
 ## Screenshots
 
-<!-- Attached assets -->
+![Visualisation screenshot](https://github.com/krahd/disk_organiser/releases/download/v0.1.1/screenshot-1.svg)
 
-- Screenshot: https://github.com/krahd/disk_organiser/releases/download/v0.1.1/screenshot-1.svg
-- Screenshot: https://github.com/krahd/disk_organiser/releases/download/v0.1.1/screenshot-2.svg
-
-You can embed these directly in Markdown with `![screenshot](URL)` if desired.
+![Duplicates screenshot](https://github.com/krahd/disk_organiser/releases/download/v0.1.1/screenshot-2.svg)
 
 ## Full changes
 
