@@ -1,9 +1,12 @@
 """Background job helpers for scanning files for duplicates."""
 
-import os
+# pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals,
+# pylint: disable=broad-exception-caught,import-outside-toplevel
+
 import json
-import uuid
+import os
 import time
+import uuid
 from typing import List
 
 try:
@@ -14,7 +17,7 @@ except ImportError:
     from utils import find_duplicates
 
 BASE = os.path.dirname(__file__)
-JOBS_DIR = os.path.join(BASE, 'scan_jobs')
+JOBS_DIR = os.path.join(BASE, "scan_jobs")
 os.makedirs(JOBS_DIR, exist_ok=True)
 
 
@@ -33,6 +36,7 @@ def background_scan(
     max_files: int | None = None,
     job_id: str | None = None,
     max_workers: int | None = None,
+    dry_run: bool = False,
 ):
     """Run a background duplicate scan and persist job status to disk.
 
@@ -42,31 +46,43 @@ def background_scan(
     job_id = job_id or uuid.uuid4().hex
     job_file = _job_path(job_id)
     job = {
-        'id': job_id,
-        'status': 'started',
-        'created_at': time.time(),
-        'result': None,
-        'progress': {},
+        "id": job_id,
+        "status": "started",
+        "created_at": time.time(),
+        "result": None,
+        "progress": {},
     }
-    with open(job_file, 'w', encoding='utf-8') as f:
-        json.dump(job, f)
+    # write initial job file unless dry_run is requested
+    if not dry_run:
+        try:
+            with open(job_file, "w", encoding="utf-8") as f:
+                json.dump(job, f)
+        except Exception:
+            pass
 
     cancel_file = _cancel_path(job_id)
 
     def _write_status(updated: dict):
+        # In dry_run mode avoid writing files to disk; otherwise persist
+        # status to the job file so external clients can follow progress.
+        if dry_run:
+            # keep job dict in-memory only
+            nonlocal job
+            job = updated
+            return
         try:
-            with open(job_file, 'w', encoding='utf-8') as _f:
+            with open(job_file, "w", encoding="utf-8") as _f:
                 json.dump(updated, _f, default=str)
         except Exception:
             pass
 
     def progress_cb(data: dict):
         # update progress and persist
-        job['progress'] = data
+        job["progress"] = data
         _write_status(job)
         # check cancellation file for thread-based jobs
-        if os.path.exists(cancel_file):
-            raise RuntimeError('cancelled')
+        if not dry_run and os.path.exists(cancel_file):
+            raise RuntimeError("cancelled")
 
     try:
         result = find_duplicates(
@@ -76,20 +92,22 @@ def background_scan(
             progress_callback=progress_cb,
             max_workers=max_workers,
         )
-        job['status'] = 'finished'
-        job['finished_at'] = time.time()
-        job['result'] = result
+        job["status"] = "finished"
+        job["finished_at"] = time.time()
+        job["result"] = result
     except RuntimeError as e:
         # cancellation requested
-        job['status'] = 'cancelled'
-        job['error'] = str(e)
+        job["status"] = "cancelled"
+        job["error"] = str(e)
     except Exception as e:  # pylint: disable=broad-exception-caught
-        job['status'] = 'failed'
-        job['error'] = str(e)
-    _write_status(job)
+        job["status"] = "failed"
+        job["error"] = str(e)
+    # Only write status if not in dry_run mode
+    if not dry_run:
+        _write_status(job)
     # cleanup cancel file if present
     try:
-        if os.path.exists(cancel_file):
+        if not dry_run and os.path.exists(cancel_file):
             os.remove(cancel_file)
     except Exception:
         pass
@@ -109,25 +127,30 @@ def rebuild_index_job(
     """
     job_id = job_id or uuid.uuid4().hex
     job_file = _job_path(job_id)
-    job = {'id': job_id, 'status': 'started', 'created_at': time.time(), 'result': None,
-           'progress': {}}
-    with open(job_file, 'w', encoding='utf-8') as f:
+    job = {
+        "id": job_id,
+        "status": "started",
+        "created_at": time.time(),
+        "result": None,
+        "progress": {},
+    }
+    with open(job_file, "w", encoding="utf-8") as f:
         json.dump(job, f)
 
     cancel_file = _cancel_path(job_id)
 
     def _write_status(updated: dict):
         try:
-            with open(job_file, 'w', encoding='utf-8') as _f:
+            with open(job_file, "w", encoding="utf-8") as _f:
                 json.dump(updated, _f, default=str)
         except Exception:
             pass
 
     def progress_cb(data: dict):
-        job['progress'] = data
+        job["progress"] = data
         _write_status(job)
         if os.path.exists(cancel_file):
-            raise RuntimeError('cancelled')
+            raise RuntimeError("cancelled")
 
     try:
         # import scan_index locally to keep function resilient
@@ -136,23 +159,29 @@ def rebuild_index_job(
         except Exception:
             # fallback to local import
             import importlib.util
+
             base = os.path.dirname(__file__)
             spec = importlib.util.spec_from_file_location(
-                'scan_index', os.path.join(base, 'scan_index.py'))
+                "scan_index", os.path.join(base, "scan_index.py")
+            )
             scan_index_mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(scan_index_mod)  # type: ignore
 
         result = scan_index_mod.rebuild_index(
-            paths, min_size=min_size, sample_size=sample_size, progress_callback=progress_cb)
-        job['status'] = 'finished'
-        job['finished_at'] = time.time()
-        job['result'] = result
+            paths,
+            min_size=min_size,
+            sample_size=sample_size,
+            progress_callback=progress_cb,
+        )
+        job["status"] = "finished"
+        job["finished_at"] = time.time()
+        job["result"] = result
     except RuntimeError as e:
-        job['status'] = 'cancelled'
-        job['error'] = str(e)
+        job["status"] = "cancelled"
+        job["error"] = str(e)
     except Exception as e:  # pylint: disable=broad-exception-caught
-        job['status'] = 'failed'
-        job['error'] = str(e)
+        job["status"] = "failed"
+        job["error"] = str(e)
     _write_status(job)
     try:
         if os.path.exists(cancel_file):
@@ -166,9 +195,9 @@ def job_status(job_id: str):
     """Read job status from disk for given job id."""
     job_file = _job_path(job_id)
     if not os.path.exists(job_file):
-        return {'error': 'not found'}
+        return {"error": "not found"}
     try:
-        with open(job_file, 'r', encoding='utf-8') as f:
+        with open(job_file, "r", encoding="utf-8") as f:
             return json.load(f)
     except (OSError, json.JSONDecodeError):
-        return {'error': 'failed to read job file'}
+        return {"error": "failed to read job file"}

@@ -19,7 +19,7 @@ def generate_backup_name(backup_dir: str, src_path: str) -> str:
     This mirrors the behaviour in `op_store._relpath_to_backup` without
     importing private symbols.
     """
-    name = uuid.uuid4().hex + '_' + os.path.basename(src_path)
+    name = uuid.uuid4().hex + "_" + os.path.basename(src_path)
     return os.path.join(backup_dir, name)
 
 
@@ -43,57 +43,61 @@ def _missing_parent_dirs(path: str) -> List[str]:
     return out
 
 
-def preview_move_action(src: str, dst: str, op_backup_dir: Optional[str] = None) -> Dict:
+def preview_move_action(
+    src: str, dst: str, op_backup_dir: Optional[str] = None
+) -> Dict:
     """Produce a planned action dict for moving `src` to `dst`.
 
     Only performs safe read-only checks (existence, size) and does not
     modify disk.
     """
     action: Dict = {
-        'action': 'move',
-        'from': src,
-        'to': dst,
+        "action": "move",
+        "from": src,
+        "to": dst,
     }
     if not os.path.exists(src):
-        action['status'] = 'missing'
+        action["status"] = "missing"
         return action
 
     try:
         size = os.path.getsize(src) if os.path.isfile(src) else None
     except OSError:
         size = None
-    action['size'] = size
+    action["size"] = size
 
     dst_abs = os.path.abspath(dst)
     op_backup_dir_abs = os.path.abspath(op_backup_dir) if op_backup_dir else None
 
     if op_backup_dir_abs and dst_abs.startswith(op_backup_dir_abs):
         # moving into the operation's backup directory (treat as backup)
-        action['type'] = 'backup_move'
-        action['backup'] = dst
-        action['create_dirs'] = _missing_parent_dirs(dst)
-        action['status'] = 'planned'
+        action["type"] = "backup_move"
+        action["backup"] = dst
+        action["create_dirs"] = _missing_parent_dirs(dst)
+        action["status"] = "planned"
     else:
         # normal flow: would create a backup then move the file
-        action['type'] = 'move_with_backup'
+        action["type"] = "move_with_backup"
         if op_backup_dir_abs:
-            action['backup'] = generate_backup_name(op_backup_dir_abs, src)
+            action["backup"] = generate_backup_name(op_backup_dir_abs, src)
         else:
-            action['backup'] = None
-        action['create_dirs'] = _missing_parent_dirs(dst)
-        action['status'] = 'planned'
+            action["backup"] = None
+        action["create_dirs"] = _missing_parent_dirs(dst)
+        action["status"] = "planned"
 
     return action
 
 
-def preview_suggestions(suggestions: List[dict], op_backup_dir: Optional[str] = None) -> List[dict]:
+def preview_suggestions(
+    suggestions: List[dict], op_backup_dir: Optional[str] = None
+) -> List[dict]:
     """Return a flat list of planned actions for a given suggestions list."""
     actions: List[dict] = []
     for s in suggestions:
-        moves = s.get('moves', [])
+        moves = s.get("moves", [])
         for m in moves:
-            src = m.get('from')
-            dst = m.get('to')
+            src = m.get("from")
+            dst = m.get("to")
             actions.append(preview_move_action(src, dst, op_backup_dir))
     return actions
 
@@ -105,23 +109,23 @@ def summarize_actions(actions: List[dict]) -> Dict:
     create_dirs = set()
     missing = []
     for a in actions:
-        st = a.get('status')
-        if st == 'planned' or st == 'moved':
-            if a.get('size'):
+        st = a.get("status")
+        if st in ("planned", "moved"):
+            if a.get("size"):
                 try:
-                    total_bytes += int(a.get('size') or 0)
-                except Exception:
+                    total_bytes += int(a.get("size") or 0)
+                except (TypeError, ValueError):
                     pass
-            if st != 'missing':
+            if st != "missing":
                 total_files += 1
-        if a.get('create_dirs'):
-            for d in a.get('create_dirs'):
+        if a.get("create_dirs"):
+            for d in a.get("create_dirs"):
                 create_dirs.add(d)
-        if st == 'missing':
-            missing.append(a.get('from'))
+        if st == "missing":
+            missing.append(a.get("from"))
     return {
-        'files': total_files,
-        'total_bytes': total_bytes,
-        'create_dirs': sorted(create_dirs),
-        'missing': missing,
+        "files": total_files,
+        "total_bytes": total_bytes,
+        "create_dirs": sorted(create_dirs),
+        "missing": missing,
     }

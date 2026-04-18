@@ -116,9 +116,28 @@ document.addEventListener('DOMContentLoaded', () => {
                                     const pres = await fetch('/api/organise/preview', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({suggestions: currentSuggestions})});
                                     const pj = await pres.json();
                                     actions.innerHTML += `<div>Preview created: <strong>${pj.op.id}</strong></div>`;
-                                    // show execute/undo controls
+                                    // show preview / execute / undo controls
+                                    const previewBtn = document.createElement('button');
+                                    previewBtn.textContent = 'Preview';
+                                    previewBtn.style.marginLeft = '8px';
+                                    previewBtn.onclick = async () => {
+                                        previewBtn.disabled = true;
+                                        try {
+                                            const pr = await fetch('/api/organise/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: pj.op.id, dry_run: true})});
+                                            const pjres = await pr.json();
+                                            const preEl = document.createElement('pre');
+                                            preEl.textContent = JSON.stringify(pjres, null, 2);
+                                            actions.appendChild(preEl);
+                                        } catch (e) {
+                                            showAlert('Preview failed: ' + e.message);
+                                        } finally {
+                                            previewBtn.disabled = false;
+                                        }
+                                    };
+                                    actions.appendChild(previewBtn);
                                     const exec = document.createElement('button');
                                     exec.textContent = 'Execute';
+                                    exec.style.marginLeft = '8px';
                                     exec.onclick = async () => {
                                         exec.disabled = true;
                                         const er = await fetch('/api/organise/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: pj.op.id})});
@@ -154,8 +173,23 @@ document.addEventListener('DOMContentLoaded', () => {
                             const pres = await fetch('http://127.0.0.1:5000/api/organise/remove-preview', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({duplicates: j.duplicates})});
                             const pj = await pres.json();
                             actions.innerHTML = `<div>Recycle preview created: <strong>${pj.op.id}</strong></div>`;
+                            const previewBtn = document.createElement('button');
+                            previewBtn.textContent = 'Preview';
+                            previewBtn.style.marginLeft = '8px';
+                            previewBtn.onclick = async () => {
+                                previewBtn.disabled = true;
+                                try {
+                                    const pr = await fetch('/api/organise/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: pj.op.id, dry_run: true})});
+                                    const pjres = await pr.json();
+                                    actions.innerHTML += `<pre>${JSON.stringify(pjres, null, 2)}</pre>`;
+                                } catch (e) {
+                                    showAlert('Preview failed: ' + e.message);
+                                } finally { previewBtn.disabled = false; }
+                            };
+                            actions.appendChild(previewBtn);
                             const exec = document.createElement('button');
                             exec.textContent = 'Execute (move to recycle)';
+                            exec.style.marginLeft = '8px';
                             exec.onclick = async () => {
                                 const er = await fetch('http://127.0.0.1:5000/api/organise/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: pj.op.id})});
                                 const ej = await er.json();
@@ -399,7 +433,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             showAlert(JSON.stringify(jr));
                             loadOps();
                         };
+                        const previewUndo = document.createElement('button');
+                        previewUndo.textContent = 'Preview Undo';
+                        previewUndo.style.marginLeft = '8px';
+                        previewUndo.onclick = async () => {
+                            const r = await fetch('http://127.0.0.1:5000/api/organise/undo', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: opId, dry_run: true})});
+                            const jr = await r.json();
+                            const det = document.getElementById('ops-detail');
+                            det.innerHTML = `<pre>${JSON.stringify(jr, null, 2)}</pre>`;
+                        };
                         card.appendChild(undo);
+                        card.appendChild(previewUndo);
                         const del = document.createElement('button');
                         del.textContent = 'Delete Backup';
                         del.style.marginLeft = '8px';
@@ -409,6 +453,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             showAlert(JSON.stringify(jd));
                             loadOps();
                         };
+                        const previewDelete = document.createElement('button');
+                        previewDelete.textContent = 'Preview Delete';
+                        previewDelete.style.marginLeft = '8px';
+                        previewDelete.onclick = async () => {
+                            const r = await fetch('http://127.0.0.1:5000/api/recycle/delete_op', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: opId, dry_run: true})});
+                            const jd = await r.json();
+                            const det = document.getElementById('ops-detail');
+                            det.innerHTML = `<pre>${JSON.stringify(jd, null, 2)}</pre>`;
+                        };
+                        card.appendChild(previewDelete);
                         card.appendChild(del);
                         list.appendChild(card);
                     }
@@ -463,7 +517,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             showAlert(JSON.stringify(jr));
                             loadRecycle();
                         };
+                        const previewUndo = document.createElement('button');
+                        previewUndo.textContent = 'Preview Undo';
+                        previewUndo.style.marginLeft = '8px';
+                        previewUndo.onclick = async () => {
+                            const r = await fetch('http://127.0.0.1:5000/api/organise/undo', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: opId, dry_run: true})});
+                            const jr = await r.json();
+                            showAlert(JSON.stringify(jr));
+                            loadRecycle();
+                        };
                         card.appendChild(undo);
+                        card.appendChild(previewUndo);
                         const del = document.createElement('button');
                         del.textContent = 'Delete Backup (permanent)';
                         del.style.marginLeft = '8px';
@@ -473,6 +537,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             showAlert(JSON.stringify(jd));
                             loadRecycle();
                         };
+                        const previewDelete = document.createElement('button');
+                        previewDelete.textContent = 'Preview Delete';
+                        previewDelete.style.marginLeft = '8px';
+                        previewDelete.onclick = async () => {
+                            const r = await fetch('http://127.0.0.1:5000/api/recycle/delete_op', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: opId, dry_run: true})});
+                            const jd = await r.json();
+                            showAlert(JSON.stringify(jd));
+                            loadRecycle();
+                        };
+                        card.appendChild(previewDelete);
                         card.appendChild(del);
                         list.appendChild(card);
                     }
