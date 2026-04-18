@@ -1,0 +1,69 @@
+"""Background job helpers for scanning files for duplicates."""
+
+import os
+import json
+import uuid
+import time
+from typing import List
+
+try:
+    # try package import
+    from backend.utils import find_duplicates
+except ImportError:
+    # allow fallback to local import when running from repo root
+    from utils import find_duplicates
+
+BASE = os.path.dirname(__file__)
+JOBS_DIR = os.path.join(BASE, 'scan_jobs')
+os.makedirs(JOBS_DIR, exist_ok=True)
+
+
+def _job_path(job_id: str) -> str:
+    """Return the file path for a job id."""
+    return os.path.join(JOBS_DIR, f"{job_id}.json")
+
+
+def background_scan(
+    paths: List[str],
+    min_size: int = 1,
+    max_files: int | None = None,
+    job_id: str | None = None,
+):
+    """Run a background duplicate scan and persist job status to disk.
+
+    The function records job start/finish/failure to a job file. Callers
+    (or a web endpoint) can subsequently inspect progress.
+    """
+    job_id = job_id or uuid.uuid4().hex
+    job_file = _job_path(job_id)
+    job = {
+        'id': job_id,
+        'status': 'started',
+        'created_at': time.time(),
+        'result': None,
+    }
+    with open(job_file, 'w', encoding='utf-8') as f:
+        json.dump(job, f)
+    try:
+        result = find_duplicates(paths, min_size=min_size, max_files=max_files)
+        job['status'] = 'finished'
+        job['finished_at'] = time.time()
+        job['result'] = result
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        job['status'] = 'failed'
+        job['error'] = str(e)
+    with open(job_file, 'w', encoding='utf-8') as f:
+        json.dump(job, f, default=str)
+    return job
+
+
+def job_status(job_id: str):
+    """Read job status from disk for given job id."""
+    job_file = _job_path(job_id)
+    if not os.path.exists(job_file):
+        return {'error': 'not found'}
+    try:
+        with open(job_file, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {'error': 'failed to read job file'}

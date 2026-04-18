@@ -1,0 +1,9 @@
+# Disk Organiser Backend Requirements
+
+Flask
+flask-cors
+pytest
+redis
+rq
+gunicorn
+flake8

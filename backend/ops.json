@@ -1,0 +1,137 @@
+{
+  "f23270d7f4024b22a6210b0c90cd0340": {
+    "id": "f23270d7f4024b22a6210b0c90cd0340",
+    "suggestions": [
+      {
+        "keep": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-32/test_preview_execute_undo0/ops/b.txt",
+        "moves": [
+          {
+            "from": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-32/test_preview_execute_undo0/ops/a.txt",
+            "to": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-32/test_preview_execute_undo0/ops/Duplicates/a.txt"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "user": "anonymous"
+    },
+    "status": "reverted",
+    "created_at": 1776451405.669766,
+    "backup_dir": "/Users/tom/devel/ml-llm/llm/disk_organiser/backend/ops_backups/f23270d7f4024b22a6210b0c90cd0340",
+    "executed_actions": [
+      {
+        "from": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-32/test_preview_execute_undo0/ops/a.txt",
+        "to": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-32/test_preview_execute_undo0/ops/Duplicates/a.txt",
+        "backup": "/Users/tom/devel/ml-llm/llm/disk_organiser/backend/ops_backups/f23270d7f4024b22a6210b0c90cd0340/3797d551cb6b4e238269ee6a54742a3f_a.txt"
+      }
+    ]
+  },
+  "c54207bad6cd4fe9a6a44f7f122c0575": {
+    "id": "c54207bad6cd4fe9a6a44f7f122c0575",
+    "suggestions": [
+      {
+        "keep": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-33/test_preview_execute_undo0/ops/b.txt",
+        "moves": [
+          {
+            "from": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-33/test_preview_execute_undo0/ops/a.txt",
+            "to": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-33/test_preview_execute_undo0/ops/Duplicates/a.txt"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "user": "anonymous"
+    },
+    "status": "reverted",
+    "created_at": 1776452810.953884,
+    "backup_dir": "/Users/tom/devel/ml-llm/llm/disk_organiser/backend/ops_backups/c54207bad6cd4fe9a6a44f7f122c0575",
+    "executed_actions": [
+      {
+        "from": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-33/test_preview_execute_undo0/ops/a.txt",
+        "to": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-33/test_preview_execute_undo0/ops/Duplicates/a.txt",
+        "backup": "/Users/tom/devel/ml-llm/llm/disk_organiser/backend/ops_backups/c54207bad6cd4fe9a6a44f7f122c0575/acfff55151694b67b80890602e891051_a.txt"
+      }
+    ]
+  },
+  "941e63fa86ea4953b2cb3dda8678e52b": {
+    "id": "941e63fa86ea4953b2cb3dda8678e52b",
+    "suggestions": [
+      {
+        "keep": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-34/test_preview_execute_undo0/ops/b.txt",
+        "moves": [
+          {
+            "from": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-34/test_preview_execute_undo0/ops/a.txt",
+            "to": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-34/test_preview_execute_undo0/ops/Duplicates/a.txt"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "user": "anonymous"
+    },
+    "status": "reverted",
+    "created_at": 1776453278.442107,
+    "backup_dir": "/Users/tom/devel/ml-llm/llm/disk_organiser/backend/ops_backups/941e63fa86ea4953b2cb3dda8678e52b",
+    "executed_actions": [
+      {
+        "from": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-34/test_preview_execute_undo0/ops/a.txt",
+        "to": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-34/test_preview_execute_undo0/ops/Duplicates/a.txt",
+        "backup": "/Users/tom/devel/ml-llm/llm/disk_organiser/backend/ops_backups/941e63fa86ea4953b2cb3dda8678e52b/21dda9ecb2ee4e968725174c3cb6e19a_a.txt"
+      }
+    ]
+  },
+  "b979eaa046c44235af81c5209d02e63a": {
+    "id": "b979eaa046c44235af81c5209d02e63a",
+    "suggestions": [
+      {
+        "keep": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-35/test_preview_execute_undo0/ops/b.txt",
+        "moves": [
+          {
+            "from": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-35/test_preview_execute_undo0/ops/a.txt",
+            "to": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-35/test_preview_execute_undo0/ops/Duplicates/a.txt"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "user": "anonymous"
+    },
+    "status": "reverted",
+    "created_at": 1776454593.342038,
+    "backup_dir": "/Users/tom/devel/ml-llm/llm/disk_organiser/backend/ops_backups/b979eaa046c44235af81c5209d02e63a",
+    "executed_actions": [
+      {
+        "from": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-35/test_preview_execute_undo0/ops/a.txt",
+        "to": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-35/test_preview_execute_undo0/ops/Duplicates/a.txt",
+        "backup": "/Users/tom/devel/ml-llm/llm/disk_organiser/backend/ops_backups/b979eaa046c44235af81c5209d02e63a/6e39a1eaf854413186eeb5ca1e151ee7_a.txt"
+      }
+    ]
+  },
+  "454e292d251343f6a1da8bdde6b86a4e": {
+    "id": "454e292d251343f6a1da8bdde6b86a4e",
+    "suggestions": [
+      {
+        "keep": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-36/test_preview_execute_undo0/ops/b.txt",
+        "moves": [
+          {
+            "from": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-36/test_preview_execute_undo0/ops/a.txt",
+            "to": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-36/test_preview_execute_undo0/ops/Duplicates/a.txt"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "user": "anonymous"
+    },
+    "status": "reverted",
+    "created_at": 1776455752.567728,
+    "backup_dir": "/Users/tom/devel/ml-llm/llm/disk_organiser/backend/ops_backups/454e292d251343f6a1da8bdde6b86a4e",
+    "executed_actions": [
+      {
+        "from": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-36/test_preview_execute_undo0/ops/a.txt",
+        "to": "/private/var/folders/z_/872qmw6s5_d1qlyd3xdgsl5r0000gn/T/pytest-of-tom/pytest-36/test_preview_execute_undo0/ops/Duplicates/a.txt",
+        "backup": "/Users/tom/devel/ml-llm/llm/disk_organiser/backend/ops_backups/454e292d251343f6a1da8bdde6b86a4e/99a301b0874c42f4be303850fe2a292c_a.txt"
+      }
+    ]
+  }
+}
