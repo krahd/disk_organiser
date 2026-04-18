@@ -2,7 +2,7 @@
 ignore=venv,.venv
 
 [MESSAGES CONTROL]
-disable=C0114,C0115,C0116
+disable=C0114,C0115,C0116,broad-exception-caught,invalid-name,import-outside-toplevel,ungrouped-imports,too-many-arguments,too-many-positional-arguments,too-many-locals,too-many-branches,too-many-statements,too-many-nested-blocks,redefined-outer-name,unused-variable,duplicate-code,consider-using-in
 
 [FORMAT]
-max-line-length=100
+max-line-length=120

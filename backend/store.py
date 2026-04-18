@@ -17,9 +17,16 @@ def load_config():
         return {"model": "ollama", "preferences": {}}
 
 
-def save_config(data: dict):
-    """Save configuration to disk, merging with existing values."""
+def save_config(data: dict, dry_run: bool = False):
+    """Save configuration to disk, merging with existing values.
+
+    If `dry_run` is True, do not write the file; instead return the
+    merged configuration that would have been saved.
+    """
     existing = load_config()
     existing.update(data)
+    if dry_run:
+        return existing
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(existing, f, indent=2)
+    return existing
