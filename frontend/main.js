@@ -53,34 +53,97 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (j.count && j.count > 0) {
                         const btn = document.createElement('button');
                         btn.textContent = 'Create Preview';
+                        // editable suggestions UI container
+                        const editorContainer = document.createElement('div');
+                        editorContainer.style.marginTop = '8px';
+                        const editBtn = document.createElement('button');
+                        editBtn.textContent = 'Edit Suggestions';
+                        editBtn.style.marginLeft = '8px';
+                        let currentSuggestions = null;
+
+                        editBtn.onclick = () => {
+                            if (!currentSuggestions) return showAlert('No suggestions available to edit');
+                            // toggle editor
+                            if (editorContainer.innerHTML) {
+                                editorContainer.innerHTML = '';
+                                return;
+                            }
+                            const ta = document.createElement('textarea');
+                            ta.style.width = '100%';
+                            ta.style.height = '200px';
+                            ta.value = JSON.stringify(currentSuggestions, null, 2);
+                            const save = document.createElement('button');
+                            save.textContent = 'Save Suggestions';
+                            save.onclick = () => {
+                                try {
+                                    const parsed = JSON.parse(ta.value);
+                                    currentSuggestions = parsed;
+                                    editorContainer.innerHTML = '';
+                                    showAlert('Suggestions updated');
+                                } catch (e) {
+                                    showAlert('Invalid JSON: ' + e.message);
+                                }
+                            };
+                            const cancel = document.createElement('button');
+                            cancel.textContent = 'Cancel';
+                            cancel.style.marginLeft = '8px';
+                            cancel.onclick = () => { editorContainer.innerHTML = ''; };
+                            editorContainer.appendChild(ta);
+                            editorContainer.appendChild(save);
+                            editorContainer.appendChild(cancel);
+                        };
+
                         btn.onclick = async () => {
                             // choose endpoint: AI suggestions or heuristic
                             const useAI = document.getElementById('use-ai-suggestions') && document.getElementById('use-ai-suggestions').checked;
-                            const endpoint = useAI ? 'http://127.0.0.1:5000/api/organise/suggest' : 'http://127.0.0.1:5000/api/organise';
+                            const endpoint = useAI ? '/api/organise/suggest' : '/api/organise';
                             const sres = await fetch(endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({duplicates: j.duplicates})});
                             const sj = await sres.json();
-                            // create op preview
-                            const pres = await fetch('http://127.0.0.1:5000/api/organise/preview', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({suggestions: sj.suggestions})});
-                            const pj = await pres.json();
-                            actions.innerHTML = `<div>Preview created: <strong>${pj.op.id}</strong></div>`;
-                            const exec = document.createElement('button');
-                            exec.textContent = 'Execute';
-                            exec.onclick = async () => {
-                                const er = await fetch('http://127.0.0.1:5000/api/organise/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: pj.op.id})});
-                                const ej = await er.json();
-                                actions.innerHTML += `<pre>${JSON.stringify(ej, null, 2)}</pre>`;
-                                const undo = document.createElement('button');
-                                undo.textContent = 'Undo';
-                                undo.onclick = async () => {
-                                    const ur = await fetch('http://127.0.0.1:5000/api/organise/undo', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: pj.op.id})});
-                                    const uj = await ur.json();
-                                    actions.innerHTML += `<pre>${JSON.stringify(uj, null, 2)}</pre>`;
-                                };
-                                actions.appendChild(undo);
+                            currentSuggestions = sj.suggestions || [];
+                            // show a small preview and allow editing before creating op
+                            actions.innerHTML = `<div>Suggestions received (${currentSuggestions.length}) — you may edit before preview.</div>`;
+                            actions.appendChild(editBtn);
+                            actions.appendChild(editorContainer);
+                            const createOp = document.createElement('button');
+                            createOp.textContent = 'Create Preview (from suggestions)';
+                            createOp.style.marginLeft = '8px';
+                            createOp.onclick = async () => {
+                                createOp.disabled = true;
+                                try {
+                                    const pres = await fetch('/api/organise/preview', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({suggestions: currentSuggestions})});
+                                    const pj = await pres.json();
+                                    actions.innerHTML += `<div>Preview created: <strong>${pj.op.id}</strong></div>`;
+                                    // show execute/undo controls
+                                    const exec = document.createElement('button');
+                                    exec.textContent = 'Execute';
+                                    exec.onclick = async () => {
+                                        exec.disabled = true;
+                                        const er = await fetch('/api/organise/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: pj.op.id})});
+                                        const ej = await er.json();
+                                        actions.innerHTML += `<pre>${JSON.stringify(ej, null, 2)}</pre>`;
+                                        const undo = document.createElement('button');
+                                        undo.textContent = 'Undo';
+                                        undo.onclick = async () => {
+                                            undo.disabled = true;
+                                            const ur = await fetch('/api/organise/undo', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: pj.op.id})});
+                                            const uj = await ur.json();
+                                            actions.innerHTML += `<pre>${JSON.stringify(uj, null, 2)}</pre>`;
+                                            undo.disabled = false;
+                                        };
+                                        actions.appendChild(undo);
+                                        exec.disabled = false;
+                                    };
+                                    actions.appendChild(exec);
+                                } catch (e) {
+                                    showAlert('Preview creation failed: ' + e.message);
+                                } finally {
+                                    createOp.disabled = false;
+                                }
                             };
-                            actions.appendChild(exec);
+                            actions.appendChild(createOp);
                         };
                         actions.appendChild(btn);
+                        actions.appendChild(editBtn);
                         const recycleBtn = document.createElement('button');
                         recycleBtn.textContent = 'Move to Recycle Bin (safe)';
                         recycleBtn.style.marginLeft = '8px';

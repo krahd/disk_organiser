@@ -109,3 +109,71 @@ def cleanup_missing():
     conn.commit()
     conn.close()
     return removed
+
+
+def stats():
+    """Return basic statistics about the index."""
+    conn = _connect()
+    cur = conn.cursor()
+    cur.execute('SELECT COUNT(*) FROM files')
+    total = cur.fetchone()[0]
+    cur.execute('SELECT COUNT(*) FROM files WHERE full_hash IS NOT NULL')
+    full = cur.fetchone()[0]
+    cur.execute('SELECT COUNT(*) FROM files WHERE sample_hash IS NOT NULL')
+    sample = cur.fetchone()[0]
+    conn.close()
+    return {'total': total, 'with_full': full, 'with_sample': sample}
+
+
+def _local_sample_hash(path: str, sample_size: int = 4096) -> str:
+    import hashlib
+    size = os.path.getsize(path)
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        if size <= sample_size * 2:
+            for chunk in iter(lambda: f.read(8192), b''):
+                h.update(chunk)
+            return h.hexdigest()
+        first = f.read(sample_size)
+        h.update(first)
+        try:
+            f.seek(-sample_size, os.SEEK_END)
+            last = f.read(sample_size)
+            h.update(last)
+        except OSError:
+            f.seek(0)
+            for chunk in iter(lambda: f.read(8192), b''):
+                h.update(chunk)
+    return h.hexdigest()
+
+
+def rebuild_index(paths: list, min_size: int = 1, sample_size: int = 4096):
+    """Walk provided paths and (re)populate sample_hash entries in the index.
+
+    This operation is synchronous and may take time on large trees.
+    Returns a summary dict with counts and any errors encountered.
+    """
+    scanned = 0
+    upserted = 0
+    errors = []
+    for root in paths:
+        if not os.path.exists(root):
+            continue
+        for dirpath, _, filenames in os.walk(root):
+            for fn in filenames:
+                fp = os.path.join(dirpath, fn)
+                try:
+                    st = os.stat(fp)
+                    if st.st_size < min_size:
+                        continue
+                    sh = _local_sample_hash(fp, sample_size=sample_size)
+                    try:
+                        upsert_entry(fp, st.st_size, os.path.getmtime(fp), sample_hash=sh, full_hash=None)
+                        upserted += 1
+                    except Exception as e:
+                        errors.append(str(e))
+                    scanned += 1
+                except (OSError, PermissionError) as e:
+                    errors.append(str(e))
+                    continue
+    return {'scanned': scanned, 'upserted': upserted, 'errors': errors}

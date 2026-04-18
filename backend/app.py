@@ -64,6 +64,10 @@ try:
     cleanup_recycle = op_store_mod.cleanup_recycle
     list_backups = op_store_mod.list_backups
     delete_op = op_store_mod.delete_op
+    try:
+        scan_index_mod = _import_local_module('scan_index', 'scan_index.py')
+    except Exception:
+        scan_index_mod = None
 except (ImportError, FileNotFoundError):
     # final fallback: try package imports if available
     try:
@@ -83,6 +87,10 @@ except (ImportError, FileNotFoundError):
             list_backups,
             delete_op,
         )
+        try:
+            from backend import scan_index as scan_index_mod
+        except Exception:
+            scan_index_mod = None
     except ImportError:
         traceback.print_exc()
         raise
@@ -557,6 +565,33 @@ def api_recycle_delete_op():
             return jsonify({'deleted': op_id})
         return jsonify({'error': 'op not found'}), 404
     except (OSError, shutil.Error) as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/scan_index/stats', methods=['GET'])
+def api_scan_index_stats():
+    """Return basic scan-index statistics."""
+    if 'scan_index_mod' not in globals() or scan_index_mod is None:
+        return jsonify({'error': 'scan index not available'}), 404
+    try:
+        return jsonify(scan_index_mod.stats())
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/scan_index/rebuild', methods=['POST'])
+def api_scan_index_rebuild():
+    """Rebuild sample hashes for provided paths into the scan index."""
+    if 'scan_index_mod' not in globals() or scan_index_mod is None:
+        return jsonify({'error': 'scan index not available'}), 404
+    data = request.get_json(silent=True) or {}
+    paths = data.get('paths') or [os.getcwd()]
+    min_size = int(data.get('min_size', 1))
+    sample_size = int(data.get('sample_size', 4096))
+    try:
+        res = scan_index_mod.rebuild_index(paths, min_size=min_size, sample_size=sample_size)
+        return jsonify(res)
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 

@@ -15,13 +15,13 @@ Open `frontend/index.html` in a browser and use the UI. The frontend uses `http:
 
 Background jobs (optional):
 
- - Install Redis and run it locally or via docker-compose:
+- Install Redis and run it locally or via docker-compose:
 
 ```bash
 docker-compose up -d redis
 ```
 
- - Start a worker:
+- Start a worker:
 
 ```bash
 python backend/worker.py
@@ -32,4 +32,3 @@ Deployment with Docker:
 ```bash
 docker-compose up --build
 ```
-

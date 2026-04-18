@@ -11,6 +11,7 @@ collections while remaining deterministic.
 
 import os
 import hashlib
+import concurrent.futures
 from typing import List, Dict
 try:
     from backend import scan_index as scan_index_mod
@@ -130,17 +131,13 @@ def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, 
         sample_map = {}
         for fp in files:
             try:
-                # consult scan index to reuse cached full hash where possible
+                # consult scan index to reuse cached sample hash where possible
                 entry = None
                 if _SCAN_INDEX_AVAILABLE:
                     try:
                         entry = scan_index_mod.get_entry(fp)
                     except Exception:
                         entry = None
-                if entry and entry.get('size') == size and entry.get('mtime') == os.path.getmtime(fp) and entry.get('full_hash'):
-                    # directly use cached full hash
-                    full_map.setdefault(entry.get('full_hash'), []).append(fp)
-                    continue
 
                 # compute or reuse sample hash
                 sh = entry.get('sample_hash') if entry and entry.get('sample_hash') else _sample_hash(fp, sample_size=sample_size)
@@ -157,10 +154,11 @@ def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, 
         for sh, fpaths in sample_map.items():
             if len(fpaths) <= 1:
                 continue
+            # compute full hashes in parallel for performance
             full_map = {}
-            for fp in fpaths:
+            # helper to compute or reuse full hash for a single file
+            def _compute_full(fp):
                 try:
-                    # check index again before expensive full file hash
                     entry = None
                     if _SCAN_INDEX_AVAILABLE:
                         try:
@@ -168,22 +166,37 @@ def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, 
                         except Exception:
                             entry = None
                     if entry and entry.get('full_hash'):
-                        fh = entry.get('full_hash')
-                    else:
-                        fh = file_hash(fp)
-                        if _SCAN_INDEX_AVAILABLE:
-                            try:
-                                scan_index_mod.set_full_hash(fp, fh)
-                            except Exception:
-                                pass
-                    full_map.setdefault(fh, []).append(fp)
-                    if progress_callback:
+                        return fp, entry.get('full_hash'), None
+                    fh = file_hash(fp)
+                    if _SCAN_INDEX_AVAILABLE:
                         try:
-                            progress_callback({'status': 'hashing', 'file': fp})
+                            scan_index_mod.set_full_hash(fp, fh)
                         except Exception:
                             pass
-                except (OSError, PermissionError):
-                    continue
+                    return fp, fh, None
+                except Exception as e:
+                    return fp, None, str(e)
+
+            to_hash = list(fpaths)
+            total = len(to_hash)
+            hashed = 0
+            max_workers = min(32, (os.cpu_count() or 1) * 4, total)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as exe:
+                futures = {exe.submit(_compute_full, fp): fp for fp in to_hash}
+                for fut in concurrent.futures.as_completed(futures):
+                    fp = futures[fut]
+                    try:
+                        fp_ret, fh, err = fut.result()
+                    except Exception as e:
+                        fp_ret, fh, err = fp, None, str(e)
+                    hashed += 1
+                    if fh:
+                        full_map.setdefault(fh, []).append(fp_ret)
+                    if progress_callback:
+                        try:
+                            progress_callback({'status': 'hashing', 'file': fp_ret, 'processed': hashed, 'total': total})
+                        except Exception:
+                            pass
             for fh, fps in full_map.items():
                 if len(fps) > 1:
                     items = []

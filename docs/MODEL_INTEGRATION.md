@@ -152,6 +152,15 @@ Contact/next steps
 
 If you want, I can:
 
-- Add an example `model_wrapper` for Ollama or another provider.
+- Add an example `model_wrapper` for Ollama, Modelito, or another provider.
 - Update `frontend/main.js` to optionally call `/api/organise/suggest` when the user toggles AI suggestions.
 - Add a short CONTRIBUTING section about adding new providers.
+
+Modelito example
+-----------------
+
+An example provider wrapper for Modelito is included at `backend/model_wrappers/modelito.py`.
+You can configure it by setting the `MODELITO_URL` environment variable (or `MODELITO_SIMULATE=1` to use the local simulator),
+or by selecting it at runtime via the API: `POST /api/model` with body `{ "model": "modelito" }`.
+
+The wrapper is defensive and will fall back to a safe heuristic if the external endpoint or the `requests` library is unavailable.
