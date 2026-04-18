@@ -1,5 +1,5 @@
 {
-  "model": "test-model",
+  "model": "ci_dummy",
   "preferences": {
     "ui": "minimal"
   }
