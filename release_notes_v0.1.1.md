@@ -9,7 +9,16 @@
 - Repository cleanup: removed compiled Python artifacts and updated `.gitignore`.
 - Applied Prettier formatting to frontend and added dev scripts in `package.json`.
 
-## Changes
+## Screenshots
+
+<!-- Attached assets -->
+
+- Screenshot: https://github.com/krahd/disk_organiser/releases/download/v0.1.1/screenshot-1.svg
+- Screenshot: https://github.com/krahd/disk_organiser/releases/download/v0.1.1/screenshot-2.svg
+
+You can embed these directly in Markdown with `![screenshot](URL)` if desired.
+
+## Full changes
 
 - chore: format frontend with Prettier (commit 9013593)
 - Merge PR #2: resolved conflicts and merge into main (commit 20d279a)
@@ -18,10 +27,6 @@
 - Merge feature/safe-mode-visual-ci into main (commit 41c9a57)
 - feat(preview): modal UX, grouping, collapse, and tests (commit 7d8ad09)
 - Fix lint issues, run formatters, update lint config (commit 14e2a7c)
-
-## Assets
-
-- `release-v0.1.1.zip` — Source snapshot of this commit (created from `HEAD`).
 
 ## How to run
 
@@ -48,5 +53,11 @@ npm run format
 
 ## Notes
 
-See `CHANGELOG.md` for a concise summary of notable changes. Report issues at https://github.com/krahd/disk_organiser/issues.
+Assets attached to this release:
+
+- `release-v0.1.1.zip`
+- `screenshot-1.svg`
+- `screenshot-2.svg`
+
+Please report issues at https://github.com/krahd/disk_organiser/issues.
 
