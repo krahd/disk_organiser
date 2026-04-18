@@ -7,3 +7,6 @@ redis
 rq
 gunicorn
 flake8
+filelock
+xxhash
+send2trash

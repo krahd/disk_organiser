@@ -13,6 +13,7 @@ import shutil
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from flask import Response, stream_with_context
 
 # Optional Redis/RQ imports (may not be installed in development environments)
 try:
@@ -55,6 +56,7 @@ try:
     create_op = op_store_mod.create_op
     get_op = op_store_mod.get_op
     update_op = op_store_mod.update_op
+    list_ops = op_store_mod.list_ops
     backup_file = op_store_mod.backup_file
     add_executed_action = op_store_mod.add_executed_action
     undo_op = op_store_mod.undo_op
@@ -72,6 +74,7 @@ except (ImportError, FileNotFoundError):
             create_op,
             get_op,
             update_op,
+            list_ops,
             backup_file,
             add_executed_action,
             undo_op,
@@ -310,10 +313,19 @@ def api_organise_execute():
                 else:
                     # normal flow: create a backup copy then move file
                     b = backup_file(op_id, src)
-                    os.makedirs(os.path.dirname(dst), exist_ok=True)
-                    shutil.move(src, dst)
-                    executed.append({'from': src, 'to': dst, 'backup': b, 'status': 'moved'})
-                    add_executed_action(op_id, {'from': src, 'to': dst, 'backup': b})
+                    if not b:
+                        # backup failed — do not move the original to avoid data loss
+                        executed.append({'from': src, 'to': dst, 'backup': None,
+                                        'status': 'backup_failed'})
+                        continue
+                    try:
+                        os.makedirs(os.path.dirname(dst), exist_ok=True)
+                        shutil.move(src, dst)
+                        executed.append({'from': src, 'to': dst, 'backup': b, 'status': 'moved'})
+                        add_executed_action(op_id, {'from': src, 'to': dst, 'backup': b})
+                    except (OSError, shutil.Error) as e:
+                        executed.append(
+                            {'from': src, 'to': dst, 'status': 'error', 'error': str(e)})
             except (OSError, shutil.Error) as e:
                 executed.append({'from': src, 'to': dst, 'status': 'error', 'error': str(e)})
     set_op_status(op_id, 'executed')
@@ -414,12 +426,108 @@ def api_scan_status(job_id):
         return jsonify({"error": str(e)}), 500
 
 
+@app.route('/api/scan/events/<job_id>')
+def api_scan_events(job_id):
+    """SSE endpoint streaming JSON job updates for a given job id."""
+    job_file = os.path.join(os.path.dirname(__file__), 'scan_jobs', f"{job_id}.json")
+
+    def event_stream():
+        last_mtime = 0
+        while True:
+            if not os.path.exists(job_file):
+                yield 'data: {}\n\n'
+                time.sleep(0.5)
+                continue
+            try:
+                mtime = os.path.getmtime(job_file)
+            except Exception:
+                mtime = last_mtime
+            if mtime > last_mtime:
+                try:
+                    with open(job_file, 'r', encoding='utf-8') as f:
+                        data = f.read()
+                    # send as SSE data
+                    yield f'data: {data}\n\n'
+                    last_mtime = mtime
+                except Exception:
+                    pass
+            time.sleep(0.5)
+
+    return Response(stream_with_context(event_stream()), mimetype='text/event-stream')
+
+
+@app.route('/api/scan/cancel', methods=['POST'])
+def api_scan_cancel():
+    """Request cancellation for a background scan job.
+
+    Tries to cancel RQ jobs if Redis is available; otherwise creates a
+    cancel file that threaded jobs check for.
+    POST JSON: {job_id: str}
+    """
+    data = request.get_json(silent=True) or {}
+    job_id = data.get('job_id')
+    if not job_id:
+        return jsonify({'error': 'missing job_id'}), 400
+    # best-effort: attempt to cancel RQ job
+    cancelled = False
+    if _REDIS_AVAILABLE:
+        try:
+            redis_conn = Redis()
+            from rq.job import Job
+
+            try:
+                job = Job.fetch(job_id, connection=redis_conn)
+                # try to delete job from queue; may not stop running job
+                job.delete()
+                cancelled = True
+            except Exception:
+                # if fetch/delete fails, continue to write cancel file
+                cancelled = False
+        except Exception:
+            cancelled = False
+
+    # write cancel file so thread fallback can detect
+    try:
+        cancel_path = os.path.join(os.path.dirname(__file__), 'scan_jobs', f"{job_id}.cancel")
+        with open(cancel_path, 'w', encoding='utf-8'):
+            pass
+        cancelled = True
+    except Exception:
+        pass
+
+    if cancelled:
+        return jsonify({'cancelled': job_id})
+    return jsonify({'error': 'failed to cancel'}), 500
+
+
 @app.route('/api/recycle/list', methods=['GET'])
 def api_recycle_list():
     """List recycle/backed-up files for review."""
     try:
         data = list_backups()
         return jsonify({'recycle': data})
+    except (OSError, ValueError) as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/ops', methods=['GET'])
+def api_list_ops():
+    """Return all stored operations."""
+    try:
+        ops = list_ops()
+        return jsonify({'ops': ops})
+    except (OSError, ValueError) as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/op/<op_id>', methods=['GET'])
+def api_get_op(op_id):
+    """Return a single operation by id."""
+    try:
+        op = get_op(op_id)
+        if not op:
+            return jsonify({'error': 'op not found'}), 404
+        return jsonify({'op': op})
     except (OSError, ValueError) as e:
         return jsonify({'error': str(e)}), 500
 

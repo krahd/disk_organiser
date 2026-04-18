@@ -23,6 +23,10 @@ def _job_path(job_id: str) -> str:
     return os.path.join(JOBS_DIR, f"{job_id}.json")
 
 
+def _cancel_path(job_id: str) -> str:
+    return os.path.join(JOBS_DIR, f"{job_id}.cancel")
+
+
 def background_scan(
     paths: List[str],
     min_size: int = 1,
@@ -41,19 +45,47 @@ def background_scan(
         'status': 'started',
         'created_at': time.time(),
         'result': None,
+        'progress': {},
     }
     with open(job_file, 'w', encoding='utf-8') as f:
         json.dump(job, f)
+
+    cancel_file = _cancel_path(job_id)
+
+    def _write_status(updated: dict):
+        try:
+            with open(job_file, 'w', encoding='utf-8') as _f:
+                json.dump(updated, _f, default=str)
+        except Exception:
+            pass
+
+    def progress_cb(data: dict):
+        # update progress and persist
+        job['progress'] = data
+        _write_status(job)
+        # check cancellation file for thread-based jobs
+        if os.path.exists(cancel_file):
+            raise RuntimeError('cancelled')
+
     try:
-        result = find_duplicates(paths, min_size=min_size, max_files=max_files)
+        result = find_duplicates(paths, min_size=min_size, max_files=max_files, progress_callback=progress_cb)
         job['status'] = 'finished'
         job['finished_at'] = time.time()
         job['result'] = result
+    except RuntimeError as e:
+        # cancellation requested
+        job['status'] = 'cancelled'
+        job['error'] = str(e)
     except Exception as e:  # pylint: disable=broad-exception-caught
         job['status'] = 'failed'
         job['error'] = str(e)
-    with open(job_file, 'w', encoding='utf-8') as f:
-        json.dump(job, f, default=str)
+    _write_status(job)
+    # cleanup cancel file if present
+    try:
+        if os.path.exists(cancel_file):
+            os.remove(cancel_file)
+    except Exception:
+        pass
     return job
 
 

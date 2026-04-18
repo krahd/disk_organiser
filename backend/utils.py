@@ -1,8 +1,29 @@
-"""Utilities for file hashing, duplicate detection and lightweight visualisation."""
+"""Utilities for file hashing, duplicate detection and lightweight visualisation.
+
+Implements a multi-stage duplicate finder:
+  1) Group files by size
+  2) Compute a small sample hash (first+last bytes) to filter
+  3) Compute a full content hash for remaining candidates
+
+This approach reduces the number of expensive full-file hashes on large
+collections while remaining deterministic.
+"""
 
 import os
 import hashlib
 from typing import List, Dict
+try:
+    from backend import scan_index as scan_index_mod
+    _SCAN_INDEX_AVAILABLE = True
+except Exception:
+    scan_index_mod = None
+    _SCAN_INDEX_AVAILABLE = False
+try:
+    import xxhash  # type: ignore
+    _XXHASH_AVAILABLE = True
+except Exception:
+    xxhash = None
+    _XXHASH_AVAILABLE = False
 
 
 def file_hash(path: str, chunk_size: int = 8192) -> str:
@@ -14,12 +35,69 @@ def file_hash(path: str, chunk_size: int = 8192) -> str:
     return h.hexdigest()
 
 
-def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None) -> List[Dict]:
-    """Scan given paths for duplicate files (by content hash).
+def _sample_hash(path: str, sample_size: int = 4096) -> str:
+    """Compute a small sample hash combining the first and last samples of the file.
 
-    Returns a list of groups where each group is a dict {hash, files:[{path,size}]}
+    If the file is smaller than 2 * sample_size, hash the full file instead.
     """
-    hashes = {}
+    size = os.path.getsize(path)
+    # prefer xxhash for sample hashing if available for speed
+    if _XXHASH_AVAILABLE:
+        h = xxhash.xxh64()
+        size = os.path.getsize(path)
+        with open(path, 'rb') as f:
+            if size <= sample_size * 2:
+                for chunk in iter(lambda: f.read(8192), b''):
+                    h.update(chunk)
+                return h.hexdigest()
+            first = f.read(sample_size)
+            h.update(first)
+            try:
+                f.seek(-sample_size, os.SEEK_END)
+                last = f.read(sample_size)
+                h.update(last)
+            except OSError:
+                f.seek(0)
+                for chunk in iter(lambda: f.read(8192), b''):
+                    h.update(chunk)
+        return h.hexdigest()
+
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        if size <= sample_size * 2:
+            # small file: hash full content
+            for chunk in iter(lambda: f.read(8192), b''):
+                h.update(chunk)
+            return h.hexdigest()
+        # read first sample
+        first = f.read(sample_size)
+        h.update(first)
+        # read last sample
+        try:
+            f.seek(-sample_size, os.SEEK_END)
+            last = f.read(sample_size)
+            h.update(last)
+        except OSError:
+            # fallback: read from current position
+            f.seek(0)
+            for chunk in iter(lambda: f.read(8192), b''):
+                h.update(chunk)
+    return h.hexdigest()
+
+
+def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, sample_size: int = 4096, progress_callback=None) -> List[Dict]:
+    """Multi-stage duplicate detection.
+
+    Parameters:
+      - paths: list of root paths to scan
+      - min_size: ignore files smaller than this
+      - max_files: optional limit on number of files to process
+      - sample_size: bytes to read from start/end for sample hash
+
+    Returns a list of groups: {'hash': <full_hash>, 'files': [{'path':..., 'size': ...}, ...]}
+    """
+    # 1) Walk and group by size
+    size_buckets = {}
     seen = 0
     for root in paths:
         if not os.path.exists(root):
@@ -33,15 +111,88 @@ def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None) 
                         continue
                     if max_files is not None and seen >= max_files:
                         break
-                    h = file_hash(fp)
-                    hashes.setdefault(h, []).append({"path": fp, "size": st.st_size})
+                    size_buckets.setdefault(st.st_size, []).append(fp)
                     seen += 1
+                    if progress_callback and seen % 100 == 0:
+                        try:
+                            progress_callback({'status': 'scanning', 'processed': seen})
+                        except Exception:
+                            pass
                 except (OSError, PermissionError):
                     continue
+
     result = []
-    for h, items in hashes.items():
-        if len(items) > 1:
-            result.append({"hash": h, "files": items})
+    # 2) For each size bucket, sample-hash and then full-hash where needed
+    for size, files in size_buckets.items():
+        if len(files) <= 1:
+            continue
+        # group by sample hash
+        sample_map = {}
+        for fp in files:
+            try:
+                # consult scan index to reuse cached full hash where possible
+                entry = None
+                if _SCAN_INDEX_AVAILABLE:
+                    try:
+                        entry = scan_index_mod.get_entry(fp)
+                    except Exception:
+                        entry = None
+                if entry and entry.get('size') == size and entry.get('mtime') == os.path.getmtime(fp) and entry.get('full_hash'):
+                    # directly use cached full hash
+                    full_map.setdefault(entry.get('full_hash'), []).append(fp)
+                    continue
+
+                # compute or reuse sample hash
+                sh = entry.get('sample_hash') if entry and entry.get('sample_hash') else _sample_hash(fp, sample_size=sample_size)
+                # persist sample hash to index
+                if _SCAN_INDEX_AVAILABLE:
+                    try:
+                        scan_index_mod.upsert_entry(fp, size, os.path.getmtime(fp), sample_hash=sh, full_hash=entry.get('full_hash') if entry else None)
+                    except Exception:
+                        pass
+                sample_map.setdefault(sh, []).append(fp)
+            except (OSError, PermissionError):
+                continue
+        # for each candidate sample group, compute full hash
+        for sh, fpaths in sample_map.items():
+            if len(fpaths) <= 1:
+                continue
+            full_map = {}
+            for fp in fpaths:
+                try:
+                    # check index again before expensive full file hash
+                    entry = None
+                    if _SCAN_INDEX_AVAILABLE:
+                        try:
+                            entry = scan_index_mod.get_entry(fp)
+                        except Exception:
+                            entry = None
+                    if entry and entry.get('full_hash'):
+                        fh = entry.get('full_hash')
+                    else:
+                        fh = file_hash(fp)
+                        if _SCAN_INDEX_AVAILABLE:
+                            try:
+                                scan_index_mod.set_full_hash(fp, fh)
+                            except Exception:
+                                pass
+                    full_map.setdefault(fh, []).append(fp)
+                    if progress_callback:
+                        try:
+                            progress_callback({'status': 'hashing', 'file': fp})
+                        except Exception:
+                            pass
+                except (OSError, PermissionError):
+                    continue
+            for fh, fps in full_map.items():
+                if len(fps) > 1:
+                    items = []
+                    for p in fps:
+                        try:
+                            items.append({'path': p, 'size': os.path.getsize(p)})
+                        except (OSError, PermissionError):
+                            continue
+                    result.append({'hash': fh, 'files': items})
     return result
 
 
