@@ -2,11 +2,16 @@
   "name": "disk_organiser_frontend_tests",
   "version": "0.1.0",
   "scripts": {
-    "test": "jest --config jest.config.js"
+    "test": "jest --config jest.config.js",
+    "test:visual": "npx playwright test",
+    "format": "prettier --write \"frontend/**/*.js\" \"frontend/**/*.css\" \"frontend/**/*.html\"",
+    "format:check": "prettier --check \"frontend/**/*.js\" \"frontend/**/*.css\" \"frontend/**/*.html\""
   },
   "devDependencies": {
     "jest": "29.6.1",
-    "jsdom": "22.1.0"
+    "jsdom": "22.1.0",
+    "prettier": "2.8.8",
+    "@playwright/test": "1.37.1"
   },
   "dependencies": {
     "jest-environment-jsdom": "^28.1.3"
