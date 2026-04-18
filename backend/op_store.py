@@ -25,6 +25,12 @@ try:
 except Exception:
     send2trash = None  # type: ignore
 
+# Optional: import fs_ops for generating consistent preview actions
+try:
+    from backend import fs_ops as fs_ops_mod
+except Exception:
+    fs_ops_mod = None
+
 
 def _ensure_dirs():
     os.makedirs(BACKUP_ROOT, exist_ok=True)
@@ -272,7 +278,7 @@ def backup_file(op_id: str, src_path: str, dry_run: bool = False) -> str | None:
         return None
 
 
-def undo_op(op_id: str) -> dict:
+def undo_op(op_id: str, dry_run: bool = False) -> dict:
     op = get_op(op_id)
     if not op:
         return {"error": "not found"}
@@ -284,6 +290,7 @@ def undo_op(op_id: str) -> dict:
     )
     rows = cur.fetchall()
     results = []
+    preview = []
     for (action_json,) in rows:
         try:
             a = json.loads(action_json)
@@ -292,6 +299,16 @@ def undo_op(op_id: str) -> dict:
             continue
         backup = a.get("backup")
         orig = a.get("from")
+        if dry_run:
+            # produce preview entries without moving files
+            if fs_ops_mod:
+                preview.append(
+                    fs_ops_mod.preview_move_action(backup, orig, op.get("backup_dir"))
+                )
+            else:
+                preview.append({"action": "restore", "from": backup,
+                               "to": orig, "status": "would_restore"})
+            continue
         try:
             if backup and os.path.exists(backup):
                 os.makedirs(os.path.dirname(orig), exist_ok=True)
@@ -302,17 +319,20 @@ def undo_op(op_id: str) -> dict:
         except (OSError, shutil.Error) as e:
             results.append({"error": str(e), "file": orig})
     conn.close()
+    if dry_run:
+        return {"op_id": op_id, "dry_run": True, "preview": preview}
     set_op_status(op_id, "reverted")
     return {"restored": results}
 
 
-def cleanup_recycle(retention_days: int = 30) -> dict:
+def cleanup_recycle(retention_days: int = 30, dry_run: bool = False) -> dict:
     now = time.time()
     cutoff = now - (retention_days * 24 * 3600)
     removed = 0
     scanned = 0
+    to_remove = []
     if not os.path.exists(BACKUP_ROOT):
-        return {"scanned": 0, "removed": 0}
+        return {"scanned": 0, "removed": 0} if not dry_run else {"scanned": 0, "would_remove": 0, "files": []}
     for opid in os.listdir(BACKUP_ROOT):
         opdir = os.path.join(BACKUP_ROOT, opid)
         if not os.path.isdir(opdir):
@@ -323,23 +343,35 @@ def cleanup_recycle(retention_days: int = 30) -> dict:
                 try:
                     scanned += 1
                     if os.path.getmtime(fp) < cutoff:
-                        os.remove(fp)
-                        removed += 1
+                        if dry_run:
+                            try:
+                                size = os.path.getsize(fp)
+                            except Exception:
+                                size = 0
+                            to_remove.append(
+                                {"path": fp, "size": size, "mtime": os.path.getmtime(fp)})
+                        else:
+                            os.remove(fp)
+                            removed += 1
                 except (OSError, PermissionError):
                     continue
         # attempt to remove empty dirs
         try:
-            for root, _, files in os.walk(opdir, topdown=False):
-                if not os.listdir(root):
-                    os.rmdir(root)
-            if not os.listdir(opdir):
-                os.rmdir(opdir)
+            if not dry_run:
+                for root, _, files in os.walk(opdir, topdown=False):
+                    if not os.listdir(root):
+                        os.rmdir(root)
+                if not os.listdir(opdir):
+                    os.rmdir(opdir)
         except (OSError, PermissionError):
             pass
+    if dry_run:
+        total_bytes = sum(int(f.get("size") or 0) for f in to_remove)
+        return {"scanned": scanned, "would_remove": len(to_remove), "total_bytes": total_bytes, "files": to_remove}
     return {"scanned": scanned, "removed": removed}
 
 
-def delete_op(op_id: str) -> bool:
+def delete_op(op_id: str, dry_run: bool = False):
     _init_db()
     conn = _connect()
     cur = conn.cursor()
@@ -347,13 +379,24 @@ def delete_op(op_id: str) -> bool:
     row = cur.fetchone()
     if not row:
         conn.close()
-        return False
+        return False if not dry_run else {"op_id": op_id, "dry_run": True, "files": []}
     bdir = row[0]
     cur.execute("DELETE FROM ops WHERE id=?", (op_id,))
     conn.commit()
     conn.close()
     try:
         if bdir and os.path.exists(bdir):
+            if dry_run:
+                files = []
+                for root, _, fns in os.walk(bdir):
+                    for fn in fns:
+                        fp = os.path.join(root, fn)
+                        try:
+                            files.append({"path": fp, "size": os.path.getsize(
+                                fp), "mtime": os.path.getmtime(fp)})
+                        except Exception:
+                            files.append({"path": fp})
+                return {"op_id": op_id, "dry_run": True, "files": files}
             # prefer os-native trash if available
             try:
                 if send2trash:
