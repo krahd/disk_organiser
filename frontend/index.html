@@ -6,29 +6,11 @@
     <title>Disk Organiser</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-        /* Minimal page layout additions for the project page */
-        .hero { padding: 24px; text-align: center; border-bottom: 1px solid #e6eef3; }
-        .tagline { color: #586069; margin-top: 8px; }
-        .btn { display: inline-block; margin: 8px 6px; padding: 8px 12px; background:#0366d6; color:#fff; text-decoration:none; border-radius:4px }
-        main { padding: 18px; max-width: 1100px; margin: 0 auto; }
-        .screenshots img { max-width: 48%; margin: 6px; border:1px solid #e1e4e8; border-radius:6px }
-        section { margin: 20px 0; }
-    </style>
 </head>
 <body>
     <header>
-        <div class="hero">
-            <h1>Disk Organiser</h1>
-            <p class="tagline">Visualise and safely organise files on your hard drive — previews, backups, and optional AI suggestions.</p>
-            <p>
-                <a href="https://github.com/krahd/disk_organiser" class="btn">Repository</a>
-                <a href="https://github.com/krahd/disk_organiser/releases/latest" class="btn">Download</a>
-                <a href="docs/USAGE.md" class="btn">Usage Docs</a>
-            </p>
-        </div>
+        <h1>Disk Organiser</h1>
     </header>
-
     <nav>
         <button id="nav-duplicates">Duplicate Search</button>
         <button id="nav-visualisation">Visualisation</button>
@@ -36,43 +18,10 @@
         <button id="nav-organise">Organise</button>
         <button id="nav-preferences">Preferences</button>
     </nav>
-
     <main id="main-content">
-        <section id="about">
-            <h2>About</h2>
-            <p>Disk Organiser is a small prototype to help users visualise, search and safely reorganise files on their filesystem. Operations create automatic backups so changes can be reviewed or undone.</p>
-        </section>
-
-        <section id="screenshots">
-            <h2>Screenshots</h2>
-            <div class="screenshots">
-                <img src="images/screenshot-1.svg" alt="Visualisation screenshot">
-                <img src="images/screenshot-2.svg" alt="Duplicates screenshot">
-            </div>
-        </section>
-
-        <section id="quickstart">
-            <h2>Quick start</h2>
-            <ol>
-                <li>Download the latest release from the <a href="https://github.com/krahd/disk_organiser/releases">releases page</a> or run from source.</li>
-                <li>Start the backend: <code>python backend/app.py</code></li>
-                <li>Open this file in a browser: <code>frontend/index.html</code> (the UI expects the API at <code>http://127.0.0.1:5000</code> by default).</li>
-            </ol>
-        </section>
-
-        <section id="links">
-            <h2>Links</h2>
-            <ul>
-                <li><a href="https://github.com/krahd/disk_organiser">Repository on GitHub</a></li>
-                <li><a href="https://github.com/krahd/disk_organiser/releases">Releases</a></li>
-                <li><a href="docs/USAGE.md">Usage documentation</a></li>
-            </ul>
-        </section>
-
+        <!-- Content will be loaded here -->
     </main>
-
     <script src="main.js"></script>
-
     <!-- Preview modal (hidden by default) -->
     <div id="preview-modal" class="modal hidden" aria-hidden="true">
         <div class="modal-backdrop" id="preview-modal-backdrop"></div>
@@ -85,6 +34,5 @@
             <div class="modal-footer" id="preview-modal-footer"></div>
         </div>
     </div>
-
 </body>
 </html>
