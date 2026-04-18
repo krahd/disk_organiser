@@ -11,6 +11,8 @@ local filesystem. It provides:
 This repository contains the backend API under `backend/` and the frontend in
 `frontend/`.
 
+Website: https://krahd.github.io/disk_organiser/
+
 ## Quick start (macOS / Linux)
 
 Create a virtual environment, install dependencies and run the API:
