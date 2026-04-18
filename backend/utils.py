@@ -86,7 +86,7 @@ def _sample_hash(path: str, sample_size: int = 4096) -> str:
     return h.hexdigest()
 
 
-def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, sample_size: int = 4096, progress_callback=None) -> List[Dict]:
+def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, sample_size: int = 4096, progress_callback=None, max_workers: int | None = None) -> List[Dict]:
     """Multi-stage duplicate detection.
 
     Parameters:
@@ -180,8 +180,12 @@ def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, 
             to_hash = list(fpaths)
             total = len(to_hash)
             hashed = 0
-            max_workers = min(32, (os.cpu_count() or 1) * 4, total)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as exe:
+            # respect explicit max_workers if provided, otherwise fallback to heuristic
+            if max_workers is None:
+                computed_workers = min(32, (os.cpu_count() or 1) * 4, total)
+            else:
+                computed_workers = max(1, min(int(max_workers), total))
+            with concurrent.futures.ThreadPoolExecutor(max_workers=computed_workers) as exe:
                 futures = {exe.submit(_compute_full, fp): fp for fp in to_hash}
                 for fut in concurrent.futures.as_completed(futures):
                     fp = futures[fut]

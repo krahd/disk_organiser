@@ -111,6 +111,42 @@ def cleanup_missing():
     return removed
 
 
+def prune(retention_days: int | None = None, max_entries: int | None = None):
+    """Prune index entries by age (last_seen) and/or reduce total entries.
+
+    Returns a summary dict with counts of removed rows.
+    """
+    conn = _connect()
+    cur = conn.cursor()
+    removed_by_age = 0
+    removed_by_max = 0
+    try:
+        now = time.time()
+        if retention_days is not None:
+            threshold = now - float(retention_days) * 86400.0
+            # count entries to remove
+            cur.execute('SELECT COUNT(*) FROM files WHERE last_seen IS NOT NULL AND last_seen < ?', (threshold,))
+            removed_by_age = cur.fetchone()[0]
+            cur.execute('DELETE FROM files WHERE last_seen IS NOT NULL AND last_seen < ?', (threshold,))
+
+        if max_entries is not None:
+            cur.execute('SELECT COUNT(*) FROM files')
+            total = cur.fetchone()[0]
+            if total > int(max_entries):
+                to_remove = total - int(max_entries)
+                cur.execute('SELECT path FROM files ORDER BY last_seen ASC NULLS FIRST LIMIT ?', (to_remove,))
+                rows = cur.fetchall()
+                paths = [r[0] for r in rows]
+                for p in paths:
+                    cur.execute('DELETE FROM files WHERE path=?', (p,))
+                removed_by_max = len(paths)
+
+        conn.commit()
+    finally:
+        conn.close()
+    return {'removed_by_age': removed_by_age, 'removed_by_max': removed_by_max, 'total_removed': removed_by_age + removed_by_max}
+
+
 def stats():
     """Return basic statistics about the index."""
     conn = _connect()

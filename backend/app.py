@@ -150,11 +150,16 @@ def api_find_duplicates():
         paths = [os.getcwd()]
     min_size = int(data.get('min_size', 1))
     max_files = data.get('max_files')
+    max_workers = data.get('max_workers')
     try:
         max_files = int(max_files) if max_files is not None else None
     except (TypeError, ValueError):
         max_files = None
-    duplicates = find_duplicates(paths, min_size=min_size, max_files=max_files)
+    try:
+        max_workers = int(max_workers) if max_workers is not None else None
+    except (TypeError, ValueError):
+        max_workers = None
+    duplicates = find_duplicates(paths, min_size=min_size, max_files=max_files, max_workers=max_workers)
     return jsonify({"duplicates": duplicates, "count": len(duplicates)})
 
 
@@ -400,17 +405,23 @@ def api_scan_start():
     paths = data.get('paths') or [os.getcwd()]
     min_size = int(data.get('min_size', 1))
     max_files = data.get('max_files')
+    max_workers = data.get('max_workers')
     try:
         max_files = int(max_files) if max_files is not None else None
     except (TypeError, ValueError):
         max_files = None
+    try:
+        max_workers = int(max_workers) if max_workers is not None else None
+    except (TypeError, ValueError):
+        max_workers = None
 
     # attempt to use RQ/Redis if available, otherwise fallback to thread
     if _REDIS_AVAILABLE:
         try:
             redis_conn = Redis()
             q = Queue(connection=redis_conn)
-            job = q.enqueue(background_scan, paths, min_size, max_files)
+            # enqueue positional args: paths, min_size, max_files, job_id(None), max_workers
+            job = q.enqueue(background_scan, paths, min_size, max_files, None, max_workers)
             return jsonify({"job_id": job.get_id(), "backend": "rq"})
         except Exception:  # pylint: disable=broad-exception-caught
             # fallthrough to threaded fallback
@@ -419,7 +430,7 @@ def api_scan_start():
     # fallback: spawn a thread and use tasks.background_scan to write job file
     job_id = uuid.uuid4().hex
     thread = threading.Thread(target=background_scan, args=(
-        paths, min_size, max_files, job_id), daemon=True)
+        paths, min_size, max_files, job_id, max_workers), daemon=True)
     thread.start()
     return jsonify({"job_id": job_id, "backend": "thread"})
 
@@ -590,6 +601,31 @@ def api_scan_index_rebuild():
     sample_size = int(data.get('sample_size', 4096))
     try:
         res = scan_index_mod.rebuild_index(paths, min_size=min_size, sample_size=sample_size)
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/scan_index/prune', methods=['POST'])
+def api_scan_index_prune():
+    """Prune scan index entries by retention days and/or max entries."""
+    if 'scan_index_mod' not in globals() or scan_index_mod is None:
+        return jsonify({'error': 'scan index not available'}), 404
+    data = request.get_json(silent=True) or {}
+    retention_days = data.get('retention_days')
+    max_entries = data.get('max_entries')
+    try:
+        if retention_days is not None:
+            retention_days = int(retention_days)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'invalid retention_days'}), 400
+    try:
+        if max_entries is not None:
+            max_entries = int(max_entries)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'invalid max_entries'}), 400
+    try:
+        res = scan_index_mod.prune(retention_days=retention_days, max_entries=max_entries)
         return jsonify(res)
     except Exception as e:
         return jsonify({'error': str(e)}), 500

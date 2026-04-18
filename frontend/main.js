@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <label>Path: <input id="dup-path" type="text" placeholder="/path/to/scan" style="width:60%"></label>
                     <label>Min size (bytes): <input id="dup-min" type="number" value="1"></label>
                     <label>Max files to process: <input id="dup-max" type="number" placeholder="(optional)"></label>
+                    <label>Workers: <input id="dup-workers" type="number" placeholder="(optional)"></label>
                     <button id="dup-run">Run</button>
                     <label style="margin-left:1rem"><input id="use-ai-suggestions" type="checkbox"> Use AI suggestions</label>
                     <div id="dup-actions" style="margin-top:1rem"></div>
@@ -42,10 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const path = document.getElementById('dup-path').value || undefined;
                     const min = parseInt(document.getElementById('dup-min').value || '1', 10);
                     const maxFiles = parseInt(document.getElementById('dup-max').value || '', 10);
+                    const maxWorkers = parseInt(document.getElementById('dup-workers').value || '', 10);
                     const body = {};
                     if (path) body.paths = [path];
                     body.min_size = min;
                     if (!Number.isNaN(maxFiles)) body.max_files = maxFiles;
+                    if (!Number.isNaN(maxWorkers)) body.max_workers = maxWorkers;
                     const res = await fetch('http://127.0.0.1:5000/api/duplicates', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
                     const j = await res.json();
                     const actions = document.getElementById('dup-actions');
@@ -197,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p>Visualise your hard drive structure and usage.</p>
                     <label>Path: <input id="vis-path" type="text" placeholder="/path/to/scan" style="width:60%"></label>
                     <label>Depth: <input id="vis-depth" type="number" value="2"></label>
+                    <label>Workers: <input id="vis-workers" type="number" placeholder="(optional)"></label>
                     <button id="vis-run">Run</button>
                     <button id="vis-bg">Run Background Scan</button>
                     <div id="vis-progress" style="margin-top:0.5rem"></div>
@@ -260,7 +264,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 document.getElementById('vis-bg').onclick = async () => {
                     const path = document.getElementById('vis-path').value || undefined;
+                    const maxWorkers = parseInt(document.getElementById('vis-workers') ? document.getElementById('vis-workers').value : '', 10);
                     const body = {paths: path ? [path] : undefined};
+                    if (!Number.isNaN(maxWorkers)) body.max_workers = maxWorkers;
                     const res = await fetch('/api/scan/start', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
                     const j = await res.json();
                     const jobId = j.job_id;
@@ -481,6 +487,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button id="pref-save">Save</button>
                     <pre id="pref-result"></pre>
                 `;
+                // Scan index admin UI
+                const prefExtra = document.createElement('div');
+                prefExtra.innerHTML = `
+                    <h3>Scan Index</h3>
+                    <button id="index-stats">Get Index Stats</button>
+                    <button id="index-rebuild">Rebuild Index (sample hashes)</button>
+                    <div style="margin-top:6px">
+                      <label>Prune retention days: <input id="index-prune-days" type="number" value="365"></label>
+                      <label style="margin-left:8px">Max entries: <input id="index-prune-max" type="number" placeholder="(optional)"></label>
+                      <button id="index-prune">Prune Index</button>
+                    </div>
+                    <pre id="index-result" style="margin-top:8px"></pre>
+                `;
+                document.getElementById('pref-result').parentNode.appendChild(prefExtra);
+                document.getElementById('index-stats').onclick = async () => {
+                    const r = await fetch('/api/scan_index/stats');
+                    const j = await r.json();
+                    document.getElementById('index-result').textContent = JSON.stringify(j, null, 2);
+                };
+                document.getElementById('index-rebuild').onclick = async () => {
+                    if (!confirm('Rebuild sample-hashes for scan index? This may take time.')) return;
+                    const r = await fetch('/api/scan_index/rebuild', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({paths: [window.location.pathname || '/'], min_size:1})});
+                    const j = await r.json();
+                    document.getElementById('index-result').textContent = JSON.stringify(j, null, 2);
+                };
+                document.getElementById('index-prune').onclick = async () => {
+                    const days = parseInt(document.getElementById('index-prune-days').value || '365', 10);
+                    const maxEntries = parseInt(document.getElementById('index-prune-max').value || '', 10);
+                    const body = {retention_days: days};
+                    if (!Number.isNaN(maxEntries)) body.max_entries = maxEntries;
+                    const r = await fetch('/api/scan_index/prune', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+                    const j = await r.json();
+                    document.getElementById('index-result').textContent = JSON.stringify(j, null, 2);
+                };
                 document.getElementById('pref-save').onclick = async () => {
                     const model = document.getElementById('pref-model').value;
                     const body = {model};
