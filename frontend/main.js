@@ -703,6 +703,149 @@ document.addEventListener('DOMContentLoaded', () => {
                 main.innerHTML = `<h2>Welcome</h2><p>Select a workflow above to get started.</p>`;
         }
     }
+    // Modal helpers (formatting, open/close, grouping UX)
+    function formatBytes(n) {
+        if (typeof n !== 'number') return '' + n;
+        if (n === 0) return '0 B';
+        if (n < 1024) return n + ' B';
+        const units = ['KB','MB','GB','TB'];
+        let u = -1;
+        do { n = n / 1024; u++; } while (n >= 1024 && u < units.length-1);
+        return n.toFixed(2) + ' ' + units[u];
+    }
+
+    function openPreviewModal(preview) {
+        const modal = document.getElementById('preview-modal');
+        const body = document.getElementById('preview-modal-body');
+        const footer = document.getElementById('preview-modal-footer');
+        body.innerHTML = '';
+        footer.innerHTML = '';
+        const title = document.getElementById('preview-modal-title');
+        title.textContent = preview && preview.op && preview.op.id ? `Preview — ${preview.op.id}` : 'Preview';
+
+        // summary
+        const summary = document.createElement('div');
+        summary.className = 'small-muted';
+        const s = preview && (preview.summary || (preview.result && preview.result.summary)) ? (preview.summary || (preview.result && preview.result.summary)) : null;
+        if (s) summary.textContent = `Actions: ${s.actions || 0} — Files: ${s.files || 0} — Total: ${formatBytes(s.bytes || 0)}`;
+        body.appendChild(summary);
+
+        // actions
+        const acts = (preview && preview.actions) || (preview && preview.result && preview.result.actions) || [];
+
+        // group actions by explicit `group` if present, otherwise by action type
+        const groups = {};
+        const hasGroup = acts.some(a => a && (a.group !== undefined && a.group !== null));
+        acts.forEach(a => {
+            const key = hasGroup ? (a.group || 'default') : (a.action || a.type || 'other');
+            groups[key] = groups[key] || [];
+            groups[key].push(a);
+        });
+
+        function groupIconFor(name) {
+            const k = String(name || '').toLowerCase();
+            if (k.includes('move')) return '➡️';
+            if (k.includes('delete') || k.includes('remove') || k.includes('del')) return '🗑️';
+            if (k.includes('backup')) return '🗂️';
+            if (k.includes('create') || k.includes('dir') || k.includes('folder')) return '📁';
+            if (k.includes('copy')) return '📄';
+            return '🔧';
+        }
+
+        Object.keys(groups).forEach(groupName => {
+            const groupActs = groups[groupName] || [];
+            const details = document.createElement('details');
+            details.className = 'preview-group';
+            details.open = true;
+
+            const summaryHdr = document.createElement('summary');
+            summaryHdr.className = 'group-header';
+            const icon = document.createElement('span');
+            icon.className = 'group-icon';
+            icon.textContent = groupIconFor(groupName);
+            const hdrText = document.createElement('span');
+            const totalBytes = groupActs.reduce((acc, it) => acc + (it.size || it.bytes || 0), 0);
+            hdrText.textContent = ` ${groupName} — ${groupActs.length} items — ${formatBytes(totalBytes)}`;
+            summaryHdr.appendChild(icon);
+            summaryHdr.appendChild(hdrText);
+            details.appendChild(summaryHdr);
+
+            const table = document.createElement('table');
+            table.className = 'preview-actions';
+            const thead = document.createElement('thead');
+            thead.innerHTML = `<tr><th class="action-type">Type</th><th>Path</th><th>Target</th><th class="action-size">Size</th><th>Status</th></tr>`;
+            table.appendChild(thead);
+            const tbody = document.createElement('tbody');
+            groupActs.forEach(a => {
+                const tr = document.createElement('tr');
+                const typeTd = document.createElement('td'); typeTd.className = 'action-type'; typeTd.textContent = a.action || a.type || '';
+                const fromTd = document.createElement('td'); fromTd.className = 'action-path'; fromTd.textContent = a.src || a.path || a.from || '';
+                const toTd = document.createElement('td'); toTd.className = 'action-path'; toTd.textContent = a.dst || a.to || '';
+                const sizeTd = document.createElement('td'); sizeTd.className = 'action-size'; sizeTd.textContent = formatBytes(a.size || a.bytes || 0);
+                const statusTd = document.createElement('td');
+                const status = a.status || (a.ok ? 'ok' : (a.err ? 'error' : 'pending'));
+                const span = document.createElement('span');
+                span.className = 'status-preview ' + (status === 'ok' ? 'status-ok' : (status === 'warning' ? 'status-warn' : (status === 'error' || status === 'err' ? 'status-err' : '')));
+                span.textContent = status;
+                statusTd.appendChild(span);
+                tr.appendChild(typeTd);
+                tr.appendChild(fromTd);
+                tr.appendChild(toTd);
+                tr.appendChild(sizeTd);
+                tr.appendChild(statusTd);
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            details.appendChild(table);
+            body.appendChild(details);
+        });
+
+        // footer buttons
+        const close = document.createElement('button');
+        close.textContent = 'Close';
+        close.onclick = closePreviewModal;
+        footer.appendChild(close);
+
+        // optional execute button
+        const execute = document.createElement('button');
+        execute.textContent = 'Execute';
+        execute.onclick = async () => {
+            execute.disabled = true;
+            try {
+                const opId = preview && preview.op && preview.op.id;
+                if (!opId) throw new Error('Missing op id');
+                const r = await fetch('/api/organise/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({op_id: opId})});
+                const j = await r.json();
+                showAlert('Executed: ' + (j.status || 'ok'));
+                closePreviewModal();
+            } catch (e) {
+                showAlert('Execute failed: ' + e.message);
+            } finally { execute.disabled = false; }
+        };
+        footer.appendChild(execute);
+
+        // show modal
+        modal.classList.remove('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closePreviewModal() {
+        const modal = document.getElementById('preview-modal');
+        modal.classList.add('hidden');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    // bind modal close via backdrop or close button
+    document.addEventListener('click', (ev) => {
+        const modal = document.getElementById('preview-modal');
+        if (!modal || modal.classList.contains('hidden')) return;
+        const closeBtn = document.getElementById('preview-modal-close');
+        if (ev.target === document.getElementById('preview-modal-backdrop') || ev.target === closeBtn) closePreviewModal();
+    });
+
+    // expose modal helpers on window for tests
+    try { window.openPreviewModal = openPreviewModal; window.closePreviewModal = closePreviewModal; window.formatBytes = formatBytes; } catch (e) {}
+
     document.getElementById('nav-duplicates').onclick = () => loadContent('duplicates');
     document.getElementById('nav-visualisation').onclick = () => loadContent('visualisation');
     document.getElementById('nav-recycle').onclick = () => loadContent('recycle');

@@ -90,3 +90,10 @@ main {
 .status-err { background:#ffebee; color:#c62828; }
 
 .small-muted { font-size:0.85rem; color:#666; }
+
+/* Group header styles for preview modal */
+.preview-group { margin-top: 8px; border: 1px solid #f3f3f3; border-radius: 6px; overflow: hidden; }
+.group-header { padding: 8px 10px; cursor: pointer; background: #fff; display:flex; align-items:center; gap:8px; font-weight:600; }
+.group-icon { display:inline-block; width:20px; text-align:center; }
+.preview-group details[open] .group-header { background: #fbfbfb; }
+
