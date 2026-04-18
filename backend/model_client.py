@@ -4,10 +4,18 @@ This module provides a thin wrapper around an external model integration library
 When the external library is unavailable, a safe heuristic fallback is used so
 the application remains functional for tests and local usage.
 """
+
+# pylint: disable=broad-exception-caught
+
+
 from __future__ import annotations
 
+import importlib
+import importlib.util
+import logging
 import os
-from typing import List, Dict, TYPE_CHECKING
+from types import ModuleType
+from typing import TYPE_CHECKING, Dict, List
 
 # Avoid a static `import model_wrapper` which will raise lint/errors in
 # environments where the optional integration isn't installed. Use
@@ -15,11 +23,6 @@ from typing import List, Dict, TYPE_CHECKING
 # TYPE_CHECKING import so type-checkers can still resolve the symbol.
 if TYPE_CHECKING:  # pragma: no cover - static typing only
     import model_wrapper  # type: ignore  # noqa: F401
-
-import importlib
-import importlib.util
-import logging
-from types import ModuleType
 
 
 logger = logging.getLogger(__name__)
@@ -45,7 +48,7 @@ def _load_provider(provider_name: str | None = None) -> ModuleType | None:
       - If no provider_name: try top-level `model_wrapper`.
     Returns the module or None.
     """
-    name = provider_name or os.getenv('MODEL_PROVIDER')
+    name = provider_name or os.getenv("MODEL_PROVIDER")
     if name:
         # try direct import
         mod = _import_by_name(name)
@@ -82,14 +85,14 @@ class ModelClient:
         `provider_name` may be a module name (e.g. `ci_dummy`) or None to use
         the default provider resolution (env var or top-level `model_wrapper`).
         """
-        self.provider_name = provider_name or os.getenv('MODEL_PROVIDER')
+        self.provider_name = provider_name or os.getenv("MODEL_PROVIDER")
         self._external = _load_provider(self.provider_name)
 
     def reload(self, provider_name: str | None = None) -> bool:
         """Reload and switch to a new provider. Returns True if a provider
         module was successfully loaded.
         """
-        self.provider_name = provider_name or os.getenv('MODEL_PROVIDER')
+        self.provider_name = provider_name or os.getenv("MODEL_PROVIDER")
         self._external = _load_provider(self.provider_name)
         return self._external is not None
 
@@ -102,26 +105,27 @@ class ModelClient:
         """
         if self._external is not None:
             try:
-                fn = getattr(self._external, 'suggest_organise', None)
+                fn = getattr(self._external, "suggest_organise", None)
                 if callable(fn):
                     return fn(duplicates)
             except Exception as e:
-                logger.debug('External provider failed: %s', e)
+                logger.debug("External provider failed: %s", e)
                 # fall through to heuristic fallback
-                pass
 
         # Heuristic fallback (deterministic and safe)
         suggestions: List[Dict] = []
         for group in duplicates:
-            files = group.get('files', [])
+            files = group.get("files", [])
             if len(files) <= 1:
                 continue
             first = files[0]
-            keep = first['path'] if isinstance(first, dict) else first
+            keep = first["path"] if isinstance(first, dict) else first
             moves = []
             for f in files[1:]:
-                src = f['path'] if isinstance(f, dict) else f
-                dst = os.path.join(os.path.dirname(keep), 'Duplicates', os.path.basename(src))
-                moves.append({'from': src, 'to': dst})
-            suggestions.append({'keep': keep, 'moves': moves})
+                src = f["path"] if isinstance(f, dict) else f
+                dst = os.path.join(
+                    os.path.dirname(keep), "Duplicates", os.path.basename(src)
+                )
+                moves.append({"from": src, "to": dst})
+            suggestions.append({"keep": keep, "moves": moves})
         return suggestions

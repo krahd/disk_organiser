@@ -9,18 +9,25 @@ This approach reduces the number of expensive full-file hashes on large
 collections while remaining deterministic.
 """
 
-import os
-import hashlib
+# pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals,
+# pylint: disable=too-many-branches,too-many-statements,too-many-nested-blocks,
+# pylint: disable=broad-exception-caught,invalid-name
+
 import concurrent.futures
-from typing import List, Dict
+import hashlib
+import os
+from typing import Dict, List
+
 try:
     from backend import scan_index as scan_index_mod
+
     _SCAN_INDEX_AVAILABLE = True
 except Exception:
     scan_index_mod = None
     _SCAN_INDEX_AVAILABLE = False
 try:
     import xxhash  # type: ignore
+
     _XXHASH_AVAILABLE = True
 except Exception:
     xxhash = None
@@ -30,8 +37,8 @@ except Exception:
 def file_hash(path: str, chunk_size: int = 8192) -> str:
     """Return SHA-256 hex digest for file at `path` read in chunks."""
     h = hashlib.sha256()
-    with open(path, 'rb') as f:
-        for chunk in iter(lambda: f.read(chunk_size), b''):
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(chunk_size), b""):
             h.update(chunk)
     return h.hexdigest()
 
@@ -46,9 +53,9 @@ def _sample_hash(path: str, sample_size: int = 4096) -> str:
     if _XXHASH_AVAILABLE:
         h = xxhash.xxh64()
         size = os.path.getsize(path)
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             if size <= sample_size * 2:
-                for chunk in iter(lambda: f.read(8192), b''):
+                for chunk in iter(lambda: f.read(8192), b""):
                     h.update(chunk)
                 return h.hexdigest()
             first = f.read(sample_size)
@@ -59,15 +66,15 @@ def _sample_hash(path: str, sample_size: int = 4096) -> str:
                 h.update(last)
             except OSError:
                 f.seek(0)
-                for chunk in iter(lambda: f.read(8192), b''):
+                for chunk in iter(lambda: f.read(8192), b""):
                     h.update(chunk)
         return h.hexdigest()
 
     h = hashlib.sha256()
-    with open(path, 'rb') as f:
+    with open(path, "rb") as f:
         if size <= sample_size * 2:
             # small file: hash full content
-            for chunk in iter(lambda: f.read(8192), b''):
+            for chunk in iter(lambda: f.read(8192), b""):
                 h.update(chunk)
             return h.hexdigest()
         # read first sample
@@ -81,18 +88,18 @@ def _sample_hash(path: str, sample_size: int = 4096) -> str:
         except OSError:
             # fallback: read from current position
             f.seek(0)
-            for chunk in iter(lambda: f.read(8192), b''):
+            for chunk in iter(lambda: f.read(8192), b""):
                 h.update(chunk)
     return h.hexdigest()
 
 
 def find_duplicates(
-        paths: List[str],
-        min_size: int = 1,
-        max_files: int = None,
-        sample_size: int = 4096,
-        progress_callback=None,
-        max_workers: int | None = None,
+    paths: List[str],
+    min_size: int = 1,
+    max_files: int = None,
+    sample_size: int = 4096,
+    progress_callback=None,
+    max_workers: int | None = None,
 ) -> List[Dict]:
     # 1) Walk and group by size
     size_buckets = {}
@@ -113,7 +120,7 @@ def find_duplicates(
                     seen += 1
                     if progress_callback and seen % 100 == 0:
                         try:
-                            progress_callback({'status': 'scanning', 'processed': seen})
+                            progress_callback({"status": "scanning", "processed": seen})
                         except Exception:
                             pass
                 except (OSError, PermissionError):
@@ -138,14 +145,14 @@ def find_duplicates(
 
                 # compute or reuse sample hash
                 sh = (
-                    entry.get('sample_hash')
-                    if entry and entry.get('sample_hash')
+                    entry.get("sample_hash")
+                    if entry and entry.get("sample_hash")
                     else _sample_hash(fp, sample_size=sample_size)
                 )
                 # persist sample hash to index
                 if _SCAN_INDEX_AVAILABLE:
                     try:
-                        full_hash = entry.get('full_hash') if entry else None
+                        full_hash = entry.get("full_hash") if entry else None
                         scan_index_mod.upsert_entry(
                             fp,
                             size,
@@ -175,8 +182,8 @@ def find_duplicates(
                             entry = scan_index_mod.get_entry(fp)
                         except Exception:
                             entry = None
-                    if entry and entry.get('full_hash'):
-                        return fp, entry.get('full_hash')
+                    if entry and entry.get("full_hash"):
+                        return fp, entry.get("full_hash")
                     fh = file_hash(fp)
                     if _SCAN_INDEX_AVAILABLE:
                         try:
@@ -194,18 +201,22 @@ def find_duplicates(
             # conservative heuristic. Allow overriding via `MAX_HASH_WORKERS`
             # environment variable for advanced deployments.
             if max_workers is None:
-                env_val = os.getenv('MAX_HASH_WORKERS')
+                env_val = os.getenv("MAX_HASH_WORKERS")
                 if env_val:
                     try:
                         computed_workers = max(1, min(int(env_val), total))
                     except Exception:
-                        computed_workers = max(1, min((os.cpu_count() or 1) * 2, total, 32))
+                        computed_workers = max(
+                            1, min((os.cpu_count() or 1) * 2, total, 32)
+                        )
                 else:
                     # default: 2 * cpu_count, capped to 32
                     computed_workers = max(1, min((os.cpu_count() or 1) * 2, total, 32))
             else:
                 computed_workers = max(1, min(int(max_workers), total))
-            with concurrent.futures.ThreadPoolExecutor(max_workers=computed_workers) as exe:
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=computed_workers
+            ) as exe:
                 futures = {exe.submit(_compute_full, fp): fp for fp in to_hash}
                 for fut in concurrent.futures.as_completed(futures):
                     fp = futures[fut]
@@ -218,8 +229,12 @@ def find_duplicates(
                         full_map.setdefault(fh, []).append(fp_ret)
                     if progress_callback:
                         try:
-                            info = {'status': 'hashing', 'file': fp_ret,
-                                    'processed': hashed, 'total': total}
+                            info = {
+                                "status": "hashing",
+                                "file": fp_ret,
+                                "processed": hashed,
+                                "total": total,
+                            }
                             progress_callback(info)
                         except Exception:
                             pass
@@ -228,10 +243,10 @@ def find_duplicates(
                     items = []
                     for p in fps:
                         try:
-                            items.append({'path': p, 'size': os.path.getsize(p)})
+                            items.append({"path": p, "size": os.path.getsize(p)})
                         except (OSError, PermissionError):
                             continue
-                    result.append({'hash': fh, 'files': items})
+                    result.append({"hash": fh, "files": items})
     return result
 
 
@@ -240,6 +255,7 @@ def visualise_path(path: str, depth: int = 2, max_entries: int = 50) -> Dict:
 
     Structure: {path, size, files, children: [{name,path,size,files,children}]}
     """
+
     def scan(p: str, d: int):
         size = 0
         files = 0
@@ -256,13 +272,15 @@ def visualise_path(path: str, depth: int = 2, max_entries: int = 50) -> Dict:
                         elif e.is_dir():
                             if d > 0:
                                 child = scan(e.path, d - 1)
-                                children.append({
-                                    "name": e.name,
-                                    "path": e.path,
-                                    "size": child["size"],
-                                    "files": child["files"],
-                                    "children": child.get("children", []),
-                                })
+                                children.append(
+                                    {
+                                        "name": e.name,
+                                        "path": e.path,
+                                        "size": child["size"],
+                                        "files": child["files"],
+                                        "children": child.get("children", []),
+                                    }
+                                )
                     except (OSError, PermissionError):
                         continue
         except (OSError, PermissionError):
@@ -272,7 +290,9 @@ def visualise_path(path: str, depth: int = 2, max_entries: int = 50) -> Dict:
     root = os.path.abspath(path)
     data = scan(root, depth)
     # sort children by size desc for top-level visibility
-    data_children = sorted(data.get("children", []), key=lambda x: x.get("size", 0), reverse=True)
+    data_children = sorted(
+        data.get("children", []), key=lambda x: x.get("size", 0), reverse=True
+    )
     return {
         "path": root,
         "size": data.get("size", 0),

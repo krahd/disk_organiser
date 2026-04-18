@@ -1,0 +1,14 @@
+{
+  "name": "disk_organiser_frontend_tests",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "jest --config jest.config.js"
+  },
+  "devDependencies": {
+    "jest": "29.6.1",
+    "jsdom": "22.1.0"
+  },
+  "dependencies": {
+    "jest-environment-jsdom": "^28.1.3"
+  }
+}
