@@ -14,7 +14,7 @@ from typing import List, Dict, TYPE_CHECKING
 # importlib to dynamically load the module when present. Keep a
 # TYPE_CHECKING import so type-checkers can still resolve the symbol.
 if TYPE_CHECKING:  # pragma: no cover - static typing only
-    import model_wrapper  # type: ignore
+    import model_wrapper  # type: ignore  # noqa: F401
 
 import importlib
 import importlib.util
@@ -92,7 +92,6 @@ class ModelClient:
         self.provider_name = provider_name or os.getenv('MODEL_PROVIDER')
         self._external = _load_provider(self.provider_name)
         return self._external is not None
-
 
     def suggest_organise(self, duplicates: List[Dict]) -> List[Dict]:
         """Return organise suggestions for given duplicate groups.

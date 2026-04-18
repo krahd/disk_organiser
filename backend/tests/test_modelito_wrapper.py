@@ -1,12 +1,11 @@
 """Tests for the Modelito provider wrapper (simulation mode)."""
 import os
 import sys
-import importlib
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, ROOT)
 
-from backend.model_wrappers import modelito
+from backend.model_wrappers import modelito  # noqa: E402
 
 
 def _sample_duplicates(tmp_path):

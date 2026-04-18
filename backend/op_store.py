@@ -89,8 +89,12 @@ def create_op(suggestions: list, metadata: dict | None = None, op_id: str | None
     created_at = time.time()
     conn = _connect()
     cur = conn.cursor()
+    sql = (
+        "INSERT OR REPLACE INTO ops (id, suggestions, metadata, status, created_at, backup_dir) "
+        "VALUES (?, ?, ?, ?, ?, ?)"
+    )
     cur.execute(
-        "INSERT OR REPLACE INTO ops (id, suggestions, metadata, status, created_at, backup_dir) VALUES (?, ?, ?, ?, ?, ?)",
+        sql,
         (op_id, json.dumps(suggestions), json.dumps(metadata or {}), 'preview', created_at, backup_dir),
     )
     conn.commit()

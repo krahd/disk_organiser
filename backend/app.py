@@ -10,6 +10,8 @@ import threading
 import traceback
 import uuid
 import shutil
+import time
+import logging
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -127,6 +129,7 @@ except Exception:
 
 app = Flask(__name__)
 CORS(app)
+logger = logging.getLogger(__name__)
 
 
 @app.route('/')
@@ -159,7 +162,8 @@ def api_find_duplicates():
         max_workers = int(max_workers) if max_workers is not None else None
     except (TypeError, ValueError):
         max_workers = None
-    duplicates = find_duplicates(paths, min_size=min_size, max_files=max_files, max_workers=max_workers)
+    duplicates = find_duplicates(paths, min_size=min_size,
+                                 max_files=max_files, max_workers=max_workers)
     return jsonify({"duplicates": duplicates, "count": len(duplicates)})
 
 
@@ -221,7 +225,8 @@ def api_organise_suggest():
     if model_client is not None:
         try:
             suggestions = model_client.suggest_organise(duplicates)
-        except Exception as e:
+        except Exception:
+            logger.debug('Model client suggest failed', exc_info=True)
             # model failure: fall back to heuristic
             suggestions = []
             for group in duplicates:

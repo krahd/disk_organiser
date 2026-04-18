@@ -1,12 +1,11 @@
 """Unit tests for backend.model_client.ModelClient."""
 import os
 import sys
-import importlib
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, ROOT)
 
-from backend.model_client import ModelClient
+from backend.model_client import ModelClient  # noqa: E402
 
 
 def _sample_duplicates(tmp_path):

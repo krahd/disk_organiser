@@ -1,7 +1,6 @@
 """Integration test: AI suggestion -> preview -> execute -> undo flow using CI dummy provider."""
 import os
 import sys
-import time
 import importlib
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))

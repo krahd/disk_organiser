@@ -1,12 +1,11 @@
 """Tests for scan-index admin utilities and endpoints."""
 import os
 import sys
-import importlib
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, ROOT)
 
-from backend import scan_index
+from backend import scan_index  # noqa: E402
 
 
 def test_scan_index_stats_returns_counts():

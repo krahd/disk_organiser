@@ -69,7 +69,13 @@ def background_scan(
             raise RuntimeError('cancelled')
 
     try:
-        result = find_duplicates(paths, min_size=min_size, max_files=max_files, progress_callback=progress_cb, max_workers=max_workers)
+        result = find_duplicates(
+            paths,
+            min_size=min_size,
+            max_files=max_files,
+            progress_callback=progress_cb,
+            max_workers=max_workers,
+        )
         job['status'] = 'finished'
         job['finished_at'] = time.time()
         job['result'] = result

@@ -5,7 +5,6 @@ files across scans. Intended to be used by `backend.utils.find_duplicates`.
 """
 
 import os
-import json
 import sqlite3
 import time
 from typing import Optional, List
@@ -41,7 +40,9 @@ def _init_db(db: Optional[str] = None):
         )
         """
     )
-    cur.execute('CREATE INDEX IF NOT EXISTS idx_size_sample ON files(size, sample_hash)')
+    cur.execute(
+        'CREATE INDEX IF NOT EXISTS idx_size_sample ON files(size, sample_hash)'
+    )
     conn.commit()
     conn.close()
 
@@ -52,7 +53,10 @@ _init_db()
 def get_entry(path: str) -> Optional[dict]:
     conn = _connect()
     cur = conn.cursor()
-    cur.execute('SELECT path,size,mtime,sample_hash,full_hash,last_seen FROM files WHERE path=?', (path,))
+    cur.execute(
+        'SELECT path,size,mtime,sample_hash,full_hash,last_seen FROM files WHERE path=?',
+        (path,),
+    )
     row = cur.fetchone()
     conn.close()
     if not row:
@@ -67,12 +71,21 @@ def get_entry(path: str) -> Optional[dict]:
     }
 
 
-def upsert_entry(path: str, size: int, mtime: float, sample_hash: Optional[str] = None, full_hash: Optional[str] = None):
+def upsert_entry(
+    path: str,
+    size: int,
+    mtime: float,
+    sample_hash: Optional[str] = None,
+    full_hash: Optional[str] = None,
+):
     conn = _connect()
     cur = conn.cursor()
     now = time.time()
-    cur.execute('INSERT OR REPLACE INTO files (path,size,mtime,sample_hash,full_hash,last_seen) VALUES (?, ?, ?, ?, ?, ?)',
-                (path, size, mtime, sample_hash, full_hash, now))
+    sql = (
+        'INSERT OR REPLACE INTO files (path, size, mtime, sample_hash, full_hash, last_seen) '
+        'VALUES (?, ?, ?, ?, ?, ?)'
+    )
+    cur.execute(sql, (path, size, mtime, sample_hash, full_hash, now))
     conn.commit()
     conn.close()
 
@@ -81,7 +94,10 @@ def set_full_hash(path: str, full_hash: str):
     conn = _connect()
     cur = conn.cursor()
     now = time.time()
-    cur.execute('UPDATE files SET full_hash=?, last_seen=? WHERE path=?', (full_hash, now, path))
+    cur.execute(
+        'UPDATE files SET full_hash=?, last_seen=? WHERE path=?',
+        (full_hash, now, path),
+    )
     conn.commit()
     conn.close()
 
@@ -125,7 +141,8 @@ def prune(retention_days: int | None = None, max_entries: int | None = None):
         if retention_days is not None:
             threshold = now - float(retention_days) * 86400.0
             # count entries to remove
-            cur.execute('SELECT COUNT(*) FROM files WHERE last_seen IS NOT NULL AND last_seen < ?', (threshold,))
+            cur.execute(
+                'SELECT COUNT(*) FROM files WHERE last_seen IS NOT NULL AND last_seen < ?', (threshold,))
             removed_by_age = cur.fetchone()[0]
             cur.execute('DELETE FROM files WHERE last_seen IS NOT NULL AND last_seen < ?', (threshold,))
 
@@ -134,7 +151,10 @@ def prune(retention_days: int | None = None, max_entries: int | None = None):
             total = cur.fetchone()[0]
             if total > int(max_entries):
                 to_remove = total - int(max_entries)
-                cur.execute('SELECT path FROM files ORDER BY last_seen ASC NULLS FIRST LIMIT ?', (to_remove,))
+                cur.execute(
+                    'SELECT path FROM files ORDER BY last_seen ASC NULLS FIRST LIMIT ?',
+                    (to_remove,),
+                )
                 rows = cur.fetchall()
                 paths = [r[0] for r in rows]
                 for p in paths:
@@ -144,7 +164,11 @@ def prune(retention_days: int | None = None, max_entries: int | None = None):
         conn.commit()
     finally:
         conn.close()
-    return {'removed_by_age': removed_by_age, 'removed_by_max': removed_by_max, 'total_removed': removed_by_age + removed_by_max}
+    return {
+        'removed_by_age': removed_by_age,
+        'removed_by_max': removed_by_max,
+        'total_removed': removed_by_age + removed_by_max,
+    }
 
 
 def stats():
@@ -204,7 +228,13 @@ def rebuild_index(paths: list, min_size: int = 1, sample_size: int = 4096):
                         continue
                     sh = _local_sample_hash(fp, sample_size=sample_size)
                     try:
-                        upsert_entry(fp, st.st_size, os.path.getmtime(fp), sample_hash=sh, full_hash=None)
+                        upsert_entry(
+                            fp,
+                            st.st_size,
+                            os.path.getmtime(fp),
+                            sample_hash=sh,
+                            full_hash=None,
+                        )
                         upserted += 1
                     except Exception as e:
                         errors.append(str(e))

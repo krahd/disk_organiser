@@ -86,17 +86,14 @@ def _sample_hash(path: str, sample_size: int = 4096) -> str:
     return h.hexdigest()
 
 
-def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, sample_size: int = 4096, progress_callback=None, max_workers: int | None = None) -> List[Dict]:
-    """Multi-stage duplicate detection.
-
-    Parameters:
-      - paths: list of root paths to scan
-      - min_size: ignore files smaller than this
-      - max_files: optional limit on number of files to process
-      - sample_size: bytes to read from start/end for sample hash
-
-    Returns a list of groups: {'hash': <full_hash>, 'files': [{'path':..., 'size': ...}, ...]}
-    """
+def find_duplicates(
+        paths: List[str],
+        min_size: int = 1,
+        max_files: int = None,
+        sample_size: int = 4096,
+        progress_callback=None,
+        max_workers: int | None = None,
+) -> List[Dict]:
     # 1) Walk and group by size
     size_buckets = {}
     seen = 0
@@ -140,11 +137,22 @@ def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, 
                         entry = None
 
                 # compute or reuse sample hash
-                sh = entry.get('sample_hash') if entry and entry.get('sample_hash') else _sample_hash(fp, sample_size=sample_size)
+                sh = (
+                    entry.get('sample_hash')
+                    if entry and entry.get('sample_hash')
+                    else _sample_hash(fp, sample_size=sample_size)
+                )
                 # persist sample hash to index
                 if _SCAN_INDEX_AVAILABLE:
                     try:
-                        scan_index_mod.upsert_entry(fp, size, os.path.getmtime(fp), sample_hash=sh, full_hash=entry.get('full_hash') if entry else None)
+                        full_hash = entry.get('full_hash') if entry else None
+                        scan_index_mod.upsert_entry(
+                            fp,
+                            size,
+                            os.path.getmtime(fp),
+                            sample_hash=sh,
+                            full_hash=full_hash,
+                        )
                     except Exception:
                         pass
                 sample_map.setdefault(sh, []).append(fp)
@@ -157,6 +165,8 @@ def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, 
             # compute full hashes in parallel for performance
             full_map = {}
             # helper to compute or reuse full hash for a single file
+            # helper to compute or reuse full hash for a single file
+
             def _compute_full(fp):
                 try:
                     entry = None
@@ -166,16 +176,16 @@ def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, 
                         except Exception:
                             entry = None
                     if entry and entry.get('full_hash'):
-                        return fp, entry.get('full_hash'), None
+                        return fp, entry.get('full_hash')
                     fh = file_hash(fp)
                     if _SCAN_INDEX_AVAILABLE:
                         try:
                             scan_index_mod.set_full_hash(fp, fh)
                         except Exception:
                             pass
-                    return fp, fh, None
-                except Exception as e:
-                    return fp, None, str(e)
+                    return fp, fh
+                except Exception:
+                    return fp, None
 
             to_hash = list(fpaths)
             total = len(to_hash)
@@ -190,15 +200,17 @@ def find_duplicates(paths: List[str], min_size: int = 1, max_files: int = None, 
                 for fut in concurrent.futures.as_completed(futures):
                     fp = futures[fut]
                     try:
-                        fp_ret, fh, err = fut.result()
-                    except Exception as e:
-                        fp_ret, fh, err = fp, None, str(e)
+                        fp_ret, fh = fut.result()
+                    except Exception:
+                        fp_ret, fh = fp, None
                     hashed += 1
                     if fh:
                         full_map.setdefault(fh, []).append(fp_ret)
                     if progress_callback:
                         try:
-                            progress_callback({'status': 'hashing', 'file': fp_ret, 'processed': hashed, 'total': total})
+                            info = {'status': 'hashing', 'file': fp_ret,
+                                    'processed': hashed, 'total': total}
+                            progress_callback(info)
                         except Exception:
                             pass
             for fh, fps in full_map.items():
