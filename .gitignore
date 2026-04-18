@@ -83,3 +83,7 @@ pnpm-debug.log*
 *.tmp
 .cache/
 Thumbs.db
+
+# Ignore runtime maintenance/status and job files
+/backend/maintenance_status.json
+/backend/scan_jobs/
