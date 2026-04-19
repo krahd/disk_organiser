@@ -75,8 +75,9 @@ jobs:
       - name: Build binary (macOS)
         run: |
           . .venv/bin/activate
+          mkdir -p out
           pyinstaller --noconfirm --clean --onefile --name disk-organiser \
-            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_macos.log
 
       - id: package
         name: Package macOS binary
@@ -89,10 +90,16 @@ jobs:
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
 
       - name: Upload mac artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mac-binary
           path: out/${{ steps.package.outputs.tar }}
+
+      - name: Upload mac build log
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-build-log
+          path: out/pyinstaller_macos.log
 
     outputs:
       mac_tar: ${{ steps.package.outputs.tar }}
@@ -124,8 +131,9 @@ jobs:
       - name: Build binary (Linux)
         run: |
           . .venv/bin/activate
+          mkdir -p out
           pyinstaller --noconfirm --clean --onefile --name disk-organiser \
-            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_linux.log
 
       - id: package
         name: Package linux binary
@@ -138,10 +146,16 @@ jobs:
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
 
       - name: Upload linux artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-binary
           path: out/${{ steps.package.outputs.tar }}
+
+      - name: Upload linux build log
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build-log
+          path: out/pyinstaller_linux.log
 
     outputs:
       linux_tar: ${{ steps.package.outputs.tar }}
@@ -156,13 +170,13 @@ jobs:
       REF_NAME: ${{ github.ref_name }}
     steps:
       - name: Download mac artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: mac-binary
           path: artifacts
 
       - name: Download linux artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: linux-binary
           path: artifacts
