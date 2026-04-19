@@ -50,6 +50,13 @@ jobs:
         run: |
           npx playwright install --with-deps
 
+      - name: Start static server (frontend)
+        run: |
+          # serve frontend files on port 8000 for visual tests
+          cd frontend
+          python -m http.server 8000 &
+          sleep 1
+
       - name: Run visual tests (Playwright)
         run: |
           npm run test:visual
