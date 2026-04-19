@@ -1,0 +1,211 @@
+name: Build and publish binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: build-bottles-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-macos:
+    name: Build macOS binary
+    runs-on: macos-latest
+    env:
+      REF_NAME: ${{ github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install build dependencies
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r backend/requirements.txt || true
+          pip install pyinstaller==5.13.0
+
+      - name: Build binary (macOS)
+        run: |
+          . .venv/bin/activate
+          pyinstaller --noconfirm --clean --onefile --name disk-organiser \
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py
+
+      - id: package
+        name: Package macOS binary
+        run: |
+          mkdir -p out
+          TARNAME=disk-organiser-${REF_NAME}-macos-$(uname -m)-bin.tar.gz
+          tar czf out/${TARNAME} dist/disk-organiser
+          shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
+          echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
+          echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
+
+      - name: Upload mac artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: mac-binary
+          path: out/${{ steps.package.outputs.tar }}
+
+    outputs:
+      mac_tar: ${{ steps.package.outputs.tar }}
+      mac_sha: ${{ steps.package.outputs.sha }}
+
+  build-linux:
+    name: Build Linux binary
+    runs-on: ubuntu-latest
+    env:
+      REF_NAME: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-venv build-essential
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r backend/requirements.txt || true
+          pip install pyinstaller==5.13.0
+
+      - name: Build binary (Linux)
+        run: |
+          . .venv/bin/activate
+          pyinstaller --noconfirm --clean --onefile --name disk-organiser \
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py
+
+      - id: package
+        name: Package linux binary
+        run: |
+          mkdir -p out
+          TARNAME=disk-organiser-${REF_NAME}-linux-$(uname -m)-bin.tar.gz
+          tar czf out/${TARNAME} dist/disk-organiser
+          shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
+          echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
+          echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
+
+      - name: Upload linux artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-binary
+          path: out/${{ steps.package.outputs.tar }}
+
+    outputs:
+      linux_tar: ${{ steps.package.outputs.tar }}
+      linux_sha: ${{ steps.package.outputs.sha }}
+
+  publish-release:
+    name: Create release and update Homebrew tap
+    needs: [build-macos, build-linux]
+    runs-on: ubuntu-latest
+    env:
+      REF_NAME: ${{ github.ref_name }}
+    steps:
+      - name: Download mac artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: mac-binary
+          path: artifacts
+
+      - name: Download linux artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-binary
+          path: artifacts
+
+      - id: compute
+        name: Compute filenames and checksums
+        run: |
+          MAC_TAR=$(ls artifacts/*macos* || true)
+          LINUX_TAR=$(ls artifacts/*linux* || true)
+          MAC_SHA=$(shasum -a 256 "$MAC_TAR" | awk '{print $1}')
+          LINUX_SHA=$(shasum -a 256 "$LINUX_TAR" | awk '{print $1}')
+          echo "mac_tar=$(basename "$MAC_TAR")" >> $GITHUB_OUTPUT
+          echo "mac_sha=$MAC_SHA" >> $GITHUB_OUTPUT
+          echo "linux_tar=$(basename "$LINUX_TAR")" >> $GITHUB_OUTPUT
+          echo "linux_sha=$LINUX_SHA" >> $GITHUB_OUTPUT
+
+      - id: create_release
+        name: Create GitHub release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }}
+          body: "Automated binary builds for ${{ github.ref_name }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload mac asset to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/${{ steps.compute.outputs.mac_tar }}
+          asset_name: ${{ steps.compute.outputs.mac_tar }}
+          asset_content_type: application/gzip
+
+      - name: Upload linux asset to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/${{ steps.compute.outputs.linux_tar }}
+          asset_name: ${{ steps.compute.outputs.linux_tar }}
+          asset_content_type: application/gzip
+
+      - name: Update Homebrew tap formula (optional)
+        env:
+          HOME_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          REF_NAME: ${{ github.ref_name }}
+          MAC_TAR: ${{ steps.compute.outputs.mac_tar }}
+          MAC_SHA: ${{ steps.compute.outputs.mac_sha }}
+        run: |
+          if [ -z "$HOME_TAP_TOKEN" ]; then
+            echo "HOMEBREW_TAP_TOKEN not set; skipping homebrew tap update"
+            exit 0
+          fi
+          git clone https://x-access-token:${HOME_TAP_TOKEN}@github.com/krahd/homebrew-tap.git homebrew-tap
+          cd homebrew-tap
+          mkdir -p Formula
+          cat > Formula/disk-organiser.rb <<RUBY
+class DiskOrganiser < Formula
+  desc "Visualise and safely organise files on your hard drive"
+  homepage "https://github.com/krahd/disk_organiser"
+  url "https://github.com/krahd/disk_organiser/releases/download/${REF_NAME}/${MAC_TAR}"
+  sha256 "${MAC_SHA}"
+  license "MIT"
+
+  depends_on "python@3.12"
+
+  def install
+    libexec.install Dir["*"]
+    (bin/"disk-organiser").write <<~EOS
+      #!/bin/bash
+      exec "#{Formula[\"python@3.12\"].opt_bin}/python3" "#{libexec}/backend/app.py" "$@"
+    EOS
+    chmod 0755, bin/"disk-organiser"
+  end
+
+  test do
+    assert_predicate libexec/"backend/app.py", :exist?
+  end
+end
+RUBY
+          git add Formula/disk-organiser.rb
+          git commit -m "disk-organiser: update formula for ${REF_NAME}" || true
+          git push origin HEAD:main
