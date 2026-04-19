@@ -19,5 +19,11 @@ To use the automated workflow:
 - Merge the workflow file to `main`.
 - (Optional) In repository Settings → Pages set the source to `gh-pages` branch so GitHub Pages serves the `gh-pages` branch.
 
+Demo
+
+A static copy of the frontend is included under `docs/demo/` for a read-only preview of the UI. Note that interactive features that require the backend API will not function on the published site.
+
+Access the demo at: https://krahd.github.io/disk_organiser/demo/
+
 If you prefer to have Pages directly serve `/docs` from `main` (no deployment step), you can continue using the `main` branch `/docs` source in Pages settings instead of the `gh-pages` branch.
 
