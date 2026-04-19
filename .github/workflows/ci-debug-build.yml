@@ -1,0 +1,67 @@
+name: CI — Debug PyInstaller build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  debug-linux-build:
+    name: Debug Linux build and upload artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Create venv and install dependencies
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip setuptools==65.5.0 wheel
+          pip install -r backend/requirements.txt || true
+          pip install pyinstaller==5.13.0
+
+      - name: Write debug metadata
+        run: |
+          mkdir -p out
+          echo "run_id=$GITHUB_RUN_ID" > out/debug_metadata.txt
+          echo "run_number=$GITHUB_RUN_NUMBER" >> out/debug_metadata.txt
+          echo "ref=$GITHUB_REF" >> out/debug_metadata.txt
+          echo "sha=$GITHUB_SHA" >> out/debug_metadata.txt
+          echo "actor=$GITHUB_ACTOR" >> out/debug_metadata.txt
+          uname -a >> out/debug_metadata.txt
+          cat out/debug_metadata.txt
+
+      - name: Build binary (Linux) — debug
+        run: |
+          . .venv/bin/activate
+          mkdir -p out
+          set -o pipefail
+          pyinstaller --noconfirm --clean --onefile --name disk-organiser \
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_debug_linux.log
+          echo "pyinstaller_exit=$?" >> out/pyinstaller_debug_linux.log || true
+          ls -la dist || true
+          if [ -f dist/disk-organiser ]; then cp dist/disk-organiser out/ || true; fi
+
+      - name: Package debug binary
+        run: |
+          mkdir -p out
+          if [ -f out/disk-organiser ]; then tar -czf out/disk-organiser-debug-${GITHUB_SHA::7}.tar.gz -C out disk-organiser; fi
+          ls -la out
+
+      - name: Upload debug artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-build-artifacts
+          path: out
