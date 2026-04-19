@@ -136,3 +136,18 @@ textarea.editor-textarea{min-height:200px;width:100%;resize:vertical;padding:12p
 @media (max-width:700px){.site-nav{flex-wrap:wrap}.main-card{padding:16px}.site-header h1{font-size:1rem}.logo{width:36px;height:36px}}
 
 /* end of styles */
+
+/* Side-panel details (right) */
+.side-panel{position:fixed;right:18px;top:88px;width:360px;max-width:calc(100% - 40px);height:calc(100% - 160px);background:var(--card);border-radius:12px;box-shadow:var(--shadow-large);overflow:auto;padding:0;z-index:1500;border:1px solid var(--border)}
+.side-panel.hidden{display:none}
+.side-panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#fbfdff,#f7fbff)}
+.side-panel-header h3{margin:0;font-size:1rem}
+.side-panel-header button{background:transparent;border:0;font-size:20px;padding:6px;border-radius:6px;cursor:pointer}
+.side-panel-body{padding:12px}
+
+/* Treemap cell focus styles for keyboard users */
+.treemap-cell:focus rect{stroke:rgba(2,6,23,0.85);stroke-width:2px}
+.treemap-cell{outline: none}
+
+/* ensure tab-focus visible for SVG groups in browsers */
+.treemap-cell:focus{outline: none}

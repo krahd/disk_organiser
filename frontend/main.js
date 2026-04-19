@@ -341,6 +341,10 @@ document.addEventListener("DOMContentLoaded", () => {
             .enter()
             .append("g")
             .attr("transform", (d) => `translate(${d.x0},${d.y0})`)
+            .attr("tabindex", 0)
+            .attr("role", "button")
+            .attr("aria-label", (d) => (d.data.name ? `${d.data.name} ${formatBytes(d.value || 0)}` : ''))
+            .classed("treemap-cell", true)
             .style("cursor", "pointer");
 
           cell
@@ -355,19 +359,112 @@ document.addEventListener("DOMContentLoaded", () => {
             .attr("x", 4)
             .attr("y", 14)
             .attr("font-size", "12px")
-            .text(
-              (d) =>
-                (d.data.name ? d.data.name.split("/").pop() : "") + (d.value ? ` (${d.value})` : "")
+            .text((d) =>
+              (d.data.name ? d.data.name.split("/").pop() : "") +
+              (d.value ? ` (${formatBytes(d.value)})` : "")
             );
 
           cell.on("click", (event, d) => {
             event.stopPropagation();
+            // if this node has children, drill down into it
             if (d.children) {
               renderTreemap(d.data, container);
-            } else {
-              // leaf clicked: show info
-              const info = document.getElementById("vis-progress");
-              info.textContent = `Selected: ${d.data.name} (${d.value} bytes)`;
+              return;
+            }
+
+            // prepare panel content
+            const panelContent = document.createElement("div");
+            const title = document.createElement("div");
+            title.innerHTML = `<strong>${d.data.name}</strong>`;
+            const sizeEl = document.createElement("div");
+            sizeEl.textContent = `Size: ${formatBytes(d.value)}`;
+            panelContent.appendChild(title);
+            panelContent.appendChild(sizeEl);
+
+            const resultEl = document.createElement("div");
+            resultEl.className = "mt-6";
+
+            const findBtn = document.createElement("button");
+            findBtn.textContent = "Find duplicates in this folder";
+            findBtn.className = "btn";
+            findBtn.onclick = async () => {
+              findBtn.disabled = true;
+              try {
+                const res = await fetch("/api/duplicates", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ paths: [d.data.name], min_size: 1 }),
+                });
+                const j = await res.json();
+                resultEl.innerHTML = "";
+                if (j.duplicates && j.duplicates.length) {
+                  const summary = document.createElement("div");
+                  summary.textContent = `Found ${j.count || j.duplicates.length} duplicate groups`;
+                  resultEl.appendChild(summary);
+
+                  const createBtn = document.createElement("button");
+                  createBtn.textContent = "Create Preview (heuristic)";
+                  createBtn.className = "btn primary mt-6";
+                  createBtn.onclick = async () => {
+                    createBtn.disabled = true;
+                    try {
+                      const sres = await fetch("/api/organise", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ duplicates: j.duplicates }),
+                      });
+                      const sj = await sres.json();
+                      const pres = await fetch("/api/organise/preview", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ suggestions: sj.suggestions || [] }),
+                      });
+                      const pj = await pres.json();
+                      resultEl.innerHTML += `<div class="mt-6">Preview created: <strong>${pj.op && pj.op.id}</strong></div>`;
+                    } catch (e) {
+                      showAlert("Preview creation failed: " + (e.message || e));
+                    } finally {
+                      createBtn.disabled = false;
+                    }
+                  };
+                  resultEl.appendChild(createBtn);
+
+                  // render duplicate groups
+                  j.duplicates.forEach((g, i) => {
+                    const gdiv = document.createElement("div");
+                    gdiv.className = "dup-group";
+                    const hdr = document.createElement("div");
+                    hdr.innerHTML = `<strong>Group ${i + 1} (hash: ${g.hash})</strong>`;
+                    gdiv.appendChild(hdr);
+                    const ul = document.createElement("ul");
+                    (g.files || []).forEach((f) => {
+                      const li = document.createElement("li");
+                      li.textContent = `${f.path} — ${formatBytes(f.size || f.bytes || 0)}`;
+                      ul.appendChild(li);
+                    });
+                    gdiv.appendChild(ul);
+                    resultEl.appendChild(gdiv);
+                  });
+                } else {
+                  resultEl.textContent = "No duplicates found";
+                }
+              } catch (e) {
+                showAlert("Duplicate search failed: " + (e.message || e));
+              } finally {
+                findBtn.disabled = false;
+              }
+            };
+
+            panelContent.appendChild(findBtn);
+            panelContent.appendChild(resultEl);
+            openSidePanel(`Details — ${d.data.name}`, panelContent);
+          });
+
+          // keyboard: activate cell with Enter or Space
+          cell.on("keydown", function (event, d) {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              d3.select(this).dispatch("click");
             }
           });
 
@@ -1101,6 +1198,52 @@ document.addEventListener("DOMContentLoaded", () => {
     window.closePreviewModal = closePreviewModal;
     window.formatBytes = formatBytes;
   } catch (e) {}
+
+  // Side-panel helpers (details panel)
+  function openSidePanel(titleText, contentNode) {
+    const panel = document.getElementById("side-panel");
+    const body = document.getElementById("side-panel-body");
+    const title = document.getElementById("side-panel-title");
+    if (!panel || !body || !title) return;
+    title.textContent = titleText || "Details";
+    body.innerHTML = "";
+    if (typeof contentNode === "string") body.innerHTML = contentNode;
+    else if (contentNode instanceof Node) body.appendChild(contentNode);
+    panel.classList.remove("hidden");
+    panel.setAttribute("aria-hidden", "false");
+    // focus close button for keyboard users
+    const closeBtn = document.getElementById("side-panel-close");
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeSidePanel() {
+    const panel = document.getElementById("side-panel");
+    if (!panel) return;
+    panel.classList.add("hidden");
+    panel.setAttribute("aria-hidden", "true");
+    // return focus to main content
+    const main = document.getElementById("main-content");
+    if (main) main.focus();
+  }
+
+  // close button binding
+  try {
+    const spClose = document.getElementById("side-panel-close");
+    if (spClose) spClose.addEventListener("click", closeSidePanel);
+  } catch (e) {}
+
+  // global key handler: Esc closes modals and side-panel
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape" || ev.key === "Esc") {
+      const panel = document.getElementById("side-panel");
+      if (panel && !panel.classList.contains("hidden")) {
+        closeSidePanel();
+        return;
+      }
+      const modal = document.getElementById("preview-modal");
+      if (modal && !modal.classList.contains("hidden")) closePreviewModal();
+    }
+  });
 
   // helper: mark active nav button
   function setActiveNav(section) {
