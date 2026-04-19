@@ -31,6 +31,13 @@ python backend/app.py
 Open `frontend/index.html` in a browser. The frontend expects the API at
 `http://127.0.0.1:5000` by default.
 
+## Screenshot
+
+Here is a preview of the modernised frontend UI (generated snapshot):
+
+![Frontend screenshot](frontend/images/screenshot.svg)
+
+
 ## Features
 
 - Scan directories and detect duplicate files using content hashing.
