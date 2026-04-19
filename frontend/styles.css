@@ -36,9 +36,18 @@ body{
 /* App layout */
 .app{max-width:1200px;margin:20px auto;padding:0 16px}
 .site-nav{display:flex;gap:8px;justify-content:center;margin:16px 0}
-.site-nav .nav-btn{background:transparent;border:1px solid transparent;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600;color:var(--muted);transition:all 160ms ease}
+.site-nav .nav-btn{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid transparent;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600;color:var(--muted);transition:all 160ms ease}
 .site-nav .nav-btn:hover{background:rgba(37,99,235,0.06);color:var(--accent)}
 .site-nav .nav-btn.active{background:var(--accent);color:#fff}
+
+/* nav icons inside buttons */
+.nav-icon{width:18px;height:18px;display:inline-block;fill:currentColor}
+
+/* Focus visible styles for keyboard users */
+.nav-btn:focus-visible, button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.12), 0 6px 18px rgba(16,24,40,0.06);
+}
 
 .main-card{max-width:1100px;margin:0 auto;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow-small);padding:20px;min-height:360px}
 
@@ -101,6 +110,10 @@ textarea.editor-textarea{min-height:200px;width:100%;resize:vertical;padding:12p
 .modal-content h3{margin:0;font-size:1.05rem}
 .modal-content button{cursor:pointer}
 
+/* modal close button */
+#preview-modal-close{background:transparent;border:0;font-size:20px;padding:6px;border-radius:6px;cursor:pointer}
+#preview-modal-close:hover{background:rgba(2,6,23,0.04)}
+
 .preview-actions{width:100%;border-collapse:collapse}
 .preview-actions th,.preview-actions td{padding:8px 10px;border-bottom:1px solid #f3f6fa;text-align:left;font-size:0.95rem}
 .preview-actions th{background:#fbfdff;font-weight:700}
@@ -122,27 +135,4 @@ textarea.editor-textarea{min-height:200px;width:100%;resize:vertical;padding:12p
 /* Responsive tweaks */
 @media (max-width:700px){.site-nav{flex-wrap:wrap}.main-card{padding:16px}.site-header h1{font-size:1rem}.logo{width:36px;height:36px}}
 
-/* Group header styles for preview modal */
-.preview-group {
-  margin-top: 8px;
-  border: 1px solid #f3f3f3;
-  border-radius: 6px;
-  overflow: hidden;
-}
-.group-header {
-  padding: 8px 10px;
-  cursor: pointer;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-}
-.group-icon {
-  display: inline-block;
-  width: 20px;
-  text-align: center;
-}
-.preview-group details[open] .group-header {
-  background: #fbfbfb;
-}
+/* end of styles */

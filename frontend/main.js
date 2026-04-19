@@ -35,32 +35,32 @@ document.addEventListener("DOMContentLoaded", () => {
       }`;
       body.innerHTML = "";
       const summary = (preview && preview.summary) || {};
-      const sumEl = document.createElement("div");
-      sumEl.textContent = `Actions: ${summary.actions || 0} — Files: ${
-        summary.files || 0
-      } — Bytes: ${formatBytes(summary.bytes || 0)}`;
-      body.appendChild(sumEl);
-      ((preview && preview.actions) || []).forEach((a) => {
-        const d = document.createElement("div");
-        const src = a.src || a.from || a.from_path || a.path || "";
-        const dst = a.dst || a.to || a.to_path || "";
-        d.textContent = `${a.action || a.type || "op"} ${src} ${dst ? "→ " + dst : ""}`;
-        body.appendChild(d);
-      });
-      footer.innerHTML = "";
-      const close = document.createElement("button");
-      close.textContent = "Close";
-      close.onclick = closePreviewModal;
-      footer.appendChild(close);
-      modal.classList.remove("hidden");
-      modal.setAttribute("aria-hidden", "false");
-    } catch (e) {
-      // best-effort: if modal not present, no-op
-    }
-  }
-
-  function closePreviewModal() {
-    const modal = document.getElementById("preview-modal");
+        const prefExtra = document.createElement("div");
+        prefExtra.innerHTML = `
+                    <h3>Scan Index</h3>
+                    <button id="index-stats" class="btn">Get Index Stats</button>
+                    <button id="index-rebuild" class="btn">Rebuild Index (sample hashes)</button>
+                    <button id="index-rebuild-bg" class="btn ml-8">Rebuild Index (Background)</button>
+                    <div class="mt-6">
+                      <label>Prune retention days: <input id="index-prune-days" type="number" value="365"></label>
+                      <label class="ml-8">Max entries: <input id="index-prune-max" type="number" placeholder="(optional)"></label>
+                      <button id="index-prune" class="btn">Prune Index</button>
+                    </div>
+                    <pre id="index-result" class="mt-8"></pre>
+                                        <h3 class="mt-12">Scheduled Maintenance</h3>
+                                        <label><input id="maint-enabled" type="checkbox"> Enable scheduled maintenance</label>
+                                        <div class="mt-6">
+                                            <label>Prune days: <input id="maint-prune-days" type="number" value="30"></label>
+                                            <label class="ml-8">Max entries: <input id="maint-prune-max" type="number" placeholder="(optional)"></label>
+                                            <label class="ml-8">Interval hours: <input id="maint-interval-hours" type="number" value="24"></label>
+                                        </div>
+                                        <div class="mt-6">
+                                            <button id="maint-save" class="btn">Save Maintenance Settings</button>
+                                            <button id="maint-run" class="btn ml-8">Run Now</button>
+                                            <button id="maint-status" class="btn ml-8">Show Last Run</button>
+                                        </div>
+                                        <pre id="maint-result" class="mt-8"></pre>
+                `;
     if (!modal) return;
     modal.classList.add("hidden");
     modal.setAttribute("aria-hidden", "true");
@@ -456,7 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // render progress bar + text + cancel
             prog.innerHTML = `
-                  <div class="progress"><div class="progress-bar" id="vis-progress-bar" style="width:0%"></div></div>
+                  <div class="progress"><div class="progress-bar" id="vis-progress-bar"></div></div>
                   <div class="progress-text" id="vis-progress-text">Job <strong>${jobId}</strong> started (backend: ${j.backend})</div>
                   <div class="mt-6"><button id="scan-cancel" class="btn">Cancel</button></div>
                 `;
@@ -820,7 +820,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const j = await r.json();
           const jobId = j.job_id;
           const resEl = document.getElementById("index-result");
-          resEl.innerHTML = `<div class="progress"><div class="progress-bar" id="index-progress-bar" style="width:0%"></div></div><div id="index-progress-text">Job ${jobId} started (backend: ${j.backend})</div>`;
+          resEl.innerHTML = `<div class="progress"><div class="progress-bar" id="index-progress-bar"></div></div><div id="index-progress-text">Job ${jobId} started (backend: ${j.backend})</div>`;
 
           // connect to SSE for updates
           try {
@@ -1081,6 +1081,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const close = document.createElement("button");
     close.textContent = "Close";
     close.onclick = closePreviewModal;
+    close.classList.add('btn');
     footer.appendChild(close);
 
     // optional execute button
@@ -1105,6 +1106,7 @@ document.addEventListener("DOMContentLoaded", () => {
         execute.disabled = false;
       }
     };
+    execute.classList.add('btn','primary');
     footer.appendChild(execute);
 
     // show modal
@@ -1137,9 +1139,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // helper: mark active nav button
   function setActiveNav(section) {
     try {
-      document.querySelectorAll('.site-nav .nav-btn').forEach((b) => b.classList.remove('active'));
+      document.querySelectorAll('.site-nav .nav-btn').forEach((b) => {
+        b.classList.remove('active');
+        try {
+          b.setAttribute('aria-pressed', 'false');
+          b.removeAttribute('aria-current');
+        } catch (e) {}
+      });
       const el = document.getElementById('nav-' + section);
-      if (el) el.classList.add('active');
+      if (el) {
+        el.classList.add('active');
+        try {
+          el.setAttribute('aria-pressed', 'true');
+          el.setAttribute('aria-current', 'page');
+        } catch (e) {}
+      }
     } catch (e) {
       // ignore when DOM not ready
     }
