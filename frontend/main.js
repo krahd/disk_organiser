@@ -1,5 +1,16 @@
 /* eslint-env browser */
-/* global d3 */
+
+// lazy-load D3 only when visualisation is requested (avoids network fetch during tests)
+function ensureD3() {
+  return new Promise((resolve, reject) => {
+    if (typeof window.d3 !== "undefined") return resolve(window.d3);
+    const s = document.createElement("script");
+    s.src = "https://d3js.org/d3.v7.min.js";
+    s.onload = () => resolve(window.d3);
+    s.onerror = () => reject(new Error("Failed to load d3"));
+    document.head.appendChild(s);
+  });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   const main = document.getElementById("main-content");
@@ -23,53 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Preview modal helpers exposed on `window` for testability
-  function openPreviewModal(preview) {
-    const modal = document.getElementById("preview-modal");
-    const title = document.getElementById("preview-modal-title");
-    const body = document.getElementById("preview-modal-body");
-    const footer = document.getElementById("preview-modal-footer");
-    try {
-      title.textContent = `Preview — ${
-        preview && preview.op && preview.op.id ? preview.op.id : ""
-      }`;
-      body.innerHTML = "";
-      const summary = (preview && preview.summary) || {};
-        const prefExtra = document.createElement("div");
-        prefExtra.innerHTML = `
-                    <h3>Scan Index</h3>
-                    <button id="index-stats" class="btn">Get Index Stats</button>
-                    <button id="index-rebuild" class="btn">Rebuild Index (sample hashes)</button>
-                    <button id="index-rebuild-bg" class="btn ml-8">Rebuild Index (Background)</button>
-                    <div class="mt-6">
-                      <label>Prune retention days: <input id="index-prune-days" type="number" value="365"></label>
-                      <label class="ml-8">Max entries: <input id="index-prune-max" type="number" placeholder="(optional)"></label>
-                      <button id="index-prune" class="btn">Prune Index</button>
-                    </div>
-                    <pre id="index-result" class="mt-8"></pre>
-                                        <h3 class="mt-12">Scheduled Maintenance</h3>
-                                        <label><input id="maint-enabled" type="checkbox"> Enable scheduled maintenance</label>
-                                        <div class="mt-6">
-                                            <label>Prune days: <input id="maint-prune-days" type="number" value="30"></label>
-                                            <label class="ml-8">Max entries: <input id="maint-prune-max" type="number" placeholder="(optional)"></label>
-                                            <label class="ml-8">Interval hours: <input id="maint-interval-hours" type="number" value="24"></label>
-                                        </div>
-                                        <div class="mt-6">
-                                            <button id="maint-save" class="btn">Save Maintenance Settings</button>
-                                            <button id="maint-run" class="btn ml-8">Run Now</button>
-                                            <button id="maint-status" class="btn ml-8">Show Last Run</button>
-                                        </div>
-                                        <pre id="maint-result" class="mt-8"></pre>
-                `;
-    if (!modal) return;
-    modal.classList.add("hidden");
-    modal.setAttribute("aria-hidden", "true");
-  }
-
-  // expose helpers globally for tests and external usage
-  window.formatBytes = formatBytes;
-  window.openPreviewModal = openPreviewModal;
-  window.closePreviewModal = closePreviewModal;
+  
 
   function showAlert(message) {
     let container = document.getElementById("app-alert");
@@ -355,7 +320,8 @@ document.addEventListener("DOMContentLoaded", () => {
           };
         }
 
-        function renderTreemap(data, container) {
+        async function renderTreemap(data, container) {
+          await ensureD3();
           container.innerHTML = "";
           const width = Math.max(700, container.clientWidth || 800);
           const height = 500;
@@ -420,7 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
           });
           const j = await res.json();
           const out = document.getElementById("vis-result");
-          if (j.visualisation) renderTreemap(j.visualisation, out);
+          if (j.visualisation) await renderTreemap(j.visualisation, out);
           else out.textContent = JSON.stringify(j, null, 2);
         };
         document.getElementById("vis-bg").onclick = async () => {
