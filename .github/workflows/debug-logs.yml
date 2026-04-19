@@ -1,0 +1,33 @@
+name: Quick debug workflow
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'debug-*'
+
+jobs:
+  quick:
+    name: Quick debug artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create debug file
+        run: |
+          echo "debug run: $(date -u)" > debug.txt
+          echo "repo: $GITHUB_REPOSITORY" >> debug.txt
+          echo "ref: $GITHUB_REF" >> debug.txt
+          echo "sha: $GITHUB_SHA" >> debug.txt
+          echo "actor: $GITHUB_ACTOR" >> debug.txt
+          ls -la >> debug.txt
+
+      - name: Upload debug artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-artifact
+          path: debug.txt
+
+      - name: Print debug file
+        run: cat debug.txt
