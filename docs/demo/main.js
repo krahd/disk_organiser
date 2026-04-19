@@ -32,6 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
       { label: 'Photos', value: 28_400_000 },
       { label: 'Music', value: 10_400_000 },
       { label: 'Documents', value: 680_000 }
+    ],
+    recycle: [
+      { name: 'Videos/clip_old.mp4', size: 56_400_000, note: 'Low quality duplicate' },
+      { name: 'Temp/tmp123.tmp', size: 2_400, note: 'Temporary file' },
+      { name: 'Downloads/manual.pdf', size: 1_240_000, note: 'Installer manual (old)'}
+    ],
+    organise: [
+      { file: 'Documents/report.pdf', suggestion: 'Reports/2026/report.pdf', reason: 'Group by year' },
+      { file: 'Music/track01.mp3', suggestion: 'Music/Album/track01.mp3', reason: 'Place in album folder' }
     ]
   };
 
@@ -52,11 +61,24 @@ document.addEventListener('DOMContentLoaded', () => {
     previewBody.innerHTML = `<p><strong>${file.name}</strong></p><p>Size: ${formatBytes(file.size)}</p><p>${file.note || ''}</p>`;
     previewModal.classList.remove('hidden');
     previewModal.setAttribute('aria-hidden','false');
+    // focus management
+    previewModal.__lastFocus = document.activeElement;
+    previewClose.focus();
   }
 
   previewClose.addEventListener('click', () => {
     previewModal.classList.add('hidden');
     previewModal.setAttribute('aria-hidden','true');
+    if (previewModal.__lastFocus) previewModal.__lastFocus.focus();
+  });
+
+  // close on ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !previewModal.classList.contains('hidden')) {
+      previewModal.classList.add('hidden');
+      previewModal.setAttribute('aria-hidden','true');
+      if (previewModal.__lastFocus) previewModal.__lastFocus.focus();
+    }
   });
 
   function renderViz(data) {
@@ -93,6 +115,66 @@ document.addEventListener('DOMContentLoaded', () => {
   function displayResults() {
     renderDuplicates(sample.duplicates);
     renderViz(sample.byType);
+    // populate recycle and organise panels as well
+    renderRecycleList(sample.recycle);
+    renderOrganiseList(sample.organise);
+  }
+
+  // --- recycle flow ---
+  function renderRecycleList(items) {
+    const ul = document.getElementById('recycle-list');
+    ul.innerHTML = '';
+    items.forEach((it, idx) => {
+      const li = document.createElement('li');
+      li.className = 'dup-item';
+      li.innerHTML = `<label><input type="checkbox" data-idx="${idx}" /> <span class="dup-name">${it.name}</span></label><div class="dup-meta">${formatBytes(it.size)}</div>`;
+      ul.appendChild(li);
+    });
+  }
+
+  document.getElementById('apply-recycle-btn').addEventListener('click', () => {
+    const checks = Array.from(document.querySelectorAll('#recycle-list input[type=checkbox]'));
+    const selected = checks.filter(c => c.checked).map(c => sample.recycle[Number(c.dataset.idx)]);
+    if (selected.length === 0) {
+      previewBody.innerHTML = '<p>No items selected for removal.</p>';
+    } else {
+      previewBody.innerHTML = `<p><strong>${selected.length} items</strong> selected for preview:</p><ul>${selected.map(s => `<li>${s.name} — ${formatBytes(s.size)}</li>`).join('')}</ul>`;
+    }
+    previewModal.classList.remove('hidden');
+    previewModal.setAttribute('aria-hidden','false');
+    previewModal.__lastFocus = document.activeElement;
+    previewClose.focus();
+  });
+
+  // --- organise flow ---
+  function renderOrganiseList(items) {
+    const ul = document.getElementById('organise-list');
+    ul.innerHTML = '';
+    items.forEach((it, idx) => {
+      const li = document.createElement('li');
+      li.className = 'dup-item';
+      li.innerHTML = `<div class="dup-name">${it.file} → ${it.suggestion}</div><div class="dup-meta">${it.reason}</div>`;
+      ul.appendChild(li);
+    });
+  }
+
+  document.getElementById('apply-organise-btn').addEventListener('click', () => {
+    const items = sample.organise;
+    previewBody.innerHTML = `<p>Preview suggested moves (${items.length}):</p><ul>${items.map(i => `<li>${i.file} → ${i.suggestion} (${i.reason})</li>`).join('')}</ul>`;
+    previewModal.classList.remove('hidden');
+    previewModal.setAttribute('aria-hidden','false');
+    previewModal.__lastFocus = document.activeElement;
+    previewClose.focus();
+  });
+
+  // panel show/hide helpers
+  function showPanel(panelId) {
+    ['duplicates-panel','viz-panel','recycle-panel','organise-panel','preferences-panel'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (id === panelId) { el.classList.remove('hidden'); el.setAttribute('aria-hidden','false'); }
+      else { el.classList.add('hidden'); el.setAttribute('aria-hidden','true'); }
+    });
   }
 
   // Simulated scan
@@ -122,11 +204,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btn) btn.setAttribute('aria-pressed','true');
   }
 
-  document.getElementById('nav-duplicates').addEventListener('click', () => { setNavActive('nav-duplicates'); duplicatesList.parentElement.scrollIntoView({behavior:'smooth'}); });
-  document.getElementById('nav-visualisation').addEventListener('click', () => { setNavActive('nav-visualisation'); viz.parentElement.scrollIntoView({behavior:'smooth'}); });
-  document.getElementById('nav-recycle').addEventListener('click', () => { setNavActive('nav-recycle'); alert('Recycle (demo): shows files flagged for removal.'); });
-  document.getElementById('nav-organise').addEventListener('click', () => { setNavActive('nav-organise'); alert('Organise (demo): displays suggested folder structure.'); });
-  document.getElementById('nav-preferences').addEventListener('click', () => { setNavActive('nav-preferences'); alert('Preferences (demo): preview only.'); });
+  document.getElementById('nav-duplicates').addEventListener('click', () => { setNavActive('nav-duplicates'); showPanel('duplicates-panel'); duplicatesList.parentElement.scrollIntoView({behavior:'smooth'}); });
+  document.getElementById('nav-visualisation').addEventListener('click', () => { setNavActive('nav-visualisation'); showPanel('viz-panel'); viz.parentElement.scrollIntoView({behavior:'smooth'}); });
+  document.getElementById('nav-recycle').addEventListener('click', () => { setNavActive('nav-recycle'); showPanel('recycle-panel'); document.getElementById('recycle-list').scrollIntoView({behavior:'smooth'}); });
+  document.getElementById('nav-organise').addEventListener('click', () => { setNavActive('nav-organise'); showPanel('organise-panel'); document.getElementById('organise-list').scrollIntoView({behavior:'smooth'}); });
+  document.getElementById('nav-preferences').addEventListener('click', () => { setNavActive('nav-preferences'); showPanel('preferences-panel'); alert('Preferences (demo): preview only.'); });
 
   // initial small hint
   scanStatus.textContent = 'No scan yet. Click "Run simulated scan" to populate demo data.';
