@@ -1,18 +1,133 @@
-// Static copy of frontend main.js — keeping app structure but non-functional without backend
+// Demo main.js — adds simulated scan, sample data, and small D3 visualisation
 /* eslint-env browser */
 /* global d3 */
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  const units = ['KB','MB','GB','TB'];
+  let u = -1;
+  do { bytes /= 1024; u++; } while (bytes >= 1024 && u < units.length - 1);
+  return bytes.toFixed(1) + ' ' + units[u];
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  const main = document.getElementById('main-content');
-  function setSection(title, html) {
-    main.innerHTML = `<h2>${title}</h2>` + (html || '');
+  const scanBtn = document.getElementById('scan-btn');
+  const scanStatus = document.getElementById('scan-status');
+  const duplicatesList = document.getElementById('duplicates-list');
+  const viz = document.getElementById('viz');
+  const previewModal = document.getElementById('preview-modal');
+  const previewBody = document.getElementById('preview-modal-body');
+  const previewClose = document.getElementById('preview-modal-close');
+
+  const sample = {
+    duplicates: [
+      { name: 'Photos/IMG_001.jpg', size: 14_200_000, note: 'Shot on phone' },
+      { name: 'Photos/IMG_001 (copy).jpg', size: 14_200_000, note: 'Duplicate copy' },
+      { name: 'Music/track01.mp3', size: 5_200_000, note: 'Album rip' },
+      { name: 'Music/track01 (1).mp3', size: 5_200_000, note: 'Duplicate copy' },
+      { name: 'Documents/report.pdf', size: 340_000, note: 'Quarterly report' },
+      { name: 'Documents/report (copy).pdf', size: 340_000, note: 'Duplicate copy' }
+    ],
+    byType: [
+      { label: 'Photos', value: 28_400_000 },
+      { label: 'Music', value: 10_400_000 },
+      { label: 'Documents', value: 680_000 }
+    ]
+  };
+
+  function renderDuplicates(list) {
+    duplicatesList.innerHTML = '';
+    list.forEach((f, i) => {
+      const li = document.createElement('li');
+      li.className = 'dup-item';
+      li.tabIndex = 0;
+      li.innerHTML = `<div class="dup-name">${f.name}</div><div class="dup-meta">${formatBytes(f.size)}</div>`;
+      li.addEventListener('click', () => showPreview(f));
+      li.addEventListener('keydown', (e) => { if (e.key === 'Enter') showPreview(f); });
+      duplicatesList.appendChild(li);
+    });
   }
-  document.getElementById('nav-duplicates').addEventListener('click', () => {
-    setSection('Duplicate Search', '<p>(Demo) This feature requires the backend API to run.</p>');
+
+  function showPreview(file) {
+    previewBody.innerHTML = `<p><strong>${file.name}</strong></p><p>Size: ${formatBytes(file.size)}</p><p>${file.note || ''}</p>`;
+    previewModal.classList.remove('hidden');
+    previewModal.setAttribute('aria-hidden','false');
+  }
+
+  previewClose.addEventListener('click', () => {
+    previewModal.classList.add('hidden');
+    previewModal.setAttribute('aria-hidden','true');
   });
-  document.getElementById('nav-visualisation').addEventListener('click', () => {
-    setSection('Visualisation', '<p>(Demo) Interactive visualisations need the API.</p>');
+
+  function renderViz(data) {
+    viz.innerHTML = '';
+    const width = Math.min(480, viz.clientWidth || 480);
+    const height = 220;
+    const svg = d3.select(viz).append('svg').attr('width', width).attr('height', height);
+
+    const margin = {top:20,right:20,bottom:30,left:100};
+    const w = width - margin.left - margin.right;
+    const h = height - margin.top - margin.bottom;
+
+    const x = d3.scaleLinear().range([0, w]).domain([0, d3.max(data, d => d.value)]);
+    const y = d3.scaleBand().range([0, h]).domain(data.map(d => d.label)).padding(0.2);
+
+    const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+    g.append('g').call(d3.axisLeft(y));
+    g.selectAll('.bar').data(data).enter().append('rect')
+      .attr('class','bar')
+      .attr('y', d => y(d.label))
+      .attr('height', y.bandwidth())
+      .attr('x', 0)
+      .attr('width', d => x(d.value))
+      .style('fill','#2563eb');
+
+    g.selectAll('.label').data(data).enter().append('text')
+      .attr('x', d => x(d.value) + 8)
+      .attr('y', d => y(d.label) + y.bandwidth() / 2 + 4)
+      .text(d => formatBytes(d.value))
+      .style('font-size','12px')
+      .style('fill','#0f172a');
+  }
+
+  function displayResults() {
+    renderDuplicates(sample.duplicates);
+    renderViz(sample.byType);
+  }
+
+  // Simulated scan
+  scanBtn.addEventListener('click', () => {
+    scanBtn.disabled = true;
+    scanStatus.textContent = 'Scanning: 0%';
+    let p = 0;
+    const t = setInterval(() => {
+      p += Math.floor(Math.random() * 18) + 7;
+      if (p >= 100) {
+        p = 100;
+        scanStatus.textContent = 'Scan complete — sample data loaded.';
+        clearInterval(t);
+        scanBtn.disabled = false;
+        displayResults();
+      } else {
+        scanStatus.textContent = `Scanning: ${p}%`;
+      }
+    }, 300);
   });
-  document.getElementById('nav-recycle').addEventListener('click', () => setSection('Recycle'));
-  document.getElementById('nav-organise').addEventListener('click', () => setSection('Organise'));
-  document.getElementById('nav-preferences').addEventListener('click', () => setSection('Preferences'));
+
+  // navigation behaviour (show panels)
+  const navButtons = document.querySelectorAll('.site-nav .nav-btn');
+  function setNavActive(id) {
+    navButtons.forEach(b => b.setAttribute('aria-pressed','false'));
+    const btn = document.getElementById(id);
+    if (btn) btn.setAttribute('aria-pressed','true');
+  }
+
+  document.getElementById('nav-duplicates').addEventListener('click', () => { setNavActive('nav-duplicates'); duplicatesList.parentElement.scrollIntoView({behavior:'smooth'}); });
+  document.getElementById('nav-visualisation').addEventListener('click', () => { setNavActive('nav-visualisation'); viz.parentElement.scrollIntoView({behavior:'smooth'}); });
+  document.getElementById('nav-recycle').addEventListener('click', () => { setNavActive('nav-recycle'); alert('Recycle (demo): shows files flagged for removal.'); });
+  document.getElementById('nav-organise').addEventListener('click', () => { setNavActive('nav-organise'); alert('Organise (demo): displays suggested folder structure.'); });
+  document.getElementById('nav-preferences').addEventListener('click', () => { setNavActive('nav-preferences'); alert('Preferences (demo): preview only.'); });
+
+  // initial small hint
+  scanStatus.textContent = 'No scan yet. Click "Run simulated scan" to populate demo data.';
 });
