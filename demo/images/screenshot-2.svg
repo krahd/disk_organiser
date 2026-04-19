@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" rx="12" fill="#fff" stroke="#e6eef7"/>
+  <g fill="#fff3e8"><rect x="20" y="40" width="600" height="24" rx="6"/></g>
+  <g transform="translate(20,80)"><rect width="600" height="200" rx="8" fill="#fff7ed"/></g>
+  <text x="320" y="300" font-family="Inter,Arial" font-size="14" text-anchor="middle" fill="#6b7280">Demo screenshot</text>
+</svg>
