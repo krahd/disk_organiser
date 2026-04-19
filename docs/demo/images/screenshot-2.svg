@@ -1,3 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="Demo screenshot: storage visualisation">
+  <rect width="100%" height="100%" fill="#f8fafc"/>
+  <text x="56" y="60" font-family="Inter, sans-serif" font-size="20" fill="#0f172a">Storage Visualisation</text>
+  <!-- simple bar chart mock -->
+  <g transform="translate(80,110)">
+    <rect x="0" y="0" width="640" height="260" rx="12" fill="#fff" stroke="#e6eef8"/>
+    <g transform="translate(32,30)">
+      <rect x="0" y="0" width="520" height="40" fill="#e6f0ff"/>
+      <rect x="0" y="60" width="380" height="40" fill="#e6f0ff"/>
+      <rect x="0" y="120" width="240" height="40" fill="#e6f0ff"/>
+      <text x="12" y="28" font-family="Inter, sans-serif" font-size="14" fill="#0f172a">Photos — 28.4 MB</text>
+      <text x="12" y="88" font-family="Inter, sans-serif" font-size="14" fill="#0f172a">Music — 10.4 MB</text>
+      <text x="12" y="148" font-family="Inter, sans-serif" font-size="14" fill="#0f172a">Documents — 680 KB</text>
+    </g>
+  </g>
+</svg>
 <svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
   <rect width="640" height="360" rx="12" fill="#fff" stroke="#e6eef7"/>
   <g fill="#fff3e8"><rect x="20" y="40" width="600" height="24" rx="6"/></g>
