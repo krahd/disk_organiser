@@ -4,23 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Disk Organiser</title>
+    <link rel="icon" href="images/logo.svg" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
     <script src="https://d3js.org/d3.v7.min.js"></script>
   </head>
   <body>
-    <header>
-      <h1>Disk Organiser</h1>
+    <header class="site-header">
+      <div class="brand">
+        <img src="images/logo.svg" alt="Disk Organiser logo" class="logo" />
+        <div class="title">
+          <h1>Disk Organiser</h1>
+          <p class="tagline">Find duplicates, visualise and organise your files</p>
+        </div>
+      </div>
     </header>
-    <nav>
-      <button id="nav-duplicates">Duplicate Search</button>
-      <button id="nav-visualisation">Visualisation</button>
-      <button id="nav-recycle">Recycle</button>
-      <button id="nav-organise">Organise</button>
-      <button id="nav-preferences">Preferences</button>
-    </nav>
-    <main id="main-content">
-      <!-- Content will be loaded here -->
-    </main>
+
+    <div class="app">
+      <nav class="site-nav" role="navigation" aria-label="Main">
+        <button id="nav-duplicates" class="nav-btn">Duplicate Search</button>
+        <button id="nav-visualisation" class="nav-btn">Visualisation</button>
+        <button id="nav-recycle" class="nav-btn">Recycle</button>
+        <button id="nav-organise" class="nav-btn">Organise</button>
+        <button id="nav-preferences" class="nav-btn">Preferences</button>
+      </nav>
+
+      <main id="main-content" class="main-card">
+        <!-- Content will be loaded here -->
+      </main>
+    </div>
     <script src="main.js"></script>
     <!-- Preview modal (hidden by default) -->
     <div id="preview-modal" class="modal hidden" aria-hidden="true">

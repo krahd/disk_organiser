@@ -76,21 +76,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) {
       container = document.createElement("div");
       container.id = "app-alert";
-      container.style.position = "fixed";
-      container.style.bottom = "16px";
-      container.style.right = "16px";
-      container.style.background = "rgba(0,0,0,0.8)";
-      container.style.color = "#fff";
-      container.style.padding = "8px 12px";
-      container.style.borderRadius = "6px";
-      container.style.zIndex = "9999";
+      container.className = "app-alert";
       document.body.appendChild(container);
     }
     container.textContent = typeof message === "string" ? message : JSON.stringify(message);
-    container.style.display = "block";
+    container.classList.add("visible");
     clearTimeout(container._timeout);
     container._timeout = setTimeout(() => {
-      container.style.display = "none";
+      container.classList.remove("visible");
     }, 5000);
   }
   function loadContent(section) {
@@ -99,13 +92,13 @@ document.addEventListener("DOMContentLoaded", () => {
         main.innerHTML = `
                     <h2>Duplicate Search</h2>
                     <p>Find duplicate files on your hard drive.</p>
-                    <label>Path: <input id="dup-path" type="text" placeholder="/path/to/scan" style="width:60%"></label>
+                    <label>Path: <input id="dup-path" type="text" placeholder="/path/to/scan" class="input-wide"></label>
                     <label>Min size (bytes): <input id="dup-min" type="number" value="1"></label>
                     <label>Max files to process: <input id="dup-max" type="number" placeholder="(optional)"></label>
                     <label>Workers: <input id="dup-workers" type="number" placeholder="(optional)"></label>
-                    <button id="dup-run">Run</button>
-                    <label style="margin-left:1rem"><input id="use-ai-suggestions" type="checkbox"> Use AI suggestions</label>
-                    <div id="dup-actions" style="margin-top:1rem"></div>
+                    <button id="dup-run" class="btn primary">Run</button>
+                    <label class="ml-1rem"><input id="use-ai-suggestions" type="checkbox"> Use AI suggestions</label>
+                    <div id="dup-actions" class="mt-1"></div>
                     <div id="dup-result"></div>
                 `;
         document.getElementById("dup-run").onclick = async () => {
@@ -131,10 +124,10 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.textContent = "Create Preview";
             // editable suggestions UI container
             const editorContainer = document.createElement("div");
-            editorContainer.style.marginTop = "8px";
+            editorContainer.className = "editor-container";
             const editBtn = document.createElement("button");
             editBtn.textContent = "Edit Suggestions";
-            editBtn.style.marginLeft = "8px";
+            editBtn.className = "btn";
             let currentSuggestions = null;
 
             editBtn.onclick = () => {
@@ -145,11 +138,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
               }
               const ta = document.createElement("textarea");
-              ta.style.width = "100%";
-              ta.style.height = "200px";
+              ta.className = "editor-textarea";
               ta.value = JSON.stringify(currentSuggestions, null, 2);
               const save = document.createElement("button");
               save.textContent = "Save Suggestions";
+              save.className = "btn primary";
               save.onclick = () => {
                 try {
                   const parsed = JSON.parse(ta.value);
@@ -162,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
               };
               const cancel = document.createElement("button");
               cancel.textContent = "Cancel";
-              cancel.style.marginLeft = "8px";
+              cancel.className = "btn";
               cancel.onclick = () => {
                 editorContainer.innerHTML = "";
               };
@@ -190,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
               actions.appendChild(editorContainer);
               const createOp = document.createElement("button");
               createOp.textContent = "Create Preview (from suggestions)";
-              createOp.style.marginLeft = "8px";
+              createOp.className = "btn primary";
               createOp.onclick = async () => {
                 createOp.disabled = true;
                 try {
@@ -204,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   // show preview / execute / undo controls
                   const previewBtn = document.createElement("button");
                   previewBtn.textContent = "Preview";
-                  previewBtn.style.marginLeft = "8px";
+                  previewBtn.className = "btn";
                   previewBtn.onclick = async () => {
                     previewBtn.disabled = true;
                     try {
@@ -226,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   actions.appendChild(previewBtn);
                   const exec = document.createElement("button");
                   exec.textContent = "Execute";
-                  exec.style.marginLeft = "8px";
+                  exec.className = "btn primary";
                   exec.onclick = async () => {
                     exec.disabled = true;
                     const er = await fetch("/api/organise/execute", {
@@ -265,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
             actions.appendChild(editBtn);
             const recycleBtn = document.createElement("button");
             recycleBtn.textContent = "Move to Recycle Bin (safe)";
-            recycleBtn.style.marginLeft = "8px";
+            recycleBtn.className = "btn secondary";
             recycleBtn.onclick = async () => {
               const pres = await fetch("http://127.0.0.1:5000/api/organise/remove-preview", {
                 method: "POST",
@@ -276,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
               actions.innerHTML = `<div>Recycle preview created: <strong>${pj.op.id}</strong></div>`;
               const previewBtn = document.createElement("button");
               previewBtn.textContent = "Preview";
-              previewBtn.style.marginLeft = "8px";
+              previewBtn.className = "btn";
               previewBtn.onclick = async () => {
                 previewBtn.disabled = true;
                 try {
@@ -296,7 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
               actions.appendChild(previewBtn);
               const exec = document.createElement("button");
               exec.textContent = "Execute (move to recycle)";
-              exec.style.marginLeft = "8px";
+              exec.className = "btn primary";
               exec.onclick = async () => {
                 const er = await fetch("http://127.0.0.1:5000/api/organise/execute", {
                   method: "POST",
@@ -327,8 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
           out.innerHTML = "";
           j.duplicates.forEach((g, i) => {
             const div = document.createElement("div");
-            div.style.borderTop = "1px solid #eee";
-            div.style.padding = "0.5rem 0";
+            div.className = "dup-group";
             const title = document.createElement("div");
             title.textContent = `Group ${i + 1} (hash: ${g.hash})`;
             div.appendChild(title);
@@ -347,12 +339,12 @@ document.addEventListener("DOMContentLoaded", () => {
         main.innerHTML = `
                     <h2>Visualisation</h2>
                     <p>Visualise your hard drive structure and usage.</p>
-                    <label>Path: <input id="vis-path" type="text" placeholder="/path/to/scan" style="width:60%"></label>
+                    <label>Path: <input id="vis-path" type="text" placeholder="/path/to/scan" class="input-wide"></label>
                     <label>Depth: <input id="vis-depth" type="number" value="2"></label>
                     <label>Workers: <input id="vis-workers" type="number" placeholder="(optional)"></label>
-                    <button id="vis-run">Run</button>
-                    <button id="vis-bg">Run Background Scan</button>
-                    <div id="vis-progress" style="margin-top:0.5rem"></div>
+                    <button id="vis-run" class="btn primary">Run</button>
+                    <button id="vis-bg" class="btn">Run Background Scan</button>
+                    <div id="vis-progress" class="mt-06"></div>
                     <div id="vis-result"></div>
                 `;
         function toHierarchy(node) {
@@ -462,12 +454,12 @@ document.addEventListener("DOMContentLoaded", () => {
             // ignore
           }
 
-          // render progress bar + text + cancel
-          prog.innerHTML = `
-                        <div class="progress"><div class="progress-bar" id="vis-progress-bar" style="width:0%"></div></div>
-                        <div class="progress-text" id="vis-progress-text">Job <strong>${jobId}</strong> started (backend: ${j.backend})</div>
-                        <div style="margin-top:6px"><button id="scan-cancel">Cancel</button></div>
-                    `;
+            // render progress bar + text + cancel
+            prog.innerHTML = `
+                  <div class="progress"><div class="progress-bar" id="vis-progress-bar" style="width:0%"></div></div>
+                  <div class="progress-text" id="vis-progress-text">Job <strong>${jobId}</strong> started (backend: ${j.backend})</div>
+                  <div class="mt-6"><button id="scan-cancel" class="btn">Cancel</button></div>
+                `;
 
           const cancelBtn = document.getElementById("scan-cancel");
           cancelBtn.onclick = async () => {
@@ -572,9 +564,9 @@ document.addEventListener("DOMContentLoaded", () => {
         main.innerHTML = `
                     <h2>Organise</h2>
                     <p>Review created operations, view details, undo or remove backups.</p>
-                    <button id="ops-refresh">Refresh Ops</button>
-                    <div id="ops-list" style="margin-top:1rem"></div>
-                    <div id="ops-detail" style="margin-top:1rem"></div>
+                    <button id="ops-refresh" class="btn">Refresh Ops</button>
+                    <div id="ops-list" class="mt-1"></div>
+                    <div id="ops-detail" class="mt-1"></div>
                 `;
         async function loadOps() {
           const res = await fetch("http://127.0.0.1:5000/api/ops");
@@ -585,9 +577,7 @@ document.addEventListener("DOMContentLoaded", () => {
           for (const opId of Object.keys(ops)) {
             const op = ops[opId];
             const card = document.createElement("div");
-            card.style.border = "1px solid #ddd";
-            card.style.padding = "8px";
-            card.style.marginBottom = "8px";
+            card.className = "card";
             const title = document.createElement("div");
             title.innerHTML = `<strong>Op:</strong> ${opId} — <em>${op.status}</em>`;
             card.appendChild(title);
@@ -596,6 +586,7 @@ document.addEventListener("DOMContentLoaded", () => {
             card.appendChild(meta);
             const view = document.createElement("button");
             view.textContent = "View Details";
+            view.className = "btn";
             view.onclick = async () => {
               const dres = await fetch(`http://127.0.0.1:5000/api/op/${opId}`);
               const dj = await dres.json();
@@ -605,7 +596,7 @@ document.addEventListener("DOMContentLoaded", () => {
             card.appendChild(view);
             const undo = document.createElement("button");
             undo.textContent = "Undo";
-            undo.style.marginLeft = "8px";
+            undo.className = "btn";
             undo.onclick = async () => {
               const r = await fetch("http://127.0.0.1:5000/api/organise/undo", {
                 method: "POST",
@@ -618,7 +609,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
             const previewUndo = document.createElement("button");
             previewUndo.textContent = "Preview Undo";
-            previewUndo.style.marginLeft = "8px";
+            previewUndo.className = "btn";
             previewUndo.onclick = async () => {
               const r = await fetch("http://127.0.0.1:5000/api/organise/undo", {
                 method: "POST",
@@ -633,7 +624,7 @@ document.addEventListener("DOMContentLoaded", () => {
             card.appendChild(previewUndo);
             const del = document.createElement("button");
             del.textContent = "Delete Backup";
-            del.style.marginLeft = "8px";
+            del.className = "btn secondary";
             del.onclick = async () => {
               const r = await fetch("http://127.0.0.1:5000/api/recycle/delete_op", {
                 method: "POST",
@@ -646,7 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
             const previewDelete = document.createElement("button");
             previewDelete.textContent = "Preview Delete";
-            previewDelete.style.marginLeft = "8px";
+            previewDelete.className = "btn";
             previewDelete.onclick = async () => {
               const r = await fetch("http://127.0.0.1:5000/api/recycle/delete_op", {
                 method: "POST",
@@ -669,8 +660,8 @@ document.addEventListener("DOMContentLoaded", () => {
         main.innerHTML = `
                     <h2>Recycle Bin</h2>
                     <label>Retention days: <input id="recycle-days" type="number" value="30"></label>
-                    <button id="recycle-clean">Run Cleanup</button>
-                    <div id="recycle-list" style="margin-top:1rem"></div>
+                    <button id="recycle-clean" class="btn">Run Cleanup</button>
+                    <div id="recycle-list" class="mt-1"></div>
                 `;
         document.getElementById("recycle-clean").onclick = async () => {
           const days = parseInt(document.getElementById("recycle-days").value || "30", 10);
@@ -692,9 +683,7 @@ document.addEventListener("DOMContentLoaded", () => {
           for (const opId of Object.keys(data)) {
             const op = data[opId];
             const card = document.createElement("div");
-            card.style.border = "1px solid #ddd";
-            card.style.padding = "8px";
-            card.style.marginBottom = "8px";
+            card.className = "card";
             const title = document.createElement("div");
             title.innerHTML = `<strong>Op:</strong> ${opId} — <em>${op.status}</em>`;
             card.appendChild(title);
@@ -710,6 +699,7 @@ document.addEventListener("DOMContentLoaded", () => {
             card.appendChild(files);
             const undo = document.createElement("button");
             undo.textContent = "Undo (restore)";
+            undo.className = "btn";
             undo.onclick = async () => {
               const r = await fetch("http://127.0.0.1:5000/api/organise/undo", {
                 method: "POST",
@@ -722,7 +712,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
             const previewUndo = document.createElement("button");
             previewUndo.textContent = "Preview Undo";
-            previewUndo.style.marginLeft = "8px";
+            previewUndo.className = "btn";
             previewUndo.onclick = async () => {
               const r = await fetch("http://127.0.0.1:5000/api/organise/undo", {
                 method: "POST",
@@ -737,7 +727,7 @@ document.addEventListener("DOMContentLoaded", () => {
             card.appendChild(previewUndo);
             const del = document.createElement("button");
             del.textContent = "Delete Backup (permanent)";
-            del.style.marginLeft = "8px";
+            del.className = "btn secondary";
             del.onclick = async () => {
               const r = await fetch("http://127.0.0.1:5000/api/recycle/delete_op", {
                 method: "POST",
@@ -750,7 +740,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
             const previewDelete = document.createElement("button");
             previewDelete.textContent = "Preview Delete";
-            previewDelete.style.marginLeft = "8px";
+            previewDelete.className = "btn";
             previewDelete.onclick = async () => {
               const r = await fetch("http://127.0.0.1:5000/api/recycle/delete_op", {
                 method: "POST",
@@ -780,28 +770,28 @@ document.addEventListener("DOMContentLoaded", () => {
         const prefExtra = document.createElement("div");
         prefExtra.innerHTML = `
                     <h3>Scan Index</h3>
-                    <button id="index-stats">Get Index Stats</button>
-                    <button id="index-rebuild">Rebuild Index (sample hashes)</button>
-                    <button id="index-rebuild-bg" style="margin-left:8px">Rebuild Index (Background)</button>
-                    <div style="margin-top:6px">
+                    <button id="index-stats" class="btn">Get Index Stats</button>
+                    <button id="index-rebuild" class="btn">Rebuild Index (sample hashes)</button>
+                    <button id="index-rebuild-bg" class="btn ml-8">Rebuild Index (Background)</button>
+                    <div class="mt-6">
                       <label>Prune retention days: <input id="index-prune-days" type="number" value="365"></label>
-                      <label style="margin-left:8px">Max entries: <input id="index-prune-max" type="number" placeholder="(optional)"></label>
-                      <button id="index-prune">Prune Index</button>
+                      <label class="ml-8">Max entries: <input id="index-prune-max" type="number" placeholder="(optional)"></label>
+                      <button id="index-prune" class="btn">Prune Index</button>
                     </div>
-                    <pre id="index-result" style="margin-top:8px"></pre>
-                                        <h3 style="margin-top:12px">Scheduled Maintenance</h3>
+                    <pre id="index-result" class="mt-8"></pre>
+                                        <h3 class="mt-12">Scheduled Maintenance</h3>
                                         <label><input id="maint-enabled" type="checkbox"> Enable scheduled maintenance</label>
-                                        <div style="margin-top:6px">
+                                        <div class="mt-6">
                                             <label>Prune days: <input id="maint-prune-days" type="number" value="30"></label>
-                                            <label style="margin-left:8px">Max entries: <input id="maint-prune-max" type="number" placeholder="(optional)"></label>
-                                            <label style="margin-left:8px">Interval hours: <input id="maint-interval-hours" type="number" value="24"></label>
+                                            <label class="ml-8">Max entries: <input id="maint-prune-max" type="number" placeholder="(optional)"></label>
+                                            <label class="ml-8">Interval hours: <input id="maint-interval-hours" type="number" value="24"></label>
                                         </div>
-                                        <div style="margin-top:6px">
-                                            <button id="maint-save">Save Maintenance Settings</button>
-                                            <button id="maint-run" style="margin-left:8px">Run Now</button>
-                                            <button id="maint-status" style="margin-left:8px">Show Last Run</button>
+                                        <div class="mt-6">
+                                            <button id="maint-save" class="btn">Save Maintenance Settings</button>
+                                            <button id="maint-run" class="btn ml-8">Run Now</button>
+                                            <button id="maint-status" class="btn ml-8">Show Last Run</button>
                                         </div>
-                                        <pre id="maint-result" style="margin-top:8px"></pre>
+                                        <pre id="maint-result" class="mt-8"></pre>
                 `;
         document.getElementById("pref-result").parentNode.appendChild(prefExtra);
         document.getElementById("index-stats").onclick = async () => {
@@ -1144,10 +1134,37 @@ document.addEventListener("DOMContentLoaded", () => {
     window.formatBytes = formatBytes;
   } catch (e) {}
 
-  document.getElementById("nav-duplicates").onclick = () => loadContent("duplicates");
-  document.getElementById("nav-visualisation").onclick = () => loadContent("visualisation");
-  document.getElementById("nav-recycle").onclick = () => loadContent("recycle");
-  document.getElementById("nav-organise").onclick = () => loadContent("organise");
-  document.getElementById("nav-preferences").onclick = () => loadContent("preferences");
+  // helper: mark active nav button
+  function setActiveNav(section) {
+    try {
+      document.querySelectorAll('.site-nav .nav-btn').forEach((b) => b.classList.remove('active'));
+      const el = document.getElementById('nav-' + section);
+      if (el) el.classList.add('active');
+    } catch (e) {
+      // ignore when DOM not ready
+    }
+  }
+
+  document.getElementById("nav-duplicates").onclick = () => {
+    setActiveNav('duplicates');
+    loadContent("duplicates");
+  };
+  document.getElementById("nav-visualisation").onclick = () => {
+    setActiveNav('visualisation');
+    loadContent("visualisation");
+  };
+  document.getElementById("nav-recycle").onclick = () => {
+    setActiveNav('recycle');
+    loadContent("recycle");
+  };
+  document.getElementById("nav-organise").onclick = () => {
+    setActiveNav('organise');
+    loadContent("organise");
+  };
+  document.getElementById("nav-preferences").onclick = () => {
+    setActiveNav('preferences');
+    loadContent("preferences");
+  };
+  // initial load (no nav active)
   loadContent();
 });
