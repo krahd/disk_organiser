@@ -1,0 +1,27 @@
+name: Bottle Build Smoke Test
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  smoke:
+    name: Smoke job (tag trigger)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create smoke file
+        run: |
+          echo "smoke run: $(date -u)" > smoke.txt
+          echo "ref: $GITHUB_REF" >> smoke.txt
+          echo "sha: $GITHUB_SHA" >> smoke.txt
+          ls -la >> smoke.txt
+
+      - name: Upload smoke artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-artifact
+          path: smoke.txt
