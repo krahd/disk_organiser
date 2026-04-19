@@ -34,8 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  
-
   function showAlert(message) {
     let container = document.getElementById("app-alert");
     if (!container) {
@@ -343,7 +341,9 @@ document.addEventListener("DOMContentLoaded", () => {
             .attr("transform", (d) => `translate(${d.x0},${d.y0})`)
             .attr("tabindex", 0)
             .attr("role", "button")
-            .attr("aria-label", (d) => (d.data.name ? `${d.data.name} ${formatBytes(d.value || 0)}` : ''))
+            .attr("aria-label", (d) =>
+              d.data.name ? `${d.data.name} ${formatBytes(d.value || 0)}` : ""
+            )
             .classed("treemap-cell", true)
             .style("cursor", "pointer");
 
@@ -359,9 +359,10 @@ document.addEventListener("DOMContentLoaded", () => {
             .attr("x", 4)
             .attr("y", 14)
             .attr("font-size", "12px")
-            .text((d) =>
-              (d.data.name ? d.data.name.split("/").pop() : "") +
-              (d.value ? ` (${formatBytes(d.value)})` : "")
+            .text(
+              (d) =>
+                (d.data.name ? d.data.name.split("/").pop() : "") +
+                (d.value ? ` (${formatBytes(d.value)})` : "")
             );
 
           cell.on("click", (event, d) => {
@@ -420,7 +421,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         body: JSON.stringify({ suggestions: sj.suggestions || [] }),
                       });
                       const pj = await pres.json();
-                      resultEl.innerHTML += `<div class="mt-6">Preview created: <strong>${pj.op && pj.op.id}</strong></div>`;
+                      resultEl.innerHTML += `<div class="mt-6">Preview created: <strong>${
+                        pj.op && pj.op.id
+                      }</strong></div>`;
                     } catch (e) {
                       showAlert("Preview creation failed: " + (e.message || e));
                     } finally {
@@ -517,8 +520,8 @@ document.addEventListener("DOMContentLoaded", () => {
             // ignore
           }
 
-            // render progress bar + text + cancel
-            prog.innerHTML = `
+          // render progress bar + text + cancel
+          prog.innerHTML = `
                   <div class="progress"><div class="progress-bar" id="vis-progress-bar"></div></div>
                   <div class="progress-text" id="vis-progress-text">Job <strong>${jobId}</strong> started (backend: ${j.backend})</div>
                   <div class="mt-6"><button id="scan-cancel" class="btn">Cancel</button></div>
@@ -1144,7 +1147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const close = document.createElement("button");
     close.textContent = "Close";
     close.onclick = closePreviewModal;
-    close.classList.add('btn');
+    close.classList.add("btn");
     footer.appendChild(close);
 
     // optional execute button
@@ -1169,7 +1172,7 @@ document.addEventListener("DOMContentLoaded", () => {
         execute.disabled = false;
       }
     };
-    execute.classList.add('btn','primary');
+    execute.classList.add("btn", "primary");
     footer.appendChild(execute);
 
     // show modal
@@ -1248,19 +1251,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // helper: mark active nav button
   function setActiveNav(section) {
     try {
-      document.querySelectorAll('.site-nav .nav-btn').forEach((b) => {
-        b.classList.remove('active');
+      document.querySelectorAll(".site-nav .nav-btn").forEach((b) => {
+        b.classList.remove("active");
         try {
-          b.setAttribute('aria-pressed', 'false');
-          b.removeAttribute('aria-current');
+          b.setAttribute("aria-pressed", "false");
+          b.removeAttribute("aria-current");
         } catch (e) {}
       });
-      const el = document.getElementById('nav-' + section);
+      const el = document.getElementById("nav-" + section);
       if (el) {
-        el.classList.add('active');
+        el.classList.add("active");
         try {
-          el.setAttribute('aria-pressed', 'true');
-          el.setAttribute('aria-current', 'page');
+          el.setAttribute("aria-pressed", "true");
+          el.setAttribute("aria-current", "page");
         } catch (e) {}
       }
     } catch (e) {
@@ -1269,23 +1272,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   document.getElementById("nav-duplicates").onclick = () => {
-    setActiveNav('duplicates');
+    setActiveNav("duplicates");
     loadContent("duplicates");
   };
   document.getElementById("nav-visualisation").onclick = () => {
-    setActiveNav('visualisation');
+    setActiveNav("visualisation");
     loadContent("visualisation");
   };
   document.getElementById("nav-recycle").onclick = () => {
-    setActiveNav('recycle');
+    setActiveNav("recycle");
     loadContent("recycle");
   };
   document.getElementById("nav-organise").onclick = () => {
-    setActiveNav('organise');
+    setActiveNav("organise");
     loadContent("organise");
   };
   document.getElementById("nav-preferences").onclick = () => {
-    setActiveNav('preferences');
+    setActiveNav("preferences");
     loadContent("preferences");
   };
   // initial load (no nav active)
