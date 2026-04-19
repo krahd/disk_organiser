@@ -83,7 +83,7 @@ jobs:
         run: |
           mkdir -p out
           TARNAME=disk-organiser-${REF_NAME}-macos-$(uname -m)-bin.tar.gz
-          tar czf out/${TARNAME} dist/disk-organiser
+          tar -C dist -czf out/${TARNAME} disk-organiser
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
@@ -132,7 +132,7 @@ jobs:
         run: |
           mkdir -p out
           TARNAME=disk-organiser-${REF_NAME}-linux-$(uname -m)-bin.tar.gz
-          tar czf out/${TARNAME} dist/disk-organiser
+          tar -C dist -czf out/${TARNAME} disk-organiser
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
@@ -226,19 +226,12 @@ class DiskOrganiser < Formula
   sha256 "${MAC_SHA}"
   license "MIT"
 
-  depends_on "python@3.12"
-
   def install
-    libexec.install Dir["*"]
-    (bin/"disk-organiser").write <<~EOS
-      #!/bin/bash
-      exec "#{Formula[\"python@3.12\"].opt_bin}/python3" "#{libexec}/backend/app.py" "$@"
-    EOS
-    chmod 0755, bin/"disk-organiser"
+    bin.install "disk-organiser"
   end
 
   test do
-    assert_predicate libexec/"backend/app.py", :exist?
+    assert_predicate bin/"disk-organiser", :exist?
   end
 end
 RUBY
