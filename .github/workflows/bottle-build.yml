@@ -15,7 +15,42 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Python deps
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt || true
+
+      - name: Run backend tests
+        run: |
+          . .venv/bin/activate
+          pytest -q
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run frontend tests
+        run: |
+          npm ci
+          npm test
+
   build-macos:
+    needs: test
     name: Build macOS binary
     runs-on: macos-latest
     env:
@@ -65,6 +100,7 @@ jobs:
 
   build-linux:
     name: Build Linux binary
+    needs: test
     runs-on: ubuntu-latest
     env:
       REF_NAME: ${{ github.ref_name }}
