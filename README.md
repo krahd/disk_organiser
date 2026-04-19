@@ -14,6 +14,7 @@ This repository contains the backend API under `backend/` and the frontend in
 ![CI](https://github.com/krahd/disk_organiser/actions/workflows/bottle-build.yml/badge.svg)
 
 Website: https://krahd.github.io/disk_organiser/
+Demo (static): https://krahd.github.io/disk_organiser/demo/
 Download (release): https://github.com/krahd/disk_organiser/releases/tag/v0.1.0
 
 
