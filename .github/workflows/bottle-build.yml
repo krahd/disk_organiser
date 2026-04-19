@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 concurrency:
@@ -17,7 +17,7 @@ concurrency:
 jobs:
   test:
     name: Run tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -68,9 +68,9 @@ jobs:
         run: |
           python -m venv .venv
           . .venv/bin/activate
-          python -m pip install --upgrade pip setuptools wheel
-          pip install -r backend/requirements.txt || true
-          pip install pyinstaller==5.13.0
+          python -m pip install --upgrade pip setuptools==65.5.0 wheel
+          python -m pip install -r backend/requirements.txt || true
+          python -m pip install pyinstaller==5.13.0
 
       - name: Build binary (macOS)
         run: |
@@ -117,9 +117,9 @@ jobs:
           sudo apt-get install -y python3-venv build-essential
           python -m venv .venv
           . .venv/bin/activate
-          python -m pip install --upgrade pip setuptools wheel
-          pip install -r backend/requirements.txt || true
-          pip install pyinstaller==5.13.0
+          python -m pip install --upgrade pip setuptools==65.5.0 wheel
+          python -m pip install -r backend/requirements.txt || true
+          python -m pip install pyinstaller==5.13.0
 
       - name: Build binary (Linux)
         run: |
@@ -149,6 +149,7 @@ jobs:
 
   publish-release:
     name: Create release and update Homebrew tap
+    if: "startsWith(github.ref, 'refs/tags/')"
     needs: [build-macos, build-linux]
     runs-on: ubuntu-latest
     env:
