@@ -24,7 +24,7 @@ jobs:
           ls -la >> debug.txt
 
       - name: Upload debug artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: debug-artifact
           path: debug.txt
