@@ -34,8 +34,6 @@ Open `frontend/index.html` in a browser. The frontend expects the API at
 
 ## Screenshot
 
-Here is a preview of the modernised frontend UI (generated snapshot):
-
 ![Frontend screenshot](frontend/images/screenshot.svg)
 
 
