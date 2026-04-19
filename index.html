@@ -1,38 +1,55 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disk Organiser</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Disk Organiser — Project Site</title>
+  <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-    <header>
-        <h1>Disk Organiser</h1>
-    </header>
-    <nav>
-        <button id="nav-duplicates">Duplicate Search</button>
-        <button id="nav-visualisation">Visualisation</button>
-        <button id="nav-recycle">Recycle</button>
-        <button id="nav-organise">Organise</button>
-        <button id="nav-preferences">Preferences</button>
-    </nav>
-    <main id="main-content">
-        <!-- Content will be loaded here -->
-    </main>
-    <script src="main.js"></script>
-    <!-- Preview modal (hidden by default) -->
-    <div id="preview-modal" class="modal hidden" aria-hidden="true">
-        <div class="modal-backdrop" id="preview-modal-backdrop"></div>
-        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="preview-modal-title">
-            <div class="modal-header">
-                <h3 id="preview-modal-title">Preview</h3>
-                <button id="preview-modal-close" aria-label="Close">×</button>
-            </div>
-            <div class="modal-body" id="preview-modal-body"></div>
-            <div class="modal-footer" id="preview-modal-footer"></div>
-        </div>
+  <header>
+    <div class="container">
+      <h1>Disk Organiser</h1>
+      <p class="tagline">Visualise and organise your hard drive with optional AI assistance</p>
+      <nav>
+        <ul>
+          <li><a href="https://github.com/krahd/disk_organiser">Repository</a></li>
+          <li><a href="https://github.com/krahd/disk_organiser/tree/main/docs">Docs</a></li>
+          <li><a href="https://krahd.github.io/disk_organiser/">Frontend demo</a></li>
+          <li><a href="https://github.com/krahd/disk_organiser/blob/main/README.md">README</a></li>
+        </ul>
+      </nav>
     </div>
+  </header>
+  <main class="container">
+    <section>
+      <h2>About</h2>
+      <p>Disk Organiser helps users explore and organise storage, find duplicate files, and build a customised organisation structure. It supports local and remote model integrations.</p>
+    </section>
+    <section>
+      <h2>Getting started</h2>
+      <ul>
+        <li>Clone: <code>git clone https://github.com/krahd/disk_organiser.git</code></li>
+        <li>Backend: <a href="https://github.com/krahd/disk_organiser/tree/main/backend">/backend</a></li>
+        <li>Frontend: <a href="https://github.com/krahd/disk_organiser/tree/main/frontend">/frontend</a></li>
+      </ul>
+    </section>
+    <section>
+      <h2>Documentation</h2>
+      <ul>
+        <li><a href="https://github.com/krahd/disk_organiser/blob/main/docs/USAGE.md">Usage guide</a></li>
+        <li><a href="https://github.com/krahd/disk_organiser/blob/main/docs/API.md">API reference</a></li>
+        <li><a href="https://github.com/krahd/disk_organiser/blob/main/docs/MODEL_INTEGRATION.md">Model integration</a></li>
+      </ul>
+    </section>
+    <section>
+      <h2>Publish this site</h2>
+      <p>To publish this project site (instead of the frontend), go to your repository <strong>Settings → Pages</strong> and set the source to <strong>"main branch /docs folder"</strong>.</p>
+      <p>Alternatively create a <code>gh-pages</code> branch if you prefer to keep pages separate from <code>main</code>.</p>
+    </section>
+  </main>
+  <footer class="container">
+    <p>License: MIT · <a href="https://github.com/krahd/disk_organiser/blob/main/LICENSE">LICENSE</a></p>
+  </footer>
 </body>
 </html>
