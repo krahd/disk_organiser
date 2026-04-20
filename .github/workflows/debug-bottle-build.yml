@@ -2,6 +2,9 @@ name: Debug bottle build (manual)
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'debug-*'
 
 permissions:
   contents: read
