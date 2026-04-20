@@ -1,9 +1,7 @@
 name: Debug — importlib and pkg_resources diagnostics
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: read
