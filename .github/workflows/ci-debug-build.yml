@@ -28,22 +28,36 @@ jobs:
         run: |
           python -m venv .venv
           . .venv/bin/activate
-          python -m pip install --upgrade pip setuptools wheel
-          pip install -r backend/requirements.txt || true
-          python -m pip install pyinstaller==5.13.0
-          # Diagnostic: show setuptools/pip info and attempt to reinstall setuptools
-          python -m pip show setuptools || true
-          python -m pip list || true
-          python -c "import sys, importlib; print('sys.executable:', sys.executable); print('importlib.util.find_spec(pkg_resources):', importlib.util.find_spec('pkg_resources'))" || true
-          python -m pip install --force-reinstall --no-cache-dir setuptools || true
-          python -m pip show setuptools || true
-          python - <<'PY' || true
+            python -m pip install --upgrade pip setuptools wheel
+            pip install -r backend/requirements.txt || true
+            # Ensure setuptools is present before installing PyInstaller
+            python -m pip install --force-reinstall --no-cache-dir setuptools || true
+            python -m pip install pyinstaller==5.13.0
+            # Diagnostic: show setuptools/pip info and inspect importlib
+            python -m pip show setuptools || true
+            python -m pip list || true
+            python - <<'PY' || true
+import sys, os
+import importlib
+print('sys.executable:', sys.executable)
+print('cwd:', os.getcwd())
+print('importlib repr:', repr(importlib))
+print('importlib __file__:', getattr(importlib, '__file__', '<no __file__>'))
+print('importlib __spec__:', getattr(importlib, '__spec__', None))
+try:
+    import importlib.util as _util
+    print('importlib.util OK, file:', getattr(_util, '__file__', '<no __file__>'))
+except Exception as e:
+    print('importlib.util import failed:', e)
+print('importlib attrs sample:', [a for a in dir(importlib) if not a.startswith("__")][:50])
+print('sys.modules["importlib"]:', type(sys.modules.get('importlib')), sys.modules.get('importlib'))
+# detect local files that may shadow stdlib
+print('files in cwd matching importlib*:', [f for f in os.listdir('.') if f.startswith('importlib')])
 try:
     import pkg_resources
-    print('pkg_resources:', getattr(pkg_resources, '__file__', None), getattr(pkg_resources, '__version__', None))
+    print('pkg_resources import OK:', getattr(pkg_resources, '__file__', None), getattr(pkg_resources, '__version__', None))
 except Exception as e:
     print('pkg_resources import failed:', e)
-import sys
 print('sys.path:')
 print('\n'.join(sys.path))
 PY
