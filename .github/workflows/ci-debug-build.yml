@@ -71,12 +71,14 @@ PY
           if [ -f dist/disk-organiser ]; then cp dist/disk-organiser out/ || true; fi
 
       - name: Package debug binary
+        if: always()
         run: |
           mkdir -p out
           if [ -f out/disk-organiser ]; then tar -czf out/disk-organiser-debug-${GITHUB_SHA::7}.tar.gz -C out disk-organiser; fi
           ls -la out
 
       - name: Upload debug artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: debug-build-artifacts
