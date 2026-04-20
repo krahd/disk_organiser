@@ -25,17 +25,15 @@ jobs:
         run: |
           python -m venv .venv
           . .venv/bin/activate
-          python -m venv .venv
-          . .venv/bin/activate
           python -m pip install --upgrade pip setuptools wheel
           pip install -r backend/requirements.txt || true
+          # Ensure setuptools is present before installing PyInstaller
+          python -m pip install --force-reinstall --no-cache-dir setuptools || true
           python -m pip install pyinstaller==5.13.0 || true
-          # Diagnostic: show setuptools/pip info and attempt to reinstall setuptools
+          # Diagnostic: show setuptools/pip info
           python -m pip show setuptools || true
           python -m pip list || true
-          python -c "import sys; import importlib; print('sys.executable:', sys.executable); print('importlib.util present:', hasattr(importlib, 'util'))" || true
-          python -m pip install --force-reinstall --no-cache-dir setuptools || true
-          python -m pip show setuptools || true
+          python -c "import sys; import importlib; print('sys.executable:', sys.executable); print('has_importlib_util:', hasattr(importlib, 'util'))" || true
           python - <<'PY' || true
 try:
     import pkg_resources
