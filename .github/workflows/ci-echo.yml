@@ -1,0 +1,23 @@
+name: CI Echo Test
+
+on:
+  push:
+    tags:
+      - 'ci-echo-*'
+  workflow_dispatch: {}
+
+jobs:
+  echo-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Echo message and create file
+        run: |
+          echo "ci-echo test" > out.txt
+          echo "ok"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: echo-artifact
+          path: out.txt
