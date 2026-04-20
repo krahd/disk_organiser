@@ -1,0 +1,63 @@
+name: Debug — importlib and pkg_resources diagnostics
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    name: Inspect importlib/pkg_resources
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Run diagnostics
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip setuptools wheel
+          mkdir -p out
+          echo "=== pip show setuptools ===" > out/diagnostics.txt
+          python -m pip show setuptools >> out/diagnostics.txt 2>&1 || true
+          echo "\n=== pip list ===" >> out/diagnostics.txt
+          python -m pip list >> out/diagnostics.txt 2>&1 || true
+          echo "\n=== importlib/pk_resources diagnostics ===" >> out/diagnostics.txt
+          python - <<'PY' 2>&1 | tee -a out/diagnostics.txt
+import sys, os, importlib
+print('sys.executable:', sys.executable)
+print('cwd:', os.getcwd())
+print('importlib repr:', repr(importlib))
+print('importlib __file__:', getattr(importlib, '__file__', '<no __file__>'))
+print('importlib __spec__:', getattr(importlib, '__spec__', None))
+try:
+    import importlib.util as _util
+    print('importlib.util OK, file:', getattr(_util, '__file__', '<no __file__>'))
+except Exception as e:
+    print('importlib.util import failed:', e)
+print('importlib attrs sample:', [a for a in dir(importlib) if not a.startswith('__')][:50])
+print('sys.modules["importlib"]:', type(sys.modules.get('importlib')), sys.modules.get('importlib'))
+print('files in cwd matching importlib*:', [f for f in os.listdir('.') if f.startswith('importlib')])
+try:
+    import pkg_resources
+    print('pkg_resources import OK:', getattr(pkg_resources, '__file__', None), getattr(pkg_resources, '__version__', None))
+except Exception as e:
+    print('pkg_resources import failed:', e)
+print('sys.path:')
+print('\n'.join(sys.path))
+PY
+
+      - name: Upload diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: importlib-diagnostics
+          path: out/diagnostics.txt
