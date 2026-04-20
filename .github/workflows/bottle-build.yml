@@ -32,12 +32,12 @@ jobs:
           python -m venv .venv
           . .venv/bin/activate
           python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt || true
+          python -m pip install -r backend/requirements.txt
 
       - name: Run backend tests
         run: |
           . .venv/bin/activate
-          pytest -q
+          pytest -q backend/tests
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -70,7 +70,7 @@ jobs:
           . .venv/bin/activate
           python -m pip install --upgrade pip
           python -m pip install --upgrade --force-reinstall setuptools==68.2.2 wheel
-          python -m pip install -r backend/requirements.txt || true
+          python -m pip install -r backend/requirements.txt
           python -m pip install pyinstaller==5.13.0
 
       - name: Build binary (macOS)
@@ -84,14 +84,12 @@ jobs:
         name: Package macOS binary
         run: |
           mkdir -p out
-          if [ -f dist/disk-organiser ]; then
-            TARNAME=disk-organiser-${REF_NAME}-macos-$(uname -m)-bin.tar.gz
-            tar -C dist -czf out/${TARNAME} disk-organiser
-          else
-            # Fallback: package wheel or other built artifacts
-            TARNAME=disk-organiser-${REF_NAME}-macos-wheel.tar.gz
-            tar -C out -czf out/${TARNAME} . || true
+          if [ ! -f dist/disk-organiser ]; then
+            echo "Expected dist/disk-organiser to exist after PyInstaller build"
+            exit 1
           fi
+          TARNAME=disk-organiser-${REF_NAME}-macos-$(uname -m)-bin.tar.gz
+          tar -C dist -czf out/${TARNAME} disk-organiser
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
@@ -133,7 +131,7 @@ jobs:
           . .venv/bin/activate
           python -m pip install --upgrade pip
           python -m pip install --upgrade --force-reinstall setuptools==68.2.2 wheel
-          python -m pip install -r backend/requirements.txt || true
+          python -m pip install -r backend/requirements.txt
           python -m pip install pyinstaller==5.13.0
 
       - name: Build binary (Linux)
@@ -147,14 +145,12 @@ jobs:
         name: Package linux binary
         run: |
           mkdir -p out
-          if [ -f dist/disk-organiser ]; then
-            TARNAME=disk-organiser-${REF_NAME}-linux-$(uname -m)-bin.tar.gz
-            tar -C dist -czf out/${TARNAME} disk-organiser
-          else
-            # Fallback: package wheel or other built artifacts
-            TARNAME=disk-organiser-${REF_NAME}-linux-wheel.tar.gz
-            tar -C out -czf out/${TARNAME} . || true
+          if [ ! -f dist/disk-organiser ]; then
+            echo "Expected dist/disk-organiser to exist after PyInstaller build"
+            exit 1
           fi
+          TARNAME=disk-organiser-${REF_NAME}-linux-$(uname -m)-bin.tar.gz
+          tar -C dist -czf out/${TARNAME} disk-organiser
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
@@ -198,8 +194,8 @@ jobs:
       - id: compute
         name: Compute filenames and checksums
         run: |
-          MAC_TAR=$(ls artifacts/*macos* || true)
-          LINUX_TAR=$(ls artifacts/*linux* || true)
+          MAC_TAR=$(ls artifacts/*macos*)
+          LINUX_TAR=$(ls artifacts/*linux*)
           MAC_SHA=$(shasum -a 256 "$MAC_TAR" | awk '{print $1}')
           LINUX_SHA=$(shasum -a 256 "$LINUX_TAR" | awk '{print $1}')
           echo "mac_tar=$(basename "$MAC_TAR")" >> $GITHUB_OUTPUT
