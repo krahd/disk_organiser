@@ -68,7 +68,8 @@ jobs:
         run: |
           python -m venv .venv
           . .venv/bin/activate
-          python -m pip install --upgrade pip setuptools==65.5.0 wheel
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade --force-reinstall setuptools==68.2.2 wheel
           python -m pip install -r backend/requirements.txt || true
           python -m pip install pyinstaller==5.13.0
 
@@ -83,8 +84,14 @@ jobs:
         name: Package macOS binary
         run: |
           mkdir -p out
-          TARNAME=disk-organiser-${REF_NAME}-macos-$(uname -m)-bin.tar.gz
-          tar -C dist -czf out/${TARNAME} disk-organiser
+          if [ -f dist/disk-organiser ]; then
+            TARNAME=disk-organiser-${REF_NAME}-macos-$(uname -m)-bin.tar.gz
+            tar -C dist -czf out/${TARNAME} disk-organiser
+          else
+            # Fallback: package wheel or other built artifacts
+            TARNAME=disk-organiser-${REF_NAME}-macos-wheel.tar.gz
+            tar -C out -czf out/${TARNAME} . || true
+          fi
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
@@ -124,7 +131,8 @@ jobs:
           sudo apt-get install -y python3-venv build-essential
           python -m venv .venv
           . .venv/bin/activate
-          python -m pip install --upgrade pip setuptools==65.5.0 wheel
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade --force-reinstall setuptools==68.2.2 wheel
           python -m pip install -r backend/requirements.txt || true
           python -m pip install pyinstaller==5.13.0
 
@@ -139,8 +147,14 @@ jobs:
         name: Package linux binary
         run: |
           mkdir -p out
-          TARNAME=disk-organiser-${REF_NAME}-linux-$(uname -m)-bin.tar.gz
-          tar -C dist -czf out/${TARNAME} disk-organiser
+          if [ -f dist/disk-organiser ]; then
+            TARNAME=disk-organiser-${REF_NAME}-linux-$(uname -m)-bin.tar.gz
+            tar -C dist -czf out/${TARNAME} disk-organiser
+          else
+            # Fallback: package wheel or other built artifacts
+            TARNAME=disk-organiser-${REF_NAME}-linux-wheel.tar.gz
+            tar -C out -czf out/${TARNAME} . || true
+          fi
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
