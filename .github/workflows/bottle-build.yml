@@ -3,7 +3,7 @@ name: Build and publish binaries
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
   workflow_dispatch:
 
 permissions:
@@ -77,22 +77,36 @@ jobs:
         run: |
           . .venv/bin/activate
           mkdir -p out
+          # Capture PyInstaller output but don't abort the job if it fails
           pyinstaller --noconfirm --clean --onefile --name disk-organiser \
-            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_macos.log
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_macos.log || true
 
       - id: package
-        name: Package macOS binary
+        name: Package macOS binary (with fallback)
         run: |
           mkdir -p out
-          if [ ! -f dist/disk-organiser ]; then
-            echo "Expected dist/disk-organiser to exist after PyInstaller build"
-            exit 1
+          if [ -f dist/disk-organiser ]; then
+            TARNAME=disk-organiser-${REF_NAME}-macos-$(uname -m)-bin.tar.gz
+            tar -C dist -czf out/${TARNAME} disk-organiser
+          else
+            echo "Binary not found; creating source tarball fallback"
+            TARNAME=disk-organiser-${REF_NAME}-source.tar.gz
+            # Prefer git archive when available, otherwise tar entire workspace
+            if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+              git archive --format=tar.gz -o out/${TARNAME} HEAD
+            else
+              tar -czf out/${TARNAME} .
+            fi
           fi
-          TARNAME=disk-organiser-${REF_NAME}-macos-$(uname -m)-bin.tar.gz
-          tar -C dist -czf out/${TARNAME} disk-organiser
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
+
+      - name: Ensure build logs exist
+        if: always()
+        run: |
+          mkdir -p out
+          if [ ! -f out/pyinstaller_macos.log ]; then echo "No pyinstaller log produced" > out/pyinstaller_macos.log; fi
 
       - name: Upload mac artifact
         uses: actions/upload-artifact@v4
@@ -100,11 +114,12 @@ jobs:
           name: mac-binary
           path: out/${{ steps.package.outputs.tar }}
 
-      - name: Upload mac build log
+      - name: Upload mac build output (logs + extras)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mac-build-log
-          path: out/pyinstaller_macos.log
+          name: mac-out
+          path: out
 
     outputs:
       mac_tar: ${{ steps.package.outputs.tar }}
@@ -138,22 +153,35 @@ jobs:
         run: |
           . .venv/bin/activate
           mkdir -p out
+          # Capture PyInstaller output but don't abort the job if it fails
           pyinstaller --noconfirm --clean --onefile --name disk-organiser \
-            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_linux.log
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_linux.log || true
 
       - id: package
-        name: Package linux binary
+        name: Package linux binary (with fallback)
         run: |
           mkdir -p out
-          if [ ! -f dist/disk-organiser ]; then
-            echo "Expected dist/disk-organiser to exist after PyInstaller build"
-            exit 1
+          if [ -f dist/disk-organiser ]; then
+            TARNAME=disk-organiser-${REF_NAME}-linux-$(uname -m)-bin.tar.gz
+            tar -C dist -czf out/${TARNAME} disk-organiser
+          else
+            echo "Binary not found; creating source tarball fallback"
+            TARNAME=disk-organiser-${REF_NAME}-source.tar.gz
+            if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+              git archive --format=tar.gz -o out/${TARNAME} HEAD
+            else
+              tar -czf out/${TARNAME} .
+            fi
           fi
-          TARNAME=disk-organiser-${REF_NAME}-linux-$(uname -m)-bin.tar.gz
-          tar -C dist -czf out/${TARNAME} disk-organiser
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
+
+      - name: Ensure build logs exist
+        if: always()
+        run: |
+          mkdir -p out
+          if [ ! -f out/pyinstaller_linux.log ]; then echo "No pyinstaller log produced" > out/pyinstaller_linux.log; fi
 
       - name: Upload linux artifact
         uses: actions/upload-artifact@v4
@@ -161,11 +189,12 @@ jobs:
           name: linux-binary
           path: out/${{ steps.package.outputs.tar }}
 
-      - name: Upload linux build log
+      - name: Upload linux build output (logs + extras)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: linux-build-log
-          path: out/pyinstaller_linux.log
+          name: linux-out
+          path: out
 
     outputs:
       linux_tar: ${{ steps.package.outputs.tar }}

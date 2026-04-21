@@ -69,6 +69,11 @@ PY
           ls -la dist || true
           ls -la out || true
 
+      - name: Ensure out exists
+        if: always()
+        run: |
+          mkdir -p out || true
+
       - name: Upload debug artifacts
         uses: actions/upload-artifact@v4
         with:

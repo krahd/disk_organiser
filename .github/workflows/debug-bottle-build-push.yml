@@ -41,6 +41,11 @@ jobs:
           pyinstaller --noconfirm --clean --onefile --name disk-organiser \
             --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_debug.log || true
 
+      - name: Ensure out exists
+        if: always()
+        run: |
+          mkdir -p out || true
+
       - name: Upload debug artifacts
         uses: actions/upload-artifact@v4
         with:
