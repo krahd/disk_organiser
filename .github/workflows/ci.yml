@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
-        python-version: ['3.10']
+        python-version: ['3.12']
     steps:
       - uses: actions/checkout@v4
 
@@ -23,6 +23,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
+
+      - name: Python dependency audit
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pip-audit || true
+          pip-audit || true
 
       - name: Run backend tests
         run: |
@@ -37,6 +43,10 @@ jobs:
       - name: Install Node dependencies
         run: |
           npm ci
+
+      - name: Node dependency audit
+        run: |
+          npm audit --audit-level=moderate || true
 
       - name: Prettier check
         run: |

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import os
 import uuid
+from pathlib import Path
 from typing import Dict, List, Optional
 
 
@@ -69,7 +70,25 @@ def preview_move_action(
     dst_abs = os.path.abspath(dst)
     op_backup_dir_abs = os.path.abspath(op_backup_dir) if op_backup_dir else None
 
-    if op_backup_dir_abs and dst_abs.startswith(op_backup_dir_abs):
+    # Use a robust containment check to avoid false positives from simple
+    # string-prefix checks (e.g. /data/backup vs /data/backup-other).
+    is_in_backup = False
+    if op_backup_dir_abs:
+        try:
+            # Python 3.9+ Path.is_relative_to is reliable
+            is_in_backup = Path(dst_abs).resolve().is_relative_to(
+                Path(op_backup_dir_abs).resolve()
+            )
+        except AttributeError:
+            # Fallback for older stdlib: use commonpath
+            try:
+                is_in_backup = os.path.commonpath([dst_abs, op_backup_dir_abs]) == op_backup_dir_abs
+            except Exception:
+                is_in_backup = dst_abs.startswith(op_backup_dir_abs)
+        except Exception:
+            is_in_backup = dst_abs.startswith(op_backup_dir_abs)
+
+    if op_backup_dir_abs and is_in_backup:
         # moving into the operation's backup directory (treat as backup)
         action["type"] = "backup_move"
         action["backup"] = dst

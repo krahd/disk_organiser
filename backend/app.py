@@ -17,6 +17,7 @@ import threading
 import time
 import traceback
 import uuid
+from pathlib import Path
 
 from flask import Flask, Response, jsonify, request, stream_with_context
 from flask_cors import CORS
@@ -136,7 +137,15 @@ except Exception:
     pass
 
 app = Flask(__name__)
-CORS(app)
+# Configure CORS: allow explicit origins via the `CORS_ALLOWED_ORIGINS`
+# environment variable (comma-separated). If not set, default to permissive
+# CORS to preserve existing development behaviour.
+cors_allowed = os.getenv("CORS_ALLOWED_ORIGINS")
+if cors_allowed:
+    origins = [o.strip() for o in cors_allowed.split(",") if o.strip()]
+    CORS(app, resources={r"/api/*": {"origins": origins}})
+else:
+    CORS(app)
 logger = logging.getLogger(__name__)
 MAINT_FILE = os.path.join(os.path.dirname(__file__), "maintenance_status.json")
 
@@ -353,9 +362,27 @@ def api_organise_execute():
                     executed.append({"from": src, "to": dst, "status": "missing"})
                     continue
                 # If destination is inside op backup_dir, treat moved file as backup
-                op_backup_dir = os.path.abspath(op.get("backup_dir", ""))
+                op_backup_dir_val = op.get("backup_dir", "")
+                op_backup_dir = os.path.abspath(op_backup_dir_val) if op_backup_dir_val else None
                 dst_abs = os.path.abspath(dst)
-                if op_backup_dir and dst_abs.startswith(op_backup_dir):
+
+                # robust containment check to avoid prefix collisions
+                is_in_backup = False
+                if op_backup_dir:
+                    try:
+                        is_in_backup = Path(dst_abs).resolve().is_relative_to(
+                            Path(op_backup_dir).resolve()
+                        )
+                    except AttributeError:
+                        try:
+                            is_in_backup = os.path.commonpath(
+                                [dst_abs, op_backup_dir]) == op_backup_dir
+                        except Exception:
+                            is_in_backup = dst_abs.startswith(op_backup_dir)
+                    except Exception:
+                        is_in_backup = dst_abs.startswith(op_backup_dir)
+
+                if op_backup_dir and is_in_backup:
                     # move original into recycle/backup location
                     # and record that as the backup
                     os.makedirs(os.path.dirname(dst), exist_ok=True)

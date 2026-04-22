@@ -2,6 +2,7 @@
 
 import json
 import os
+import tempfile
 
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config.json")
 
@@ -27,6 +28,22 @@ def save_config(data: dict, dry_run: bool = False):
     existing.update(data)
     if dry_run:
         return existing
-    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
-        json.dump(existing, f, indent=2)
+    # Write atomically to avoid partial/corrupt config files on crash.
+    dirpath = os.path.dirname(CONFIG_FILE)
+    os.makedirs(dirpath, exist_ok=True)
+    fd = None
+    tmp = None
+    try:
+        fd, tmp = tempfile.mkstemp(prefix="config.", dir=dirpath, suffix=".tmp")
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(existing, f, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, CONFIG_FILE)
+    finally:
+        try:
+            if tmp and os.path.exists(tmp):
+                os.remove(tmp)
+        except Exception:
+            pass
     return existing

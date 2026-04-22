@@ -26,6 +26,9 @@ env/
 venv.bak/
 pyenv/
 .python-version
+# Local build/CI virtualenvs (should not be committed)
+.ci-venv/
+.pyinstaller_build_venv/
 
 # Installer logs
 pip-log.txt

@@ -1,5 +1,9 @@
 /* eslint-env browser */
 
+// API base can be injected at runtime by setting `window._DISK_ORGANISER_API_BASE`.
+// Defaults to empty string so relative paths are used (works in Docker/production).
+const API_BASE = typeof window !== 'undefined' && window._DISK_ORGANISER_API_BASE ? window._DISK_ORGANISER_API_BASE : '';
+
 // lazy-load D3 only when visualisation is requested (avoids network fetch during tests)
 function ensureD3() {
   return new Promise((resolve, reject) => {
@@ -74,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
           body.min_size = min;
           if (!Number.isNaN(maxFiles)) body.max_files = maxFiles;
           if (!Number.isNaN(maxWorkers)) body.max_workers = maxWorkers;
-          const res = await fetch("http://127.0.0.1:5000/api/duplicates", {
+          const res = await fetch(`${API_BASE}/api/duplicates`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
@@ -223,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
             recycleBtn.textContent = "Move to Recycle Bin (safe)";
             recycleBtn.className = "btn secondary";
             recycleBtn.onclick = async () => {
-              const pres = await fetch("http://127.0.0.1:5000/api/organise/remove-preview", {
+              const pres = await fetch(`${API_BASE}/api/organise/remove-preview`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ duplicates: j.duplicates }),
@@ -254,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
               exec.textContent = "Execute (move to recycle)";
               exec.className = "btn primary";
               exec.onclick = async () => {
-                const er = await fetch("http://127.0.0.1:5000/api/organise/execute", {
+                const er = await fetch(`${API_BASE}/api/organise/execute`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ op_id: pj.op.id }),
@@ -264,7 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const undo = document.createElement("button");
                 undo.textContent = "Undo";
                 undo.onclick = async () => {
-                  const ur = await fetch("http://127.0.0.1:5000/api/organise/undo", {
+                      const ur = await fetch(`${API_BASE}/api/organise/undo`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ op_id: pj.op.id }),
@@ -479,7 +483,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const body = {};
           if (path) body.path = path;
           body.depth = depth;
-          const res = await fetch("http://127.0.0.1:5000/api/visualisation", {
+          const res = await fetch(`${API_BASE}/api/visualisation`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
@@ -635,7 +639,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div id="ops-detail" class="mt-1"></div>
                 `;
         async function loadOps() {
-          const res = await fetch("http://127.0.0.1:5000/api/ops");
+          const res = await fetch(`${API_BASE}/api/ops`);
           const j = await res.json();
           const list = document.getElementById("ops-list");
           list.innerHTML = "";
@@ -654,7 +658,7 @@ document.addEventListener("DOMContentLoaded", () => {
             view.textContent = "View Details";
             view.className = "btn";
             view.onclick = async () => {
-              const dres = await fetch(`http://127.0.0.1:5000/api/op/${opId}`);
+              const dres = await fetch(`${API_BASE}/api/op/${opId}`);
               const dj = await dres.json();
               const det = document.getElementById("ops-detail");
               det.innerHTML = `<pre>${JSON.stringify(dj.op, null, 2)}</pre>`;
@@ -664,7 +668,7 @@ document.addEventListener("DOMContentLoaded", () => {
             undo.textContent = "Undo";
             undo.className = "btn";
             undo.onclick = async () => {
-              const r = await fetch("http://127.0.0.1:5000/api/organise/undo", {
+              const r = await fetch(`${API_BASE}/api/organise/undo`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ op_id: opId }),
@@ -677,7 +681,7 @@ document.addEventListener("DOMContentLoaded", () => {
             previewUndo.textContent = "Preview Undo";
             previewUndo.className = "btn";
             previewUndo.onclick = async () => {
-              const r = await fetch("http://127.0.0.1:5000/api/organise/undo", {
+              const r = await fetch(`${API_BASE}/api/organise/undo`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ op_id: opId, dry_run: true }),
@@ -692,7 +696,7 @@ document.addEventListener("DOMContentLoaded", () => {
             del.textContent = "Delete Backup";
             del.className = "btn secondary";
             del.onclick = async () => {
-              const r = await fetch("http://127.0.0.1:5000/api/recycle/delete_op", {
+              const r = await fetch(`${API_BASE}/api/recycle/delete_op`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ op_id: opId }),
@@ -705,7 +709,7 @@ document.addEventListener("DOMContentLoaded", () => {
             previewDelete.textContent = "Preview Delete";
             previewDelete.className = "btn";
             previewDelete.onclick = async () => {
-              const r = await fetch("http://127.0.0.1:5000/api/recycle/delete_op", {
+              const r = await fetch(`${API_BASE}/api/recycle/delete_op`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ op_id: opId, dry_run: true }),
@@ -731,7 +735,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
         document.getElementById("recycle-clean").onclick = async () => {
           const days = parseInt(document.getElementById("recycle-days").value || "30", 10);
-          const res = await fetch("http://127.0.0.1:5000/api/recycle/cleanup", {
+          const res = await fetch(`${API_BASE}/api/recycle/cleanup`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ retention_days: days }),
@@ -741,7 +745,7 @@ document.addEventListener("DOMContentLoaded", () => {
           loadRecycle();
         };
         async function loadRecycle() {
-          const res = await fetch("http://127.0.0.1:5000/api/recycle/list");
+          const res = await fetch(`${API_BASE}/api/recycle/list`);
           const j = await res.json();
           const list = document.getElementById("recycle-list");
           list.innerHTML = "";
@@ -767,7 +771,7 @@ document.addEventListener("DOMContentLoaded", () => {
             undo.textContent = "Undo (restore)";
             undo.className = "btn";
             undo.onclick = async () => {
-              const r = await fetch("http://127.0.0.1:5000/api/organise/undo", {
+                      const r = await fetch(`${API_BASE}/api/organise/undo`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ op_id: opId }),
@@ -780,7 +784,7 @@ document.addEventListener("DOMContentLoaded", () => {
             previewUndo.textContent = "Preview Undo";
             previewUndo.className = "btn";
             previewUndo.onclick = async () => {
-              const r = await fetch("http://127.0.0.1:5000/api/organise/undo", {
+              const r = await fetch(`${API_BASE}/api/organise/undo`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ op_id: opId, dry_run: true }),
@@ -795,7 +799,7 @@ document.addEventListener("DOMContentLoaded", () => {
             del.textContent = "Delete Backup (permanent)";
             del.className = "btn secondary";
             del.onclick = async () => {
-              const r = await fetch("http://127.0.0.1:5000/api/recycle/delete_op", {
+              const r = await fetch(`${API_BASE}/api/recycle/delete_op`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ op_id: opId }),
@@ -808,7 +812,7 @@ document.addEventListener("DOMContentLoaded", () => {
             previewDelete.textContent = "Preview Delete";
             previewDelete.className = "btn";
             previewDelete.onclick = async () => {
-              const r = await fetch("http://127.0.0.1:5000/api/recycle/delete_op", {
+              const r = await fetch(`${API_BASE}/api/recycle/delete_op`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ op_id: opId, dry_run: true }),
@@ -1004,7 +1008,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("pref-save").onclick = async () => {
           const model = document.getElementById("pref-model").value;
           const body = { model };
-          const res = await fetch("http://127.0.0.1:5000/api/model", {
+          const res = await fetch(`${API_BASE}/api/model`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),

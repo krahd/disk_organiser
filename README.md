@@ -29,8 +29,11 @@ pip install -r backend/requirements.txt
 python backend/app.py
 ```
 
-Open `frontend/index.html` in a browser. The frontend expects the API at
-`http://127.0.0.1:5000` by default.
+Open `frontend/index.html` in a browser. The frontend uses relative `/api` paths
+by default. For local development run the backend with `python backend/app.py`
+(default API: `http://127.0.0.1:5000`). When running in Docker the backend runs
+on port `8000` (see `Dockerfile` / `docker-compose.yml`). You can override the
+frontend API base at runtime by setting `window._DISK_ORGANISER_API_BASE`.
 
 ## Screenshot
 

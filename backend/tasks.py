@@ -7,6 +7,7 @@ import json
 import os
 import time
 import uuid
+import tempfile
 from typing import List
 
 try:
@@ -70,11 +71,22 @@ def background_scan(
             nonlocal job
             job = updated
             return
+        tmp = None
         try:
-            with open(job_file, "w", encoding="utf-8") as _f:
+            dirpath = os.path.dirname(job_file)
+            os.makedirs(dirpath, exist_ok=True)
+            fd, tmp = tempfile.mkstemp(dir=dirpath, prefix=".job.", suffix=".tmp")
+            with os.fdopen(fd, "w", encoding="utf-8") as _f:
                 json.dump(updated, _f, default=str)
+                _f.flush()
+                os.fsync(_f.fileno())
+            os.replace(tmp, job_file)
         except Exception:
-            pass
+            try:
+                if tmp and os.path.exists(tmp):
+                    os.remove(tmp)
+            except Exception:
+                pass
 
     def progress_cb(data: dict):
         # update progress and persist
@@ -150,11 +162,22 @@ def rebuild_index_job(
             nonlocal job
             job = updated
             return
+        tmp = None
         try:
-            with open(job_file, "w", encoding="utf-8") as _f:
+            dirpath = os.path.dirname(job_file)
+            os.makedirs(dirpath, exist_ok=True)
+            fd, tmp = tempfile.mkstemp(dir=dirpath, prefix=".job.", suffix=".tmp")
+            with os.fdopen(fd, "w", encoding="utf-8") as _f:
                 json.dump(updated, _f, default=str)
+                _f.flush()
+                os.fsync(_f.fileno())
+            os.replace(tmp, job_file)
         except Exception:
-            pass
+            try:
+                if tmp and os.path.exists(tmp):
+                    os.remove(tmp)
+            except Exception:
+                pass
 
     def progress_cb(data: dict):
         job["progress"] = data
