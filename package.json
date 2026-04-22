@@ -1,6 +1,6 @@
 {
   "name": "disk_organiser_frontend_tests",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "scripts": {
     "test": "jest --config jest.config.js",
     "test:visual": "npx playwright test",
