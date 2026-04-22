@@ -99,7 +99,7 @@ jobs:
           mkdir -p out
           # Capture PyInstaller output but don't abort the job if it fails
           pyinstaller --noconfirm --clean --onefile --name disk-organiser \
-            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_macos.log || true
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_macos.log
 
       - id: package
         name: Package macOS binary (with fallback)
@@ -201,7 +201,7 @@ jobs:
           mkdir -p out
           # Capture PyInstaller output but don't abort the job if it fails
           pyinstaller --noconfirm --clean --onefile --name disk-organiser \
-            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_linux.log || true
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_linux.log
 
       - id: package
         name: Package linux binary (with fallback)
