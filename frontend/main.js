@@ -2,7 +2,10 @@
 
 // API base can be injected at runtime by setting `window._DISK_ORGANISER_API_BASE`.
 // Defaults to empty string so relative paths are used (works in Docker/production).
-const API_BASE = typeof window !== 'undefined' && window._DISK_ORGANISER_API_BASE ? window._DISK_ORGANISER_API_BASE : '';
+const API_BASE =
+  typeof window !== "undefined" && window._DISK_ORGANISER_API_BASE
+    ? window._DISK_ORGANISER_API_BASE
+    : "";
 
 // lazy-load D3 only when visualisation is requested (avoids network fetch during tests)
 function ensureD3() {
@@ -268,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const undo = document.createElement("button");
                 undo.textContent = "Undo";
                 undo.onclick = async () => {
-                      const ur = await fetch(`${API_BASE}/api/organise/undo`, {
+                  const ur = await fetch(`${API_BASE}/api/organise/undo`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ op_id: pj.op.id }),
@@ -771,7 +774,7 @@ document.addEventListener("DOMContentLoaded", () => {
             undo.textContent = "Undo (restore)";
             undo.className = "btn";
             undo.onclick = async () => {
-                      const r = await fetch(`${API_BASE}/api/organise/undo`, {
+              const r = await fetch(`${API_BASE}/api/organise/undo`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ op_id: opId }),
