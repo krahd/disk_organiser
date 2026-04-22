@@ -15,6 +15,17 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  sanity:
+    name: Sanity check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Print environment
+        run: |
+          echo "Sanity check: $GITHUB_WORKFLOW started"
+          echo "GITHUB_REF: $GITHUB_REF"
+          echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
   test:
     name: Run tests
     runs-on: ubuntu-22.04
@@ -316,22 +327,22 @@ jobs:
           cd homebrew-tap
           mkdir -p Formula
           cat > Formula/disk-organiser.rb <<RUBY
-class DiskOrganiser < Formula
-  desc "Visualise and safely organise files on your hard drive"
-  homepage "https://github.com/krahd/disk_organiser"
-  url "https://github.com/krahd/disk_organiser/releases/download/${REF_NAME}/${MAC_TAR}"
-  sha256 "${MAC_SHA}"
-  license "MIT"
-
-  def install
-    bin.install "disk-organiser"
-  end
-
-  test do
-    assert_predicate bin/"disk-organiser", :exist?
-  end
-end
-RUBY
+          class DiskOrganiser < Formula
+            desc "Visualise and safely organise files on your hard drive"
+            homepage "https://github.com/krahd/disk_organiser"
+            url "https://github.com/krahd/disk_organiser/releases/download/${REF_NAME}/${MAC_TAR}"
+            sha256 "${MAC_SHA}"
+            license "MIT"
+          
+            def install
+              bin.install "disk-organiser"
+            end
+          
+            test do
+              assert_predicate bin/"disk-organiser", :exist?
+            end
+          end
+          RUBY
           git add Formula/disk-organiser.rb
           git commit -m "disk-organiser: update formula for ${REF_NAME}" || true
           git push origin HEAD:main
