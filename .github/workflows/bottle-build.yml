@@ -75,6 +75,7 @@ jobs:
 
       - name: Build binary (macOS)
         run: |
+          set -o pipefail
           . .venv/bin/activate
           mkdir -p out
           # Capture PyInstaller output but don't abort the job if it fails
@@ -101,6 +102,13 @@ jobs:
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
+          # Diagnostics: list produced files and show start of pyinstaller log
+          echo "--- DIAGNOSTICS: dist contents ---"
+          ls -la dist || true
+          echo "--- DIAGNOSTICS: out contents ---"
+          ls -la out || true
+          echo "--- DIAGNOSTICS: pyinstaller log (head) ---"
+          head -n 200 out/pyinstaller_macos.log || true
 
       - name: Ensure build logs exist
         if: always()
@@ -108,11 +116,25 @@ jobs:
           mkdir -p out
           if [ ! -f out/pyinstaller_macos.log ]; then echo "No pyinstaller log produced" > out/pyinstaller_macos.log; fi
 
+      - name: Ensure dist exists for upload
+        if: always()
+        run: |
+          mkdir -p dist || true
+          # create marker if dist is empty so upload-artifact doesn't fail
+          if [ -z "$(ls -A dist 2>/dev/null)" ]; then touch dist/.no_dist_found; fi
+
       - name: Upload mac artifact
         uses: actions/upload-artifact@v4
         with:
           name: mac-binary
           path: out/${{ steps.package.outputs.tar }}
+
+      - name: Upload mac dist (if present)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-dist
+          path: dist
 
       - name: Upload mac build output (logs + extras)
         if: always()
@@ -151,6 +173,7 @@ jobs:
 
       - name: Build binary (Linux)
         run: |
+          set -o pipefail
           . .venv/bin/activate
           mkdir -p out
           # Capture PyInstaller output but don't abort the job if it fails
@@ -176,6 +199,13 @@ jobs:
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
+          # Diagnostics: list produced files and show start of pyinstaller log
+          echo "--- DIAGNOSTICS: dist contents ---"
+          ls -la dist || true
+          echo "--- DIAGNOSTICS: out contents ---"
+          ls -la out || true
+          echo "--- DIAGNOSTICS: pyinstaller log (head) ---"
+          head -n 200 out/pyinstaller_linux.log || true
 
       - name: Ensure build logs exist
         if: always()
@@ -183,11 +213,24 @@ jobs:
           mkdir -p out
           if [ ! -f out/pyinstaller_linux.log ]; then echo "No pyinstaller log produced" > out/pyinstaller_linux.log; fi
 
+      - name: Ensure dist exists for upload
+        if: always()
+        run: |
+          mkdir -p dist || true
+          if [ -z "$(ls -A dist 2>/dev/null)" ]; then touch dist/.no_dist_found; fi
+
       - name: Upload linux artifact
         uses: actions/upload-artifact@v4
         with:
           name: linux-binary
           path: out/${{ steps.package.outputs.tar }}
+
+      - name: Upload linux dist (if present)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-dist
+          path: dist
 
       - name: Upload linux build output (logs + extras)
         if: always()
