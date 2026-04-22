@@ -38,12 +38,16 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Python deps
+      - name: Install Python deps (pinned)
         run: |
           python -m venv .venv
           . .venv/bin/activate
           python -m pip install --upgrade pip
-          python -m pip install -r backend/requirements.txt
+          if [ -f backend/requirements-locked.txt ]; then
+            python -m pip install -r backend/requirements-locked.txt
+          else
+            python -m pip install -r backend/requirements.txt
+          fi
 
       - name: Run backend tests
         run: |
@@ -81,7 +85,11 @@ jobs:
           . .venv/bin/activate
           python -m pip install --upgrade pip
           python -m pip install --upgrade --force-reinstall setuptools==68.2.2 wheel
-          python -m pip install -r backend/requirements.txt
+          if [ -f backend/requirements-locked.txt ]; then
+            python -m pip install -r backend/requirements-locked.txt
+          else
+            python -m pip install -r backend/requirements.txt
+          fi
           python -m pip install pyinstaller==5.13.0
 
       - name: Build binary (macOS)
@@ -179,7 +187,11 @@ jobs:
           . .venv/bin/activate
           python -m pip install --upgrade pip
           python -m pip install --upgrade --force-reinstall setuptools==68.2.2 wheel
-          python -m pip install -r backend/requirements.txt
+          if [ -f backend/requirements-locked.txt ]; then
+            python -m pip install -r backend/requirements-locked.txt
+          else
+            python -m pip install -r backend/requirements.txt
+          fi
           python -m pip install pyinstaller==5.13.0
 
       - name: Build binary (Linux)

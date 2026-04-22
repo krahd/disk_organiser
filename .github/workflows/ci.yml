@@ -19,16 +19,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Python deps
+      - name: Install Python deps (pinned)
         run: |
           python -m pip install --upgrade pip
-          if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
+          if [ -f backend/requirements-locked.txt ]; then
+            pip install -r backend/requirements-locked.txt
+          elif [ -f backend/requirements.txt ]; then
+            pip install -r backend/requirements.txt
+          fi
 
       - name: Python dependency audit
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pip-audit || true
-          pip-audit || true
+          python -m pip install pip-audit
+          pip-audit
 
       - name: Run backend tests
         run: |
@@ -46,7 +50,7 @@ jobs:
 
       - name: Node dependency audit
         run: |
-          npm audit --audit-level=moderate || true
+          npm audit --audit-level=moderate
 
       - name: Prettier check
         run: |
