@@ -7,6 +7,14 @@ permissions:
   contents: read
 
 jobs:
+  noop:
+    name: No-op guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: No-op
+        run: |
+          echo "No-op job to prevent empty-run failures for ${{ github.workflow }} (event: ${{ github.event_name }})"
+
   inspect:
     name: Inspect importlib/pkg_resources
     runs-on: ubuntu-latest
