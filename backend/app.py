@@ -150,6 +150,34 @@ logger = logging.getLogger(__name__)
 MAINT_FILE = os.path.join(os.path.dirname(__file__), "maintenance_status.json")
 
 
+def _coerce_int_with_min(value, default, minimum=0):
+    """Coerce `value` to int, or return `default`; enforce `value >= minimum`."""
+    if value is None:
+        return default
+    coerced = int(value)
+    if coerced < minimum:
+        raise ValueError(f"value must be >= {minimum}")
+    return coerced
+
+
+def _normalize_paths(value, default_to_cwd=True):
+    """Normalize path input into a list of non-empty strings."""
+    if value is None:
+        return [os.getcwd()] if default_to_cwd else None
+    if isinstance(value, str):
+        value = [value]
+    if not isinstance(value, list):
+        raise ValueError("paths must be a list or string path")
+    normalized = []
+    for p in value:
+        if not isinstance(p, str) or not p.strip():
+            raise ValueError("all paths must be non-empty strings")
+        normalized.append(p)
+    if not normalized and default_to_cwd:
+        return [os.getcwd()]
+    return normalized
+
+
 @app.route("/")
 def index():
     """Health-check endpoint for the API."""
@@ -163,13 +191,14 @@ def api_find_duplicates():
     POST JSON: {paths: [...], min_size: int, max_files: int}
     """
     data = request.get_json(silent=True) or {}
-    paths = data.get("paths") or data.get("path")
-    if isinstance(paths, str):
-        paths = [paths]
-    if not paths:
-        # default to current working directory
-        paths = [os.getcwd()]
-    min_size = int(data.get("min_size", 1))
+    try:
+        paths = _normalize_paths(data.get("paths") or data.get("path"), default_to_cwd=True)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    try:
+        min_size = _coerce_int_with_min(data.get("min_size"), 1, minimum=0)
+    except (TypeError, ValueError):
+        return jsonify({"error": "min_size must be an integer >= 0"}), 400
     max_files = data.get("max_files")
     max_workers = data.get("max_workers")
     try:
@@ -194,7 +223,10 @@ def api_visualise():
     """
     data = request.get_json(silent=True) or {}
     path = data.get("path") or os.getcwd()
-    depth = int(data.get("depth", 2))
+    try:
+        depth = _coerce_int_with_min(data.get("depth"), 2, minimum=0)
+    except (TypeError, ValueError):
+        return jsonify({"error": "depth must be an integer >= 0"}), 400
     try:
         vis = visualise_path(path, depth=depth)
     except (OSError, ValueError) as e:
@@ -528,8 +560,16 @@ def api_scan_start():
     POST JSON: {paths: [...], min_size: int, max_files: int}
     """
     data = request.get_json(silent=True) or {}
-    paths = data.get("paths") or [os.getcwd()]
-    min_size = int(data.get("min_size", 1))
+    try:
+        paths = _normalize_paths(
+            data.get("paths") or data.get("path"), default_to_cwd=True
+        )
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    try:
+        min_size = _coerce_int_with_min(data.get("min_size"), 1, minimum=0)
+    except (TypeError, ValueError):
+        return jsonify({"error": "min_size must be an integer >= 0"}), 400
     max_files = data.get("max_files")
     max_workers = data.get("max_workers")
     try:

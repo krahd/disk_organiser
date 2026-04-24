@@ -27,6 +27,10 @@ served under the root host (default `http://127.0.0.1:5000`). The examples use
   - Body: `{suggestions: [...]}`
   - Response: `{op: {...}}` (contains `id` and `backup_dir`)
 
+- `POST /api/organise/remove-preview` — create a remove-preview operation
+  - Body: `{duplicates: [...]}`
+  - Response: `{op: {...}}`
+
 - `POST /api/organise/execute` — execute an operation
   - Body: `{op_id: <id>}`
   - Response: `{executed: [...]}`
@@ -37,6 +41,8 @@ served under the root host (default `http://127.0.0.1:5000`). The examples use
 
 - `GET /api/model` — get selected model
 - `POST /api/model` — set model: `{model: 'ollama'|'gpt'|...'}
+- `GET /api/preferences` — get saved user preferences
+- `POST /api/preferences` — set preferences: `{preferences: {...}}`
 
 Background scan endpoints
 
@@ -52,6 +58,25 @@ Recycle / ops endpoints
 - `GET /api/ops` — list ops
 - `GET /api/op/<op_id>` — get op
 - `POST /api/recycle/delete_op` — delete an op
+
+Scan index endpoints (optional, if scan index module is enabled)
+
+- `GET /api/scan_index/stats` — current index stats
+- `POST /api/scan_index/rebuild` — synchronous index rebuild
+- `POST /api/scan_index/rebuild_async` — async index rebuild
+- `POST /api/scan_index/prune` — prune missing entries
+
+Maintenance endpoints
+
+- `GET /api/maintenance/status` — get maintenance mode status
+- `POST /api/maintenance/run` — run maintenance workflow
+
+Validation notes
+
+- Integer fields like `min_size` and `depth` must be `>= 0`; invalid values
+  return HTTP `400`.
+- `POST /api/scan/start` accepts either `paths: [...]` or `path: "..."`;
+  each path must be a non-empty string.
 
 If you need a machine-readable OpenAPI spec, I can help generate one from the
 current codebase.

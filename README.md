@@ -15,7 +15,7 @@ This repository contains the backend API under `backend/` and the frontend in
 
 Website: https://krahd.github.io/disk_organiser/
 Demo (static): https://krahd.github.io/disk_organiser/demo/
-Download (release): https://github.com/krahd/disk_organiser/releases/tag/v0.1.0
+Download (latest releases): https://github.com/krahd/disk_organiser/releases
 
 
 ## Quick start (macOS / Linux)
@@ -100,6 +100,7 @@ Additional documentation is available in the `docs/` folder:
 - `docs/DEVELOPMENT.md` — developer setup and testing
 - `docs/API.md` — API reference
 - `docs/MODEL_INTEGRATION.md` — how to add model providers
+- `docs/NEXT_STEPS.md` — prioritized follow-up implementation checklist
 
 ## About
 
@@ -110,13 +111,6 @@ See `ABOUT.md` for a brief project description and goals.
 ## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
-
-## Documentation
-
-A user manual and contributing guidelines are included in the `docs/` folder:
-
-- [docs/USER_MANUAL.md](docs/USER_MANUAL.md) — user manual and usage examples
-- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) — how to contribute, run tests, and submit PRs
 
 ## Disclaimer
 
