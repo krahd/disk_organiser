@@ -1,0 +1,82 @@
+name: Debug bottle build (archived)
+
+# Archived copy of the debug bottle build workflow to stop it running on pushes.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'debug-*'
+
+permissions:
+  contents: read
+
+jobs:
+  debug-build:
+    name: Debug build and upload artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install build dependencies
+        run: |
+          set -eux
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade --force-reinstall setuptools==68.2.2 wheel
+          python -m pip install -r backend/requirements.txt || true
+          python -m pip install pyinstaller==5.13.0 || true
+          mkdir -p out
+          python -m pip freeze > out/installed.txt
+
+      - name: Show Python path and import diagnostics
+        run: |
+          . .venv/bin/activate
+          python - <<'PY'
+import sys
+print('python:', sys.version)
+print('sys.path:')
+for p in sys.path:
+    print(' -', p)
+try:
+    import pkg_resources
+    print('pkg_resources available')
+except Exception as e:
+    print('pkg_resources import failed:', type(e).__name__, e)
+try:
+    import importlib
+    print('importlib.util exists:', hasattr(importlib, 'util'))
+except Exception as e:
+    print('importlib error:', type(e).__name__, e)
+PY
+
+      - name: Build with PyInstaller
+        run: |
+          . .venv/bin/activate
+          mkdir -p out dist
+          pyinstaller --noconfirm --clean --onefile --name disk-organiser \
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_debug.log || true
+
+      - name: List workspace, dist and out
+        run: |
+          ls -la
+          ls -la dist || true
+          ls -la out || true
+
+      - name: Ensure out exists
+        if: always()
+        run: |
+          mkdir -p out || true
+
+      - name: Upload debug artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-bottle-artifacts
+          path: out
