@@ -56,3 +56,64 @@ def test_duplicates_and_visualisation(tmp_path):
     assert r2.status_code == 200
     v = r2.get_json()
     assert "visualisation" in v
+
+
+def test_validation_errors_return_400(tmp_path):
+    client = app.app.test_client()
+    d = tmp_path / "scan"
+    d.mkdir()
+
+    dup_resp = client.post("/api/duplicates", json={"paths": [str(d)], "min_size": -1})
+    assert dup_resp.status_code == 400
+    assert "min_size" in dup_resp.get_json().get("error", "")
+
+    vis_resp = client.post("/api/visualisation", json={"path": str(d), "depth": -1})
+    assert vis_resp.status_code == 400
+    assert "depth" in vis_resp.get_json().get("error", "")
+
+
+def test_zero_values_are_allowed_for_min_size_and_depth(tmp_path):
+    client = app.app.test_client()
+    d = tmp_path / "scan"
+    d.mkdir()
+    (d / "a.txt").write_text("x", encoding="utf-8")
+
+    dup_resp = client.post("/api/duplicates", json={"paths": [str(d)], "min_size": 0})
+    assert dup_resp.status_code == 200
+
+    vis_resp = client.post("/api/visualisation", json={"path": str(d), "depth": 0})
+    assert vis_resp.status_code == 200
+
+
+def test_scan_start_accepts_path_string(tmp_path):
+    client = app.app.test_client()
+    d = tmp_path / "scan"
+    d.mkdir()
+    f1 = d / "a.txt"
+    f2 = d / "b.txt"
+    content = b"same-content"
+    f1.write_bytes(content)
+    f2.write_bytes(content)
+
+    start = client.post(
+        "/api/scan/start",
+        json={"path": str(d), "min_size": 1, "dry_run": True},
+    )
+    assert start.status_code == 200
+    payload = start.get_json()
+    assert payload.get("backend") == "thread"
+    assert payload.get("dry_run") is True
+
+
+def test_paths_validation_for_duplicates_and_scan_start(tmp_path):
+    client = app.app.test_client()
+    d = tmp_path / "scan"
+    d.mkdir()
+
+    bad_shape = client.post("/api/duplicates", json={"paths": {"x": str(d)}})
+    assert bad_shape.status_code == 400
+    assert "paths must be a list or string path" in bad_shape.get_json().get("error", "")
+
+    bad_member = client.post("/api/scan/start", json={"paths": [str(d), 1], "dry_run": True})
+    assert bad_member.status_code == 400
+    assert "non-empty strings" in bad_member.get_json().get("error", "")
