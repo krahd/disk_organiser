@@ -2,6 +2,7 @@
   "name": "disk_organiser_frontend_tests",
   "version": "0.1.2",
   "scripts": {
+    "start": "npx http-server frontend -p 8000",
     "test": "jest --config jest.config.js",
     "test:visual": "npx playwright test",
     "format": "prettier --write \"frontend/**/*.js\" \"frontend/**/*.css\" \"frontend/**/*.html\"",
