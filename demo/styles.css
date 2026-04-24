@@ -9,3 +9,50 @@ body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica
 .site-nav{display:flex;gap:8px;justify-content:center;margin:16px 0}
 .nav-btn{padding:8px 12px;border-radius:10px;border:1px solid transparent;background:transparent;cursor:pointer}
 .main-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 8px 24px rgba(15,23,42,0.06)}
+
+/* Demo-specific layout */
+.demo-hero{display:flex;flex-direction:column;gap:18px}
+.demo-intro{display:flex;flex-direction:column;gap:8px}
+.controls{display:flex;align-items:center;gap:12px;margin-top:8px}
+.primary{background:#2563eb;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+.primary:disabled{opacity:0.6;cursor:not-allowed}
+.scan-status{font-size:14px;color:#475569}
+.demo-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.panel{background:#fbfdff;border-radius:10px;padding:12px;border:1px solid rgba(15,23,42,0.03)}
+.panel-note{font-size:13px;color:#64748b;margin:0 0 8px}
+.duplicates-list{list-style:none;padding:0;margin:0}
+.dup-item{display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid rgba(15,23,42,0.03);cursor:pointer}
+.dup-item:focus{outline:2px solid rgba(37,99,235,0.15);}
+.dup-name{font-weight:500;color:#0f172a}
+.dup-meta{color:#64748b;font-size:13px}
+.viz{min-height:160px}
+
+@media (max-width:800px){
+	.demo-layout{grid-template-columns:1fr;}
+}
+
+/* accessibility + modal */
+.hidden{display:none}
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1200}
+.modal.hidden{display:none}
+.modal-backdrop{position:absolute;inset:0;background:rgba(2,6,23,0.45)}
+.modal-content{position:relative;background:#fff;border-radius:10px;max-width:640px;width:min(94%,640px);padding:18px;box-shadow:0 12px 40px rgba(2,6,23,0.12);z-index:1201}
+.modal-header{display:flex;align-items:center;justify-content:space-between}
+.modal-body{margin-top:12px}
+.modal-footer{margin-top:12px;text-align:right}
+
+/* focus styles */
+.nav-btn:focus-visible, .primary:focus-visible, .dup-item:focus-visible { outline:3px solid rgba(37,99,235,0.18); outline-offset:2px }
+.nav-btn{transition:background .12s ease-color}
+.nav-btn[aria-pressed="true"]{background:#eef2ff}
+.primary{transition:opacity .12s ease}
+.dup-item:hover{background:#fbfdff}
+
+/* panel headings */
+.panel h3{margin:0 0 8px 0;font-size:16px}
+
+/* small responsive tweaks */
+@media (max-width:520px){
+	.primary{padding:8px 10px}
+	.demo-intro h2{font-size:18px}
+}

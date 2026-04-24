@@ -23,16 +23,51 @@
 
     <div class="app">
       <nav class="site-nav" role="navigation" aria-label="Main">
-        <button id="nav-duplicates" class="nav-btn" aria-pressed="false">Duplicate Search</button>
-        <button id="nav-visualisation" class="nav-btn" aria-pressed="false">Visualisation</button>
-        <button id="nav-recycle" class="nav-btn" aria-pressed="false">Recycle</button>
-        <button id="nav-organise" class="nav-btn" aria-pressed="false">Organise</button>
-        <button id="nav-preferences" class="nav-btn" aria-pressed="false">Preferences</button>
+        <button id="nav-duplicates" class="nav-btn" aria-pressed="false" aria-controls="duplicates-panel">Duplicate Search</button>
+        <button id="nav-visualisation" class="nav-btn" aria-pressed="false" aria-controls="viz-panel">Visualisation</button>
+        <button id="nav-recycle" class="nav-btn" aria-pressed="false" aria-controls="recycle-panel">Recycle</button>
+        <button id="nav-organise" class="nav-btn" aria-pressed="false" aria-controls="organise-panel">Organise</button>
+        <button id="nav-preferences" class="nav-btn" aria-pressed="false" aria-controls="preferences-panel">Preferences</button>
       </nav>
 
       <main id="main-content" class="main-card">
-        <h2>Demo</h2>
-        <p>This is a static copy of the frontend included for demo purposes. Interactive features that require the backend (API) will not function on the published site.</p>
+        <div class="demo-hero">
+          <div class="demo-intro">
+            <h2>Interactive demo (static)</h2>
+            <p>Run a simulated scan to load sample duplicate results and a storage visualisation. This demo is read-only — no backend is required or called.</p>
+            <div class="controls">
+              <button id="scan-btn" class="primary">Run simulated scan</button>
+              <div id="scan-status" class="scan-status" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <div class="demo-layout">
+            <section id="duplicates-panel" class="panel" role="region" aria-labelledby="duplicates-title">
+              <h3>Duplicate files</h3>
+              <p class="panel-note">Click a file to preview details.</p>
+              <ul id="duplicates-list" class="duplicates-list" aria-live="polite"></ul>
+            </section>
+
+            <section id="viz-panel" class="panel">
+              <h3>Storage visualisation</h3>
+              <div id="viz" class="viz" aria-hidden="false"></div>
+            </section>
+            
+            <section id="recycle-panel" class="panel hidden" role="region" aria-hidden="true" aria-labelledby="recycle-title">
+              <h3 id="recycle-title">Recycle (simulated)</h3>
+              <p class="panel-note">Mark items you would like to delete and preview the removal.</p>
+              <ul id="recycle-list" class="duplicates-list" aria-live="polite"></ul>
+              <div style="margin-top:10px"><button id="apply-recycle-btn" class="primary">Preview removal</button></div>
+            </section>
+
+            <section id="organise-panel" class="panel hidden" role="region" aria-hidden="true" aria-labelledby="organise-title">
+              <h3 id="organise-title">Organise suggestions (simulated)</h3>
+              <p class="panel-note">Suggested moves to keep files organised by project or type.</p>
+              <ul id="organise-list" class="duplicates-list" aria-live="polite"></ul>
+              <div style="margin-top:10px"><button id="apply-organise-btn" class="primary">Preview suggestions</button></div>
+            </section>
+          </div>
+        </div>
       </main>
     </div>
     <script src="main.js"></script>
