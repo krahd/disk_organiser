@@ -237,6 +237,7 @@ textarea.editor-textarea {
 .chat-refine-card,
 .insight-panel,
 .backup-banner,
+.capability-banner,
 .analysis-group {
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -246,6 +247,7 @@ textarea.editor-textarea {
 
 .analysis-summary-card,
 .backup-banner,
+.capability-banner,
 .insight-panel,
 .chat-refine-card {
   padding: 14px 16px;
@@ -253,6 +255,20 @@ textarea.editor-textarea {
 
 .backup-banner {
   margin-top: 10px;
+}
+
+.capability-banner {
+  margin-top: 10px;
+}
+
+.capability-ok {
+  border-color: rgba(22, 163, 74, 0.25);
+  background: linear-gradient(180deg, rgba(240, 253, 244, 0.95), rgba(240, 253, 244, 0.75));
+}
+
+.capability-warn {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.95), rgba(255, 251, 235, 0.75));
 }
 
 .backup-ok {

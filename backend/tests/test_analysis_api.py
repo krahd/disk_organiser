@@ -29,6 +29,10 @@ def test_analyse_reason_preview_and_chat_refinement(tmp_path):
     assert payload["op"]["id"]
     assert payload["summary"]["actions"] >= 1
     assert payload["backup_status"] is not None
+    assert "analysis_capabilities" in payload
+    assert isinstance(payload["analysis_capabilities"], dict)
+    assert "ocr" in payload["analysis_capabilities"]
+    assert "embeddings" in payload["analysis_capabilities"]
     assert any(action["action"] in {"delete_stale", "move", "create_symlink"} for action in payload["actions"])
 
     preview_response = client.get(f"/api/ops/{payload['op']['id']}/preview")
@@ -69,3 +73,71 @@ def test_analyse_reason_groups_content_similar_files_with_different_names(tmp_pa
     semantic_actions = [action for action in payload["actions"] if action["action"] == "move"]
     assert semantic_actions
     assert any("content" in (action.get("reason") or "").lower() for action in semantic_actions)
+
+
+def test_analyse_reason_capabilities_disabled_branch(monkeypatch, tmp_path):
+    root = tmp_path / "analysis"
+    root.mkdir(parents=True)
+    (root / "a.txt").write_text("alpha", encoding="utf-8")
+
+    monkeypatch.setattr(
+        app,
+        "get_runtime_capabilities",
+        lambda: {
+            "ocr": {
+                "available": False,
+                "image": False,
+                "pdf": False,
+                "missing": ["pytesseract", "pdf2image", "Pillow"],
+            },
+            "embeddings": {
+                "available": False,
+                "disabled": True,
+                "model": "all-MiniLM-L6-v2",
+                "missing": ["sentence-transformers", "numpy"],
+            },
+        },
+    )
+
+    client = app.app.test_client()
+    response = client.post("/api/analyse/reason", json={"paths": [str(root)]})
+    assert response.status_code == 200
+    payload = response.get_json()
+
+    assert payload["analysis_capabilities"]["ocr"]["available"] is False
+    assert payload["analysis_capabilities"]["embeddings"]["available"] is False
+    assert payload["analysis_capabilities"]["embeddings"]["disabled"] is True
+
+
+def test_analyse_reason_capabilities_enabled_branch(monkeypatch, tmp_path):
+    root = tmp_path / "analysis"
+    root.mkdir(parents=True)
+    (root / "a.txt").write_text("alpha", encoding="utf-8")
+
+    monkeypatch.setattr(
+        app,
+        "get_runtime_capabilities",
+        lambda: {
+            "ocr": {
+                "available": True,
+                "image": True,
+                "pdf": True,
+                "missing": [],
+            },
+            "embeddings": {
+                "available": True,
+                "disabled": False,
+                "model": "all-MiniLM-L6-v2",
+                "missing": [],
+            },
+        },
+    )
+
+    client = app.app.test_client()
+    response = client.post("/api/analyse/reason", json={"paths": [str(root)]})
+    assert response.status_code == 200
+    payload = response.get_json()
+
+    assert payload["analysis_capabilities"]["ocr"]["available"] is True
+    assert payload["analysis_capabilities"]["embeddings"]["available"] is True
+    assert payload["analysis_capabilities"]["embeddings"]["disabled"] is False

@@ -1,6 +1,6 @@
-# Disk Organiser - Status Report
+# Disk Organiser – Project Status
 
-Date: 2026-05-06
+Last updated: 2026-05-06 09:01
 
 ## Executive Summary
 
@@ -68,6 +68,7 @@ Organise tab now supports:
 - per-action selection and selective execution
 - chat-based refinement
 - signal visibility for why items were clustered
+- runtime capability banner showing whether optional OCR and embedding enhancements are available
 
 Visualisation tab supports:
 
@@ -80,6 +81,7 @@ Implemented:
 
 - macOS backup status endpoint (GET /api/safety/backup-status)
 - optional local snapshot trigger during execution
+- analysis preview payload now includes runtime optional capability flags (`analysis_capabilities`)
 - OpenAPI route drift check (scripts/validate_openapi.py)
 - CI route coverage validation against docs/openapi.json
 
@@ -97,18 +99,69 @@ Executed successfully:
   - Result: all matched files use Prettier code style
 - npm run test:visual (with npm run start server running)
   - Result: 2 Playwright tests passed
+- source venv/bin/activate && pytest -q backend/tests/test_context_builder.py
+  - Result: 9 passed (includes monkeypatch coverage for missing optional dependencies and disabled embedding model)
+- npm test --silent -- frontend/__tests__/organise.analysis.test.js
+  - Result: 1 suite passed, 4 tests passed (includes unavailable and available capability-banner states)
+
+## Optional Runtime Dependencies
+
+All optional features degrade gracefully — missing packages are caught at import time and the
+affected capability silently disables. No configuration is required to run the tool without them.
+
+### OCR Dependencies
+
+- `pytesseract`: OCR text extraction from images and scanned PDFs.
+  System requirement: Tesseract OCR binary (`brew install tesseract` / `apt install tesseract-ocr`).
+- `pdf2image`: PDF-to-image conversion for scanned PDF OCR.
+  System requirement: Poppler (`brew install poppler` / `apt install poppler-utils`).
+
+Install both to enable the OCR path:
+
+```bash
+pip install pytesseract pdf2image
+```
+
+OCR is attempted as a fallback only: for PDFs it runs when `pypdf` yields fewer than 8 tokens;
+for image files it runs after perceptual hashing when `pytesseract` is available.
+
+Content kind tags when OCR is active: `pdf-ocr`, `image-phash-ocr`, `image-ocr`.
+
+### Embedding Similarity Dependencies
+
+- `sentence-transformers`: semantic embedding vectors for hard near-duplicate detection.
+- `numpy`: L2 normalisation and cosine similarity.
+
+Install both to enable the embedding path:
+
+```bash
+pip install sentence-transformers numpy
+```
+
+Embedding similarity is tried as a last-resort signal when no other near-duplicate signal is found.
+Pairs with cosine similarity ≥ 0.90 __and__ size similarity ≥ 0.40 are clustered with the
+`"embedding-similarity"` signal.
+
+### Environment Toggles
+
+- `DISK_ORGANISER_EMBEDDING_MODEL` (default: `all-MiniLM-L6-v2`): name of the
+  `sentence-transformers` model to load. Set to any compatible HuggingFace model identifier.
+  The model is downloaded on first use and cached locally by the library.
+
+To disable embeddings without uninstalling the package, set the variable to an empty string or an
+invalid model name — the load failure is caught and embeddings are disabled for the session.
 
 ## Current Risks / Gaps
 
-1. Embedding-based similarity is not implemented yet.
-2. OCR is not implemented for scanned documents/images.
+1. Embedding and OCR enhancements are optional and only active when extra dependencies are installed.
+2. OCR quality for scanned and low-quality documents still requires real-world tuning and broader validation.
 3. Windows-specific runtime behavior is not validated by dedicated CI.
 4. Frontend test depth is still limited (modal + visual smoke vs broad unit coverage).
 
 ## Recommended Next Steps
 
-1. Add optional embedding-based similarity for hard near-duplicate cases.
-2. Add OCR-assisted extraction path for scanned PDFs/images.
+1. Add explicit UI indicators when optional OCR/embedding capabilities are unavailable.
+2. Add regression tests for OCR and embedding branches (enabled and disabled dependency scenarios).
 3. Add a Windows CI lane to validate path and filesystem behavior.
 4. Expand frontend unit tests for Organise analysis flow (selection, chat refine, execution payloads).
 

@@ -7,7 +7,12 @@ import pytest
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, ROOT)
 
-from backend.context_builder import build_context, summarize_contexts  # noqa: E402
+from backend.context_builder import (  # noqa: E402
+    build_context,
+    get_runtime_capabilities,
+    summarize_contexts,
+)
+import backend.context_builder as context_builder  # noqa: E402
 
 
 def test_build_context_marks_stale_and_semantic_clusters(tmp_path):
@@ -165,3 +170,49 @@ def test_build_context_uses_embedding_similarity_for_hard_cases(monkeypatch, tmp
     assert len(contexts) == 2
     assert contexts[0]["near_duplicate_key"] == contexts[1]["near_duplicate_key"]
     assert "embedding-similarity" in contexts[0]["near_duplicate_signals"]
+
+
+def test_get_runtime_capabilities_shape():
+    caps = get_runtime_capabilities()
+    assert "ocr" in caps
+    assert "embeddings" in caps
+    assert isinstance(caps["ocr"].get("available"), bool)
+    assert isinstance(caps["embeddings"].get("available"), bool)
+    assert isinstance(caps["ocr"].get("missing"), list)
+    assert isinstance(caps["embeddings"].get("missing"), list)
+
+
+def test_get_runtime_capabilities_reports_missing_optional_dependencies(monkeypatch):
+    monkeypatch.setattr(context_builder, "pytesseract", None)
+    monkeypatch.setattr(context_builder, "pdf2image", None)
+    monkeypatch.setattr(context_builder, "pil_image", None)
+    monkeypatch.setattr(context_builder, "sentence_transformers", None)
+    monkeypatch.setattr(context_builder, "np", None)
+    monkeypatch.setattr(
+        context_builder,
+        "_EMBEDDING_STATE",
+        {"model": None, "disabled": False},
+    )
+
+    caps = get_runtime_capabilities()
+    assert caps["ocr"]["available"] is False
+    assert "pytesseract" in caps["ocr"]["missing"]
+    assert "pdf2image" in caps["ocr"]["missing"]
+    assert "Pillow" in caps["ocr"]["missing"]
+    assert caps["embeddings"]["available"] is False
+    assert "sentence-transformers" in caps["embeddings"]["missing"]
+    assert "numpy" in caps["embeddings"]["missing"]
+
+
+def test_get_runtime_capabilities_reports_disabled_embedding_model(monkeypatch):
+    monkeypatch.setattr(context_builder, "sentence_transformers", object())
+    monkeypatch.setattr(context_builder, "np", object())
+    monkeypatch.setattr(
+        context_builder,
+        "_EMBEDDING_STATE",
+        {"model": None, "disabled": True},
+    )
+
+    caps = get_runtime_capabilities()
+    assert caps["embeddings"]["available"] is False
+    assert caps["embeddings"]["disabled"] is True

@@ -105,6 +105,53 @@ _EMBEDDING_STATE = {"model": None, "disabled": False}
 _EMBEDDING_CACHE: Dict[str, object] = {}
 
 
+def get_runtime_capabilities() -> Dict:
+    """Report availability of optional analysis enhancements.
+
+    This is intentionally lightweight and does not force model downloads or
+    binary checks; it reports Python dependency availability plus embedding
+    disable state when model loading previously failed.
+    """
+
+    image_ocr_available = pil_image is not None and pytesseract is not None
+    pdf_ocr_available = pdf2image is not None and pytesseract is not None
+    embedding_available = (
+        sentence_transformers is not None
+        and np is not None
+        and not _EMBEDDING_STATE.get("disabled", False)
+    )
+
+    return {
+        "ocr": {
+            "available": image_ocr_available or pdf_ocr_available,
+            "image": image_ocr_available,
+            "pdf": pdf_ocr_available,
+            "missing": [
+                name
+                for name, ok in {
+                    "pytesseract": pytesseract is not None,
+                    "pdf2image": pdf2image is not None,
+                    "Pillow": pil_image is not None,
+                }.items()
+                if not ok
+            ],
+        },
+        "embeddings": {
+            "available": embedding_available,
+            "disabled": bool(_EMBEDDING_STATE.get("disabled", False)),
+            "model": os.getenv("DISK_ORGANISER_EMBEDDING_MODEL", "all-MiniLM-L6-v2"),
+            "missing": [
+                name
+                for name, ok in {
+                    "sentence-transformers": sentence_transformers is not None,
+                    "numpy": np is not None,
+                }.items()
+                if not ok
+            ],
+        },
+    }
+
+
 @dataclass
 class FileContext:
     path: str

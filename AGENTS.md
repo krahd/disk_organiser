@@ -1,4 +1,4 @@
-# AGENT.md - Disk Organiser
+# AGENTS.md - Disk Organiser
 
 This guide is for coding agents working in this repository.
 
@@ -109,7 +109,12 @@ npm run test:visual
 - Preserve dual-import fallback patterns in backend modules where present.
 - Prefer additive, minimal-risk changes over broad refactors.
 - Keep API docs and OpenAPI spec in sync with route changes.
-- Keep STATUS.md up to date whenever implementation state, testing status, or major project direction changes.
+
+## Mandatory STATUS.md Updates
+
+- STATUS.md must be updated whenever implementation state, testing status, or project direction changes.
+- Every STATUS.md update must include a refreshed `Last updated` value with the current local date and time in format `YYYY-MM-DD HH:MM`.
+- Treat missing or stale STATUS.md timestamps as a blocking documentation error.
 
 ## Current Gaps (Realistic)
 

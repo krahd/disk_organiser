@@ -739,6 +739,31 @@ document.addEventListener("DOMContentLoaded", () => {
             summaryEl.appendChild(rejected);
           }
 
+          const capabilities =
+            preview.analysis_capabilities ||
+            (preview.op && preview.op.metadata ? preview.op.metadata.analysis_capabilities : null);
+          if (capabilities) {
+            const ocr = capabilities.ocr || {};
+            const embeddings = capabilities.embeddings || {};
+            const missing = [];
+            if (!ocr.available) {
+              missing.push("OCR (install pytesseract, pdf2image, Pillow)");
+            }
+            if (!embeddings.available) {
+              missing.push("embedding similarity (install sentence-transformers, numpy)");
+            }
+            const cap = document.createElement("div");
+            cap.className = `capability-banner ${missing.length ? "capability-warn" : "capability-ok"}`;
+            const headline = missing.length
+              ? "Optional enhancements unavailable"
+              : "All optional analysis enhancements available";
+            const detail = missing.length
+              ? `Disabled: ${missing.join("; ")}.`
+              : "OCR and embedding similarity are available for harder near-duplicate cases.";
+            cap.innerHTML = `<strong>${headline}</strong><div class="small-muted mt-6">${detail}</div>`;
+            summaryEl.appendChild(cap);
+          }
+
           const grouped = preview.grouped || {};
           Object.keys(grouped).forEach((groupName) => {
             const section = document.createElement("section");

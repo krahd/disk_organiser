@@ -80,6 +80,7 @@ try:
     list_backups = op_store_mod.list_backups
     delete_op = op_store_mod.delete_op
     build_context = context_builder_mod.build_context
+    get_runtime_capabilities = context_builder_mod.get_runtime_capabilities
     summarize_contexts = context_builder_mod.summarize_contexts
     summarise_folders_for_visualisation = context_builder_mod.summarise_folders_for_visualisation
     normalize_actions = action_planner_mod.normalize_actions
@@ -101,6 +102,7 @@ except (ImportError, FileNotFoundError):
         from backend.action_planner import group_actions, normalize_actions, validate_actions
         from backend.context_builder import (
             build_context,
+            get_runtime_capabilities,
             summarise_folders_for_visualisation,
             summarize_contexts,
         )
@@ -238,6 +240,7 @@ def _build_op_preview(op: dict) -> dict:
         "summary": summary,
         "grouped": group_actions(actions),
         "backup_status": op.get("metadata", {}).get("backup_status"),
+        "analysis_capabilities": op.get("metadata", {}).get("analysis_capabilities"),
         "rejected": op.get("metadata", {}).get("rejected_actions", []),
     }
 
@@ -810,11 +813,13 @@ def api_analyse_reason():
         actions, rejected = validate_actions(raw_actions, allowed_roots=paths)
         summary = summarize_contexts(contexts)
         backup_status = get_backup_status()
+        analysis_capabilities = get_runtime_capabilities()
         metadata = {
             "user": "anonymous",
             "kind": "analysis",
             "paths": paths,
             "analysis_summary": summary,
+            "analysis_capabilities": analysis_capabilities,
             "backup_status": backup_status,
             "contexts": contexts,
             "rejected_actions": rejected,
