@@ -317,6 +317,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div id="vis-progress" class="mt-06"></div>
                     <div id="vis-result"></div>
                 `;
+        let latestVisualInsights = {};
+        let latestVisualSummary = null;
         function toHierarchy(node) {
           return {
             name: node.path || node.name || "/",
@@ -388,6 +390,31 @@ document.addEventListener("DOMContentLoaded", () => {
             sizeEl.textContent = `Size: ${formatBytes(d.value)}`;
             panelContent.appendChild(title);
             panelContent.appendChild(sizeEl);
+
+            const folderInsight =
+              latestVisualInsights[d.data.name] || latestVisualInsights[d.data.path];
+            if (folderInsight) {
+              const insight = document.createElement("div");
+              insight.className = "insight-panel mt-6";
+              insight.innerHTML = `
+                <div><strong>Folder insight</strong></div>
+                <div>${folderInsight.files || 0} files, ${
+                folderInsight.semantic_groups || 0
+              } semantic groups</div>
+                <div>${folderInsight.stale || 0} stale candidates</div>
+              `;
+              panelContent.appendChild(insight);
+            }
+            if (latestVisualSummary) {
+              const summary = document.createElement("div");
+              summary.className = "small-muted mt-6";
+              summary.textContent = `Analysis snapshot: ${
+                latestVisualSummary.file_count || 0
+              } files, ${latestVisualSummary.stale_candidates || 0} stale candidates, ${
+                latestVisualSummary.near_duplicate_clusters || 0
+              } semantic clusters.`;
+              panelContent.appendChild(summary);
+            }
 
             const resultEl = document.createElement("div");
             resultEl.className = "mt-6";
@@ -489,10 +516,12 @@ document.addEventListener("DOMContentLoaded", () => {
           const res = await fetch(`${API_BASE}/api/visualisation`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
+            body: JSON.stringify({ ...body, include_insights: true }),
           });
           const j = await res.json();
           const out = document.getElementById("vis-result");
+          latestVisualInsights = j.insights || {};
+          latestVisualSummary = j.analysis_summary || null;
           if (j.visualisation) await renderTreemap(j.visualisation, out);
           else out.textContent = JSON.stringify(j, null, 2);
         };
@@ -636,11 +665,256 @@ document.addEventListener("DOMContentLoaded", () => {
       case "organise":
         main.innerHTML = `
                     <h2>Organise</h2>
-                    <p>Review created operations, view details, undo or remove backups.</p>
-                    <button id="ops-refresh" class="btn">Refresh Ops</button>
+                    <p>Analyse a drive, review grouped actions, refine them in natural language, then execute a selected subset.</p>
+                    <div class="analysis-toolbar">
+                      <label>Path: <input id="analysis-path" type="text" placeholder="/path/to/analyse" class="input-wide"></label>
+                      <label>Max files: <input id="analysis-max-files" type="number" placeholder="2000"></label>
+                      <label><input id="analysis-create-snapshot" type="checkbox"> Create local snapshot before execute</label>
+                      <button id="analysis-run" class="btn primary">Analyse</button>
+                    </div>
+                    <div id="analysis-progress" class="mt-1"></div>
+                    <div id="analysis-summary" class="mt-1"></div>
+                    <div id="analysis-preview" class="mt-1"></div>
+                    <div id="analysis-chat" class="mt-1"></div>
+                    <hr class="section-rule">
+                    <div class="ops-head">
+                      <h3>Existing operations</h3>
+                      <button id="ops-refresh" class="btn">Refresh Ops</button>
+                    </div>
                     <div id="ops-list" class="mt-1"></div>
                     <div id="ops-detail" class="mt-1"></div>
                 `;
+        const analysisState = {
+          opId: null,
+          preview: null,
+          selected: new Set(),
+        };
+
+        function selectedActionIndexes() {
+          return Array.from(analysisState.selected)
+            .map((value) => Number(value))
+            .sort((a, b) => a - b);
+        }
+
+        function renderAnalysisPreview(preview) {
+          analysisState.preview = preview;
+          analysisState.opId = preview && preview.op ? preview.op.id : null;
+          const previewEl = document.getElementById("analysis-preview");
+          const summaryEl = document.getElementById("analysis-summary");
+          const chatEl = document.getElementById("analysis-chat");
+          previewEl.innerHTML = "";
+          chatEl.innerHTML = "";
+          if (!preview || !preview.actions) {
+            summaryEl.textContent = "No actions proposed.";
+            return;
+          }
+
+          analysisState.selected = new Set(preview.actions.map((_action, index) => index));
+          const summary = preview.summary || {};
+          summaryEl.innerHTML = `
+            <div class="analysis-summary-card">
+              <div><strong>${
+                summary.actions || preview.actions.length
+              }</strong> actions across <strong>${
+            Object.keys(summary.groups || {}).length
+          }</strong> groups</div>
+              <div>${formatBytes(summary.bytes || summary.total_bytes || 0)} affected</div>
+            </div>
+          `;
+          if (preview.backup_status) {
+            const backup = preview.backup_status;
+            const banner = document.createElement("div");
+            banner.className = `backup-banner ${
+              backup.latest_backup ? "backup-ok" : "backup-warn"
+            }`;
+            banner.textContent = backup.latest_backup
+              ? `Latest Time Machine backup: ${backup.latest_backup}`
+              : backup.warning || "No recent macOS backup detected.";
+            summaryEl.appendChild(banner);
+          }
+          if (preview.rejected && preview.rejected.length) {
+            const rejected = document.createElement("div");
+            rejected.className = "small-muted mt-8";
+            rejected.textContent = `${preview.rejected.length} model actions were rejected by validation.`;
+            summaryEl.appendChild(rejected);
+          }
+
+          const grouped = preview.grouped || {};
+          Object.keys(grouped).forEach((groupName) => {
+            const section = document.createElement("section");
+            section.className = "analysis-group";
+            const header = document.createElement("div");
+            header.className = "analysis-group-header";
+            header.innerHTML = `<h3>${groupName}</h3><span>${grouped[groupName].length} actions</span>`;
+            section.appendChild(header);
+
+            grouped[groupName].forEach((action) => {
+              const actionIndex = preview.actions.findIndex(
+                (candidate) =>
+                  candidate.from === action.from &&
+                  candidate.to === action.to &&
+                  (candidate.action || candidate.type) === (action.action || action.type)
+              );
+              const card = document.createElement("label");
+              card.className = "analysis-action";
+              const checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.checked = analysisState.selected.has(actionIndex);
+              checkbox.onchange = () => {
+                if (checkbox.checked) analysisState.selected.add(actionIndex);
+                else analysisState.selected.delete(actionIndex);
+              };
+              const body = document.createElement("div");
+              body.className = "analysis-action-body";
+              const nearDupSignals =
+                action.near_duplicate_signals ||
+                (action.metadata && Array.isArray(action.metadata.signals)
+                  ? action.metadata.signals
+                  : []);
+              const signalHtml = nearDupSignals.length
+                ? `<div class="analysis-signal-row">${nearDupSignals
+                    .map((signal) => `<span class="analysis-signal-pill">${signal}</span>`)
+                    .join("")}</div>`
+                : "";
+              body.innerHTML = `
+                <div class="analysis-action-top">
+                  <span class="action-pill">${action.action || action.type}</span>
+                  <span class="confidence-pill">${Math.round(
+                    (action.confidence || 0) * 100
+                  )}%</span>
+                </div>
+                <div class="analysis-path-line"><strong>From:</strong> ${action.from || ""}</div>
+                <div class="analysis-path-line"><strong>To:</strong> ${action.to || ""}</div>
+                ${signalHtml}
+                <div class="analysis-reason">${action.reason || "No reason provided."}</div>
+              `;
+              card.appendChild(checkbox);
+              card.appendChild(body);
+              section.appendChild(card);
+            });
+            previewEl.appendChild(section);
+          });
+
+          const controls = document.createElement("div");
+          controls.className = "analysis-controls";
+          const executeBtn = document.createElement("button");
+          executeBtn.className = "btn primary";
+          executeBtn.textContent = "Execute Selected";
+          executeBtn.onclick = async () => {
+            if (!analysisState.opId) return;
+            executeBtn.disabled = true;
+            try {
+              const response = await fetch(`${API_BASE}/api/organise/execute`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  op_id: analysisState.opId,
+                  selected_actions: selectedActionIndexes(),
+                  create_snapshot: document.getElementById("analysis-create-snapshot").checked,
+                }),
+              });
+              const payload = await response.json();
+              showAlert(`Executed ${payload.executed ? payload.executed.length : 0} actions`);
+              loadOps();
+            } catch (e) {
+              showAlert(`Execution failed: ${e.message || e}`);
+            } finally {
+              executeBtn.disabled = false;
+            }
+          };
+          const previewUndoBtn = document.createElement("button");
+          previewUndoBtn.className = "btn";
+          previewUndoBtn.textContent = "Preview Undo";
+          previewUndoBtn.onclick = async () => {
+            if (!analysisState.opId) return;
+            const response = await fetch(`${API_BASE}/api/organise/undo`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ op_id: analysisState.opId, dry_run: true }),
+            });
+            const payload = await response.json();
+            openPreviewModal({
+              op: { id: analysisState.opId },
+              actions: payload.actions || [],
+              summary: payload.summary || {},
+            });
+          };
+          controls.appendChild(executeBtn);
+          controls.appendChild(previewUndoBtn);
+          previewEl.appendChild(controls);
+
+          chatEl.innerHTML = `
+            <div class="chat-refine-card">
+              <h3>Refine with natural language</h3>
+              <textarea id="analysis-chat-message" placeholder="Example: don't delete anything from Downloads, and avoid symlinks."></textarea>
+              <div class="mt-8">
+                <button id="analysis-chat-send" class="btn">Refine Actions</button>
+              </div>
+            </div>
+          `;
+          document.getElementById("analysis-chat-send").onclick = async () => {
+            const message = document.getElementById("analysis-chat-message").value;
+            if (!analysisState.opId || !message.trim()) return;
+            const button = document.getElementById("analysis-chat-send");
+            button.disabled = true;
+            try {
+              const response = await fetch(`${API_BASE}/api/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ op_id: analysisState.opId, message }),
+              });
+              const payload = await response.json();
+              renderAnalysisPreview(payload);
+            } catch (e) {
+              showAlert(`Chat refinement failed: ${e.message || e}`);
+            } finally {
+              button.disabled = false;
+            }
+          };
+        }
+
+        async function runAnalysis() {
+          const path = document.getElementById("analysis-path").value || undefined;
+          const maxFiles = parseInt(document.getElementById("analysis-max-files").value || "", 10);
+          const progressEl = document.getElementById("analysis-progress");
+          const startResponse = await fetch(`${API_BASE}/api/analyse/start`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              path,
+              max_files: Number.isNaN(maxFiles) ? undefined : maxFiles,
+            }),
+          });
+          const startPayload = await startResponse.json();
+          const jobId = startPayload.job_id;
+          progressEl.innerHTML = `
+            <div class="progress"><div class="progress-bar indeterminate" id="analysis-progress-bar"></div></div>
+            <div class="progress-text" id="analysis-progress-text">Building file contexts…</div>
+          `;
+          const evt = new EventSource(`${API_BASE}/api/scan/events/${jobId}`);
+          evt.onmessage = async (event) => {
+            const data = JSON.parse(event.data || "{}");
+            const text = document.getElementById("analysis-progress-text");
+            if (data.progress && data.progress.processed && text) {
+              text.textContent = `Analysed ${data.progress.processed} files`;
+            }
+            if (data.status === "finished") {
+              evt.close();
+              if (text) text.textContent = "Reasoning over the drive…";
+              const reasonResponse = await fetch(`${API_BASE}/api/analyse/reason`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ job_id: jobId }),
+              });
+              const preview = await reasonResponse.json();
+              renderAnalysisPreview(preview);
+            }
+          };
+          evt.onerror = () => {
+            /* SSE reconnect is not needed here; the result request will fail if the job did not finish. */
+          };
+        }
+
         async function loadOps() {
           const res = await fetch(`${API_BASE}/api/ops`);
           const j = await res.json();
@@ -661,10 +935,10 @@ document.addEventListener("DOMContentLoaded", () => {
             view.textContent = "View Details";
             view.className = "btn";
             view.onclick = async () => {
-              const dres = await fetch(`${API_BASE}/api/op/${opId}`);
+              const dres = await fetch(`${API_BASE}/api/ops/${opId}/preview`);
               const dj = await dres.json();
               const det = document.getElementById("ops-detail");
-              det.innerHTML = `<pre>${JSON.stringify(dj.op, null, 2)}</pre>`;
+              det.innerHTML = `<pre>${JSON.stringify(dj, null, 2)}</pre>`;
             };
             card.appendChild(view);
             const undo = document.createElement("button");
@@ -726,6 +1000,7 @@ document.addEventListener("DOMContentLoaded", () => {
             list.appendChild(card);
           }
         }
+        document.getElementById("analysis-run").onclick = runAnalysis;
         document.getElementById("ops-refresh").onclick = loadOps;
         loadOps();
         break;

@@ -12,6 +12,7 @@ import shutil
 import sqlite3
 import time
 import uuid
+import importlib
 from typing import Optional
 
 BASE = os.path.dirname(__file__)
@@ -21,7 +22,8 @@ INDEX_PRAGMA = "PRAGMA journal_mode=WAL"
 
 # Optional: prefer sending to OS recycle/trash if available
 try:
-    from send2trash import send2trash  # type: ignore
+    send2trash_mod = importlib.import_module("send2trash")
+    send2trash = getattr(send2trash_mod, "send2trash", None)
 except Exception:
     send2trash = None  # type: ignore
 
@@ -190,9 +192,7 @@ def list_ops() -> dict:
     _init_db()
     conn = _connect()
     cur = conn.cursor()
-    cur.execute(
-        "SELECT id, suggestions, metadata, status, created_at, backup_dir " "FROM ops"
-    )
+    cur.execute("SELECT id, suggestions, metadata, status, created_at, backup_dir FROM ops")
     rows = cur.fetchall()
     out = {}
     for row in rows:
@@ -272,10 +272,23 @@ def backup_file(op_id: str, src_path: str, dry_run: bool = False) -> str | None:
         return target
     try:
         os.makedirs(backup_dir, exist_ok=True)
-        shutil.copy2(src_path, target)
+        if os.path.isdir(src_path) and not os.path.islink(src_path):
+            shutil.copytree(src_path, target)
+        else:
+            shutil.copy2(src_path, target)
         return target
     except (OSError, shutil.Error):
         return None
+
+
+def _restore_backup(backup: str, orig: str):
+    os.makedirs(os.path.dirname(orig), exist_ok=True)
+    if os.path.isdir(backup) and not os.path.islink(backup):
+        if os.path.exists(orig):
+            shutil.rmtree(orig)
+        shutil.move(backup, orig)
+    else:
+        shutil.move(backup, orig)
 
 
 def undo_op(op_id: str, dry_run: bool = False) -> dict:
@@ -297,22 +310,48 @@ def undo_op(op_id: str, dry_run: bool = False) -> dict:
         except Exception:
             results.append({"error": "invalid action", "raw": action_json})
             continue
+        action_type = a.get("action_type") or a.get("action") or "move"
         backup = a.get("backup")
         orig = a.get("from")
+        dst = a.get("to")
         if dry_run:
             # produce preview entries without moving files
             if fs_ops_mod:
-                preview.append(
-                    fs_ops_mod.preview_move_action(backup, orig, op.get("backup_dir"))
-                )
+                if action_type == "create_symlink":
+                    preview.append(
+                        {
+                            "action": "remove_symlink",
+                            "from": dst,
+                            "to": orig,
+                            "status": "planned",
+                            "group": "Undo",
+                        }
+                    )
+                else:
+                    preview.append(
+                        fs_ops_mod.preview_move_action(backup or dst, orig, op.get("backup_dir"))
+                    )
             else:
                 preview.append({"action": "restore", "from": backup,
                                "to": orig, "status": "would_restore"})
             continue
         try:
-            if backup and os.path.exists(backup):
-                os.makedirs(os.path.dirname(orig), exist_ok=True)
-                shutil.move(backup, orig)
+            if action_type == "create_symlink":
+                if dst and os.path.islink(dst):
+                    os.unlink(dst)
+                if backup and os.path.exists(backup):
+                    _restore_backup(backup, dst)
+                results.append({"restored": dst})
+            elif backup and os.path.exists(backup):
+                if dst and os.path.exists(dst) and not backup.startswith(op.get("backup_dir") or ""):
+                    if os.path.isdir(dst) and not os.path.islink(dst):
+                        shutil.rmtree(dst)
+                    else:
+                        os.unlink(dst)
+                _restore_backup(backup, orig)
+                results.append({"restored": orig})
+            elif dst and os.path.exists(dst):
+                _restore_backup(dst, orig)
                 results.append({"restored": orig})
             else:
                 results.append({"failed": orig})
@@ -381,23 +420,28 @@ def delete_op(op_id: str, dry_run: bool = False):
         conn.close()
         return False if not dry_run else {"op_id": op_id, "dry_run": True, "files": []}
     bdir = row[0]
+    conn.close()
+
+    if dry_run:
+        files = []
+        if bdir and os.path.exists(bdir):
+            for root, _, fns in os.walk(bdir):
+                for fn in fns:
+                    fp = os.path.join(root, fn)
+                    try:
+                        files.append({"path": fp, "size": os.path.getsize(
+                            fp), "mtime": os.path.getmtime(fp)})
+                    except Exception:
+                        files.append({"path": fp})
+        return {"op_id": op_id, "dry_run": True, "files": files}
+
+    conn = _connect()
+    cur = conn.cursor()
     cur.execute("DELETE FROM ops WHERE id=?", (op_id,))
     conn.commit()
     conn.close()
     try:
         if bdir and os.path.exists(bdir):
-            if dry_run:
-                files = []
-                for root, _, fns in os.walk(bdir):
-                    for fn in fns:
-                        fp = os.path.join(root, fn)
-                        try:
-                            files.append({"path": fp, "size": os.path.getsize(
-                                fp), "mtime": os.path.getmtime(fp)})
-                        except Exception:
-                            files.append({"path": fp})
-                return {"op_id": op_id, "dry_run": True, "files": files}
-            # prefer os-native trash if available
             try:
                 if send2trash:
                     send2trash(bdir)

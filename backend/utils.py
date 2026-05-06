@@ -52,7 +52,6 @@ def _sample_hash(path: str, sample_size: int = 4096) -> str:
     # prefer xxhash for sample hashing if available for speed
     if _XXHASH_AVAILABLE:
         h = xxhash.xxh64()
-        size = os.path.getsize(path)
         with open(path, "rb") as f:
             if size <= sample_size * 2:
                 for chunk in iter(lambda: f.read(8192), b""):
@@ -144,9 +143,16 @@ def find_duplicates(
                         entry = None
 
                 # compute or reuse sample hash
+                # only reuse the cached value when size AND mtime still match
+                cur_mtime = os.path.getmtime(fp)
                 sh = (
                     entry.get("sample_hash")
-                    if entry and entry.get("sample_hash")
+                    if (
+                        entry
+                        and entry.get("sample_hash")
+                        and entry.get("size") == size
+                        and entry.get("mtime") == cur_mtime
+                    )
                     else _sample_hash(fp, sample_size=sample_size)
                 )
                 # persist sample hash to index
@@ -156,7 +162,7 @@ def find_duplicates(
                         scan_index_mod.upsert_entry(
                             fp,
                             size,
-                            os.path.getmtime(fp),
+                            cur_mtime,
                             sample_hash=sh,
                             full_hash=full_hash,
                         )
@@ -182,8 +188,19 @@ def find_duplicates(
                             entry = scan_index_mod.get_entry(fp)
                         except Exception:
                             entry = None
+                    # only reuse cached full_hash when size AND mtime match
                     if entry and entry.get("full_hash"):
-                        return fp, entry.get("full_hash")
+                        try:
+                            cur_size = os.path.getsize(fp)
+                            cur_mtime = os.path.getmtime(fp)
+                        except OSError:
+                            cur_size, cur_mtime = None, None
+                        if (
+                            cur_size is not None
+                            and entry.get("size") == cur_size
+                            and entry.get("mtime") == cur_mtime
+                        ):
+                            return fp, entry.get("full_hash")
                     fh = file_hash(fp)
                     if _SCAN_INDEX_AVAILABLE:
                         try:

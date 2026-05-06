@@ -5,8 +5,9 @@ local filesystem. It provides:
 
 - A Flask backend API for scanning, finding duplicates, and applying safe
 	organise operations (with backups).
-- A minimal static frontend for quick visualisation and previewing actions.
+- A minimal static frontend for quick visualisation, grouped previews, and conversational refinement.
 - Optional AI-assisted suggestions via pluggable model wrappers.
+- Preview-first semantic analysis with typed reversible actions: moves, stale-file removal, symlink proposals.
 
 This repository contains the backend API under `backend/` and the frontend in
 `frontend/`.
@@ -43,9 +44,11 @@ frontend API base at runtime by setting `window._DISK_ORGANISER_API_BASE`.
 ## Features
 
 - Scan directories and detect duplicate files using content hashing.
-- Lightweight visualisation of folder structure and sizes.
+- Lightweight visualisation of folder structure and sizes, with optional semantic folder insights.
 - Preview organise suggestions and execute operations with automatic backups.
-- Optional AI model integration (pluggable providers) to suggest keeps/moves.
+- Build rich file contexts and ask the model layer to propose reversible actions.
+- Refine proposed actions conversationally before executing them.
+- Optional macOS Time Machine status and local snapshot creation before execution.
 
 ## Docker / Compose
 
@@ -84,7 +87,8 @@ See `docs/DEVELOPMENT.md` for more development notes and helpful commands.
 ## API
 
 The backend exposes a simple REST API used by the frontend. See
-`docs/API.md` for endpoint descriptions and example payloads.
+`docs/API.md` for endpoint descriptions and example payloads, and `docs/openapi.json`
+for the machine-readable route spec validated in CI.
 
 ## Releases
 
@@ -116,5 +120,3 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 This software is provided "AS IS", without warranty of any kind, express or implied. Use at your own risk.
 
-If you'd like a trimmed README (for GitHub About or package metadata), tell me
-which sections to keep and I will produce it.

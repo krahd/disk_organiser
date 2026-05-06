@@ -8,3 +8,6 @@ gunicorn
 filelock
 xxhash
 send2trash
+Pillow
+ImageHash
+pypdf

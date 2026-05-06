@@ -13,11 +13,11 @@ import json
 import logging
 import os
 import shutil
+import sys
 import threading
 import time
 import traceback
 import uuid
-from pathlib import Path
 
 from flask import Flask, Response, jsonify, request, stream_with_context
 from flask_cors import CORS
@@ -46,6 +46,7 @@ def _import_local_module(module_name: str, filename: str):
     if spec is None or spec.loader is None:
         raise ImportError(f"Cannot load module {module_name} from {path}")
     mod = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = mod
     spec.loader.exec_module(mod)
     return mod
 
@@ -56,11 +57,16 @@ try:
     tasks_mod = _import_local_module("tasks", "tasks.py")
     op_store_mod = _import_local_module("op_store", "op_store.py")
     fs_ops_mod = _import_local_module("fs_ops", "fs_ops.py")
+    context_builder_mod = _import_local_module("context_builder", "context_builder.py")
+    action_planner_mod = _import_local_module("action_planner", "action_planner.py")
+    validation_mod = _import_local_module("validation", "validation.py")
+    safety_mod = _import_local_module("safety", "safety.py")
     load_config = store_mod.load_config
     save_config = store_mod.save_config
     find_duplicates = utils_mod.find_duplicates
     visualise_path = utils_mod.visualise_path
     background_scan = tasks_mod.background_scan
+    background_analyse = tasks_mod.background_analyse
     job_status = tasks_mod.job_status
     create_op = op_store_mod.create_op
     get_op = op_store_mod.get_op
@@ -73,6 +79,17 @@ try:
     cleanup_recycle = op_store_mod.cleanup_recycle
     list_backups = op_store_mod.list_backups
     delete_op = op_store_mod.delete_op
+    build_context = context_builder_mod.build_context
+    summarize_contexts = context_builder_mod.summarize_contexts
+    summarise_folders_for_visualisation = context_builder_mod.summarise_folders_for_visualisation
+    normalize_actions = action_planner_mod.normalize_actions
+    validate_actions = action_planner_mod.validate_actions
+    group_actions = action_planner_mod.group_actions
+    ValidationError = validation_mod.ValidationError
+    require_json_object = validation_mod.require_json_object
+    require_string = validation_mod.require_string
+    get_backup_status = safety_mod.get_backup_status
+    create_local_snapshot = safety_mod.create_local_snapshot
     try:
         scan_index_mod = _import_local_module("scan_index", "scan_index.py")
     except Exception:
@@ -81,6 +98,12 @@ except (ImportError, FileNotFoundError):
     # final fallback: try package imports if available
     try:
         from backend import fs_ops as fs_ops_mod
+        from backend.action_planner import group_actions, normalize_actions, validate_actions
+        from backend.context_builder import (
+            build_context,
+            summarise_folders_for_visualisation,
+            summarize_contexts,
+        )
         from backend.op_store import (
             add_executed_action,
             backup_file,
@@ -94,9 +117,15 @@ except (ImportError, FileNotFoundError):
             undo_op,
             update_op,
         )
+        from backend.safety import create_local_snapshot, get_backup_status
         from backend.store import load_config, save_config
-        from backend.tasks import background_scan, job_status
+        from backend.tasks import background_analyse, background_scan, job_status
         from backend.utils import find_duplicates, visualise_path
+        from backend.validation import (
+            ValidationError,
+            require_json_object,
+            require_string,
+        )
 
         try:
             from backend import scan_index as scan_index_mod
@@ -137,6 +166,10 @@ except Exception:
     pass
 
 app = Flask(__name__)
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s %(levelname)s %(name)s event=%(message)s",
+)
 # Configure CORS: allow explicit origins via the `CORS_ALLOWED_ORIGINS`
 # environment variable (comma-separated). If not set, default to permissive
 # CORS to preserve existing development behaviour.
@@ -148,6 +181,24 @@ else:
     CORS(app)
 logger = logging.getLogger(__name__)
 MAINT_FILE = os.path.join(os.path.dirname(__file__), "maintenance_status.json")
+
+
+def _error(message: str, status: int = 400, code: str = "bad_request", **details):
+    payload = {"error": {"code": code, "message": message}}
+    if details:
+        payload["error"]["details"] = details
+    return jsonify(payload), status
+
+
+def _validate_json() -> dict:
+    try:
+        return require_json_object(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        raise ValidationError(str(exc)) from exc
+
+
+def _log_exception(event: str, exc: Exception, **details):
+    logger.exception("%s details=%s error=%s", event, details, exc)
 
 
 def _coerce_int_with_min(value, default, minimum=0):
@@ -176,6 +227,72 @@ def _normalize_paths(value, default_to_cwd=True):
     if not normalized and default_to_cwd:
         return [os.getcwd()]
     return normalized
+
+
+def _build_op_preview(op: dict) -> dict:
+    actions = fs_ops_mod.preview_suggestions(op.get("suggestions", []), op.get("backup_dir"))
+    summary = fs_ops_mod.summarize_actions(actions)
+    return {
+        "op": op,
+        "actions": actions,
+        "summary": summary,
+        "grouped": group_actions(actions),
+        "backup_status": op.get("metadata", {}).get("backup_status"),
+        "rejected": op.get("metadata", {}).get("rejected_actions", []),
+    }
+
+
+def _execute_single_action(op_id: str, _op: dict, action: dict) -> dict:
+    action_type = (action.get("action") or action.get("action_type") or "move").lower()
+    src = action.get("from") or action.get("source") or action.get("path")
+    dst = action.get("to") or action.get("destination") or action.get("link")
+    record = dict(action)
+    record["action_type"] = action_type
+
+    if action_type in {"move", "reorganise_folder"}:
+        if not src or not dst:
+            return {"status": "error", "error": "move action missing source or destination"}
+        if not os.path.exists(src):
+            return {"from": src, "to": dst, "status": "missing"}
+        backup_path = backup_file(op_id, src)
+        if not backup_path:
+            return {"from": src, "to": dst, "status": "backup_failed"}
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.move(src, dst)
+        record.update({"from": src, "to": dst, "backup": backup_path, "status": "moved"})
+        add_executed_action(op_id, record)
+        return record
+
+    if action_type == "create_symlink":
+        if not src or not dst:
+            return {"status": "error", "error": "symlink action missing source or destination"}
+        backup_path = None
+        if os.path.lexists(dst):
+            backup_path = backup_file(op_id, dst)
+            if os.path.isdir(dst) and not os.path.islink(dst):
+                shutil.rmtree(dst)
+            else:
+                os.unlink(dst)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        os.symlink(src, dst)
+        record.update({"from": src, "to": dst, "backup": backup_path, "status": "linked"})
+        add_executed_action(op_id, record)
+        return record
+
+    if action_type == "delete_stale":
+        if not src:
+            return {"status": "error", "error": "delete action missing source"}
+        if not os.path.exists(src):
+            return {"from": src, "status": "missing"}
+        backup_path = backup_file(op_id, src)
+        if not backup_path:
+            return {"from": src, "status": "backup_failed"}
+        fs_ops_mod.delete_path(src)
+        record.update({"from": src, "backup": backup_path, "status": "deleted"})
+        add_executed_action(op_id, record)
+        return record
+
+    return {"status": "error", "error": f"unsupported action type: {action_type}"}
 
 
 @app.route("/")
@@ -231,6 +348,16 @@ def api_visualise():
         vis = visualise_path(path, depth=depth)
     except (OSError, ValueError) as e:
         return jsonify({"error": str(e)}), 400
+    include_insights = bool(data.get("include_insights", False))
+    if include_insights:
+        contexts = build_context([path], min_size=0, max_files=500)
+        return jsonify(
+            {
+                "visualisation": vis,
+                "insights": summarise_folders_for_visualisation(contexts),
+                "analysis_summary": summarize_contexts(contexts),
+            }
+        )
     return jsonify({"visualisation": vis})
 
 
@@ -318,12 +445,16 @@ def api_organise_suggest():
 @app.route("/api/organise/preview", methods=["POST"])
 def api_organise_preview():
     """Create an operation entry from provided suggestions (preview)."""
-    data = request.get_json(silent=True) or {}
-    suggestions = data.get("suggestions")
-    if not suggestions:
-        return jsonify({"error": "missing suggestions"}), 400
-    op = create_op(suggestions, metadata={"user": "anonymous"})
-    return jsonify({"op": op})
+    try:
+        data = _validate_json()
+        suggestions = data.get("suggestions") or data.get("actions")
+        if not suggestions or not isinstance(suggestions, list):
+            return _error("missing suggestions", 400, "validation_error")
+        metadata = data.get("metadata") if isinstance(data.get("metadata"), dict) else {"user": "anonymous"}
+        op = create_op(suggestions, metadata=metadata)
+        return jsonify(_build_op_preview(op))
+    except ValidationError as exc:
+        return _error(str(exc), 400, "validation_error")
 
 
 @app.route("/api/organise/remove-preview", methods=["POST"])
@@ -360,103 +491,49 @@ def api_organise_execute():
     data = request.get_json(silent=True) or {}
     op_id = data.get("op_id")
     if not op_id:
-        return jsonify({"error": "missing op_id"}), 400
+        return _error("missing op_id", 400, "validation_error")
     op = get_op(op_id)
     if not op:
-        return jsonify({"error": "op not found"}), 404
+        return _error("op not found", 404, "not_found")
     dry_run = bool(data.get("dry_run", False))
+    selected_actions = data.get("selected_actions")
+    normalized_actions = normalize_actions(op.get("suggestions", []))
+    if isinstance(selected_actions, list):
+        selected_set = {int(index) for index in selected_actions if isinstance(index, int)}
+        normalized_actions = [action for idx, action in enumerate(normalized_actions) if idx in selected_set]
     if dry_run:
         # Produce a non-destructive preview of actions without touching disk.
         try:
-            actions = fs_ops_mod.preview_suggestions(
-                op.get("suggestions", []), op.get("backup_dir")
-            )
+            actions = fs_ops_mod.preview_suggestions(normalized_actions, op.get("backup_dir"))
             summary = fs_ops_mod.summarize_actions(actions)
         except Exception:
-            return jsonify({"error": "failed to generate preview"}), 500
+            return _error("failed to generate preview", 500, "preview_failed")
         return jsonify(
             {
                 "op_id": op_id,
                 "dry_run": True,
+                "actions": actions,
                 "preview": actions,
                 "summary": summary,
+                "grouped": group_actions(actions),
             }
         )
-    # Execute suggested moves, backing up originals first
+
+    if bool(data.get("create_snapshot", False)):
+        snapshot_result = create_local_snapshot()
+        op_meta = op.get("metadata", {})
+        op_meta["snapshot"] = snapshot_result
+        update_op(op_id, metadata=op_meta)
+
     executed = []
-    for s in op.get("suggestions", []):
-        moves = s.get("moves", [])
-        for m in moves:
-            src = m.get("from")
-            dst = m.get("to")
-            try:
-                if not os.path.exists(src):
-                    executed.append({"from": src, "to": dst, "status": "missing"})
-                    continue
-                # If destination is inside op backup_dir, treat moved file as backup
-                op_backup_dir_val = op.get("backup_dir", "")
-                op_backup_dir = os.path.abspath(op_backup_dir_val) if op_backup_dir_val else None
-                dst_abs = os.path.abspath(dst)
-
-                # robust containment check to avoid prefix collisions
-                is_in_backup = False
-                if op_backup_dir:
-                    try:
-                        is_in_backup = Path(dst_abs).resolve().is_relative_to(
-                            Path(op_backup_dir).resolve()
-                        )
-                    except AttributeError:
-                        try:
-                            is_in_backup = os.path.commonpath(
-                                [dst_abs, op_backup_dir]) == op_backup_dir
-                        except Exception:
-                            is_in_backup = dst_abs.startswith(op_backup_dir)
-                    except Exception:
-                        is_in_backup = dst_abs.startswith(op_backup_dir)
-
-                if op_backup_dir and is_in_backup:
-                    # move original into recycle/backup location
-                    # and record that as the backup
-                    os.makedirs(os.path.dirname(dst), exist_ok=True)
-                    shutil.move(src, dst)
-                    b = dst
-                    executed.append(
-                        {"from": src, "to": dst, "backup": b, "status": "moved"}
-                    )
-                    add_executed_action(op_id, {"from": src, "to": dst, "backup": b})
-                else:
-                    # normal flow: create a backup copy then move file
-                    b = backup_file(op_id, src)
-                    if not b:
-                        # backup failed — do not move the original to avoid data loss
-                        executed.append(
-                            {
-                                "from": src,
-                                "to": dst,
-                                "backup": None,
-                                "status": "backup_failed",
-                            }
-                        )
-                        continue
-                    try:
-                        os.makedirs(os.path.dirname(dst), exist_ok=True)
-                        shutil.move(src, dst)
-                        executed.append(
-                            {"from": src, "to": dst, "backup": b, "status": "moved"}
-                        )
-                        add_executed_action(
-                            op_id, {"from": src, "to": dst, "backup": b}
-                        )
-                    except (OSError, shutil.Error) as e:
-                        executed.append(
-                            {"from": src, "to": dst, "status": "error", "error": str(e)}
-                        )
-            except (OSError, shutil.Error) as e:
-                executed.append(
-                    {"from": src, "to": dst, "status": "error", "error": str(e)}
-                )
+    for action in normalized_actions:
+        try:
+            executed.append(_execute_single_action(op_id, op, action))
+        except Exception as exc:
+            _log_exception("organise_execute_failed", exc, op_id=op_id, action=action)
+            executed.append({"action": action, "status": "error", "error": str(exc)})
     set_op_status(op_id, "executed")
-    return jsonify({"executed": executed})
+    return jsonify({"executed": executed, "backup_status": op.get("metadata", {}).get("backup_status")})
 
 
 @app.route("/api/organise/undo", methods=["POST"])
@@ -465,7 +542,7 @@ def api_organise_undo():
     data = request.get_json(silent=True) or {}
     op_id = data.get("op_id")
     if not op_id:
-        return jsonify({"error": "missing op_id"}), 400
+        return _error("missing op_id", 400, "validation_error")
     dry_run = bool(data.get("dry_run", False))
     if dry_run:
         # produce a preview of restore actions without moving files
@@ -496,14 +573,7 @@ def api_organise_undo():
                     }
                 )
         summary = fs_ops_mod.summarize_actions(preview)
-        return jsonify(
-            {
-                "op_id": op_id,
-                "dry_run": True,
-                "preview": preview,
-                "summary": summary,
-            }
-        )
+        return jsonify({"op_id": op_id, "dry_run": True, "actions": preview, "preview": preview, "summary": summary})
     res = undo_op(op_id)
     return jsonify(res)
 
@@ -694,6 +764,121 @@ def api_scan_cancel():
     if cancelled:
         return jsonify({"cancelled": job_id})
     return jsonify({"error": "failed to cancel"}), 500
+
+
+@app.route("/api/analyse/start", methods=["POST"])
+def api_analyse_start():
+    """Start a background semantic analysis job that builds file contexts."""
+    try:
+        data = _validate_json()
+        paths = _normalize_paths(data.get("paths") or data.get("path"), default_to_cwd=True)
+        min_size = _coerce_int_with_min(data.get("min_size"), 0, minimum=0)
+        max_files = data.get("max_files")
+        max_files = int(max_files) if max_files is not None else None
+    except (ValidationError, TypeError, ValueError) as exc:
+        return _error(str(exc), 400, "validation_error")
+
+    job_id = uuid.uuid4().hex
+    dry_run = bool(data.get("dry_run", False))
+    thread = threading.Thread(
+        target=background_analyse,
+        args=(paths, min_size, max_files, job_id, dry_run),
+        daemon=True,
+    )
+    thread.start()
+    return jsonify({"job_id": job_id, "backend": "thread", "dry_run": dry_run})
+
+
+@app.route("/api/analyse/reason", methods=["POST"])
+def api_analyse_reason():
+    """Run semantic reasoning over built file contexts and create a preview op."""
+    try:
+        data = _validate_json()
+        job_id = data.get("job_id")
+        preferences = data.get("preferences") if isinstance(data.get("preferences"), dict) else {}
+        contexts = data.get("contexts") if isinstance(data.get("contexts"), list) else None
+        paths = _normalize_paths(data.get("paths") or data.get("path"), default_to_cwd=True)
+        if job_id:
+            job = job_status(job_id)
+            if job.get("status") != "finished":
+                return _error("analysis job is not finished", 409, "job_not_ready", job_status=job.get("status"))
+            contexts = (job.get("result") or {}).get("contexts") or []
+            paths = (job.get("result") or {}).get("paths") or paths
+        if contexts is None:
+            contexts = build_context(paths, min_size=0, max_files=data.get("max_files"))
+        raw_actions = model_client.analyse_drive(contexts, preferences) if model_client is not None else []
+        actions, rejected = validate_actions(raw_actions, allowed_roots=paths)
+        summary = summarize_contexts(contexts)
+        backup_status = get_backup_status()
+        metadata = {
+            "user": "anonymous",
+            "kind": "analysis",
+            "paths": paths,
+            "analysis_summary": summary,
+            "backup_status": backup_status,
+            "contexts": contexts,
+            "rejected_actions": rejected,
+            "chat_history": [],
+        }
+        op = create_op(actions, metadata=metadata)
+        return jsonify(_build_op_preview(op))
+    except ValidationError as exc:
+        return _error(str(exc), 400, "validation_error")
+    except Exception as exc:
+        _log_exception("analyse_reason_failed", exc)
+        return _error("analysis failed", 500, "analysis_failed")
+
+
+@app.route("/api/chat", methods=["POST"])
+def api_chat():
+    """Refine an analysis operation via natural-language feedback."""
+    try:
+        data = _validate_json()
+        op_id = require_string(data, "op_id")
+        message = require_string(data, "message")
+        op = get_op(op_id)
+        if not op:
+            return _error("op not found", 404, "not_found")
+        metadata = op.get("metadata") or {}
+        contexts = metadata.get("contexts") or []
+        paths = metadata.get("paths") or [os.getcwd()]
+        preferences = metadata.get("preferences") or {}
+        history = list(metadata.get("chat_history") or [])
+        refined = model_client.refine_actions(message, op.get("suggestions", []), contexts, preferences, history) if model_client is not None else op.get("suggestions", [])
+        actions, rejected = validate_actions(refined, allowed_roots=paths)
+        history.append({"role": "user", "message": message})
+        metadata["chat_history"] = history
+        metadata["rejected_actions"] = rejected
+        update_op(op_id, suggestions=actions, metadata=metadata)
+        return jsonify(_build_op_preview(get_op(op_id)))
+    except ValidationError as exc:
+        return _error(str(exc), 400, "validation_error")
+    except Exception as exc:
+        _log_exception("chat_refine_failed", exc)
+        return _error("chat refinement failed", 500, "chat_failed")
+
+
+@app.route("/api/ops/<op_id>/preview", methods=["GET"])
+def api_op_preview(op_id):
+    """Return a grouped diff-style preview for an operation."""
+    try:
+        op = get_op(op_id)
+        if not op:
+            return _error("op not found", 404, "not_found")
+        return jsonify(_build_op_preview(op))
+    except Exception as exc:
+        _log_exception("op_preview_failed", exc, op_id=op_id)
+        return _error("failed to load op preview", 500, "preview_failed")
+
+
+@app.route("/api/safety/backup-status", methods=["GET"])
+def api_backup_status():
+    """Return macOS backup state so the UI can warn before execution."""
+    try:
+        return jsonify({"backup_status": get_backup_status()})
+    except Exception as exc:
+        _log_exception("backup_status_failed", exc)
+        return _error("failed to retrieve backup status", 500, "backup_status_failed")
 
 
 @app.route("/api/recycle/list", methods=["GET"])

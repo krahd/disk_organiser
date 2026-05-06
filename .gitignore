@@ -2,6 +2,23 @@
 /release-*.zip
 /dist/
 /out/
+
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
+# Runtime data — generated at run-time, never commit
+backend/config.json
+backend/maintenance_status.json
+backend/ops.json
+backend/ops.db
+backend/scan_index.db
+backend/scan_jobs/
+backend/ops_backups/
+
+# Temp working directories
+tmp-homebrew-tap/
+
 .venv/
 venv/
 __pycache__/

@@ -12,9 +12,11 @@ from typing import List
 
 try:
     # try package import
+    from backend.context_builder import build_context, summarize_contexts
     from backend.utils import find_duplicates
 except ImportError:
     # allow fallback to local import when running from repo root
+    from context_builder import build_context, summarize_contexts
     from utils import find_duplicates
 
 BASE = os.path.dirname(__file__)
@@ -29,6 +31,28 @@ def _job_path(job_id: str) -> str:
 
 def _cancel_path(job_id: str) -> str:
     return os.path.join(JOBS_DIR, f"{job_id}.cancel")
+
+
+def _write_job_status(job_file: str, job: dict, dry_run: bool = False):
+    """Atomically persist job state to disk; no-op in dry_run mode."""
+    if dry_run:
+        return
+    tmp = None
+    try:
+        dirpath = os.path.dirname(job_file)
+        os.makedirs(dirpath, exist_ok=True)
+        fd, tmp = tempfile.mkstemp(dir=dirpath, prefix=".job.", suffix=".tmp")
+        with os.fdopen(fd, "w", encoding="utf-8") as _f:
+            json.dump(job, _f, default=str)
+            _f.flush()
+            os.fsync(_f.fileno())
+        os.replace(tmp, job_file)
+    except Exception:
+        try:
+            if tmp and os.path.exists(tmp):
+                os.remove(tmp)
+        except Exception:
+            pass
 
 
 def background_scan(
@@ -63,35 +87,10 @@ def background_scan(
 
     cancel_file = _cancel_path(job_id)
 
-    def _write_status(updated: dict):
-        # In dry_run mode avoid writing files to disk; otherwise persist
-        # status to the job file so external clients can follow progress.
-        if dry_run:
-            # keep job dict in-memory only
-            nonlocal job
-            job = updated
-            return
-        tmp = None
-        try:
-            dirpath = os.path.dirname(job_file)
-            os.makedirs(dirpath, exist_ok=True)
-            fd, tmp = tempfile.mkstemp(dir=dirpath, prefix=".job.", suffix=".tmp")
-            with os.fdopen(fd, "w", encoding="utf-8") as _f:
-                json.dump(updated, _f, default=str)
-                _f.flush()
-                os.fsync(_f.fileno())
-            os.replace(tmp, job_file)
-        except Exception:
-            try:
-                if tmp and os.path.exists(tmp):
-                    os.remove(tmp)
-            except Exception:
-                pass
-
     def progress_cb(data: dict):
         # update progress and persist
         job["progress"] = data
-        _write_status(job)
+        _write_job_status(job_file, job, dry_run=dry_run)
         # check cancellation file for thread-based jobs
         if not dry_run and os.path.exists(cancel_file):
             raise RuntimeError("cancelled")
@@ -116,7 +115,7 @@ def background_scan(
         job["error"] = str(e)
     # Only write status if not in dry_run mode
     if not dry_run:
-        _write_status(job)
+        _write_job_status(job_file, job)
     # cleanup cancel file if present
     try:
         if not dry_run and os.path.exists(cancel_file):
@@ -157,31 +156,9 @@ def rebuild_index_job(
 
     cancel_file = _cancel_path(job_id)
 
-    def _write_status(updated: dict):
-        if dry_run:
-            nonlocal job
-            job = updated
-            return
-        tmp = None
-        try:
-            dirpath = os.path.dirname(job_file)
-            os.makedirs(dirpath, exist_ok=True)
-            fd, tmp = tempfile.mkstemp(dir=dirpath, prefix=".job.", suffix=".tmp")
-            with os.fdopen(fd, "w", encoding="utf-8") as _f:
-                json.dump(updated, _f, default=str)
-                _f.flush()
-                os.fsync(_f.fileno())
-            os.replace(tmp, job_file)
-        except Exception:
-            try:
-                if tmp and os.path.exists(tmp):
-                    os.remove(tmp)
-            except Exception:
-                pass
-
     def progress_cb(data: dict):
         job["progress"] = data
-        _write_status(job)
+        _write_job_status(job_file, job, dry_run=dry_run)
         if os.path.exists(cancel_file):
             raise RuntimeError("cancelled")
 
@@ -215,8 +192,67 @@ def rebuild_index_job(
     except Exception as e:  # pylint: disable=broad-exception-caught
         job["status"] = "failed"
         job["error"] = str(e)
-    _write_status(job)
+    _write_job_status(job_file, job, dry_run=dry_run)
     # cleanup cancel file if present (avoid touching disk in dry_run)
+    try:
+        if not dry_run and os.path.exists(cancel_file):
+            os.remove(cancel_file)
+    except Exception:
+        pass
+    return job
+
+
+def background_analyse(
+    paths: List[str],
+    min_size: int = 1,
+    max_files: int | None = None,
+    job_id: str | None = None,
+    dry_run: bool = False,
+):
+    """Build file contexts for semantic analysis and persist job status."""
+    job_id = job_id or uuid.uuid4().hex
+    job_file = _job_path(job_id)
+    job = {
+        "id": job_id,
+        "status": "started",
+        "created_at": time.time(),
+        "result": None,
+        "progress": {},
+        "kind": "analysis",
+    }
+    if not dry_run:
+        try:
+            with open(job_file, "w", encoding="utf-8") as f:
+                json.dump(job, f)
+        except Exception:
+            pass
+
+    cancel_file = _cancel_path(job_id)
+
+    def progress_cb(data: dict):
+        job["progress"] = data
+        _write_job_status(job_file, job, dry_run=dry_run)
+        if not dry_run and os.path.exists(cancel_file):
+            raise RuntimeError("cancelled")
+
+    try:
+        contexts = build_context(paths, min_size=min_size, max_files=max_files, progress_callback=progress_cb)
+        job["status"] = "finished"
+        job["finished_at"] = time.time()
+        job["result"] = {
+            "contexts": contexts,
+            "summary": summarize_contexts(contexts),
+            "paths": list(paths),
+        }
+    except RuntimeError as e:
+        job["status"] = "cancelled"
+        job["error"] = str(e)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        job["status"] = "failed"
+        job["error"] = str(e)
+
+    if not dry_run:
+        _write_job_status(job_file, job)
     try:
         if not dry_run and os.path.exists(cancel_file):
             os.remove(cancel_file)
