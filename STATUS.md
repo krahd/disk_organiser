@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-05-06 17:38
+Last updated: 2026-05-06 19:13
 
 ## Executive Summary
 
@@ -16,6 +16,16 @@ The major architecture shift has already happened:
 - to context-driven analysis with grouped preview, selective execution, and undo.
 
 A comprehensive test pass was executed on this date and is green.
+
+## Visual Overview
+
+### Architecture Diagram
+
+![Disk Organiser architecture diagram](docs/assets/status-architecture.svg)
+
+### Flow Chart
+
+![Disk Organiser flow chart](docs/assets/status-flow.svg)
 
 ## Implemented Capabilities
 
@@ -74,6 +84,7 @@ Organise tab now supports:
 - chat-based refinement
 - signal visibility for why items were clustered
 - runtime capability banner showing whether optional OCR and embedding enhancements are available
+- explicit OCR and embedding capability status rows (available/unavailable + missing dependency names)
 
 Visualisation tab supports:
 
@@ -108,6 +119,10 @@ Executed successfully:
   - Result: 9 passed (includes monkeypatch coverage for missing optional dependencies and disabled embedding model)
 - npm test --silent -- frontend/__tests__/organise.analysis.test.js
   - Result: 1 suite passed, 4 tests passed (includes unavailable and available capability-banner states)
+- source venv/bin/activate && pytest -q backend/tests/test_analysis_api.py
+  - Result: capability payload branches for disabled/enabled dependency scenarios validated
+- npm test --silent -- frontend/__tests__/organise.analysis.test.js
+  - Result: expanded coverage for selection payloads, refine rerender behaviour, and explicit capability indicators
 
 ## Optional Runtime Dependencies
 
@@ -166,10 +181,9 @@ invalid model name — the load failure is caught and embeddings are disabled fo
 
 ## Recommended Next Steps
 
-1. Add explicit UI indicators when optional OCR/embedding capabilities are unavailable.
-2. Add regression tests for OCR and embedding branches (enabled and disabled dependency scenarios).
-3. Add a Windows CI lane to validate path and filesystem behavior.
-4. Expand frontend unit tests for Organise analysis flow (selection, chat refine, execution payloads).
+1. Add a Windows CI lane to validate path and filesystem behavior.
+2. Expand frontend unit tests for Organise analysis flow to include edge cases around failed network calls and SSE interruptions.
+3. Add integration coverage for capability indicator rendering on large analysis payloads.
 
 ## Repository Documentation Alignment
 

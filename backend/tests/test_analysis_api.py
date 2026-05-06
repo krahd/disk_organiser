@@ -33,7 +33,8 @@ def test_analyse_reason_preview_and_chat_refinement(tmp_path):
     assert isinstance(payload["analysis_capabilities"], dict)
     assert "ocr" in payload["analysis_capabilities"]
     assert "embeddings" in payload["analysis_capabilities"]
-    assert any(action["action"] in {"delete_stale", "move", "create_symlink"} for action in payload["actions"])
+    assert any(action["action"] in {"delete_stale", "move", "create_symlink"}
+               for action in payload["actions"])
 
     preview_response = client.get(f"/api/ops/{payload['op']['id']}/preview")
     assert preview_response.status_code == 200
@@ -105,8 +106,17 @@ def test_analyse_reason_capabilities_disabled_branch(monkeypatch, tmp_path):
     payload = response.get_json()
 
     assert payload["analysis_capabilities"]["ocr"]["available"] is False
+    assert payload["analysis_capabilities"]["ocr"]["missing"] == [
+        "pytesseract",
+        "pdf2image",
+        "Pillow",
+    ]
     assert payload["analysis_capabilities"]["embeddings"]["available"] is False
     assert payload["analysis_capabilities"]["embeddings"]["disabled"] is True
+    assert payload["analysis_capabilities"]["embeddings"]["missing"] == [
+        "sentence-transformers",
+        "numpy",
+    ]
 
 
 def test_analyse_reason_capabilities_enabled_branch(monkeypatch, tmp_path):
@@ -139,5 +149,7 @@ def test_analyse_reason_capabilities_enabled_branch(monkeypatch, tmp_path):
     payload = response.get_json()
 
     assert payload["analysis_capabilities"]["ocr"]["available"] is True
+    assert payload["analysis_capabilities"]["ocr"]["missing"] == []
     assert payload["analysis_capabilities"]["embeddings"]["available"] is True
     assert payload["analysis_capabilities"]["embeddings"]["disabled"] is False
+    assert payload["analysis_capabilities"]["embeddings"]["missing"] == []

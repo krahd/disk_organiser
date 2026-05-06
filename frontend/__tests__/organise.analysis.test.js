@@ -205,6 +205,36 @@ describe("Organise analysis flow", () => {
     expect(body.selected_actions).toEqual([0]);
   });
 
+  test("execute payload supports empty selected_actions", async () => {
+    document.getElementById("nav-organise").click();
+    await flush();
+
+    document.getElementById("analysis-run").click();
+    await flush();
+
+    global.EventSource.instances[0].emit({ status: "finished", progress: { processed: 2 } });
+    await flush();
+    await flush();
+
+    const checkboxes = Array.from(
+      document.querySelectorAll(".analysis-action input[type='checkbox']")
+    );
+    checkboxes.forEach((checkbox) => {
+      checkbox.checked = false;
+      checkbox.dispatchEvent(new Event("change"));
+    });
+
+    document.querySelector(".analysis-controls .btn.primary").click();
+    await flush();
+
+    const executeCall = fetchMock.mock.calls
+      .filter(([url]) => url === "/api/organise/execute")
+      .pop();
+    expect(executeCall).toBeTruthy();
+    const body = JSON.parse(executeCall[1].body);
+    expect(body.selected_actions).toEqual([]);
+  });
+
   test("execute payload includes create_snapshot when enabled", async () => {
     document.getElementById("nav-organise").click();
     await flush();
@@ -251,6 +281,11 @@ describe("Organise analysis flow", () => {
     const body = JSON.parse(chatCall[1].body);
     expect(body.op_id).toBe("op-1");
     expect(body.message).toBe("avoid moving from downloads");
+
+    const checkboxes = Array.from(
+      document.querySelectorAll(".analysis-action input[type='checkbox']")
+    );
+    expect(checkboxes.length).toBe(1);
   });
 
   test("shows capability warning banner when optional enhancements are unavailable", async () => {
@@ -268,6 +303,11 @@ describe("Organise analysis flow", () => {
     expect(banner).toBeTruthy();
     expect(banner.textContent).toContain("Optional enhancements unavailable");
     expect(banner.textContent).toContain("Disabled:");
+    expect(banner.textContent).toContain("OCR:");
+    expect(banner.textContent).toContain("unavailable");
+    expect(banner.textContent).toContain("Missing: pytesseract");
+    expect(banner.textContent).toContain("Embedding:");
+    expect(banner.textContent).toContain("Missing: sentence-transformers");
   });
 
   test("preview undo sends dry_run request for current operation", async () => {
@@ -332,5 +372,8 @@ describe("Organise analysis flow", () => {
     expect(banner).toBeTruthy();
     expect(banner.textContent).toContain("All optional analysis enhancements available");
     expect(banner.textContent).toContain("OCR and embedding similarity are available");
+    expect(banner.textContent).toContain("OCR: available");
+    expect(banner.textContent).toContain("Embedding: available");
+    expect(banner.textContent).toContain("Dependencies installed");
   });
 });

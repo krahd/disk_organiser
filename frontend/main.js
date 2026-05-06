@@ -752,6 +752,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!embeddings.available) {
               missing.push("embedding similarity (install sentence-transformers, numpy)");
             }
+            const ocrMissing =
+              Array.isArray(ocr.missing) && ocr.missing.length
+                ? `Missing: ${ocr.missing.join(", ")}`
+                : "Dependencies installed.";
+            const embedMissing =
+              Array.isArray(embeddings.missing) && embeddings.missing.length
+                ? `Missing: ${embeddings.missing.join(", ")}`
+                : "Dependencies installed.";
             const cap = document.createElement("div");
             cap.className = `capability-banner ${
               missing.length ? "capability-warn" : "capability-ok"
@@ -762,7 +770,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const detail = missing.length
               ? `Disabled: ${missing.join("; ")}.`
               : "OCR and embedding similarity are available for harder near-duplicate cases.";
-            cap.innerHTML = `<strong>${headline}</strong><div class="small-muted mt-6">${detail}</div>`;
+            cap.innerHTML = `
+              <strong>${headline}</strong>
+              <div class="small-muted mt-6">${detail}</div>
+              <div class="small-muted mt-6"><strong>OCR:</strong> ${
+                ocr.available ? "available" : "unavailable"
+              }${ocr.disabled ? " (disabled)" : ""}. ${ocrMissing}</div>
+              <div class="small-muted mt-6"><strong>Embedding:</strong> ${
+                embeddings.available ? "available" : "unavailable"
+              }${embeddings.disabled ? " (disabled)" : ""}. ${embedMissing}</div>
+            `;
             summaryEl.appendChild(cap);
           }
 
