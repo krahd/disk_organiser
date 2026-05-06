@@ -1,11 +1,14 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-05-06 09:01
+Last updated: 2026-05-06 17:38
 
 ## Executive Summary
 
 The repository is now in a phase where semantic analysis, typed reversible actions,
 and conversational refinement are implemented end-to-end.
+
+Model provider selection is now normalized onto Modelito, with Ollama lifecycle
+management exposed through dedicated API routes and the preferences GUI.
 
 The major architecture shift has already happened:
 
@@ -24,6 +27,8 @@ Implemented:
 - reasoning phase via POST /api/analyse/reason
 - conversational refinement via POST /api/chat
 - grouped operation preview via GET /api/ops/<op_id>/preview
+- Modelito-backed provider default with Ollama control endpoints:
+  GET /api/ollama/status and POST /api/ollama/install|start|stop|pull|serve|delete
 
 Context includes:
 
@@ -157,6 +162,7 @@ invalid model name — the load failure is caught and embeddings are disabled fo
 2. OCR quality for scanned and low-quality documents still requires real-world tuning and broader validation.
 3. Windows-specific runtime behavior is not validated by dedicated CI.
 4. Frontend test depth is still limited (modal + visual smoke vs broad unit coverage).
+5. Live Modelito planning quality still depends on the configured Ollama model and local runtime availability.
 
 ## Recommended Next Steps
 

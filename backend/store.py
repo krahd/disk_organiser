@@ -5,17 +5,18 @@ import os
 import tempfile
 
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config.json")
+DEFAULT_MODEL = "modelito"
 
 
 def load_config():
     """Load configuration from disk, returning sensible defaults on error."""
     if not os.path.exists(CONFIG_FILE):
-        return {"model": "ollama", "preferences": {}}
+        return {"model": DEFAULT_MODEL, "preferences": {}}
     try:
         with open(CONFIG_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     except (OSError, json.JSONDecodeError):
-        return {"model": "ollama", "preferences": {}}
+        return {"model": DEFAULT_MODEL, "preferences": {}}
 
 
 def save_config(data: dict, dry_run: bool = False):

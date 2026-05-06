@@ -39,7 +39,25 @@ def test_reload_to_none_fallback(tmp_path):
     mc = ModelClient(provider_name="ci_dummy")
     dups = _sample_duplicates(tmp_path)
     assert mc.suggest_organise(dups)
-    # reload to no provider (fallback heuristic)
-    mc.reload(None)
+    # reload to a missing provider module (fallback heuristic)
+    mc.reload("missing_provider")
     sugg2 = mc.suggest_organise(dups)
     assert sugg2 and "AI_Duplicates" not in sugg2[0]["moves"][0]["to"]
+
+
+def test_default_provider_is_modelito():
+    mc = ModelClient()
+    assert mc.provider_name == "modelito"
+
+
+def test_refine_actions_filters_delete_stale_for_delete_nothing_phrase():
+    mc = ModelClient(provider_name="missing_provider")
+    refined = mc.refine_actions(
+        "delete nothing from this proposal",
+        [
+            {"action_type": "delete_stale", "source": "/tmp/.DS_Store"},
+            {"action_type": "move", "source": "/tmp/a.txt", "destination": "/tmp/Organised/a.txt"},
+        ],
+        [{"path": "/tmp/a.txt", "root": "/tmp"}],
+    )
+    assert all(action.get("action_type") != "delete_stale" for action in refined)

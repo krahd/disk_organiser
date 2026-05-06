@@ -31,6 +31,31 @@ if TYPE_CHECKING:  # pragma: no cover - static typing only
 
 
 logger = logging.getLogger(__name__)
+DEFAULT_PROVIDER_NAME = "modelito"
+_PROVIDER_ALIASES = {"ollama": DEFAULT_PROVIDER_NAME}
+
+
+def _reject_delete_intent(message_lc: str) -> bool:
+    patterns = (
+        "don't delete",
+        "do not delete",
+        "delete nothing",
+        "delete nothing from",
+        "no delete",
+        "keep everything",
+        "keep all",
+    )
+    return any(pattern in message_lc for pattern in patterns)
+
+
+def normalize_provider_name(provider_name: str | None) -> str | None:
+    """Normalize provider names while preserving explicit unknown values."""
+    if provider_name is None:
+        provider_name = os.getenv("MODEL_PROVIDER") or DEFAULT_PROVIDER_NAME
+    candidate = str(provider_name).strip()
+    if not candidate:
+        return DEFAULT_PROVIDER_NAME
+    return _PROVIDER_ALIASES.get(candidate.lower(), candidate)
 
 
 def _cluster_reason(cluster: Sequence[Dict]) -> str:
@@ -64,7 +89,7 @@ def _load_provider(provider_name: str | None = None) -> ModuleType | None:
       - If no provider_name: try top-level `model_wrapper`.
     Returns the module or None.
     """
-    name = provider_name or os.getenv("MODEL_PROVIDER")
+    name = normalize_provider_name(provider_name)
     if name:
         # try direct import
         mod = _import_by_name(name)
@@ -101,14 +126,14 @@ class ModelClient:
         `provider_name` may be a module name (e.g. `ci_dummy`) or None to use
         the default provider resolution (env var or top-level `model_wrapper`).
         """
-        self.provider_name = provider_name or os.getenv("MODEL_PROVIDER")
+        self.provider_name = normalize_provider_name(provider_name)
         self._external = _load_provider(self.provider_name)
 
     def reload(self, provider_name: str | None = None) -> bool:
         """Reload and switch to a new provider. Returns True if a provider
         module was successfully loaded.
         """
-        self.provider_name = provider_name or os.getenv("MODEL_PROVIDER")
+        self.provider_name = normalize_provider_name(provider_name)
         self._external = _load_provider(self.provider_name)
         return self._external is not None
 
@@ -190,10 +215,11 @@ class ModelClient:
 
         message_lc = (message or "").lower()
         actions = [dict(action) for action in current_actions]
-        if "delete" in message_lc and "don't" in message_lc:
+        if "delete" in message_lc and _reject_delete_intent(message_lc):
             actions = [action for action in actions if action.get("action_type") != "delete_stale"]
         if "symlink" in message_lc and ("avoid" in message_lc or "don't" in message_lc):
-            actions = [action for action in actions if action.get("action_type") != "create_symlink"]
+            actions = [action for action in actions if action.get(
+                "action_type") != "create_symlink"]
         if "downloads" in message_lc:
             for action in actions:
                 dest = action.get("destination") or action.get("to")
@@ -250,13 +276,16 @@ class ModelClient:
         for key, cluster in by_cluster.items():
             if len(cluster) < 2:
                 continue
-            cluster = sorted(cluster, key=lambda item: (item.get("depth", 0), item.get("age_days", 0)))
+            cluster = sorted(cluster, key=lambda item: (
+                item.get("depth", 0), item.get("age_days", 0)))
             roots = {item.get("parent") for item in cluster}
             if len(roots) < 2:
                 continue
             extension_group = cluster[0].get("extension_group") or "other"
-            semantic_dir = os.path.join(cluster[0].get("root") or os.path.dirname(cluster[0].get("path") or ""), semantic_root_name, extension_group.title())
-            move_candidates = [item.get("path") for item in cluster if semantic_root_name.lower() not in (item.get("path") or "").lower()]
+            semantic_dir = os.path.join(cluster[0].get("root") or os.path.dirname(
+                cluster[0].get("path") or ""), semantic_root_name, extension_group.title())
+            move_candidates = [item.get("path") for item in cluster if semantic_root_name.lower() not in (
+                item.get("path") or "").lower()]
             if len(move_candidates) >= 2:
                 actions.append(
                     {

@@ -11,3 +11,4 @@ send2trash
 Pillow
 ImageHash
 pypdf
+modelito==1.2.2

@@ -18,6 +18,7 @@ import threading
 import time
 import traceback
 import uuid
+from dataclasses import asdict, is_dataclass
 
 from flask import Flask, Response, jsonify, request, stream_with_context
 from flask_cors import CORS
@@ -183,6 +184,109 @@ else:
     CORS(app)
 logger = logging.getLogger(__name__)
 MAINT_FILE = os.path.join(os.path.dirname(__file__), "maintenance_status.json")
+
+
+def _normalize_model_selection(model_name: str | None) -> str:
+    candidate = str(model_name or "").strip()
+    if not candidate:
+        return "modelito"
+    if candidate.lower() == "ollama":
+        return "modelito"
+    return candidate
+
+
+def _load_modelito_sdk():
+    try:
+        return importlib.import_module("modelito")
+    except Exception as exc:
+        logger.debug("modelito sdk unavailable: %s", exc)
+        return None
+
+
+def _ollama_host() -> str:
+    return os.getenv("MODELITO_OLLAMA_HOST") or os.getenv("OLLAMA_HOST") or "http://127.0.0.1"
+
+
+def _ollama_port() -> int:
+    try:
+        return int(os.getenv("MODELITO_OLLAMA_PORT") or os.getenv("OLLAMA_PORT") or "11434")
+    except ValueError:
+        return 11434
+
+
+def _ollama_host_name(host: str) -> str:
+    return host.replace("http://", "").replace("https://", "").split("/", 1)[0].split(":", 1)[0]
+
+
+def _serialize_sdk_value(value):
+    if is_dataclass(value):
+        return asdict(value)
+    if isinstance(value, dict):
+        return {key: _serialize_sdk_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_serialize_sdk_value(item) for item in value]
+    return value
+
+
+def _build_ollama_status(sdk=None) -> dict:
+    sdk = sdk or _load_modelito_sdk()
+    host = _ollama_host()
+    port = _ollama_port()
+    cfg = load_config()
+    payload = {
+        "sdk_available": sdk is not None,
+        "selected_provider": _normalize_model_selection(cfg.get("model")),
+        "host": host,
+        "port": port,
+        "installed": False,
+        "running": False,
+        "detail": None,
+        "local_models": [],
+        "running_models": [],
+        "lifecycle_states": {},
+    }
+    if sdk is None:
+        return payload
+
+    try:
+        payload["installed"] = bool(sdk.ollama_installed())
+    except Exception as exc:
+        payload["detail"] = str(exc)
+        return payload
+
+    try:
+        payload["running"] = bool(sdk.server_is_up(host, port))
+    except Exception:
+        payload["running"] = False
+
+    if hasattr(sdk, "ensure_ollama_running_verbose"):
+        try:
+            _, detail = sdk.ensure_ollama_running_verbose(
+                host=host,
+                port=port,
+                auto_start=False,
+                timeout=1.0,
+            )
+            payload["detail"] = detail
+        except Exception:
+            payload["detail"] = None
+
+    try:
+        payload["local_models"] = list(sdk.list_local_models() or [])
+    except Exception:
+        payload["local_models"] = []
+
+    try:
+        payload["running_models"] = list(sdk.running_model_names(_ollama_host_name(host)) or [])
+    except Exception:
+        payload["running_models"] = []
+
+    try:
+        payload["lifecycle_states"] = _serialize_sdk_value(sdk.list_model_lifecycle_states() or {})
+    except Exception:
+        payload["lifecycle_states"] = {}
+
+    return payload
 
 
 def _error(message: str, status: int = 400, code: str = "bad_request", **details):
@@ -453,7 +557,8 @@ def api_organise_preview():
         suggestions = data.get("suggestions") or data.get("actions")
         if not suggestions or not isinstance(suggestions, list):
             return _error("missing suggestions", 400, "validation_error")
-        metadata = data.get("metadata") if isinstance(data.get("metadata"), dict) else {"user": "anonymous"}
+        metadata = data.get("metadata") if isinstance(
+            data.get("metadata"), dict) else {"user": "anonymous"}
         op = create_op(suggestions, metadata=metadata)
         return jsonify(_build_op_preview(op))
     except ValidationError as exc:
@@ -503,7 +608,8 @@ def api_organise_execute():
     normalized_actions = normalize_actions(op.get("suggestions", []))
     if isinstance(selected_actions, list):
         selected_set = {int(index) for index in selected_actions if isinstance(index, int)}
-        normalized_actions = [action for idx, action in enumerate(normalized_actions) if idx in selected_set]
+        normalized_actions = [action for idx, action in enumerate(
+            normalized_actions) if idx in selected_set]
     if dry_run:
         # Produce a non-destructive preview of actions without touching disk.
         try:
@@ -585,14 +691,15 @@ def api_organise_undo():
 def api_model():
     """Get or set the selected model for analysis.
 
-    GET returns current model. POST JSON: {model: 'ollama'|'gpt'|...}
+    GET returns current provider. POST JSON: {model: 'modelito'|'ci_dummy'|...}
     """
     cfg = load_config()
     if request.method == "POST":
         data = request.get_json(silent=True) or {}
-        model = data.get("model")
-        if not model:
+        requested_model = data.get("model")
+        if not requested_model:
             return jsonify({"error": "missing model"}), 400
+        model = _normalize_model_selection(requested_model)
         dry_run = bool(data.get("dry_run", False))
         save_config({"model": model}, dry_run=dry_run)
         # reload model client with the newly selected provider
@@ -607,7 +714,115 @@ def api_model():
             # don't fail the request if reload fails
             pass
         return jsonify({"status": "Model updated", "model": model})
-    return jsonify({"model": cfg.get("model", "ollama")})
+    return jsonify({"model": _normalize_model_selection(cfg.get("model"))})
+
+
+@app.route("/api/ollama/status", methods=["GET"])
+def api_ollama_status():
+    """Return current Ollama runtime and local model status via Modelito."""
+    return jsonify(_build_ollama_status())
+
+
+@app.route("/api/ollama/install", methods=["POST"])
+def api_ollama_install():
+    """Install Ollama using Modelito's supported installer flow."""
+    sdk = _load_modelito_sdk()
+    if sdk is None:
+        return jsonify({"ok": False, "action": "install", "error": "modelito is unavailable", "ollama": _build_ollama_status(sdk)}), 503
+    data = request.get_json(silent=True) or {}
+    result = bool(sdk.install_ollama(allow_install=True, method=data.get("method")))
+    status = _build_ollama_status(sdk)
+    payload = {"ok": result, "action": "install", "ollama": status}
+    if not result:
+        payload["error"] = "install failed"
+    return jsonify(payload), 200 if result else 409
+
+
+@app.route("/api/ollama/start", methods=["POST"])
+def api_ollama_start():
+    """Start the local Ollama service."""
+    sdk = _load_modelito_sdk()
+    if sdk is None:
+        return jsonify({"ok": False, "action": "start", "error": "modelito is unavailable", "ollama": _build_ollama_status(sdk)}), 503
+    data = request.get_json(silent=True) or {}
+    timeout = float(data.get("timeout", 10.0))
+    result = bool(sdk.start_ollama(host=_ollama_host(), port=_ollama_port(), timeout=timeout))
+    status = _build_ollama_status(sdk)
+    payload = {"ok": result, "action": "start", "ollama": status}
+    if not result:
+        payload["error"] = "start failed"
+    return jsonify(payload), 200 if result else 409
+
+
+@app.route("/api/ollama/stop", methods=["POST"])
+def api_ollama_stop():
+    """Stop the local Ollama service."""
+    sdk = _load_modelito_sdk()
+    if sdk is None:
+        return jsonify({"ok": False, "action": "stop", "error": "modelito is unavailable", "ollama": _build_ollama_status(sdk)}), 503
+    data = request.get_json(silent=True) or {}
+    result = bool(sdk.stop_ollama(force=bool(data.get("force", False))))
+    status = _build_ollama_status(sdk)
+    payload = {"ok": result, "action": "stop", "ollama": status}
+    if not result:
+        payload["error"] = "stop failed"
+    return jsonify(payload), 200 if result else 409
+
+
+@app.route("/api/ollama/pull", methods=["POST"])
+def api_ollama_pull():
+    """Pull an Ollama model via Modelito."""
+    sdk = _load_modelito_sdk()
+    if sdk is None:
+        return jsonify({"ok": False, "action": "pull", "error": "modelito is unavailable", "ollama": _build_ollama_status(sdk)}), 503
+    try:
+        data = _validate_json()
+        model_name = require_string(data, "model")
+    except ValidationError as exc:
+        return _error(str(exc), 400, "validation_error")
+    timeout = float(data.get("timeout", 600.0))
+    result = bool(sdk.download_model(model_name, timeout=timeout))
+    status = _build_ollama_status(sdk)
+    payload = {"ok": result, "action": "pull", "model": model_name, "ollama": status}
+    if not result:
+        payload["error"] = f"failed to pull {model_name}"
+    return jsonify(payload), 200 if result else 409
+
+
+@app.route("/api/ollama/serve", methods=["POST"])
+def api_ollama_serve():
+    """Start Ollama in serve mode and optionally target a model."""
+    sdk = _load_modelito_sdk()
+    if sdk is None:
+        return jsonify({"ok": False, "action": "serve", "error": "modelito is unavailable", "ollama": _build_ollama_status(sdk)}), 503
+    data = request.get_json(silent=True) or {}
+    model_name = (data.get("model") or "").strip() or None
+    timeout = float(data.get("timeout", 10.0))
+    result = bool(sdk.serve_model(model_name=model_name, timeout=timeout))
+    status = _build_ollama_status(sdk)
+    payload = {"ok": result, "action": "serve", "model": model_name, "ollama": status}
+    if not result:
+        payload["error"] = "serve failed"
+    return jsonify(payload), 200 if result else 409
+
+
+@app.route("/api/ollama/delete", methods=["POST"])
+def api_ollama_delete():
+    """Delete a locally cached Ollama model via Modelito."""
+    sdk = _load_modelito_sdk()
+    if sdk is None:
+        return jsonify({"ok": False, "action": "delete", "error": "modelito is unavailable", "ollama": _build_ollama_status(sdk)}), 503
+    try:
+        data = _validate_json()
+        model_name = require_string(data, "model")
+    except ValidationError as exc:
+        return _error(str(exc), 400, "validation_error")
+    result = bool(sdk.delete_model(model_name))
+    status = _build_ollama_status(sdk)
+    payload = {"ok": result, "action": "delete", "model": model_name, "ollama": status}
+    if not result:
+        payload["error"] = f"failed to delete {model_name}"
+    return jsonify(payload), 200 if result else 409
 
 
 @app.route("/api/preferences", methods=["GET", "POST"])
@@ -809,7 +1024,8 @@ def api_analyse_reason():
             paths = (job.get("result") or {}).get("paths") or paths
         if contexts is None:
             contexts = build_context(paths, min_size=0, max_files=data.get("max_files"))
-        raw_actions = model_client.analyse_drive(contexts, preferences) if model_client is not None else []
+        raw_actions = model_client.analyse_drive(
+            contexts, preferences) if model_client is not None else []
         actions, rejected = validate_actions(raw_actions, allowed_roots=paths)
         summary = summarize_contexts(contexts)
         backup_status = get_backup_status()
@@ -818,6 +1034,7 @@ def api_analyse_reason():
             "user": "anonymous",
             "kind": "analysis",
             "paths": paths,
+            "preferences": preferences,
             "analysis_summary": summary,
             "analysis_capabilities": analysis_capabilities,
             "backup_status": backup_status,
@@ -849,7 +1066,8 @@ def api_chat():
         paths = metadata.get("paths") or [os.getcwd()]
         preferences = metadata.get("preferences") or {}
         history = list(metadata.get("chat_history") or [])
-        refined = model_client.refine_actions(message, op.get("suggestions", []), contexts, preferences, history) if model_client is not None else op.get("suggestions", [])
+        refined = model_client.refine_actions(message, op.get(
+            "suggestions", []), contexts, preferences, history) if model_client is not None else op.get("suggestions", [])
         actions, rejected = validate_actions(refined, allowed_roots=paths)
         history.append({"role": "user", "message": message})
         metadata["chat_history"] = history

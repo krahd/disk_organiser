@@ -59,6 +59,41 @@
         "summary": "Set selected model"
       }
     },
+    "/api/ollama/status": {
+      "get": {
+        "summary": "Get Ollama runtime and local model status via Modelito"
+      }
+    },
+    "/api/ollama/install": {
+      "post": {
+        "summary": "Install Ollama via Modelito"
+      }
+    },
+    "/api/ollama/start": {
+      "post": {
+        "summary": "Start the local Ollama runtime"
+      }
+    },
+    "/api/ollama/stop": {
+      "post": {
+        "summary": "Stop the local Ollama runtime"
+      }
+    },
+    "/api/ollama/pull": {
+      "post": {
+        "summary": "Pull an Ollama model"
+      }
+    },
+    "/api/ollama/serve": {
+      "post": {
+        "summary": "Start Ollama serve mode"
+      }
+    },
+    "/api/ollama/delete": {
+      "post": {
+        "summary": "Delete a local Ollama model"
+      }
+    },
     "/api/preferences": {
       "get": {
         "summary": "Get saved preferences"

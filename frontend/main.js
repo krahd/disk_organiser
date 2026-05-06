@@ -753,7 +753,9 @@ document.addEventListener("DOMContentLoaded", () => {
               missing.push("embedding similarity (install sentence-transformers, numpy)");
             }
             const cap = document.createElement("div");
-            cap.className = `capability-banner ${missing.length ? "capability-warn" : "capability-ok"}`;
+            cap.className = `capability-banner ${
+              missing.length ? "capability-warn" : "capability-ok"
+            }`;
             const headline = missing.length
               ? "Optional enhancements unavailable"
               : "All optional analysis enhancements available";
@@ -1134,10 +1136,31 @@ document.addEventListener("DOMContentLoaded", () => {
       case "preferences":
         main.innerHTML = `
                     <h2>Preferences</h2>
-                    <p>Set your model and UI preferences.</p>
-                    <label>Model: <input id="pref-model" type="text" placeholder="ollama"></label>
+                    <p>Set your provider defaults and manage the local Ollama runtime.</p>
+                    <label>Provider:
+                      <select id="pref-model">
+                        <option value="modelito">modelito</option>
+                        <option value="ci_dummy">ci_dummy</option>
+                      </select>
+                    </label>
+                    <label class="ml-8">Ollama model: <input id="pref-ollama-model" type="text" placeholder="llama3.2:3b"></label>
                     <button id="pref-save">Save</button>
                     <pre id="pref-result"></pre>
+                    <h3 class="mt-12">Ollama</h3>
+                    <div>
+                      <button id="ollama-refresh" class="btn">Refresh Status</button>
+                      <button id="ollama-install" class="btn ml-8">Install Ollama</button>
+                      <button id="ollama-start" class="btn ml-8">Start Ollama</button>
+                      <button id="ollama-stop" class="btn ml-8">Stop Ollama</button>
+                    </div>
+                    <div class="mt-6">
+                      <label>Model name: <input id="ollama-model-name" type="text" placeholder="llama3.2:3b"></label>
+                      <button id="ollama-pull" class="btn ml-8">Pull</button>
+                      <button id="ollama-serve" class="btn ml-8">Serve</button>
+                      <button id="ollama-delete" class="btn secondary ml-8">Delete Model</button>
+                    </div>
+                    <div id="ollama-status" class="mt-8 small-muted"></div>
+                    <pre id="ollama-result"></pre>
                 `;
         // Scan index admin UI
         const prefExtra = document.createElement("div");
@@ -1167,6 +1190,51 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <pre id="maint-result" class="mt-8"></pre>
                 `;
         document.getElementById("pref-result").parentNode.appendChild(prefExtra);
+        const prefResultEl = document.getElementById("pref-result");
+        const ollamaResultEl = document.getElementById("ollama-result");
+        const ollamaStatusEl = document.getElementById("ollama-status");
+        const getOllamaModelName = () => {
+          const explicit = document.getElementById("ollama-model-name").value.trim();
+          if (explicit) return explicit;
+          return document.getElementById("pref-ollama-model").value.trim();
+        };
+        const renderOllamaStatus = (status) => {
+          if (!status || typeof status !== "object") {
+            ollamaStatusEl.textContent = "Unable to load Ollama status.";
+            return;
+          }
+          const localModels = Array.isArray(status.local_models) ? status.local_models : [];
+          const runningModels = Array.isArray(status.running_models) ? status.running_models : [];
+          const detail = status.detail ? ` | Detail: ${status.detail}` : "";
+          ollamaStatusEl.textContent = `SDK: ${
+            status.sdk_available ? "available" : "missing"
+          } | Installed: ${status.installed ? "yes" : "no"} | Running: ${
+            status.running ? "yes" : "no"
+          } | Models: ${localModels.length ? localModels.join(", ") : "none"} | Active: ${
+            runningModels.length ? runningModels.join(", ") : "none"
+          }${detail}`;
+          if (!document.getElementById("ollama-model-name").value && localModels.length) {
+            document.getElementById("ollama-model-name").value = localModels[0];
+          }
+        };
+        const loadOllamaStatus = async () => {
+          const r = await fetch(`${API_BASE}/api/ollama/status`);
+          const j = await r.json();
+          renderOllamaStatus(j);
+          ollamaResultEl.textContent = JSON.stringify(j, null, 2);
+          return j;
+        };
+        const postOllamaAction = async (path, body = {}) => {
+          const r = await fetch(`${API_BASE}${path}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+          const j = await r.json();
+          renderOllamaStatus(j.ollama || j);
+          ollamaResultEl.textContent = JSON.stringify(j, null, 2);
+          return j;
+        };
         document.getElementById("index-stats").onclick = async () => {
           const r = await fetch("/api/scan_index/stats");
           const j = await r.json();
@@ -1292,32 +1360,93 @@ document.addEventListener("DOMContentLoaded", () => {
           const j = await r.json();
           document.getElementById("maint-result").textContent = JSON.stringify(j, null, 2);
         };
+        document.getElementById("ollama-refresh").onclick = loadOllamaStatus;
+        document.getElementById("ollama-install").onclick = async () => {
+          await postOllamaAction("/api/ollama/install", {});
+        };
+        document.getElementById("ollama-start").onclick = async () => {
+          await postOllamaAction("/api/ollama/start", {});
+        };
+        document.getElementById("ollama-stop").onclick = async () => {
+          await postOllamaAction("/api/ollama/stop", {});
+        };
+        document.getElementById("ollama-pull").onclick = async () => {
+          const model = getOllamaModelName();
+          if (!model) {
+            ollamaResultEl.textContent = JSON.stringify({ error: "missing model" }, null, 2);
+            return;
+          }
+          await postOllamaAction("/api/ollama/pull", { model });
+        };
+        document.getElementById("ollama-serve").onclick = async () => {
+          const model = getOllamaModelName();
+          await postOllamaAction("/api/ollama/serve", model ? { model } : {});
+        };
+        document.getElementById("ollama-delete").onclick = async () => {
+          const model = getOllamaModelName();
+          if (!model) {
+            ollamaResultEl.textContent = JSON.stringify({ error: "missing model" }, null, 2);
+            return;
+          }
+          await postOllamaAction("/api/ollama/delete", { model });
+        };
         // initialize preferences UI from server
         (async () => {
           try {
-            const r = await fetch("/api/preferences");
-            const j = await r.json();
-            const prefs = j.preferences || {};
-            if (prefs.model) document.getElementById("pref-model").value = prefs.model;
+            const [modelRes, prefsRes, ollamaRes] = await Promise.all([
+              fetch("/api/model"),
+              fetch("/api/preferences"),
+              fetch("/api/ollama/status"),
+            ]);
+            const modelJson = await modelRes.json();
+            const prefsJson = await prefsRes.json();
+            const ollamaJson = await ollamaRes.json();
+            const prefs = prefsJson.preferences || {};
+            document.getElementById("pref-model").value = modelJson.model || "modelito";
+            if (prefs.ollama_model) {
+              document.getElementById("pref-ollama-model").value = prefs.ollama_model;
+              document.getElementById("ollama-model-name").value = prefs.ollama_model;
+            }
             const maint = prefs.maintenance || {};
             document.getElementById("maint-enabled").checked = !!maint.enabled;
             document.getElementById("maint-prune-days").value = maint.prune_days || 30;
             document.getElementById("maint-prune-max").value = maint.prune_max_entries || "";
             document.getElementById("maint-interval-hours").value = maint.interval_hours || 24;
+            renderOllamaStatus(ollamaJson);
+            ollamaResultEl.textContent = JSON.stringify(ollamaJson, null, 2);
           } catch (e) {
             // ignore
           }
         })();
         document.getElementById("pref-save").onclick = async () => {
           const model = document.getElementById("pref-model").value;
-          const body = { model };
-          const res = await fetch(`${API_BASE}/api/model`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          });
-          const j = await res.json();
-          document.getElementById("pref-result").textContent = JSON.stringify(j, null, 2);
+          const ollamaModel = document.getElementById("pref-ollama-model").value.trim();
+          const prefsRes = await fetch("/api/preferences");
+          const prefsJson = await prefsRes.json();
+          const prefs = prefsJson.preferences || {};
+          if (ollamaModel) prefs.ollama_model = ollamaModel;
+          else delete prefs.ollama_model;
+          const [modelRes, prefSaveRes] = await Promise.all([
+            fetch(`${API_BASE}/api/model`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ model }),
+            }),
+            fetch(`${API_BASE}/api/preferences`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ preferences: prefs }),
+            }),
+          ]);
+          const modelJson = await modelRes.json();
+          const savedPrefsJson = await prefSaveRes.json();
+          prefResultEl.textContent = JSON.stringify(
+            { model: modelJson.model, preferences: savedPrefsJson.preferences },
+            null,
+            2
+          );
+          if (ollamaModel) document.getElementById("ollama-model-name").value = ollamaModel;
+          await loadOllamaStatus();
         };
         break;
       default:

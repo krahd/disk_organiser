@@ -37,6 +37,95 @@ def test_model_and_preferences_roundtrip(tmp_path, monkeypatch):
     assert j.get("model") == "test-model"
 
 
+def test_ollama_alias_normalizes_to_modelito():
+    client = app.app.test_client()
+    r = client.post("/api/model", json={"model": "ollama"})
+    assert r.status_code == 200
+    assert r.get_json().get("model") == "modelito"
+
+
+def test_ollama_status_and_actions(monkeypatch):
+    class FakeSDK:
+        @staticmethod
+        def ollama_installed():
+            return True
+
+        @staticmethod
+        def server_is_up(host, port):
+            return True
+
+        @staticmethod
+        def ensure_ollama_running_verbose(host, port, auto_start=False, timeout=1.0):
+            return True, "ready"
+
+        @staticmethod
+        def list_local_models():
+            return ["llama3.2:3b"]
+
+        @staticmethod
+        def running_model_names(host):
+            return ["llama3.2:3b"]
+
+        @staticmethod
+        def list_model_lifecycle_states():
+            return {"llama3.2:3b": {"phase": "downloaded"}}
+
+        @staticmethod
+        def install_ollama(allow_install=True, method=None):
+            return True
+
+        @staticmethod
+        def start_ollama(host, port, timeout=10.0):
+            return True
+
+        @staticmethod
+        def stop_ollama(force=False):
+            return True
+
+        @staticmethod
+        def download_model(model_name, timeout=600.0):
+            return model_name == "llama3.2:3b"
+
+        @staticmethod
+        def serve_model(model_name=None, timeout=10.0):
+            return True
+
+        @staticmethod
+        def delete_model(model_name):
+            return model_name == "llama3.2:3b"
+
+    monkeypatch.setattr(app, "_load_modelito_sdk", lambda: FakeSDK)
+    client = app.app.test_client()
+
+    status = client.get("/api/ollama/status")
+    assert status.status_code == 200
+    assert status.get_json()["installed"] is True
+
+    install = client.post("/api/ollama/install", json={})
+    assert install.status_code == 200
+    assert install.get_json()["ok"] is True
+
+    start = client.post("/api/ollama/start", json={})
+    assert start.status_code == 200
+    assert start.get_json()["ok"] is True
+
+    stop = client.post("/api/ollama/stop", json={})
+    assert stop.status_code == 200
+    assert stop.get_json()["ok"] is True
+
+    pull = client.post("/api/ollama/pull", json={"model": "llama3.2:3b"})
+    assert pull.status_code == 200
+    assert pull.get_json()["model"] == "llama3.2:3b"
+
+    serve = client.post("/api/ollama/serve", json={"model": "llama3.2:3b"})
+    assert serve.status_code == 200
+    assert serve.get_json()["ok"] is True
+
+    delete = client.post("/api/ollama/delete", json={"model": "llama3.2:3b"})
+    assert delete.status_code == 200
+    assert delete.get_json()["ok"] is True
+
+
 def test_duplicates_and_visualisation(tmp_path):
     # create temporary files with duplicate content
     d = tmp_path / "scan"
