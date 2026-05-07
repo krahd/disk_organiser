@@ -688,7 +688,44 @@ document.addEventListener("DOMContentLoaded", () => {
           opId: null,
           preview: null,
           selected: new Set(),
+          activeJobId: null,
+          eventSource: null,
         };
+
+        async function parseApiPayload(response) {
+          let payload = {};
+          try {
+            payload = await response.json();
+          } catch (e) {
+            payload = {};
+          }
+          if (!response.ok) {
+            const apiError = payload && payload.error ? payload.error : null;
+            const apiMessage = apiError
+              ? apiError.message || apiError.error || JSON.stringify(apiError)
+              : payload.error || payload.message;
+            const err = new Error(apiMessage || `Request failed (${response.status})`);
+            err.status = response.status;
+            err.code = apiError ? apiError.code : undefined;
+            err.details = apiError ? apiError.details : undefined;
+            throw err;
+          }
+          return payload;
+        }
+
+        function resetAnalysisEventSource() {
+          try {
+            if (
+              analysisState.eventSource &&
+              typeof analysisState.eventSource.close === "function"
+            ) {
+              analysisState.eventSource.close();
+            }
+          } catch (e) {
+            // ignore close failures
+          }
+          analysisState.eventSource = null;
+        }
 
         function selectedActionIndexes() {
           return Array.from(analysisState.selected)
@@ -907,7 +944,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ op_id: analysisState.opId, message }),
               });
-              const payload = await response.json();
+              const payload = await parseApiPayload(response);
               renderAnalysisPreview(payload);
             } catch (e) {
               showAlert(`Chat refinement failed: ${e.message || e}`);
@@ -921,42 +958,100 @@ document.addEventListener("DOMContentLoaded", () => {
           const path = document.getElementById("analysis-path").value || undefined;
           const maxFiles = parseInt(document.getElementById("analysis-max-files").value || "", 10);
           const progressEl = document.getElementById("analysis-progress");
-          const startResponse = await fetch(`${API_BASE}/api/analyse/start`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              path,
-              max_files: Number.isNaN(maxFiles) ? undefined : maxFiles,
-            }),
-          });
-          const startPayload = await startResponse.json();
-          const jobId = startPayload.job_id;
-          progressEl.innerHTML = `
-            <div class="progress"><div class="progress-bar indeterminate" id="analysis-progress-bar"></div></div>
-            <div class="progress-text" id="analysis-progress-text">Building file contexts…</div>
-          `;
-          const evt = new EventSource(`${API_BASE}/api/scan/events/${jobId}`);
-          evt.onmessage = async (event) => {
-            const data = JSON.parse(event.data || "{}");
-            const text = document.getElementById("analysis-progress-text");
-            if (data.progress && data.progress.processed && text) {
-              text.textContent = `Analysed ${data.progress.processed} files`;
+          resetAnalysisEventSource();
+          try {
+            const startResponse = await fetch(`${API_BASE}/api/analyse/start`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                path,
+                max_files: Number.isNaN(maxFiles) ? undefined : maxFiles,
+              }),
+            });
+            const startPayload = await parseApiPayload(startResponse);
+            const jobId = startPayload.job_id;
+            analysisState.activeJobId = jobId;
+            progressEl.innerHTML = `
+              <div class="progress"><div class="progress-bar indeterminate" id="analysis-progress-bar"></div></div>
+              <div class="progress-text" id="analysis-progress-text">Building file contexts…</div>
+              <div class="mt-6"><button id="analysis-cancel" class="btn">Cancel Analysis</button></div>
+            `;
+            const cancelBtn = document.getElementById("analysis-cancel");
+            if (cancelBtn) {
+              cancelBtn.onclick = async () => {
+                if (!analysisState.activeJobId) return;
+                cancelBtn.disabled = true;
+                try {
+                  const cancelResponse = await fetch(`${API_BASE}/api/scan/cancel`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ job_id: analysisState.activeJobId }),
+                  });
+                  await parseApiPayload(cancelResponse);
+                  showAlert("Analysis cancellation requested");
+                } catch (e) {
+                  showAlert(`Cancel request failed: ${e.message || e}`);
+                } finally {
+                  cancelBtn.disabled = false;
+                }
+              };
             }
-            if (data.status === "finished") {
-              evt.close();
-              if (text) text.textContent = "Reasoning over the drive…";
-              const reasonResponse = await fetch(`${API_BASE}/api/analyse/reason`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ job_id: jobId }),
-              });
-              const preview = await reasonResponse.json();
-              renderAnalysisPreview(preview);
-            }
-          };
-          evt.onerror = () => {
-            /* SSE reconnect is not needed here; the result request will fail if the job did not finish. */
-          };
+
+            const evt = new EventSource(`${API_BASE}/api/scan/events/${jobId}`);
+            analysisState.eventSource = evt;
+            evt.onmessage = async (event) => {
+              const data = JSON.parse(event.data || "{}");
+              const text = document.getElementById("analysis-progress-text");
+              if (data.progress && data.progress.processed && text) {
+                text.textContent = `Analysed ${data.progress.processed} files`;
+              }
+              if (data.status === "cancelled") {
+                resetAnalysisEventSource();
+                analysisState.activeJobId = null;
+                if (text) text.textContent = "Analysis cancelled";
+                return;
+              }
+              if (data.status === "failed") {
+                resetAnalysisEventSource();
+                analysisState.activeJobId = null;
+                if (text) text.textContent = "Analysis failed";
+                showAlert(`Analysis failed: ${data.error || "Unknown error"}`);
+                return;
+              }
+              if (data.status === "finished") {
+                resetAnalysisEventSource();
+                if (text) text.textContent = "Reasoning over the drive…";
+                try {
+                  const reasonResponse = await fetch(`${API_BASE}/api/analyse/reason`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ job_id: jobId }),
+                  });
+                  const preview = await parseApiPayload(reasonResponse);
+                  renderAnalysisPreview(preview);
+                } catch (e) {
+                  if (e && e.code === "job_cancelled") {
+                    showAlert("Reasoning skipped: analysis was cancelled. Run analysis again.");
+                  } else if (e && e.code === "job_not_ready") {
+                    showAlert("Reasoning deferred: analysis is still running. Please wait.");
+                  } else if (e && e.code === "not_found") {
+                    showAlert("Reasoning failed: analysis job not found. Run analysis again.");
+                  } else {
+                    showAlert(`Reasoning failed: ${e.message || e}`);
+                  }
+                } finally {
+                  analysisState.activeJobId = null;
+                }
+              }
+            };
+            evt.onerror = () => {
+              /* SSE reconnect is not needed here; the result request will fail if the job did not finish. */
+            };
+          } catch (e) {
+            analysisState.activeJobId = null;
+            progressEl.innerHTML = `<div class="progress-text">Failed to start analysis.</div>`;
+            showAlert(`Analysis start failed: ${e.message || e}`);
+          }
         }
 
         async function loadOps() {

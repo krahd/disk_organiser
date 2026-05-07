@@ -1018,8 +1018,32 @@ def api_analyse_reason():
         paths = _normalize_paths(data.get("paths") or data.get("path"), default_to_cwd=True)
         if job_id:
             job = job_status(job_id)
-            if job.get("status") != "finished":
-                return _error("analysis job is not finished", 409, "job_not_ready", job_status=job.get("status"))
+            if job.get("error") == "not found":
+                return _error("analysis job not found", 404, "not_found", job_id=job_id)
+            job_state = job.get("status")
+            if job_state == "cancelled":
+                return _error(
+                    "analysis job was cancelled",
+                    409,
+                    "job_cancelled",
+                    job_status=job_state,
+                    reason=job.get("error"),
+                )
+            if job_state == "failed":
+                return _error(
+                    "analysis job failed",
+                    500,
+                    "analysis_failed",
+                    job_status=job_state,
+                    reason=job.get("error"),
+                )
+            if job_state != "finished":
+                return _error(
+                    "analysis job is not finished",
+                    409,
+                    "job_not_ready",
+                    job_status=job_state,
+                )
             contexts = (job.get("result") or {}).get("contexts") or []
             paths = (job.get("result") or {}).get("paths") or paths
         if contexts is None:

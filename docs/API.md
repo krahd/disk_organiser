@@ -63,6 +63,11 @@ Analysis endpoints
 - `POST /api/analyse/reason` — ask the model layer to plan reversible actions
   - Body: `{job_id: <id>}` or `{paths: [...], preferences?: {...}}`
   - Response: grouped preview payload with `op`, `actions`, `summary`, `grouped`, `backup_status`, `rejected`
+  - Error responses when `job_id` is provided:
+    - `404 not_found`: analysis job id does not exist.
+    - `409 job_not_ready`: analysis job is still running.
+    - `409 job_cancelled`: analysis job was cancelled before reasoning.
+    - `500 analysis_failed`: context-building job failed.
   - Notes:
     - Contexts include content-aware near-duplicate signals.
     - Current strategies include:

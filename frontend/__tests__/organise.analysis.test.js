@@ -8,6 +8,15 @@ const path = require("path");
 function jsonResponse(payload) {
   return Promise.resolve({
     ok: true,
+    status: 200,
+    json: async () => payload,
+  });
+}
+
+function errorResponse(payload, status = 500) {
+  return Promise.resolve({
+    ok: false,
+    status,
     json: async () => payload,
   });
 }
@@ -83,8 +92,35 @@ function buildReasonPayload(overrides = {}) {
   };
 }
 
+function buildLargeReasonPayload(actionCount = 120) {
+  const actions = Array.from({ length: actionCount }, (_, index) => ({
+    action: "move",
+    from: `/tmp/in-${index}.txt`,
+    to: `/tmp/Organised/in-${index}.txt`,
+    confidence: 0.8,
+    reason: "Large payload semantic grouping",
+    near_duplicate_signals: ["content-overlap"],
+  }));
+
+  return buildReasonPayload({
+    summary: {
+      actions: actionCount,
+      groups: { "Semantic groups": actionCount },
+      bytes: 1024 * actionCount,
+    },
+    grouped: {
+      "Semantic groups": actions,
+    },
+    actions,
+  });
+}
+
 function flush() {
   return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+function lastEventSource() {
+  return global.EventSource.instances[global.EventSource.instances.length - 1];
 }
 
 describe("Organise analysis flow", () => {
@@ -124,6 +160,7 @@ describe("Organise analysis flow", () => {
     fetchMock = jest.fn((url, options = {}) => {
       if (url === "/api/ops") return jsonResponse({ ops: {} });
       if (url === "/api/analyse/start") return jsonResponse({ job_id: "job-1" });
+      if (url === "/api/scan/cancel") return jsonResponse({ cancelled: "job-1" });
       if (url === "/api/analyse/reason") return jsonResponse(buildReasonPayload());
       if (url === "/api/organise/execute") return jsonResponse({ executed: [{}, {}] });
       if (url === "/api/chat") {
@@ -182,7 +219,7 @@ describe("Organise analysis flow", () => {
     await flush();
 
     expect(global.EventSource.instances.length).toBeGreaterThan(0);
-    global.EventSource.instances[0].emit({ status: "finished", progress: { processed: 2 } });
+    lastEventSource().emit({ status: "finished", progress: { processed: 2 } });
     await flush();
     await flush();
 
@@ -212,7 +249,7 @@ describe("Organise analysis flow", () => {
     document.getElementById("analysis-run").click();
     await flush();
 
-    global.EventSource.instances[0].emit({ status: "finished", progress: { processed: 2 } });
+    lastEventSource().emit({ status: "finished", progress: { processed: 2 } });
     await flush();
     await flush();
 
@@ -242,7 +279,7 @@ describe("Organise analysis flow", () => {
     document.getElementById("analysis-run").click();
     await flush();
 
-    global.EventSource.instances[0].emit({ status: "finished", progress: { processed: 2 } });
+    lastEventSource().emit({ status: "finished", progress: { processed: 2 } });
     await flush();
     await flush();
 
@@ -266,7 +303,7 @@ describe("Organise analysis flow", () => {
     document.getElementById("analysis-run").click();
     await flush();
 
-    global.EventSource.instances[0].emit({ status: "finished", progress: { processed: 2 } });
+    lastEventSource().emit({ status: "finished", progress: { processed: 2 } });
     await flush();
     await flush();
 
@@ -295,7 +332,7 @@ describe("Organise analysis flow", () => {
     document.getElementById("analysis-run").click();
     await flush();
 
-    global.EventSource.instances[0].emit({ status: "finished", progress: { processed: 2 } });
+    lastEventSource().emit({ status: "finished", progress: { processed: 2 } });
     await flush();
     await flush();
 
@@ -317,7 +354,7 @@ describe("Organise analysis flow", () => {
     document.getElementById("analysis-run").click();
     await flush();
 
-    global.EventSource.instances[0].emit({ status: "finished", progress: { processed: 2 } });
+    lastEventSource().emit({ status: "finished", progress: { processed: 2 } });
     await flush();
     await flush();
 
@@ -364,7 +401,7 @@ describe("Organise analysis flow", () => {
     document.getElementById("analysis-run").click();
     await flush();
 
-    global.EventSource.instances[0].emit({ status: "finished", progress: { processed: 2 } });
+    lastEventSource().emit({ status: "finished", progress: { processed: 2 } });
     await flush();
     await flush();
 
@@ -375,5 +412,259 @@ describe("Organise analysis flow", () => {
     expect(banner.textContent).toContain("OCR: available");
     expect(banner.textContent).toContain("Embedding: available");
     expect(banner.textContent).toContain("Dependencies installed");
+  });
+
+  test("renders capability banner and actions for large analysis payload", async () => {
+    fetchMock.mockImplementation((url) => {
+      if (url === "/api/ops") return jsonResponse({ ops: {} });
+      if (url === "/api/analyse/start") return jsonResponse({ job_id: "job-1" });
+      if (url === "/api/analyse/reason") return jsonResponse(buildLargeReasonPayload(120));
+      if (url === "/api/organise/execute") return jsonResponse({ executed: [] });
+      if (url === "/api/chat") return jsonResponse(buildReasonPayload());
+      if (url === "/api/organise/undo") return jsonResponse({ actions: [], summary: {} });
+      return jsonResponse({});
+    });
+
+    document.getElementById("nav-organise").click();
+    await flush();
+
+    document.getElementById("analysis-run").click();
+    await flush();
+
+    lastEventSource().emit({ status: "finished", progress: { processed: 120 } });
+    await flush();
+    await flush();
+
+    const banner = document.querySelector(".capability-banner");
+    expect(banner).toBeTruthy();
+    expect(banner.textContent).toContain("Optional enhancements unavailable");
+
+    const cards = document.querySelectorAll(".analysis-action");
+    expect(cards.length).toBe(120);
+  });
+
+  test("cancel analysis posts cancellation request and shows cancelled state", async () => {
+    document.getElementById("nav-organise").click();
+    await flush();
+
+    document.getElementById("analysis-run").click();
+    await flush();
+
+    const cancelButton = document.getElementById("analysis-cancel");
+    expect(cancelButton).toBeTruthy();
+    cancelButton.click();
+    await flush();
+
+    const cancelCall = fetchMock.mock.calls.find(([url]) => url === "/api/scan/cancel");
+    expect(cancelCall).toBeTruthy();
+    expect(JSON.parse(cancelCall[1].body)).toEqual({ job_id: "job-1" });
+
+    lastEventSource().emit({ status: "cancelled", error: "cancelled" });
+    await flush();
+
+    const progressText = document.getElementById("analysis-progress-text");
+    expect(progressText.textContent).toContain("Analysis cancelled");
+  });
+
+  test("cancel analysis surfaces API error", async () => {
+    fetchMock.mockImplementation((url) => {
+      if (url === "/api/ops") return jsonResponse({ ops: {} });
+      if (url === "/api/analyse/start") return jsonResponse({ job_id: "job-1" });
+      if (url === "/api/scan/cancel") {
+        return errorResponse(
+          { error: { code: "cancel_failed", message: "failed to cancel" } },
+          500
+        );
+      }
+      return jsonResponse({});
+    });
+
+    document.getElementById("nav-organise").click();
+    await flush();
+
+    document.getElementById("analysis-run").click();
+    await flush();
+
+    const cancelButton = document.getElementById("analysis-cancel");
+    cancelButton.click();
+    await flush();
+
+    const alert = document.getElementById("app-alert");
+    expect(alert).toBeTruthy();
+    expect(alert.textContent).toContain("Cancel request failed: failed to cancel");
+    expect(cancelButton.disabled).toBe(false);
+  });
+
+  test("analysis start failure surfaces API error", async () => {
+    fetchMock.mockImplementation((url) => {
+      if (url === "/api/ops") return jsonResponse({ ops: {} });
+      if (url === "/api/analyse/start") {
+        return errorResponse(
+          { error: { code: "validation_error", message: "paths must be non-empty strings" } },
+          400
+        );
+      }
+      return jsonResponse({});
+    });
+
+    document.getElementById("nav-organise").click();
+    await flush();
+
+    document.getElementById("analysis-run").click();
+    await flush();
+
+    const alert = document.getElementById("app-alert");
+    expect(alert).toBeTruthy();
+    expect(alert.textContent).toContain("Analysis start failed: paths must be non-empty strings");
+  });
+
+  test("reasoning failure surfaces API error after finished job", async () => {
+    fetchMock.mockImplementation((url) => {
+      if (url === "/api/ops") return jsonResponse({ ops: {} });
+      if (url === "/api/analyse/start") return jsonResponse({ job_id: "job-1" });
+      if (url === "/api/scan/cancel") return jsonResponse({ cancelled: "job-1" });
+      if (url === "/api/analyse/reason") {
+        return errorResponse(
+          { error: { code: "analysis_failed", message: "analysis failed" } },
+          500
+        );
+      }
+      return jsonResponse({});
+    });
+
+    document.getElementById("nav-organise").click();
+    await flush();
+
+    document.getElementById("analysis-run").click();
+    await flush();
+
+    lastEventSource().emit({ status: "finished", progress: { processed: 2 } });
+    await flush();
+    await flush();
+
+    const alert = document.getElementById("app-alert");
+    expect(alert).toBeTruthy();
+    expect(alert.textContent).toContain("Reasoning failed: analysis failed");
+  });
+
+  test("reasoning cancelled response shows actionable message", async () => {
+    fetchMock.mockImplementation((url) => {
+      if (url === "/api/ops") return jsonResponse({ ops: {} });
+      if (url === "/api/analyse/start") return jsonResponse({ job_id: "job-1" });
+      if (url === "/api/scan/cancel") return jsonResponse({ cancelled: "job-1" });
+      if (url === "/api/analyse/reason") {
+        return errorResponse(
+          { error: { code: "job_cancelled", message: "analysis job was cancelled" } },
+          409
+        );
+      }
+      return jsonResponse({});
+    });
+
+    document.getElementById("nav-organise").click();
+    await flush();
+
+    document.getElementById("analysis-run").click();
+    await flush();
+
+    lastEventSource().emit({ status: "finished", progress: { processed: 2 } });
+    await flush();
+    await flush();
+
+    const alert = document.getElementById("app-alert");
+    expect(alert).toBeTruthy();
+    expect(alert.textContent).toContain(
+      "Reasoning skipped: analysis was cancelled. Run analysis again."
+    );
+  });
+
+  test("reasoning not-ready response shows wait message", async () => {
+    fetchMock.mockImplementation((url) => {
+      if (url === "/api/ops") return jsonResponse({ ops: {} });
+      if (url === "/api/analyse/start") return jsonResponse({ job_id: "job-1" });
+      if (url === "/api/scan/cancel") return jsonResponse({ cancelled: "job-1" });
+      if (url === "/api/analyse/reason") {
+        return errorResponse(
+          { error: { code: "job_not_ready", message: "analysis job is not finished" } },
+          409
+        );
+      }
+      return jsonResponse({});
+    });
+
+    document.getElementById("nav-organise").click();
+    await flush();
+
+    document.getElementById("analysis-run").click();
+    await flush();
+
+    lastEventSource().emit({ status: "finished", progress: { processed: 2 } });
+    await flush();
+    await flush();
+
+    const alert = document.getElementById("app-alert");
+    expect(alert).toBeTruthy();
+    expect(alert.textContent).toContain(
+      "Reasoning deferred: analysis is still running. Please wait."
+    );
+  });
+
+  test("analysis failed status from SSE shows failure without reasoning call", async () => {
+    document.getElementById("nav-organise").click();
+    await flush();
+
+    document.getElementById("analysis-run").click();
+    await flush();
+
+    lastEventSource().emit({ status: "failed", error: "index read failed" });
+    await flush();
+
+    const alert = document.getElementById("app-alert");
+    expect(alert).toBeTruthy();
+    expect(alert.textContent).toContain("Analysis failed: index read failed");
+
+    const reasonCall = fetchMock.mock.calls.find(([url]) => url === "/api/analyse/reason");
+    expect(reasonCall).toBeUndefined();
+
+    const progressText = document.getElementById("analysis-progress-text");
+    expect(progressText.textContent).toContain("Analysis failed");
+  });
+
+  test("chat refine failure surfaces API error and reenables button", async () => {
+    fetchMock.mockImplementation((url) => {
+      if (url === "/api/ops") return jsonResponse({ ops: {} });
+      if (url === "/api/analyse/start") return jsonResponse({ job_id: "job-1" });
+      if (url === "/api/scan/cancel") return jsonResponse({ cancelled: "job-1" });
+      if (url === "/api/analyse/reason") return jsonResponse(buildReasonPayload());
+      if (url === "/api/chat") {
+        return errorResponse(
+          { error: { code: "chat_failed", message: "chat refinement failed" } },
+          500
+        );
+      }
+      if (url === "/api/organise/undo") return jsonResponse({ actions: [], summary: {} });
+      return jsonResponse({});
+    });
+
+    document.getElementById("nav-organise").click();
+    await flush();
+
+    document.getElementById("analysis-run").click();
+    await flush();
+
+    lastEventSource().emit({ status: "finished", progress: { processed: 2 } });
+    await flush();
+    await flush();
+
+    const chatInput = document.getElementById("analysis-chat-message");
+    chatInput.value = "avoid downloads";
+    const chatButton = document.getElementById("analysis-chat-send");
+    chatButton.click();
+    await flush();
+
+    const alert = document.getElementById("app-alert");
+    expect(alert).toBeTruthy();
+    expect(alert.textContent).toContain("Chat refinement failed: chat refinement failed");
+    expect(chatButton.disabled).toBe(false);
   });
 });

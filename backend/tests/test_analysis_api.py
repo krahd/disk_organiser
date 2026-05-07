@@ -153,3 +153,56 @@ def test_analyse_reason_capabilities_enabled_branch(monkeypatch, tmp_path):
     assert payload["analysis_capabilities"]["embeddings"]["available"] is True
     assert payload["analysis_capabilities"]["embeddings"]["disabled"] is False
     assert payload["analysis_capabilities"]["embeddings"]["missing"] == []
+
+
+def test_analyse_reason_with_unknown_job_returns_404(monkeypatch):
+    monkeypatch.setattr(app, "job_status", lambda _job_id: {"error": "not found"})
+    client = app.app.test_client()
+
+    response = client.post("/api/analyse/reason", json={"job_id": "missing-job"})
+    assert response.status_code == 404
+    payload = response.get_json()
+    assert payload["error"]["code"] == "not_found"
+    assert payload["error"]["details"]["job_id"] == "missing-job"
+
+
+def test_analyse_reason_with_cancelled_job_returns_409(monkeypatch):
+    monkeypatch.setattr(
+        app,
+        "job_status",
+        lambda _job_id: {"status": "cancelled", "error": "cancelled"},
+    )
+    client = app.app.test_client()
+
+    response = client.post("/api/analyse/reason", json={"job_id": "cancelled-job"})
+    assert response.status_code == 409
+    payload = response.get_json()
+    assert payload["error"]["code"] == "job_cancelled"
+    assert payload["error"]["details"]["job_status"] == "cancelled"
+
+
+def test_analyse_reason_with_failed_job_returns_500(monkeypatch):
+    monkeypatch.setattr(
+        app,
+        "job_status",
+        lambda _job_id: {"status": "failed", "error": "disk read error"},
+    )
+    client = app.app.test_client()
+
+    response = client.post("/api/analyse/reason", json={"job_id": "failed-job"})
+    assert response.status_code == 500
+    payload = response.get_json()
+    assert payload["error"]["code"] == "analysis_failed"
+    assert payload["error"]["details"]["job_status"] == "failed"
+    assert payload["error"]["details"]["reason"] == "disk read error"
+
+
+def test_analyse_reason_with_started_job_returns_409(monkeypatch):
+    monkeypatch.setattr(app, "job_status", lambda _job_id: {"status": "started"})
+    client = app.app.test_client()
+
+    response = client.post("/api/analyse/reason", json={"job_id": "started-job"})
+    assert response.status_code == 409
+    payload = response.get_json()
+    assert payload["error"]["code"] == "job_not_ready"
+    assert payload["error"]["details"]["job_status"] == "started"

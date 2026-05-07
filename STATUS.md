@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-05-07 00:55
+Last updated: 2026-05-07 18:35
 
 ## Project purpose
 
@@ -145,6 +145,20 @@ npm run test:visual
 - Runtime capability flags now report optional OCR and embedding availability.
 - Frontend analysis UI shows optional capability state.
 - Test coverage has been expanded around context building, analysis capability payloads, and frontend selection/refinement paths.
+- Organise analysis flow now supports explicit cancellation while a background analysis job is running, with visible cancelled/failed state handling in the UI.
+- Organise analysis flow now surfaces API-level start/reason/chat errors to users instead of silently assuming successful JSON responses.
+- Backend `POST /api/analyse/reason` now returns lifecycle-specific errors for `job_id` lookups (`not_found`, `job_not_ready`, `job_cancelled`, `analysis_failed`) instead of collapsing all non-finished states.
+- Frontend tests now cover interrupted analysis and failed network/API paths for start, reason, and chat refinement flows.
+- Frontend analysis cancellation now validates API response status before confirming cancellation.
+- Frontend reasoning failures now map lifecycle error codes to actionable guidance (cancelled, still running, missing job).
+- Backend tests now cover analysis-reason behaviour for missing, cancelled, failed, and in-progress analysis jobs.
+- Frontend tests now cover cancel-request API failures, reasoning `job_cancelled` responses, and reasoning `job_not_ready` responses.
+- Local Node/Homebrew runtime linkage was repaired (node reinstall), restoring frontend verification execution.
+- Integration interruption test suite added (`backend/tests/test_analysis_interruption.py`, 11 tests) covering cancelled, failed, in-progress, missing-job, and happy-path lifecycle states using real job files on disk and the Flask test client.
+- Windows CI coverage was added via a dedicated `windows-backend` workflow job to validate backend tests and OpenAPI route coverage on `windows-2022`.
+- Backend payload and malformed-input coverage was expanded in `backend/tests/test_analysis_payloads.py`, including a large-context `analyse/reason` integration path and fuzzed validation checks for `analyse/start` and `scan/cancel`.
+- Frontend integration-style coverage now includes large analysis payload rendering with capability banner assertions (120 rendered action cards).
+- Playwright interruption coverage was added in `frontend/visual/analysis-interruption.spec.js` with cancelled/failed state assertions for progress and alert visibility.
 - Public project website content and visual design were refreshed in `docs/index.html` and `docs/assets/style.css` with clearer safety messaging and updated quick-start links.
 
 ## Tests and verification status
@@ -158,16 +172,26 @@ Previously recorded successful checks:
 - `npm run test:visual` with server running -> Playwright visual tests passed.
 - Focused backend and frontend capability tests were also recorded as passing.
 
-No tests were run while producing this documentation-only status normalisation.
-No tests were run for the docs website refresh in this update.
+Current session verification:
+
+- `npm test --silent` -> frontend suite passed (3 suites, 19 tests).
+- `npm test -- --runInBand frontend/__tests__/organise.analysis.test.js` -> passed (15 tests).
+- `npm run format:check` -> passed.
+- `pytest -q backend/tests/test_analysis_api.py` -> passed (8 tests).
+- `pytest -q backend/tests/test_analysis_interruption.py` -> passed (11 tests).
+- `pytest -q backend/tests/test_analysis_payloads.py` -> passed (6 tests).
+- `pytest -q backend/tests` -> passed (61 tests).
+- `python scripts/validate_openapi.py` -> passed (38 routes).
+- `npm test -- --runInBand frontend/__tests__/organise.analysis.test.js` -> passed (16 tests).
+- `npx playwright test frontend/visual/analysis-interruption.spec.js` -> failed locally due Playwright browser page closing before first UI interaction (`page.click` timeout with `Page closed`), matching the same failure currently observed on existing visual spec execution in this environment.
 
 ## Known issues, risks, and limitations
 
 - OCR and embedding enhancements are optional and only active with extra dependencies installed.
 - OCR quality needs broader real-world validation on scanned and low-quality documents.
-- Windows-specific path and filesystem behaviour still needs dedicated CI verification.
 - Frontend analysis flow has less test depth than backend safety-critical logic.
 - Live Modelito planning quality depends on configured local runtime/model availability.
+- Playwright visual tests currently fail locally in this environment with `Page closed` before first interaction; this affects both new interruption spec and existing treemap visual spec runs.
 
 ## Recurring tasks
 
@@ -176,15 +200,13 @@ No tests were run for the docs website refresh in this update.
 
 ## Pending tasks
 
-- Continue broad malformed-input fuzzing for any remaining lightly covered route shapes.
-- Add a Windows CI lane for filesystem/path behaviour.
-- Expand frontend unit tests for failed network calls and interrupted analysis/refinement flows.
-- Add integration coverage for large analysis payloads and capability indicator rendering.
+- Investigate and stabilise local Playwright execution (`Page closed` before first click) so visual suite can be validated reliably on developer machines.
+- Continue broad malformed-input fuzzing for routes outside the analysis/scan lifecycle.
 
 ## Next steps
 
-1. Add Windows CI coverage for path and filesystem operations.
-2. Expand frontend analysis-flow unit coverage.
+1. Debug Playwright local runtime instability and restore reliable visual test execution.
+2. Extend malformed-input fuzzing breadth across non-analysis endpoints.
 3. Keep OpenAPI documentation in sync with route changes.
 
 ## Longer-term steps
@@ -201,4 +223,4 @@ No tests were run for the docs website refresh in this update.
 
 ---
 
-Last updated: 2026-05-07 00:55
+Last updated: 2026-05-07 18:35
