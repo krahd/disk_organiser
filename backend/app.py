@@ -1164,7 +1164,10 @@ def api_get_op(op_id):
 def api_recycle_cleanup():
     """Remove recycled backups older than `retention_days`."""
     data = request.get_json(silent=True) or {}
-    days = int(data.get("retention_days", 30))
+    try:
+        days = int(data.get("retention_days", 30))
+    except (TypeError, ValueError):
+        return jsonify({"error": "invalid retention_days"}), 400
     dry_run = bool(data.get("dry_run", False))
     try:
         if dry_run:
@@ -1252,8 +1255,14 @@ def api_scan_index_rebuild():
         return jsonify({"error": "scan index not available"}), 404
     data = request.get_json(silent=True) or {}
     paths = data.get("paths") or [os.getcwd()]
-    min_size = int(data.get("min_size", 1))
-    sample_size = int(data.get("sample_size", 4096))
+    try:
+        min_size = int(data.get("min_size", 1))
+    except (TypeError, ValueError):
+        return jsonify({"error": "invalid min_size"}), 400
+    try:
+        sample_size = int(data.get("sample_size", 4096))
+    except (TypeError, ValueError):
+        return jsonify({"error": "invalid sample_size"}), 400
     try:
         res = scan_index_mod.rebuild_index(
             paths, min_size=min_size, sample_size=sample_size
@@ -1273,8 +1282,14 @@ def api_scan_index_rebuild_async():
         return jsonify({"error": "scan index not available"}), 404
     data = request.get_json(silent=True) or {}
     paths = data.get("paths") or [os.getcwd()]
-    min_size = int(data.get("min_size", 1))
-    sample_size = int(data.get("sample_size", 4096))
+    try:
+        min_size = int(data.get("min_size", 1))
+    except (TypeError, ValueError):
+        return jsonify({"error": "invalid min_size"}), 400
+    try:
+        sample_size = int(data.get("sample_size", 4096))
+    except (TypeError, ValueError):
+        return jsonify({"error": "invalid sample_size"}), 400
 
     dry_run = bool(data.get("dry_run", False))
     # attempt to use RQ/Redis if available and not a dry_run
