@@ -1,8 +1,16 @@
 const { test, expect } = require("@playwright/test");
+const path = require("path");
 
 test.beforeEach(async ({ page }) => {
-  await page.route("**/api/**", async (route) => {
+  await page.addInitScript(() => {
+    window._DISK_ORGANISER_API_BASE = "http://playwright.local";
+  });
+
+  await page.route("**/*", async (route) => {
     const url = route.request().url();
+    if (!url.includes("/api/")) {
+      return route.continue();
+    }
     const json = (payload, status = 200) =>
       route.fulfill({
         status,
@@ -84,8 +92,9 @@ async function installMockEventSource(page) {
 }
 
 test("analysis cancelled state is visible with interruption messaging", async ({ page }) => {
-  const base = process.env.TEST_BASE || "http://127.0.0.1:8000";
-  await page.goto(`${base}/index.html`);
+  const indexPath = path.resolve(__dirname, "..", "index.html");
+  const url = process.env.TEST_BASE ? `${process.env.TEST_BASE}/index.html` : `file://${indexPath}`;
+  await page.goto(url);
   await installMockEventSource(page);
 
   await page.click("#nav-organise");
@@ -106,8 +115,9 @@ test("analysis cancelled state is visible with interruption messaging", async ({
 });
 
 test("analysis failed state shows visible alert banner", async ({ page }) => {
-  const base = process.env.TEST_BASE || "http://127.0.0.1:8000";
-  await page.goto(`${base}/index.html`);
+  const indexPath = path.resolve(__dirname, "..", "index.html");
+  const url = process.env.TEST_BASE ? `${process.env.TEST_BASE}/index.html` : `file://${indexPath}`;
+  await page.goto(url);
   await installMockEventSource(page);
 
   await page.click("#nav-organise");

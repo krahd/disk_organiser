@@ -425,7 +425,7 @@ document.addEventListener("DOMContentLoaded", () => {
             findBtn.onclick = async () => {
               findBtn.disabled = true;
               try {
-                const res = await fetch("/api/duplicates", {
+                const res = await fetch(`${API_BASE}/api/duplicates`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ paths: [d.data.name], min_size: 1 }),
@@ -443,13 +443,13 @@ document.addEventListener("DOMContentLoaded", () => {
                   createBtn.onclick = async () => {
                     createBtn.disabled = true;
                     try {
-                      const sres = await fetch("/api/organise", {
+                      const sres = await fetch(`${API_BASE}/api/organise`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ duplicates: j.duplicates }),
                       });
                       const sj = await sres.json();
-                      const pres = await fetch("/api/organise/preview", {
+                      const pres = await fetch(`${API_BASE}/api/organise/preview`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ suggestions: sj.suggestions || [] }),

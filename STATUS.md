@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-05-07 18:35
+Last updated: 2026-05-07 19:09
 
 ## Project purpose
 
@@ -110,11 +110,10 @@ npm test --silent
 npm run format:check
 ```
 
-Playwright visual tests require the frontend server:
+Playwright visual tests:
 
 ```bash
-npm run start
-npm run test:visual
+npx playwright test frontend/visual
 ```
 
 ## Configuration and environment variables
@@ -159,6 +158,8 @@ npm run test:visual
 - Backend payload and malformed-input coverage was expanded in `backend/tests/test_analysis_payloads.py`, including a large-context `analyse/reason` integration path and fuzzed validation checks for `analyse/start` and `scan/cancel`.
 - Frontend integration-style coverage now includes large analysis payload rendering with capability banner assertions (120 rendered action cards).
 - Playwright interruption coverage was added in `frontend/visual/analysis-interruption.spec.js` with cancelled/failed state assertions for progress and alert visibility.
+- Visual Playwright specs now default to local `frontend/index.html` file URLs and intercept API calls generically, removing reliance on whatever process is bound to port 8000.
+- Frontend visual side-panel duplicate actions now honour `API_BASE`, improving testability and deployment flexibility for non-root API hosts.
 - Public project website content and visual design were refreshed in `docs/index.html` and `docs/assets/style.css` with clearer safety messaging and updated quick-start links.
 
 ## Tests and verification status
@@ -183,7 +184,8 @@ Current session verification:
 - `pytest -q backend/tests` -> passed (61 tests).
 - `python scripts/validate_openapi.py` -> passed (38 routes).
 - `npm test -- --runInBand frontend/__tests__/organise.analysis.test.js` -> passed (16 tests).
-- `npx playwright test frontend/visual/analysis-interruption.spec.js` -> failed locally due Playwright browser page closing before first UI interaction (`page.click` timeout with `Page closed`), matching the same failure currently observed on existing visual spec execution in this environment.
+- `npx playwright test frontend/visual/analysis-interruption.spec.js` -> passed (2 tests).
+- `npx playwright test frontend/visual` -> passed (4 tests).
 
 ## Known issues, risks, and limitations
 
@@ -191,7 +193,6 @@ Current session verification:
 - OCR quality needs broader real-world validation on scanned and low-quality documents.
 - Frontend analysis flow has less test depth than backend safety-critical logic.
 - Live Modelito planning quality depends on configured local runtime/model availability.
-- Playwright visual tests currently fail locally in this environment with `Page closed` before first interaction; this affects both new interruption spec and existing treemap visual spec runs.
 
 ## Recurring tasks
 
@@ -200,13 +201,12 @@ Current session verification:
 
 ## Pending tasks
 
-- Investigate and stabilise local Playwright execution (`Page closed` before first click) so visual suite can be validated reliably on developer machines.
 - Continue broad malformed-input fuzzing for routes outside the analysis/scan lifecycle.
 
 ## Next steps
 
-1. Debug Playwright local runtime instability and restore reliable visual test execution.
-2. Extend malformed-input fuzzing breadth across non-analysis endpoints.
+1. Extend malformed-input fuzzing breadth across non-analysis endpoints.
+2. Keep visual tests deterministic as new UI/API paths are introduced.
 3. Keep OpenAPI documentation in sync with route changes.
 
 ## Longer-term steps
@@ -223,4 +223,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-05-07 18:35
+Last updated: 2026-05-07 19:09
