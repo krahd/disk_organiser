@@ -2,11 +2,13 @@
 
 Flask
 flask-cors
-pytest
 redis
 rq
 gunicorn
-flake8
 filelock
 xxhash
 send2trash
+Pillow
+ImageHash
+pypdf
+modelito==1.2.2

@@ -1,0 +1,206 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Disk Organiser API",
+    "version": "0.2.0",
+    "description": "Preview-first filesystem analysis and organisation API with reversible operations."
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Health check"
+      }
+    },
+    "/api/duplicates": {
+      "post": {
+        "summary": "Find exact duplicates"
+      }
+    },
+    "/api/visualisation": {
+      "post": {
+        "summary": "Build folder visualisation and optional semantic insights"
+      }
+    },
+    "/api/organise": {
+      "post": {
+        "summary": "Return heuristic duplicate move suggestions"
+      }
+    },
+    "/api/organise/suggest": {
+      "post": {
+        "summary": "Return AI-assisted duplicate move suggestions"
+      }
+    },
+    "/api/organise/preview": {
+      "post": {
+        "summary": "Create an operation preview from actions or suggestions"
+      }
+    },
+    "/api/organise/remove-preview": {
+      "post": {
+        "summary": "Preview duplicate removal into the recycle store"
+      }
+    },
+    "/api/organise/execute": {
+      "post": {
+        "summary": "Execute selected reversible actions"
+      }
+    },
+    "/api/organise/undo": {
+      "post": {
+        "summary": "Undo an executed operation"
+      }
+    },
+    "/api/model": {
+      "get": {
+        "summary": "Get selected model"
+      },
+      "post": {
+        "summary": "Set selected model"
+      }
+    },
+    "/api/ollama/status": {
+      "get": {
+        "summary": "Get Ollama runtime and local model status via Modelito"
+      }
+    },
+    "/api/ollama/install": {
+      "post": {
+        "summary": "Install Ollama via Modelito"
+      }
+    },
+    "/api/ollama/start": {
+      "post": {
+        "summary": "Start the local Ollama runtime"
+      }
+    },
+    "/api/ollama/stop": {
+      "post": {
+        "summary": "Stop the local Ollama runtime"
+      }
+    },
+    "/api/ollama/pull": {
+      "post": {
+        "summary": "Pull an Ollama model"
+      }
+    },
+    "/api/ollama/serve": {
+      "post": {
+        "summary": "Start Ollama serve mode"
+      }
+    },
+    "/api/ollama/delete": {
+      "post": {
+        "summary": "Delete a local Ollama model"
+      }
+    },
+    "/api/preferences": {
+      "get": {
+        "summary": "Get saved preferences"
+      },
+      "post": {
+        "summary": "Persist saved preferences"
+      }
+    },
+    "/api/scan/start": {
+      "post": {
+        "summary": "Start duplicate scan"
+      }
+    },
+    "/api/scan/status/{job_id}": {
+      "get": {
+        "summary": "Get scan job status"
+      }
+    },
+    "/api/scan/events/{job_id}": {
+      "get": {
+        "summary": "Stream scan or analysis progress over SSE"
+      }
+    },
+    "/api/scan/cancel": {
+      "post": {
+        "summary": "Cancel a scan or analysis job"
+      }
+    },
+    "/api/analyse/start": {
+      "post": {
+        "summary": "Build rich file contexts in the background"
+      }
+    },
+    "/api/analyse/reason": {
+      "post": {
+        "summary": "Reason over file contexts and create a reversible operation"
+      }
+    },
+    "/api/chat": {
+      "post": {
+        "summary": "Refine a proposed operation via natural-language feedback"
+      }
+    },
+    "/api/recycle/list": {
+      "get": {
+        "summary": "List stored backups"
+      }
+    },
+    "/api/ops": {
+      "get": {
+        "summary": "List stored operations"
+      }
+    },
+    "/api/op/{op_id}": {
+      "get": {
+        "summary": "Get a single operation"
+      }
+    },
+    "/api/ops/{op_id}/preview": {
+      "get": {
+        "summary": "Get grouped diff preview for an operation"
+      }
+    },
+    "/api/recycle/cleanup": {
+      "post": {
+        "summary": "Clean up aged backups"
+      }
+    },
+    "/api/recycle/delete_op": {
+      "post": {
+        "summary": "Delete a stored operation backup"
+      }
+    },
+    "/api/scan_index/stats": {
+      "get": {
+        "summary": "Get scan index statistics"
+      }
+    },
+    "/api/scan_index/rebuild": {
+      "post": {
+        "summary": "Rebuild the scan index synchronously"
+      }
+    },
+    "/api/scan_index/rebuild_async": {
+      "post": {
+        "summary": "Rebuild the scan index asynchronously"
+      }
+    },
+    "/api/scan_index/prune": {
+      "post": {
+        "summary": "Prune aged scan index entries"
+      }
+    },
+    "/api/maintenance/status": {
+      "get": {
+        "summary": "Get maintenance status"
+      }
+    },
+    "/api/maintenance/run": {
+      "post": {
+        "summary": "Run maintenance"
+      }
+    },
+    "/api/safety/backup-status": {
+      "get": {
+        "summary": "Get macOS backup status"
+      }
+    }
+  }
+}

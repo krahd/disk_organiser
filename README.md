@@ -5,11 +5,19 @@ local filesystem. It provides:
 
 - A Flask backend API for scanning, finding duplicates, and applying safe
 	organise operations (with backups).
-- A minimal static frontend for quick visualisation and previewing actions.
+- A minimal static frontend for quick visualisation, grouped previews, and conversational refinement.
 - Optional AI-assisted suggestions via pluggable model wrappers.
+- Preview-first semantic analysis with typed reversible actions: moves, stale-file removal, symlink proposals.
 
 This repository contains the backend API under `backend/` and the frontend in
 `frontend/`.
+
+![CI](https://github.com/krahd/disk_organiser/actions/workflows/bottle-build.yml/badge.svg)
+
+Website: https://krahd.github.io/disk_organiser/
+Demo (static): https://krahd.github.io/disk_organiser/demo/
+Download (latest releases): https://github.com/krahd/disk_organiser/releases
+
 
 ## Quick start (macOS / Linux)
 
@@ -22,15 +30,25 @@ pip install -r backend/requirements.txt
 python backend/app.py
 ```
 
-Open `frontend/index.html` in a browser. The frontend expects the API at
-`http://127.0.0.1:5000` by default.
+Open `frontend/index.html` in a browser. The frontend uses relative `/api` paths
+by default. For local development run the backend with `python backend/app.py`
+(default API: `http://127.0.0.1:5000`). When running in Docker the backend runs
+on port `8000` (see `Dockerfile` / `docker-compose.yml`). You can override the
+frontend API base at runtime by setting `window._DISK_ORGANISER_API_BASE`.
+
+## Screenshot
+
+![Frontend screenshot](frontend/images/screenshot.svg)
+
 
 ## Features
 
 - Scan directories and detect duplicate files using content hashing.
-- Lightweight visualisation of folder structure and sizes.
+- Lightweight visualisation of folder structure and sizes, with optional semantic folder insights.
 - Preview organise suggestions and execute operations with automatic backups.
-- Optional AI model integration (pluggable providers) to suggest keeps/moves.
+- Build rich file contexts and ask the model layer to propose reversible actions.
+- Refine proposed actions conversationally before executing them.
+- Optional macOS Time Machine status and local snapshot creation before execution.
 
 ## Docker / Compose
 
@@ -69,7 +87,8 @@ See `docs/DEVELOPMENT.md` for more development notes and helpful commands.
 ## API
 
 The backend exposes a simple REST API used by the frontend. See
-`docs/API.md` for endpoint descriptions and example payloads.
+`docs/API.md` for endpoint descriptions and example payloads, and `docs/openapi.json`
+for the machine-readable route spec validated in CI.
 
 ## Releases
 
@@ -85,6 +104,7 @@ Additional documentation is available in the `docs/` folder:
 - `docs/DEVELOPMENT.md` — developer setup and testing
 - `docs/API.md` — API reference
 - `docs/MODEL_INTEGRATION.md` — how to add model providers
+- `docs/NEXT_STEPS.md` — prioritized follow-up implementation checklist
 
 ## About
 
@@ -96,16 +116,7 @@ See `ABOUT.md` for a brief project description and goals.
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
-## Documentation
-
-A user manual and contributing guidelines are included in the `docs/` folder:
-
-- [docs/USER_MANUAL.md](docs/USER_MANUAL.md) — user manual and usage examples
-- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) — how to contribute, run tests, and submit PRs
-
 ## Disclaimer
 
 This software is provided "AS IS", without warranty of any kind, express or implied. Use at your own risk.
 
-If you'd like a trimmed README (for GitHub About or package metadata), tell me
-which sections to keep and I will produce it.

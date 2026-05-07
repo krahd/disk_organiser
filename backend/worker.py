@@ -4,18 +4,19 @@ Example:
   redis-cli ping
   python backend/worker.py
 """
+
 try:
     from redis import Redis
-    from rq import Worker, Queue, Connection
+    from rq import Connection, Queue, Worker
 except ImportError:
-    print('RQ/Redis packages not installed; worker not started.')
+    print("RQ/Redis packages not installed; worker not started.")
 else:
     try:
         redis_conn = Redis()
-        listen = ['default']
+        listen = ["default"]
         with Connection(redis_conn):
             worker = Worker(list(map(Queue, listen)))
             worker.work()
     except Exception as e:  # pylint: disable=broad-exception-caught
-        print('Failed to start RQ worker:', e)
-        print('Ensure Redis is running and rq/redis packages are installed.')
+        print("Failed to start RQ worker:", e)
+        print("Ensure Redis is running and rq/redis packages are installed.")

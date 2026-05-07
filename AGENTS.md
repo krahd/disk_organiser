@@ -280,6 +280,7 @@ Project validation commands:
 source venv/bin/activate
 pytest -q backend/tests
 python scripts/validate_openapi.py
+
 npm test --silent
 npm run format:check
 npm run start
@@ -396,3 +397,43 @@ When finishing a task, report concisely:
 - remaining issues, blockers, or follow-up work
 
 Do not include decorative commentary.
+  =======
+```
+
+Frontend unit and formatting:
+
+```bash
+npm test --silent
+npm run format:check
+```
+
+Playwright visual tests (requires running frontend server):
+
+```bash
+# terminal 1
+npm run start
+
+# terminal 2
+npm run test:visual
+```
+
+## Coding Conventions
+
+- Keep backend Python 3.12 compatible.
+- Preserve dual-import fallback patterns in backend modules where present.
+- Prefer additive, minimal-risk changes over broad refactors.
+- Keep API docs and OpenAPI spec in sync with route changes.
+
+## Mandatory STATUS.md Updates
+
+- STATUS.md must be updated whenever implementation state, testing status, or project direction changes.
+- Every STATUS.md update must include a refreshed `Last updated` value with the current local date and time in format `YYYY-MM-DD HH:MM`.
+- Treat missing or stale STATUS.md timestamps as a blocking documentation error.
+
+## Current Gaps (Realistic)
+
+- No embedding-based semantic similarity yet.
+- No OCR pipeline for scanned PDFs/images.
+- Windows-specific path/ops behavior needs dedicated CI verification.
+- Frontend analysis flow needs deeper unit test coverage beyond modal tests.
+

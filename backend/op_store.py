@@ -4,18 +4,34 @@ Implements a small transactional store to replace the previous JSON file
 approach. Keeps file-based backups under `ops_backups/` for each operation.
 """
 
+# pylint: disable=broad-exception-caught,invalid-name,unused-variable
+
 import json
 import os
-import time
-import uuid
 import shutil
 import sqlite3
+import time
+import uuid
+import importlib
 from typing import Optional
 
 BASE = os.path.dirname(__file__)
-DB_FILE = os.path.join(BASE, 'ops.db')
-BACKUP_ROOT = os.path.join(BASE, 'ops_backups')
-INDEX_PRAGMA = 'PRAGMA journal_mode=WAL'
+DB_FILE = os.path.join(BASE, "ops.db")
+BACKUP_ROOT = os.path.join(BASE, "ops_backups")
+INDEX_PRAGMA = "PRAGMA journal_mode=WAL"
+
+# Optional: prefer sending to OS recycle/trash if available
+try:
+    send2trash_mod = importlib.import_module("send2trash")
+    send2trash = getattr(send2trash_mod, "send2trash", None)
+except Exception:
+    send2trash = None  # type: ignore
+
+# Optional: import fs_ops for generating consistent preview actions
+try:
+    from backend import fs_ops as fs_ops_mod
+except Exception:
+    fs_ops_mod = None
 
 
 def _ensure_dirs():
@@ -27,7 +43,7 @@ def _connect(db: Optional[str] = None):
     conn = sqlite3.connect(path, timeout=30, check_same_thread=False)
     try:
         conn.execute(INDEX_PRAGMA)
-        conn.execute('PRAGMA foreign_keys=ON')
+        conn.execute("PRAGMA foreign_keys=ON")
     except Exception:
         # best-effort: continue without explicit pragmas if unsupported
         pass
@@ -70,16 +86,18 @@ _init_db()
 
 def _row_to_op(row: sqlite3.Row) -> dict:
     return {
-        'id': row[0],
-        'suggestions': json.loads(row[1]) if row[1] else [],
-        'metadata': json.loads(row[2]) if row[2] else {},
-        'status': row[3],
-        'created_at': row[4],
-        'backup_dir': row[5],
+        "id": row[0],
+        "suggestions": json.loads(row[1]) if row[1] else [],
+        "metadata": json.loads(row[2]) if row[2] else {},
+        "status": row[3],
+        "created_at": row[4],
+        "backup_dir": row[5],
     }
 
 
-def create_op(suggestions: list, metadata: dict | None = None, op_id: str | None = None) -> dict:
+def create_op(
+    suggestions: list, metadata: dict | None = None, op_id: str | None = None
+) -> dict:
     _ensure_dirs()
     _init_db()
     if not op_id:
@@ -90,23 +108,30 @@ def create_op(suggestions: list, metadata: dict | None = None, op_id: str | None
     conn = _connect()
     cur = conn.cursor()
     sql = (
-        "INSERT OR REPLACE INTO ops (id, suggestions, metadata, status, created_at, backup_dir) "
-        "VALUES (?, ?, ?, ?, ?, ?)"
+        "INSERT OR REPLACE INTO ops (id, suggestions, metadata, status, created_at, "
+        "backup_dir) VALUES (?, ?, ?, ?, ?, ?)"
     )
     cur.execute(
         sql,
-        (op_id, json.dumps(suggestions), json.dumps(metadata or {}), 'preview', created_at, backup_dir),
+        (
+            op_id,
+            json.dumps(suggestions),
+            json.dumps(metadata or {}),
+            "preview",
+            created_at,
+            backup_dir,
+        ),
     )
     conn.commit()
     conn.close()
     return {
-        'id': op_id,
-        'suggestions': suggestions,
-        'metadata': metadata or {},
-        'status': 'preview',
-        'created_at': created_at,
-        'backup_dir': backup_dir,
-        'executed_actions': [],
+        "id": op_id,
+        "suggestions": suggestions,
+        "metadata": metadata or {},
+        "status": "preview",
+        "created_at": created_at,
+        "backup_dir": backup_dir,
+        "executed_actions": [],
     }
 
 
@@ -114,21 +139,28 @@ def get_op(op_id: str) -> dict | None:
     _init_db()
     conn = _connect()
     cur = conn.cursor()
-    cur.execute('SELECT id,suggestions,metadata,status,created_at,backup_dir FROM ops WHERE id=?', (op_id,))
+    cur.execute(
+        "SELECT id, suggestions, metadata, status, created_at, backup_dir "
+        "FROM ops WHERE id=?",
+        (op_id,),
+    )
     row = cur.fetchone()
     if not row:
         conn.close()
         return None
     op = _row_to_op(row)
     # load executed actions
-    cur.execute('SELECT seq, action FROM executed_actions WHERE op_id=? ORDER BY seq ASC', (op_id,))
+    cur.execute(
+        "SELECT seq, action FROM executed_actions WHERE op_id=? ORDER BY seq ASC",
+        (op_id,),
+    )
     acts = []
     for seq, action in cur.fetchall():
         try:
             acts.append(json.loads(action))
         except Exception:
-            acts.append({'raw': action})
-    op['executed_actions'] = acts
+            acts.append({"raw": action})
+    op["executed_actions"] = acts
     conn.close()
     return op
 
@@ -136,7 +168,7 @@ def get_op(op_id: str) -> dict | None:
 def update_op(op_id: str, **kwargs) -> dict | None:
     _init_db()
     # only allow updating certain columns
-    allowed = {'suggestions', 'metadata', 'status', 'backup_dir'}
+    allowed = {"suggestions", "metadata", "status", "backup_dir"}
     sets = []
     vals = []
     for k, v in kwargs.items():
@@ -160,12 +192,12 @@ def list_ops() -> dict:
     _init_db()
     conn = _connect()
     cur = conn.cursor()
-    cur.execute('SELECT id,suggestions,metadata,status,created_at,backup_dir FROM ops')
+    cur.execute("SELECT id, suggestions, metadata, status, created_at, backup_dir FROM ops")
     rows = cur.fetchall()
     out = {}
     for row in rows:
         op = _row_to_op(row)
-        out[op['id']] = op
+        out[op["id"]] = op
     conn.close()
     return out
 
@@ -175,23 +207,25 @@ def list_backups() -> dict:
     out = {}
     for opid, op in ops.items():
         files = []
-        bdir = op.get('backup_dir')
+        bdir = op.get("backup_dir")
         if bdir and os.path.exists(bdir):
             for root, _, fns in os.walk(bdir):
                 for fn in fns:
                     fp = os.path.join(root, fn)
                     try:
-                        files.append({
-                            'path': fp,
-                            'size': os.path.getsize(fp),
-                            'mtime': os.path.getmtime(fp),
-                        })
+                        files.append(
+                            {
+                                "path": fp,
+                                "size": os.path.getsize(fp),
+                                "mtime": os.path.getmtime(fp),
+                            }
+                        )
                     except (OSError, PermissionError):
                         continue
         out[opid] = {
-            'metadata': op.get('metadata', {}),
-            'files': files,
-            'status': op.get('status', ''),
+            "metadata": op.get("metadata", {}),
+            "files": files,
+            "status": op.get("status", ""),
         }
     return out
 
@@ -205,74 +239,139 @@ def add_executed_action(op_id: str, action: dict):
     conn = _connect()
     cur = conn.cursor()
     # determine next seq
-    cur.execute('SELECT MAX(seq) FROM executed_actions WHERE op_id=?', (op_id,))
+    cur.execute("SELECT MAX(seq) FROM executed_actions WHERE op_id=?", (op_id,))
     row = cur.fetchone()
     seq = (row[0] or 0) + 1
-    cur.execute('INSERT INTO executed_actions (op_id, seq, action) VALUES (?, ?, ?)',
-                (op_id, seq, json.dumps(action)))
+    cur.execute(
+        "INSERT INTO executed_actions (op_id, seq, action) VALUES (?, ?, ?)",
+        (op_id, seq, json.dumps(action)),
+    )
     conn.commit()
     conn.close()
     return True
 
 
 def _relpath_to_backup(backup_dir: str, src_path: str) -> str:
-    name = uuid.uuid4().hex + '_' + os.path.basename(src_path)
+    name = uuid.uuid4().hex + "_" + os.path.basename(src_path)
     return os.path.join(backup_dir, name)
 
 
-def backup_file(op_id: str, src_path: str) -> str | None:
+def backup_file(op_id: str, src_path: str, dry_run: bool = False) -> str | None:
+    """Create a backup copy of `src_path` under the op's backup dir.
+
+    If `dry_run` is True, do not perform the copy; instead return the
+    computed target path that would have been used.
+    """
     op = get_op(op_id)
     if not op:
         return None
-    backup_dir = op['backup_dir']
-    os.makedirs(backup_dir, exist_ok=True)
+    backup_dir = op["backup_dir"]
     target = _relpath_to_backup(backup_dir, src_path)
+    if dry_run:
+        # ensure backup_dir exists physically is not necessary for dry-run
+        return target
     try:
-        shutil.copy2(src_path, target)
+        os.makedirs(backup_dir, exist_ok=True)
+        if os.path.isdir(src_path) and not os.path.islink(src_path):
+            shutil.copytree(src_path, target)
+        else:
+            shutil.copy2(src_path, target)
         return target
     except (OSError, shutil.Error):
         return None
 
 
-def undo_op(op_id: str) -> dict:
+def _restore_backup(backup: str, orig: str):
+    os.makedirs(os.path.dirname(orig), exist_ok=True)
+    if os.path.isdir(backup) and not os.path.islink(backup):
+        if os.path.exists(orig):
+            shutil.rmtree(orig)
+        shutil.move(backup, orig)
+    else:
+        shutil.move(backup, orig)
+
+
+def undo_op(op_id: str, dry_run: bool = False) -> dict:
     op = get_op(op_id)
     if not op:
-        return {'error': 'not found'}
+        return {"error": "not found"}
     # load executed actions ordered descending
     conn = _connect()
     cur = conn.cursor()
-    cur.execute('SELECT action FROM executed_actions WHERE op_id=? ORDER BY seq DESC', (op_id,))
+    cur.execute(
+        "SELECT action FROM executed_actions WHERE op_id=? ORDER BY seq DESC", (op_id,)
+    )
     rows = cur.fetchall()
     results = []
+    preview = []
     for (action_json,) in rows:
         try:
             a = json.loads(action_json)
         except Exception:
-            results.append({'error': 'invalid action', 'raw': action_json})
+            results.append({"error": "invalid action", "raw": action_json})
             continue
-        backup = a.get('backup')
-        orig = a.get('from')
-        try:
-            if backup and os.path.exists(backup):
-                os.makedirs(os.path.dirname(orig), exist_ok=True)
-                shutil.move(backup, orig)
-                results.append({'restored': orig})
+        action_type = a.get("action_type") or a.get("action") or "move"
+        backup = a.get("backup")
+        orig = a.get("from")
+        dst = a.get("to")
+        if dry_run:
+            # produce preview entries without moving files
+            if fs_ops_mod:
+                if action_type == "create_symlink":
+                    preview.append(
+                        {
+                            "action": "remove_symlink",
+                            "from": dst,
+                            "to": orig,
+                            "status": "planned",
+                            "group": "Undo",
+                        }
+                    )
+                else:
+                    preview.append(
+                        fs_ops_mod.preview_move_action(backup or dst, orig, op.get("backup_dir"))
+                    )
             else:
-                results.append({'failed': orig})
+                preview.append({"action": "restore", "from": backup,
+                               "to": orig, "status": "would_restore"})
+            continue
+        try:
+            if action_type == "create_symlink":
+                if dst and os.path.islink(dst):
+                    os.unlink(dst)
+                if backup and os.path.exists(backup):
+                    _restore_backup(backup, dst)
+                results.append({"restored": dst})
+            elif backup and os.path.exists(backup):
+                if dst and os.path.exists(dst) and not backup.startswith(op.get("backup_dir") or ""):
+                    if os.path.isdir(dst) and not os.path.islink(dst):
+                        shutil.rmtree(dst)
+                    else:
+                        os.unlink(dst)
+                _restore_backup(backup, orig)
+                results.append({"restored": orig})
+            elif dst and os.path.exists(dst):
+                _restore_backup(dst, orig)
+                results.append({"restored": orig})
+            else:
+                results.append({"failed": orig})
         except (OSError, shutil.Error) as e:
-            results.append({'error': str(e), 'file': orig})
+            results.append({"error": str(e), "file": orig})
     conn.close()
-    set_op_status(op_id, 'reverted')
-    return {'restored': results}
+    if dry_run:
+        return {"op_id": op_id, "dry_run": True, "preview": preview}
+    set_op_status(op_id, "reverted")
+    return {"restored": results}
 
 
-def cleanup_recycle(retention_days: int = 30) -> dict:
+def cleanup_recycle(retention_days: int = 30, dry_run: bool = False) -> dict:
     now = time.time()
     cutoff = now - (retention_days * 24 * 3600)
     removed = 0
     scanned = 0
+    to_remove = []
     if not os.path.exists(BACKUP_ROOT):
-        return {'scanned': 0, 'removed': 0}
+        return {"scanned": 0, "removed": 0} if not dry_run else {"scanned": 0, "would_remove": 0, "files": []}
     for opid in os.listdir(BACKUP_ROOT):
         opdir = os.path.join(BACKUP_ROOT, opid)
         if not os.path.isdir(opdir):
@@ -283,42 +382,71 @@ def cleanup_recycle(retention_days: int = 30) -> dict:
                 try:
                     scanned += 1
                     if os.path.getmtime(fp) < cutoff:
-                        os.remove(fp)
-                        removed += 1
+                        if dry_run:
+                            try:
+                                size = os.path.getsize(fp)
+                            except Exception:
+                                size = 0
+                            to_remove.append(
+                                {"path": fp, "size": size, "mtime": os.path.getmtime(fp)})
+                        else:
+                            os.remove(fp)
+                            removed += 1
                 except (OSError, PermissionError):
                     continue
         # attempt to remove empty dirs
         try:
-            for root, _, files in os.walk(opdir, topdown=False):
-                if not os.listdir(root):
-                    os.rmdir(root)
-            if not os.listdir(opdir):
-                os.rmdir(opdir)
+            if not dry_run:
+                for root, _, files in os.walk(opdir, topdown=False):
+                    if not os.listdir(root):
+                        os.rmdir(root)
+                if not os.listdir(opdir):
+                    os.rmdir(opdir)
         except (OSError, PermissionError):
             pass
-    return {'scanned': scanned, 'removed': removed}
+    if dry_run:
+        total_bytes = sum(int(f.get("size") or 0) for f in to_remove)
+        return {"scanned": scanned, "would_remove": len(to_remove), "total_bytes": total_bytes, "files": to_remove}
+    return {"scanned": scanned, "removed": removed}
 
 
-def delete_op(op_id: str) -> bool:
+def delete_op(op_id: str, dry_run: bool = False):
     _init_db()
     conn = _connect()
     cur = conn.cursor()
-    cur.execute('SELECT backup_dir FROM ops WHERE id=?', (op_id,))
+    cur.execute("SELECT backup_dir FROM ops WHERE id=?", (op_id,))
     row = cur.fetchone()
     if not row:
         conn.close()
-        return False
+        return False if not dry_run else {"op_id": op_id, "dry_run": True, "files": []}
     bdir = row[0]
-    cur.execute('DELETE FROM ops WHERE id=?', (op_id,))
+    conn.close()
+
+    if dry_run:
+        files = []
+        if bdir and os.path.exists(bdir):
+            for root, _, fns in os.walk(bdir):
+                for fn in fns:
+                    fp = os.path.join(root, fn)
+                    try:
+                        files.append({"path": fp, "size": os.path.getsize(
+                            fp), "mtime": os.path.getmtime(fp)})
+                    except Exception:
+                        files.append({"path": fp})
+        return {"op_id": op_id, "dry_run": True, "files": files}
+
+    conn = _connect()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM ops WHERE id=?", (op_id,))
     conn.commit()
     conn.close()
     try:
         if bdir and os.path.exists(bdir):
-            # prefer os-native trash if available
             try:
-                from send2trash import send2trash  # type: ignore
-
-                send2trash(bdir)
+                if send2trash:
+                    send2trash(bdir)
+                else:
+                    shutil.rmtree(bdir)
             except Exception:
                 shutil.rmtree(bdir)
     except (OSError, shutil.Error):

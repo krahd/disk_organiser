@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="Demo screenshot: organise suggestions">
+  <rect width="100%" height="100%" fill="#fbfdff"/>
+  <text x="56" y="60" font-family="Inter, sans-serif" font-size="20" fill="#0f172a">Organise — Suggested moves</text>
+  <g transform="translate(60,110)">
+    <rect width="840" height="68" rx="8" fill="#fff" stroke="#e6eef8"/>
+    <text x="20" y="42" font-family="Inter, sans-serif" font-size="15" fill="#0f172a">Documents/report.pdf → Reports/2026/report.pdf</text>
+  </g>
+  <g transform="translate(60,200)">
+    <rect width="840" height="68" rx="8" fill="#fff" stroke="#e6eef8"/>
+    <text x="20" y="42" font-family="Inter, sans-serif" font-size="15" fill="#0f172a">Music/track01.mp3 → Music/Album/track01.mp3</text>
+  </g>
+</svg>

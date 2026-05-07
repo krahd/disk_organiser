@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Disk Organiser — Visualise & Organise Your Files</title>
+  <meta name="description" content="Disk Organiser — visualise, find duplicates and safely reorganise your filesystem with optional AI assistance." />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">
+        <img src="assets/logo.svg" alt="Disk Organiser logo" class="logo" />
+        <span class="brand-text">Disk Organiser</span>
+      </a>
+      <nav class="nav">
+        <a href="https://github.com/krahd/disk_organiser">Repository</a>
+        <a href="https://github.com/krahd/disk_organiser/tree/main/docs">Docs</a>
+        <a href="./demo/">Demo</a>
+        <a href="https://github.com/krahd/disk_organiser/releases">Releases</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-content">
+          <h1>Visualise, find duplicates, and safely reorganise your files</h1>
+          <p class="lead">Disk Organiser helps you understand disk usage, find repeated files, and apply safe, reversible reorganisation strategies — with optional AI-powered suggestions.</p>
+          <p class="hero-ctas">
+            <a class="btn primary" href="https://krahd.github.io/disk_organiser/">Open demo</a>
+            <a class="btn" href="https://github.com/krahd/disk_organiser/tree/main/docs">Read docs</a>
+          </p>
+        </div>
+        <div class="hero-visual">
+          <div class="screenshot">Preview of the visualiser</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap features">
+      <h2>Key Features</h2>
+      <div class="grid">
+        <article>
+          <h3>Disk visualisation</h3>
+          <p>Interactive maps and tree views show where space is used, helping you prioritise cleanup and organisation.</p>
+        </article>
+        <article>
+          <h3>Duplicate detection</h3>
+          <p>Find repeated files by content hash, size and metadata, with filters for date, size and type.</p>
+        </article>
+        <article>
+          <h3>Safe operations</h3>
+          <p>All automated operations create backup snapshots so you can preview and revert changes safely.</p>
+        </article>
+        <article>
+          <h3>Pluggable AI</h3>
+          <p>Integrate local or cloud models to get suggested organisation strategies tailored to your preferences.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="wrap quickstart">
+      <h2>Quick start</h2>
+      <p>Clone the repo, create a virtual environment, install requirements and run the backend:</p>
+      <pre><code>git clone https://github.com/krahd/disk_organiser.git
+cd disk_organiser
+python3 -m venv venv
+source venv/bin/activate
+pip install -r backend/requirements.txt
+python backend/app.py
+</code></pre>
+      <p>Open the frontend (`frontend/index.html`) in your browser (it expects the API at <code>http://127.0.0.1:5000</code> by default).</p>
+    </section>
+
+    <section class="wrap architecture">
+      <h2>Architecture & Integrations</h2>
+      <p>Disk Organiser is a small Flask backend with a static frontend. Model integrations live under <code>backend/model_wrappers/</code> and are optional. The app is designed to run locally and respects filesystem permissions.</p>
+    </section>
+
+    <section class="wrap contribute">
+      <h2>Contribute</h2>
+      <p>Contributions are welcome. See the documentation for development setup, tests and contribution guidelines in the <a href="https://github.com/krahd/disk_organiser/tree/main/docs">docs</a> folder.</p>
+      <p><strong>Quick links:</strong> <a href="https://github.com/krahd/disk_organiser/issues">Issues</a> · <a href="https://github.com/krahd/disk_organiser/pulls">Pull requests</a></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>© 2024–2026 Disk Organiser · <a href="https://github.com/krahd/disk_organiser/blob/main/LICENSE">MIT License</a></p>
+      <p>Hosted docs: <a href="https://krahd.github.io/disk_organiser/">krahd.github.io/disk_organiser</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

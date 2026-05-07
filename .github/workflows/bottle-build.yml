@@ -1,0 +1,347 @@
+name: Build and publish binaries
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: build-bottles-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sanity:
+    name: Sanity check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Print environment
+        run: |
+          echo "Sanity check: $GITHUB_WORKFLOW started"
+          echo "GITHUB_REF: $GITHUB_REF"
+          echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
+  test:
+    name: Run tests
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Python deps (pinned)
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          if [ -f backend/requirements-locked.txt ]; then
+            python -m pip install -r backend/requirements-locked.txt
+          else
+            python -m pip install -r backend/requirements.txt
+          fi
+
+      - name: Run backend tests
+        run: |
+          . .venv/bin/activate
+          pytest -q backend/tests
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run frontend tests
+        run: |
+          npm ci
+          npm test
+
+  build-macos:
+    needs: test
+    name: Build macOS binary
+    runs-on: macos-latest
+    env:
+      REF_NAME: ${{ github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install build dependencies
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade --force-reinstall setuptools==68.2.2 wheel
+          if [ -f backend/requirements-locked.txt ]; then
+            python -m pip install -r backend/requirements-locked.txt
+          else
+            python -m pip install -r backend/requirements.txt
+          fi
+          python -m pip install pyinstaller==5.13.0
+
+      - name: Build binary (macOS)
+        run: |
+          set -o pipefail
+          . .venv/bin/activate
+          mkdir -p out
+          # Capture PyInstaller output but don't abort the job if it fails
+          pyinstaller --noconfirm --clean --onefile --name disk-organiser \
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_macos.log
+
+      - id: package
+        name: Package macOS binary (with fallback)
+        run: |
+          mkdir -p out
+          if [ -f dist/disk-organiser ]; then
+            TARNAME=disk-organiser-${REF_NAME}-macos-$(uname -m)-bin.tar.gz
+            tar -C dist -czf out/${TARNAME} disk-organiser
+          else
+            echo "Binary not found; creating source tarball fallback"
+            TARNAME=disk-organiser-${REF_NAME}-source.tar.gz
+            # Prefer git archive when available, otherwise tar entire workspace
+            if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+              git archive --format=tar.gz -o out/${TARNAME} HEAD
+            else
+              tar -czf out/${TARNAME} .
+            fi
+          fi
+          shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
+          echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
+          echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
+          # Diagnostics: list produced files and show start of pyinstaller log
+          echo "--- DIAGNOSTICS: dist contents ---"
+          ls -la dist || true
+          echo "--- DIAGNOSTICS: out contents ---"
+          ls -la out || true
+          echo "--- DIAGNOSTICS: pyinstaller log (head) ---"
+          head -n 200 out/pyinstaller_macos.log || true
+
+      - name: Ensure build logs exist
+        if: always()
+        run: |
+          mkdir -p out
+          if [ ! -f out/pyinstaller_macos.log ]; then echo "No pyinstaller log produced" > out/pyinstaller_macos.log; fi
+
+      - name: Ensure dist exists for upload
+        if: always()
+        run: |
+          mkdir -p dist || true
+          # create marker if dist is empty so upload-artifact doesn't fail
+          if [ -z "$(ls -A dist 2>/dev/null)" ]; then touch dist/.no_dist_found; fi
+
+      - name: Upload mac artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-binary
+          path: out/${{ steps.package.outputs.tar }}
+
+      - name: Upload mac dist (if present)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-dist
+          path: dist
+
+      - name: Upload mac build output (logs + extras)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-out
+          path: out
+
+    outputs:
+      mac_tar: ${{ steps.package.outputs.tar }}
+      mac_sha: ${{ steps.package.outputs.sha }}
+
+  build-linux:
+    name: Build Linux binary
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      REF_NAME: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-venv build-essential
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade --force-reinstall setuptools==68.2.2 wheel
+          if [ -f backend/requirements-locked.txt ]; then
+            python -m pip install -r backend/requirements-locked.txt
+          else
+            python -m pip install -r backend/requirements.txt
+          fi
+          python -m pip install pyinstaller==5.13.0
+
+      - name: Build binary (Linux)
+        run: |
+          set -o pipefail
+          . .venv/bin/activate
+          mkdir -p out
+          # Capture PyInstaller output but don't abort the job if it fails
+          pyinstaller --noconfirm --clean --onefile --name disk-organiser \
+            --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_linux.log
+
+      - id: package
+        name: Package linux binary (with fallback)
+        run: |
+          mkdir -p out
+          if [ -f dist/disk-organiser ]; then
+            TARNAME=disk-organiser-${REF_NAME}-linux-$(uname -m)-bin.tar.gz
+            tar -C dist -czf out/${TARNAME} disk-organiser
+          else
+            echo "Binary not found; creating source tarball fallback"
+            TARNAME=disk-organiser-${REF_NAME}-source.tar.gz
+            if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+              git archive --format=tar.gz -o out/${TARNAME} HEAD
+            else
+              tar -czf out/${TARNAME} .
+            fi
+          fi
+          shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
+          echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
+          echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
+          # Diagnostics: list produced files and show start of pyinstaller log
+          echo "--- DIAGNOSTICS: dist contents ---"
+          ls -la dist || true
+          echo "--- DIAGNOSTICS: out contents ---"
+          ls -la out || true
+          echo "--- DIAGNOSTICS: pyinstaller log (head) ---"
+          head -n 200 out/pyinstaller_linux.log || true
+
+      - name: Ensure build logs exist
+        if: always()
+        run: |
+          mkdir -p out
+          if [ ! -f out/pyinstaller_linux.log ]; then echo "No pyinstaller log produced" > out/pyinstaller_linux.log; fi
+
+      - name: Ensure dist exists for upload
+        if: always()
+        run: |
+          mkdir -p dist || true
+          if [ -z "$(ls -A dist 2>/dev/null)" ]; then touch dist/.no_dist_found; fi
+
+      - name: Upload linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-binary
+          path: out/${{ steps.package.outputs.tar }}
+
+      - name: Upload linux dist (if present)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-dist
+          path: dist
+
+      - name: Upload linux build output (logs + extras)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-out
+          path: out
+
+    outputs:
+      linux_tar: ${{ steps.package.outputs.tar }}
+      linux_sha: ${{ steps.package.outputs.sha }}
+
+  publish-release:
+    name: Create release and update Homebrew tap
+    if: "startsWith(github.ref, 'refs/tags/')"
+    needs: [build-macos, build-linux]
+    runs-on: ubuntu-latest
+    env:
+      REF_NAME: ${{ github.ref_name }}
+    steps:
+      - name: Download mac artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-binary
+          path: artifacts
+
+      - name: Download linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-binary
+          path: artifacts
+
+      - id: compute
+        name: Compute filenames and checksums
+        run: |
+          MAC_TAR=$(ls artifacts/*macos*)
+          LINUX_TAR=$(ls artifacts/*linux*)
+          MAC_SHA=$(shasum -a 256 "$MAC_TAR" | awk '{print $1}')
+          LINUX_SHA=$(shasum -a 256 "$LINUX_TAR" | awk '{print $1}')
+          echo "mac_tar=$(basename "$MAC_TAR")" >> $GITHUB_OUTPUT
+          echo "mac_sha=$MAC_SHA" >> $GITHUB_OUTPUT
+          echo "linux_tar=$(basename "$LINUX_TAR")" >> $GITHUB_OUTPUT
+          echo "linux_sha=$LINUX_SHA" >> $GITHUB_OUTPUT
+
+      - id: create_release
+        name: Create GitHub release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: "Automated binary builds for ${{ github.ref_name }}"
+          files: |
+            artifacts/${{ steps.compute.outputs.mac_tar }}
+            artifacts/${{ steps.compute.outputs.linux_tar }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Homebrew tap formula (optional)
+        env:
+          HOME_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          REF_NAME: ${{ github.ref_name }}
+          MAC_TAR: ${{ steps.compute.outputs.mac_tar }}
+          MAC_SHA: ${{ steps.compute.outputs.mac_sha }}
+        run: |
+          if [ -z "$HOME_TAP_TOKEN" ]; then
+            echo "HOMEBREW_TAP_TOKEN not set; skipping homebrew tap update"
+            exit 0
+          fi
+          git clone https://x-access-token:${HOME_TAP_TOKEN}@github.com/krahd/homebrew-tap.git homebrew-tap
+          cd homebrew-tap
+          mkdir -p Formula
+          cat > Formula/disk-organiser.rb <<RUBY
+          class DiskOrganiser < Formula
+            desc "Visualise and safely organise files on your hard drive"
+            homepage "https://github.com/krahd/disk_organiser"
+            url "https://github.com/krahd/disk_organiser/releases/download/${REF_NAME}/${MAC_TAR}"
+            sha256 "${MAC_SHA}"
+            license "MIT"
+          
+            def install
+              bin.install "disk-organiser"
+            end
+          
+            test do
+              assert_predicate bin/"disk-organiser", :exist?
+            end
+          end
+          RUBY
+          git add Formula/disk-organiser.rb
+          git commit -m "disk-organiser: update formula for ${REF_NAME}" || true
+          git push origin HEAD:main

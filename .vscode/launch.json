@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Debug Backend (module)",
+      "type": "python",
+      "request": "launch",
+      "module": "backend.app",
+      "console": "integratedTerminal",
+      "env": {
+        "FLASK_ENV": "development",
+        "PYTHONUNBUFFERED": "1"
+      },
+      "cwd": "${workspaceFolder}"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug: Backend + Frontend",
+      "configurations": ["Python: Debug Backend (module)"]
+    }
+  ]
+}
