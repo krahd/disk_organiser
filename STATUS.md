@@ -169,8 +169,14 @@ No tests were run for the docs website refresh in this update.
 - Frontend analysis flow has less test depth than backend safety-critical logic.
 - Live Modelito planning quality depends on configured local runtime/model availability.
 
+## Recurring tasks
+
+- Keep hygiene checks current as packaging and release scripts evolve.
+- Keep browser and macOS client expectations aligned with backend response contracts.
+
 ## Pending tasks
 
+- Continue broad malformed-input fuzzing for any remaining lightly covered route shapes.
 - Add a Windows CI lane for filesystem/path behaviour.
 - Expand frontend unit tests for failed network calls and interrupted analysis/refinement flows.
 - Add integration coverage for large analysis payloads and capability indicator rendering.
