@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-05-06 23:41
+Last updated: 2026-05-07 00:55
 
 ## Project purpose
 
@@ -145,6 +145,7 @@ npm run test:visual
 - Runtime capability flags now report optional OCR and embedding availability.
 - Frontend analysis UI shows optional capability state.
 - Test coverage has been expanded around context building, analysis capability payloads, and frontend selection/refinement paths.
+- Public project website content and visual design were refreshed in `docs/index.html` and `docs/assets/style.css` with clearer safety messaging and updated quick-start links.
 
 ## Tests and verification status
 
@@ -158,6 +159,7 @@ Previously recorded successful checks:
 - Focused backend and frontend capability tests were also recorded as passing.
 
 No tests were run while producing this documentation-only status normalisation.
+No tests were run for the docs website refresh in this update.
 
 ## Known issues, risks, and limitations
 
@@ -193,4 +195,4 @@ No tests were run while producing this documentation-only status normalisation.
 
 ---
 
-Last updated: 2026-05-06 23:41
+Last updated: 2026-05-07 00:55
