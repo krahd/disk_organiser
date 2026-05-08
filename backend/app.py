@@ -745,7 +745,10 @@ def api_ollama_start():
     if sdk is None:
         return jsonify({"ok": False, "action": "start", "error": "modelito is unavailable", "ollama": _build_ollama_status(sdk)}), 503
     data = request.get_json(silent=True) or {}
-    timeout = float(data.get("timeout", 10.0))
+    try:
+        timeout = float(data.get("timeout", 10.0))
+    except (TypeError, ValueError):
+        return jsonify({"error": "invalid timeout"}), 400
     result = bool(sdk.start_ollama(host=_ollama_host(), port=_ollama_port(), timeout=timeout))
     status = _build_ollama_status(sdk)
     payload = {"ok": result, "action": "start", "ollama": status}
@@ -780,7 +783,10 @@ def api_ollama_pull():
         model_name = require_string(data, "model")
     except ValidationError as exc:
         return _error(str(exc), 400, "validation_error")
-    timeout = float(data.get("timeout", 600.0))
+    try:
+        timeout = float(data.get("timeout", 600.0))
+    except (TypeError, ValueError):
+        return _error("invalid timeout", 400, "validation_error")
     result = bool(sdk.download_model(model_name, timeout=timeout))
     status = _build_ollama_status(sdk)
     payload = {"ok": result, "action": "pull", "model": model_name, "ollama": status}
@@ -797,7 +803,10 @@ def api_ollama_serve():
         return jsonify({"ok": False, "action": "serve", "error": "modelito is unavailable", "ollama": _build_ollama_status(sdk)}), 503
     data = request.get_json(silent=True) or {}
     model_name = (data.get("model") or "").strip() or None
-    timeout = float(data.get("timeout", 10.0))
+    try:
+        timeout = float(data.get("timeout", 10.0))
+    except (TypeError, ValueError):
+        return jsonify({"error": "invalid timeout"}), 400
     result = bool(sdk.serve_model(model_name=model_name, timeout=timeout))
     status = _build_ollama_status(sdk)
     payload = {"ok": result, "action": "serve", "model": model_name, "ollama": status}
@@ -833,8 +842,14 @@ def api_preferences():
     """
     cfg = load_config()
     if request.method == "POST":
-        data = request.get_json(silent=True) or {}
+        data = request.get_json(silent=True)
+        if data is None:
+            data = {}
+        if not isinstance(data, dict):
+            return jsonify({"error": "invalid payload: expected object"}), 400
         prefs = data.get("preferences") or data
+        if not isinstance(prefs, dict):
+            return jsonify({"error": "invalid preferences: expected object"}), 400
         dry_run = bool(data.get("dry_run", False))
         save_config({"preferences": prefs}, dry_run=dry_run)
         return jsonify({"status": "Preferences updated", "preferences": prefs})

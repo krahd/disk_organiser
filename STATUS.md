@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-05-07 19:27
+Last updated: 2026-05-07 23:08
 
 ## Project purpose
 
@@ -162,6 +162,8 @@ npx playwright test frontend/visual
 - Frontend visual side-panel duplicate actions now honour `API_BASE`, improving testability and deployment flexibility for non-root API hosts.
 - Non-analysis malformed-input fuzzing was expanded in `backend/tests/test_non_analysis_input_fuzz.py` (14 tests) across organise, chat, model, recycle, scan-index, and maintenance routes.
 - Numeric validation hardening was added for `/api/recycle/cleanup`, `/api/scan_index/rebuild`, and `/api/scan_index/rebuild_async`, returning explicit `400` errors for malformed numeric payloads instead of implicit server errors.
+- Malformed-input fuzzing now covers lower-traffic write paths in Ollama lifecycle and preferences writes, including explicit timeout validation for `/api/ollama/start`, `/api/ollama/pull`, and `/api/ollama/serve`, and object-shape validation for `POST /api/preferences`.
+- `backend/tests/test_non_analysis_input_fuzz.py` now includes 19 route-level malformed-input cases spanning organise/recycle/scan-index/maintenance plus Ollama and preferences writes.
 - Public project website content and visual design were refreshed in `docs/index.html` and `docs/assets/style.css` with clearer safety messaging and updated quick-start links.
 
 ## Tests and verification status
@@ -183,8 +185,8 @@ Current session verification:
 - `pytest -q backend/tests/test_analysis_api.py` -> passed (8 tests).
 - `pytest -q backend/tests/test_analysis_interruption.py` -> passed (11 tests).
 - `pytest -q backend/tests/test_analysis_payloads.py` -> passed (6 tests).
-- `pytest -q backend/tests/test_non_analysis_input_fuzz.py` -> passed (14 tests).
-- `pytest -q backend/tests` -> passed (75 tests).
+- `pytest -q backend/tests/test_non_analysis_input_fuzz.py` -> passed (19 tests).
+- `pytest -q backend/tests` -> passed (80 tests).
 - `python scripts/validate_openapi.py` -> passed (38 routes).
 - `npm test -- --runInBand frontend/__tests__/organise.analysis.test.js` -> passed (16 tests).
 - `npx playwright test frontend/visual/analysis-interruption.spec.js` -> passed (2 tests).
@@ -204,11 +206,11 @@ Current session verification:
 
 ## Pending tasks
 
-- Extend malformed-input fuzzing to lower-traffic write paths (Ollama lifecycle actions, preferences writes) for parity with the organise/recycle/scan-index coverage.
+- Extend malformed-input fuzzing to read/status and auxiliary endpoints (`/api/ops`, `/api/recycle/list`, `/api/maintenance/status`) to tighten contract consistency across the full API surface.
 
 ## Next steps
 
-1. Extend malformed-input fuzzing to remaining lower-traffic write routes.
+1. Extend malformed-input fuzzing to read/status and auxiliary endpoints.
 2. Keep visual tests deterministic as new UI/API paths are introduced.
 3. Keep OpenAPI documentation in sync with route changes.
 
@@ -226,4 +228,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-05-07 19:27
+Last updated: 2026-05-07 23:08

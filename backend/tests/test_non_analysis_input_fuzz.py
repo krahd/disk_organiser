@@ -94,6 +94,20 @@ class _FakeScanIndex:
         }
 
 
+class _FakeOllamaSDK:
+    @staticmethod
+    def start_ollama(host, port, timeout=10.0):
+        return True
+
+    @staticmethod
+    def download_model(model_name, timeout=600.0):
+        return True
+
+    @staticmethod
+    def serve_model(model_name=None, timeout=10.0):
+        return True
+
+
 @pytest.mark.parametrize(
     "endpoint,body,expected_error",
     [
@@ -139,3 +153,54 @@ def test_scan_index_and_maintenance_routes_validate_numeric_payloads(
     assert response.status_code == 400
     payload = response.get_json()
     assert expected_error in str(payload.get("error"))
+
+
+@pytest.mark.parametrize(
+    "endpoint,body,expected_error",
+    [
+        (
+            "/api/ollama/start",
+            {"timeout": "bad"},
+            "invalid timeout",
+        ),
+        (
+            "/api/ollama/pull",
+            {"model": "llama3.2:3b", "timeout": "bad"},
+            "invalid timeout",
+        ),
+        (
+            "/api/ollama/serve",
+            {"model": "llama3.2:3b", "timeout": "bad"},
+            "invalid timeout",
+        ),
+    ],
+)
+def test_ollama_write_routes_validate_timeout(monkeypatch, endpoint, body, expected_error):
+    monkeypatch.setattr(app, "_load_modelito_sdk", lambda: _FakeOllamaSDK)
+    client = app.app.test_client()
+
+    response = client.post(endpoint, json=body)
+    assert response.status_code == 400
+    payload = response.get_json()
+    error = payload.get("error")
+    if isinstance(error, dict):
+        error_text = error.get("message") or str(error)
+    else:
+        error_text = str(error)
+    assert expected_error in error_text
+
+
+def test_preferences_write_rejects_non_object_payload_shape():
+    client = app.app.test_client()
+
+    response = client.post("/api/preferences", json=["not", "an", "object"])
+    assert response.status_code == 400
+    assert "expected object" in str(response.get_json().get("error"))
+
+
+def test_preferences_write_rejects_non_object_preferences_field():
+    client = app.app.test_client()
+
+    response = client.post("/api/preferences", json={"preferences": ["bad"]})
+    assert response.status_code == 400
+    assert "invalid preferences" in str(response.get_json().get("error"))
