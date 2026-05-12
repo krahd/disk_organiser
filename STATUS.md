@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-05-07 23:08
+Last updated: 2026-05-12 03:25
 
 ## Project purpose
 
@@ -139,6 +139,8 @@ npx playwright test frontend/visual
 
 ## Recent changes
 
+- Backend Python dependencies now pin `modelito==1.4.1` in both `backend/requirements.txt` and `backend/requirements-locked.txt` (from `1.2.2`) to align with the latest upstream release.
+- Backend Python dependencies were then advanced to `modelito==1.4.3` in both dependency pin files to track the new upstream latest version.
 - Model provider selection is normalised through Modelito.
 - Ollama lifecycle management is exposed through dedicated API routes and preferences UI.
 - Runtime capability flags now report optional OCR and embedding availability.
@@ -179,6 +181,8 @@ Previously recorded successful checks:
 
 Current session verification:
 
+- `python -c "import modelito; print(modelito.__version__)"` -> `1.4.1`.
+- `source venv/bin/activate && pip index versions modelito` -> latest `1.4.3`, installed `1.4.1` before migration.
 - `npm test --silent` -> frontend suite passed (3 suites, 19 tests).
 - `npm test -- --runInBand frontend/__tests__/organise.analysis.test.js` -> passed (15 tests).
 - `npm run format:check` -> passed.
@@ -228,4 +232,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-05-07 23:08
+Last updated: 2026-05-12 03:25
