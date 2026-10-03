@@ -21,20 +21,28 @@ Download (latest releases): https://github.com/krahd/disk_organiser/releases
 
 ## Quick start (macOS / Linux)
 
-Create a virtual environment, install dependencies and run the API:
+Bootstrap the local dependencies once, then launch the complete application:
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r backend/requirements.txt
-python backend/app.py
+./scripts/bootstrap.sh
+./scripts/dev.sh
 ```
 
-Open `frontend/index.html` in a browser. The frontend uses relative `/api` paths
-by default. For local development run the backend with `python backend/app.py`
-(default API: `http://127.0.0.1:5000`). When running in Docker the backend runs
-on port `8000` (see `Dockerfile` / `docker-compose.yml`). You can override the
-frontend API base at runtime by setting `window._DISK_ORGANISER_API_BASE`.
+Open `http://127.0.0.1:8000`. The development launcher serves the frontend and
+proxies its relative `/api` requests to the Flask backend on
+`http://127.0.0.1:5000`, so the UI and API work together from one browser
+origin. Do **not** open `frontend/index.html` directly: a `file://` page cannot
+use the application's relative API routes correctly.
+
+To verify the reversible filesystem workflow without touching real user files:
+
+```bash
+venv/bin/python3 scripts/validate_user_workflow.py
+```
+
+When running in Docker the backend runs on port `8000` (see `Dockerfile` /
+`docker-compose.yml`). You can still override the frontend API base at runtime
+by setting `window._DISK_ORGANISER_API_BASE`.
 
 ## Screenshot
 

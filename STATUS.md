@@ -6,6 +6,18 @@ Last updated: 2026-05-12 03:25
 
 Disk Organiser is a local-first filesystem organisation tool. It analyses user-selected folders, proposes typed organisation actions, previews them before execution, and preserves reversible operation history through backups and undo support.
 
+## Product recovery gate
+
+The supported local launch path is now `./scripts/bootstrap.sh` followed by
+`./scripts/dev.sh`, with the frontend served at `http://127.0.0.1:8000` and
+`/api` proxied to the Flask backend. Direct `file://` loading of
+`frontend/index.html` is not a supported runnable product path.
+
+`scripts/validate_user_workflow.py` is the release-blocking disposable
+acceptance check for duplicate discovery, preview, dry-run, execution, and
+undo/restoration. A paid build is not considered ready unless this gate and the
+browser/UI checks pass on the target release environment.
+
 ## Current implementation state
 
 The repository currently has an implemented end-to-end semantic organisation workflow:
