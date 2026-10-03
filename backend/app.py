@@ -18,9 +18,10 @@ import threading
 import time
 import traceback
 import uuid
+import webbrowser
 from dataclasses import asdict, is_dataclass
 
-from flask import Flask, Response, jsonify, request, stream_with_context
+from flask import Flask, Response, jsonify, request, send_from_directory, stream_with_context
 from flask_cors import CORS
 
 # Optional Redis/RQ imports (may not be installed in development environments)
@@ -169,6 +170,29 @@ except Exception:
     pass
 
 app = Flask(__name__)
+
+
+def _frontend_dir() -> str:
+    """Return the bundled/static frontend directory in source and frozen builds."""
+    frozen_root = getattr(sys, "_MEIPASS", None)
+    if frozen_root:
+        return os.path.join(frozen_root, "frontend")
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))
+
+
+FRONTEND_DIR = _frontend_dir()
+
+
+@app.route("/ui/")
+def ui_index():
+    """Serve the customer-facing Disk Organiser application."""
+    return send_from_directory(FRONTEND_DIR, "index.html")
+
+
+@app.route("/ui/<path:asset>")
+def ui_asset(asset: str):
+    """Serve bundled frontend assets from the same origin as the API."""
+    return send_from_directory(FRONTEND_DIR, asset)
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO").upper(),
     format="%(asctime)s %(levelname)s %(name)s event=%(message)s",
@@ -1491,4 +1515,10 @@ except Exception:
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.getenv("PORT", "5000"))
+    frozen = bool(getattr(sys, "frozen", False))
+    open_browser = os.getenv("DISK_ORGANISER_OPEN_BROWSER")
+    should_open_browser = open_browser == "1" or (frozen and open_browser != "0")
+    if should_open_browser:
+        threading.Timer(0.8, lambda: webbrowser.open(f"http://127.0.0.1:{port}/ui/")).start()
+    app.run(host="127.0.0.1", port=port, debug=not frozen, use_reloader=False)
