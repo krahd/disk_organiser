@@ -19,6 +19,16 @@ Demo (static): https://krahd.github.io/disk_organiser/demo/
 Download (latest releases): https://github.com/krahd/disk_organiser/releases
 
 
+## Run the application
+
+Use the repository launcher:
+
+```bash
+./scripts/dev.sh
+```
+
+It creates an ignored `.venv` when needed, starts the API and frontend as one same-origin process, and opens `http://127.0.0.1:5000/ui/`. Set `DISK_ORGANISER_OPEN_BROWSER=0` for headless runs.
+
 ## Quick start (macOS / Linux)
 
 Create a virtual environment, install dependencies and run the API:
