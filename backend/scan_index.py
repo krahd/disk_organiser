@@ -12,8 +12,13 @@ import sqlite3
 import time
 from typing import List, Optional
 
+try:
+    from backend.runtime_paths import data_path
+except ImportError:  # direct-script compatibility
+    from runtime_paths import data_path
+
 BASE = os.path.dirname(__file__)
-DB_FILE = os.path.join(BASE, "scan_index.db")
+DB_FILE = data_path("scan_index.db")
 INDEX_PRAGMA = "PRAGMA journal_mode=WAL"
 
 
