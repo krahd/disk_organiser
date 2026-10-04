@@ -4,7 +4,12 @@ import json
 import os
 import tempfile
 
-CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config.json")
+try:
+    from backend.runtime_paths import data_path
+except ImportError:  # direct-script compatibility
+    from runtime_paths import data_path
+
+CONFIG_FILE = data_path("config.json")
 DEFAULT_MODEL = "modelito"
 
 

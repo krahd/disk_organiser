@@ -35,6 +35,11 @@ except ImportError:
     Queue = None  # type: ignore
     _REDIS_AVAILABLE = False
 
+try:
+    from backend.runtime_paths import data_path
+except ImportError:  # direct-script compatibility
+    from runtime_paths import data_path
+
 
 def _import_local_module(module_name: str, filename: str):
     """Load a module from the local `backend` directory by filename.
@@ -207,7 +212,7 @@ if cors_allowed:
 else:
     CORS(app)
 logger = logging.getLogger(__name__)
-MAINT_FILE = os.path.join(os.path.dirname(__file__), "maintenance_status.json")
+MAINT_FILE = data_path("maintenance_status.json")
 
 
 def _normalize_model_selection(model_name: str | None) -> str:

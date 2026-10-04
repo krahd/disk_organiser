@@ -10,14 +10,19 @@ import json
 import os
 import shutil
 import sqlite3
+
+try:
+    from backend.runtime_paths import data_path
+except ImportError:  # direct-script compatibility
+    from runtime_paths import data_path
 import time
 import uuid
 import importlib
 from typing import Optional
 
 BASE = os.path.dirname(__file__)
-DB_FILE = os.path.join(BASE, "ops.db")
-BACKUP_ROOT = os.path.join(BASE, "ops_backups")
+DB_FILE = data_path("ops.db")
+BACKUP_ROOT = data_path("ops_backups")
 INDEX_PRAGMA = "PRAGMA journal_mode=WAL"
 
 # Optional: prefer sending to OS recycle/trash if available

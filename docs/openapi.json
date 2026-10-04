@@ -201,6 +201,16 @@
       "get": {
         "summary": "Get macOS backup status"
       }
+    },
+    "/ui/": {
+      "get": {
+        "summary": "Serve packaged frontend"
+      }
+    },
+    "/ui/{path:asset}": {
+      "get": {
+        "summary": "Serve packaged frontend asset"
+      }
     }
   }
 }
