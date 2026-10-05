@@ -82,3 +82,47 @@ def test_background_scan_thread(tmp_path):
         time.sleep(0.2)
     assert status is not None
     assert status.get("status") == "finished"
+
+def test_execute_revalidates_paths_after_symlink_change(tmp_path):
+    root = tmp_path / "root"
+    outside = tmp_path / "outside"
+    target = root / "target"
+    root.mkdir()
+    outside.mkdir()
+    target.mkdir()
+    source = root / "a.txt"
+    source.write_text("hello", encoding="utf-8")
+    destination = target / "a.txt"
+
+    client = app.app.test_client()
+    preview = client.post(
+        "/api/organise/preview",
+        json={
+            "suggestions": [
+                {
+                    "action_type": "move",
+                    "source": str(source),
+                    "destination": str(destination),
+                    "confidence": 1.0,
+                }
+            ],
+            "metadata": {"user": "test", "paths": [str(root)]},
+        },
+    )
+    assert preview.status_code == 200
+    op_id = preview.get_json()["op"]["id"]
+
+    target.rmdir()
+    try:
+        target.symlink_to(outside, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        import pytest
+        pytest.skip("symlinks unavailable in test environment")
+
+    response = client.post("/api/organise/execute", json={"op_id": op_id})
+
+    assert response.status_code == 409
+    payload = response.get_json()
+    assert payload["error"]["code"] == "unsafe_operation"
+    assert source.exists()
+    assert not (outside / "a.txt").exists()

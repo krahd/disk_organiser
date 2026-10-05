@@ -639,6 +639,25 @@ def api_organise_execute():
         selected_set = {int(index) for index in selected_actions if isinstance(index, int)}
         normalized_actions = [action for idx, action in enumerate(
             normalized_actions) if idx in selected_set]
+
+    execution_roots = op.get("metadata", {}).get("paths")
+    if execution_roots:
+        try:
+            roots = _normalize_paths(execution_roots, default_to_cwd=False) or []
+            revalidated_actions, rejected_actions = validate_actions(
+                normalized_actions, allowed_roots=roots
+            )
+        except (TypeError, ValueError) as exc:
+            return _error(str(exc), 409, "unsafe_operation")
+        if rejected_actions or len(revalidated_actions) != len(normalized_actions):
+            return _error(
+                "operation is no longer safe to execute",
+                409,
+                "unsafe_operation",
+                rejected=rejected_actions,
+            )
+        normalized_actions = revalidated_actions
+
     if dry_run:
         # Produce a non-destructive preview of actions without touching disk.
         try:
