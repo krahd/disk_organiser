@@ -13,13 +13,30 @@ def _abs(path: str | None) -> str | None:
     return os.path.abspath(path)
 
 
-def _is_within_roots(path: str | None, allowed_roots: Sequence[str]) -> bool:
+def _canonical(path: str | None) -> str | None:
+    """Return an absolute path with symlinked ancestors resolved.
+
+    ``realpath`` also preserves a non-existent trailing component while
+    resolving existing parents. That is important for planned destinations:
+    a missing file below a symlinked directory must still be checked against
+    the directory the symlink actually targets.
+    """
     candidate = _abs(path)
+    if candidate is None:
+        return None
+    return os.path.realpath(candidate)
+
+
+def _is_within_roots(path: str | None, allowed_roots: Sequence[str]) -> bool:
+    candidate = _canonical(path)
     if candidate is None:
         return False
     for root in allowed_roots:
+        canonical_root = _canonical(root)
+        if canonical_root is None:
+            continue
         try:
-            if os.path.commonpath([candidate, _abs(root)]) == _abs(root):
+            if os.path.commonpath([candidate, canonical_root]) == canonical_root:
                 return True
         except ValueError:
             continue
