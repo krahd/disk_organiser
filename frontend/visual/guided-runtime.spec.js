@@ -210,7 +210,7 @@ test("loading and uncertain apply never invite an automatic retry", async ({ pag
   await expect(page.locator("#scan")).toBeDisabled();
   await expect(page.locator("#apply")).toHaveCount(0);
   await screenshot(page, testInfo, "guided-uncertain-result.png");
-  await page.getByRole("button", { name: "Refresh history" }).click();
+  await page.getByRole("button", { name: "Refresh session and history" }).click();
   await expect(page.locator("#scan")).toBeEnabled();
   expect(fs.readdirSync(root)).toEqual(["Notes.txt"]);
 });
@@ -250,4 +250,64 @@ test("default build remains read-only even after reviewing a complete layout", a
   await expect(page.locator("#approve")).toHaveCount(0);
   expect(fs.readdirSync(root)).toEqual(["Notes.txt"]);
   await screenshot(page, testInfo, "guided-read-only-default.png");
+});
+
+test("read-only session survives backend restart after deliberate refresh without page reload", async ({
+  page,
+}, testInfo) => {
+  const root = folder("Session restart read only", [
+    ["Notes.txt", "Synthetic session-only fixture"],
+  ]);
+  await scan(page, root);
+  let posts = 0;
+  page.on("request", (request) => {
+    if (request.method() === "POST") posts++;
+  });
+  await stopServer();
+  await startServer(false);
+  await page.getByRole("button", { name: "Scan and preview" }).click();
+  await expect(page.locator("#status")).toContainText("No request is retried automatically");
+  await expect(page.locator("#scan")).toBeDisabled();
+  expect(posts).toBe(1);
+  await page.getByRole("button", { name: "Refresh session and history" }).click();
+  await expect(page.locator("#scan")).toBeEnabled();
+  expect(posts).toBe(1);
+  await page.getByRole("button", { name: "Scan and preview" }).click();
+  await expect(page.locator("#status")).toContainText("Overview saved");
+  expect(posts).toBe(2);
+  await expect(page.locator("#apply")).toHaveCount(0);
+  expect(fs.readdirSync(root)).toEqual(["Notes.txt"]);
+  await screenshot(page, testInfo, "guided-session-reconnected.png");
+});
+
+test("unsupported scanning preserves readable history without offering a scan", async ({
+  page,
+}, testInfo) => {
+  await page.route("**/api/guided/session", (route) =>
+    route.fulfill({
+      json: {
+        token: "read-only-test",
+        capabilities: { scan: { enabled: false }, copy_apply: { enabled: false } },
+      },
+    })
+  );
+  await page.route("**/api/guided/plans", (route) =>
+    route.fulfill({
+      json: {
+        plans: [],
+        blocked_records: 0,
+        capabilities: { scan: { enabled: false }, copy_apply: { enabled: false } },
+      },
+    })
+  );
+  await page.goto(url);
+  await expect(page.locator("#scan")).toBeDisabled();
+  await expect(page.locator("#scan-availability")).toContainText(
+    "Scanning is unavailable on this platform"
+  );
+  await expect(page.locator("#refresh")).toBeEnabled();
+  await page.getByRole("button", { name: "Refresh session and history" }).click();
+  await expect(page.locator("#status")).toContainText("Session and history refreshed");
+  await expect(page.locator("#scan")).toBeDisabled();
+  await screenshot(page, testInfo, "guided-scan-unsupported.png");
 });

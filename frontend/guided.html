@@ -34,9 +34,9 @@
       <aside class="notice" aria-labelledby="safety-title">
         <h2 id="safety-title">Read-only preview. Copying is not enabled.</h2>
         <p id="mode-description">
-          You can inspect a local file-type overview and compare a proposed copy layout. This build
-          will not apply that layout. The wider Disk Map, project relationships and reviewed
-          transaction/recovery layer are still being developed.
+          You can inspect a local file-type overview and compare a proposed copy layout. This
+          workflow will not apply that layout. The wider Disk Map, project relationships and
+          reviewed transaction/recovery layer are still being developed.
         </p>
       </aside>
       <section aria-labelledby="choose-title">
@@ -85,6 +85,9 @@
             interpret the contents.
           </p>
         </form>
+        <p id="scan-availability" class="notice" role="status">
+          Checking scanning support on this platform.
+        </p>
         <details>
           <summary>Check what this first version can safely inspect</summary>
           <p>
@@ -104,12 +107,12 @@
       <section aria-labelledby="history-title">
         <div class="section-heading">
           <h2 id="history-title">Saved plans and results</h2>
-          <button type="button" id="refresh" class="secondary">Refresh history</button>
+          <button type="button" id="refresh" class="secondary">Refresh session and history</button>
         </div>
         <p class="muted">
           The latest 50 plans are saved on this computer. A saved plan is a record, not proof that
-          its files are still unchanged. After an app restart, scan again before copying. Nothing
-          resumes automatically.
+          its files are still unchanged. After an app restart, refresh this session. Scan again for
+          current observations when supported. Nothing resumes automatically.
         </p>
         <p id="history-notice" class="notice" hidden></p>
         <div id="history"></div>

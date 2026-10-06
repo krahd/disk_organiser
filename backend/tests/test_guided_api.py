@@ -56,7 +56,11 @@ def test_real_api_scan_apply_recover(client, tmp_path):
 def test_default_ui_is_local_guided_workflow(client):
     response = client.get('/ui/')
     assert response.status_code == 200
-    assert b'Guided copies' in response.data
+    content = b' '.join(response.data.split())
+    assert b'Read-only preview. Copying is not enabled.' in content
+    assert b'Start with a file-type overview' in content
+    assert b'This workflow will not apply that layout.' in content
+    assert b'id="approve"' not in response.data
     assert b'fonts.googleapis' not in response.data
     assert b'nav-recycle' not in response.data
 

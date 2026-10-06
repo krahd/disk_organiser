@@ -2,7 +2,7 @@
 
 > Safety acceptance is held. Independent review found a persisted-journal trust flaw in the earlier copy-first candidate. Defensive repair validates all saved data, makes the app read-only by default, requires a fresh in-process preview for explicitly opted-in synthetic copy tests, and disables automatic recovery removal. Keep all originals, copies and journals. See [current safety limits](docs/GUIDED-COPIES.md) before synthetic development use.
 
-Disk Organiser is a local-first prototype. Its default guided workflow scans a chosen local folder, explains an exact extension-based copy plan, requires approval, verifies copies and retains all data when recovery cannot be safely established. Originals stay in place; no disk space is reclaimed.
+Disk Organiser is a local-first prototype. Its default guided workflow scans a chosen local folder, explains a file-type overview and compares the current layout with an exact proposed copy layout. This default workflow is read-only: it does not apply copies or offer automatic removal. Copy execution exists only for explicitly enabled synthetic development tests with fresh approval. Originals stay in place; no disk space is reclaimed.
 
 The first version supports top-level regular files on macOS/Linux, up to 500 entries and 1 GiB. It excludes cloud/synced/network folders, links and metadata-preserving copies. [Read the workflow and recovery limits](docs/GUIDED-COPIES.md) before use. Guided mode uses no AI or external services. Legacy analysis/move/delete interfaces remain experimental and are outside the guided guarantees.
 
@@ -48,14 +48,17 @@ frontend API base at runtime by setting `window._DISK_ORGANISER_API_BASE`.
 ![Frontend screenshot](frontend/images/screenshot.svg)
 
 
-## Features
+## Current default workflow
 
-- Scan directories and detect duplicate files using content hashing.
-- Lightweight visualisation of folder structure and sizes, with optional semantic folder insights.
-- Preview organise suggestions and execute operations with automatic backups.
-- Build rich file contexts and ask the model layer to propose reversible actions.
-- Refine proposed actions conversationally before executing them.
-- Optional macOS Time Machine status and local snapshot creation before execution.
+- Inspect a bounded top-level file-type overview, including skipped entries and limits.
+- Compare keeping the current layout with a proposed extension-based copy layout.
+- Inspect searchable, paged exact paths without applying changes.
+- Revisit local history with explicit stale-session, unsupported-platform and unavailable-recovery states.
+- No AI or external services in this guided workflow. The broader read-only Disk Map remains future work.
+
+## Retained experimental interfaces
+
+The legacy interface is retained outside default navigation. It includes duplicate detection, directory visualisation, optional model-generated plans and chat refinement, and backup/move/undo infrastructure. These are not the default guided experience or a safety guarantee. Legacy mutation routes are separately disabled by default; release and real-folder acceptance remain held. See [the current boundaries](docs/GUIDED-COPIES.md).
 
 ## Docker / Compose
 

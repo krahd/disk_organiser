@@ -23,9 +23,12 @@ const fixture = (count = 1) => ({
   })),
   skipped: [{ path: "Nested folder", reason: "Nested folders unsupported" }],
 });
-let calls, preview, records;
+let calls, preview, records, runtimeCapabilities, sessionToken, blockedRecords;
 async function boot() {
   calls = [];
+  runtimeCapabilities = { scan: { enabled: true }, copy_apply: { enabled: true } };
+  sessionToken = "test-token";
+  blockedRecords = 0;
   preview = fixture();
   records = [];
   document.documentElement.innerHTML = fs.readFileSync(
@@ -38,17 +41,31 @@ async function boot() {
       return {
         ok: true,
         json: async () => ({
-          token: "test-token",
-          capabilities: { copy_apply: { enabled: true } },
+          token: sessionToken,
+          capabilities: runtimeCapabilities,
         }),
       };
-    if (options?.method === "POST" && url.endsWith("/plans"))
+    if (options?.method === "POST" && url.endsWith("/plans")) {
+      if (options.headers["X-Guided-Token"] !== sessionToken)
+        return {
+          ok: false,
+          status: 403,
+          json: async () => ({ error: "Refresh the local application before making changes." }),
+        };
       return { ok: true, json: async () => preview };
+    }
     if (url.endsWith("/apply")) {
       records = [{ ...preview, state: "completed", can_apply: false }];
       return { ok: true, json: async () => records[0] };
     }
-    return { ok: true, json: async () => ({ plans: records, blocked_records: 0 }) };
+    return {
+      ok: true,
+      json: async () => ({
+        plans: records,
+        blocked_records: blockedRecords,
+        capabilities: runtimeCapabilities,
+      }),
+    };
   });
   const script = document.createElement("script");
   script.textContent = fs.readFileSync(path.resolve(__dirname, "../guided.js"), "utf8");
@@ -173,10 +190,7 @@ test("empty supported set explains incomplete coverage and has no apply", async 
   );
 });
 test("invalid saved records are counted and retained without recovery controls", async () => {
-  window.fetch.mockImplementationOnce(async () => ({
-    ok: true,
-    json: async () => ({ plans: [], blocked_records: 2 }),
-  }));
+  blockedRecords = 2;
   document.getElementById("refresh").click();
   await flush();
   expect(document.getElementById("history-notice").hidden).toBe(false);
@@ -198,14 +212,7 @@ test("saved record review restores the overview without trusting persisted appro
 });
 
 test("read-only capability cannot be overcome by a plan capability and does not suggest rescan enables copying", async () => {
-  window.fetch.mockImplementationOnce(async () => ({
-    ok: true,
-    json: async () => ({
-      plans: [],
-      blocked_records: 0,
-      capabilities: { copy_apply: { enabled: false } },
-    }),
-  }));
+  runtimeCapabilities.copy_apply.enabled = false;
   document.getElementById("refresh").click();
   await flush();
   await scan();
@@ -214,4 +221,66 @@ test("read-only capability cannot be overcome by a plan capability and does not 
     "scanning again will not enable it"
   );
   expect(document.getElementById("safety-title").textContent).toContain("Read-only preview");
+});
+
+test("read-only session refresh replaces a restarted backend token without retrying the failed scan", async () => {
+  runtimeCapabilities.copy_apply.enabled = false;
+  document.getElementById("refresh").click();
+  await flush();
+  sessionToken = "restarted-session";
+  await scan(false);
+  expect(document.getElementById("scan").disabled).toBe(true);
+  expect(document.getElementById("status").textContent).toContain(
+    "No request is retried automatically"
+  );
+  expect(calls.filter(([, o]) => o?.method === "POST")).toHaveLength(1);
+  document.getElementById("refresh").click();
+  await flush();
+  expect(document.getElementById("scan").disabled).toBe(false);
+  expect(calls.filter(([, o]) => o?.method === "POST")).toHaveLength(1);
+  await scan(false);
+  const posts = calls.filter(([, o]) => o?.method === "POST");
+  expect(posts).toHaveLength(2);
+  expect(posts[1][1].headers["X-Guided-Token"]).toBe("restarted-session");
+  expect(document.getElementById("apply")).toBeNull();
+});
+
+test("unsupported or missing scan capability disables scan while preserving history refresh", async () => {
+  runtimeCapabilities = { scan: { enabled: false }, copy_apply: { enabled: false } };
+  records = [{ ...fixture(), can_apply: false }];
+  document.getElementById("refresh").click();
+  await flush();
+  expect(document.getElementById("scan").disabled).toBe(true);
+  expect(document.getElementById("refresh").disabled).toBe(false);
+  expect(document.getElementById("scan-availability").textContent).toContain(
+    "unavailable on this platform"
+  );
+  button("Review saved preview").click();
+  expect(document.getElementById("preview").textContent).toContain("Saved snapshot");
+  await scan(false);
+  expect(calls.filter(([, o]) => o?.method === "POST")).toHaveLength(0);
+  delete runtimeCapabilities.scan;
+  document.getElementById("refresh").click();
+  await flush();
+  expect(document.getElementById("scan").disabled).toBe(true);
+  expect(document.getElementById("scan-availability").textContent).toContain(
+    "has not been confirmed"
+  );
+});
+
+test("empty read-only overview rescan and exact layout use conditional wording", async () => {
+  runtimeCapabilities.copy_apply.enabled = false;
+  document.getElementById("refresh").click();
+  await flush();
+  preview = fixture(0);
+  await scan(false);
+  button("Choose this folder for a new scan").click();
+  expect(document.getElementById("status").textContent).toContain("current read-only overview");
+  expect(document.getElementById("status").textContent).not.toContain("before copying");
+  preview = fixture();
+  await scan(true);
+  expect(document.getElementById("preview").textContent).toContain(
+    "This proposed layout would copy"
+  );
+  expect(document.getElementById("preview").textContent).not.toContain("This will copy");
 });

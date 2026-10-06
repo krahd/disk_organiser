@@ -320,7 +320,8 @@ class GuidedStore:
             if plan['state'] == 'completed':
                 return plan  # idempotent response to an uncertain/repeated submission
             if plan['state'] != 'preview' or not plan['actions']:
-                raise GuidedError('Plan cannot be applied. Recover an interrupted operation or create a new preview.')
+                raise GuidedError('Plan cannot be applied. Retain all data and inspect the saved result manually. '
+                                  'Automatic removal is unavailable.')
             if time.time() - plan['created'] > 3600:
                 raise GuidedError('Preview expired after one hour. Scan again.')
             if not self._fresh_preview(plan):
@@ -354,7 +355,8 @@ class GuidedStore:
                     self.save(plan)
                 except Exception as exc:
                     plan['state'] = 'interrupted'
-                    plan['error'] = f'{type(exc).__name__}: {exc}. Originals retained; use recovery.'
+                    plan['error'] = (f'{type(exc).__name__}: {exc}. Originals and generated files retained; '
+                                     'inspect the saved result manually. Automatic removal is unavailable.')
                     self.save(plan)
                 finally:
                     if output is not None:
@@ -397,7 +399,8 @@ class GuidedStore:
         _sync(folder)
         copy = fingerprint(folder, name)
         if copy['sha256'] != action['fingerprint']['sha256'] or fingerprint(root, name) != action['fingerprint']:
-            raise GuidedError('Verification changed; retain originals and inspect recovery.')
+            raise GuidedError('Verification changed; retain all originals and generated files. '
+                              'Inspect the saved result manually; automatic removal is unavailable.')
         action['result_fingerprint'] = copy
         action['state'] = 'copied'
         self.save(plan)

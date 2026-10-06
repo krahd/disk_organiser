@@ -51,9 +51,9 @@ No filesystem/API/schema change, new dependency, telemetry, model request, remot
 | Large lists do not bury the full scope | 25 rows, search, counts, full-plan warning, no implicit selection |
 | External services remain off | Browser request allowlist observes only the synthetic localhost server |
 
-Local executed checks: 4 Jest suites, 31 tests passed; full frontend Prettier check passed. Browser specifications are added but must pass on the final published commit; this document does not convert a build or unit test into a visual test. The restricted local runtime was not bypassed.
+Local executed checks: 4 Jest suites, 34 tests passed; full frontend Prettier check passed. Browser specifications are added but must pass on the final published commit; this document does not convert a build or unit test into a visual test. The restricted local runtime was not bypassed.
 
-Browser evidence specification: real Flask + Chromium, freshly generated synthetic files only. Captures desktop overview/exact preview, 390 px preview, retained results, closed preview, no supported entries, 500-file filtered preview, loading, uncertain result, restarted read-only plan and a final default-mode read-only build. Seven scenarios are specified. Images must be inspected after the exact-head CI run. These scripted walkthroughs do not constitute observed beginner-user or assistive-technology research.
+Browser evidence specification: real Flask + Chromium, freshly generated synthetic files only. Captures desktop overview/exact preview, 390 px preview, retained results, closed preview, no supported entries, 500-file filtered preview, loading, uncertain result, restarted read-only plan and a final default-mode read-only build. Nine scenarios are specified, including a read-only backend restart without page reload and an unsupported-scan capability response. Images must be inspected after the exact-head CI run. These scripted walkthroughs do not constitute observed beginner-user or assistive-technology research.
 
 ## Durable backlog, ordered by dependency
 
@@ -82,7 +82,7 @@ Browser evidence specification: real Flask + Chromium, freshly generated synthet
 
 ## Product direction added from supplied comments
 
-The user supplied further product comments on 2026-10-06. Their central proposal is adopted as product direction, not as evidence that any capability is implemented: **a read-only Disk Map is the main product path**. This checkpoint is only a top-level extension overview and restricted copy-review foundation. It does not implement a Disk Model, semantic understanding, project discovery, version relationships or cross-drive accounting. Competitor pricing/features and platform-policy assertions in the comments have not been independently reverified here and are not used as implementation facts.
+The user supplied further product comments on 2026-10-06. Their central proposal is adopted as product direction, not as evidence that any capability is implemented: **a read-only Disk Map is the main product path**. This checkpoint is only a top-level extension overview and restricted copy-review foundation. It does not implement a Disk Model, semantic understanding, project discovery, version relationships or cross-drive accounting. The competitor page check below distinguishes advertised capabilities from tested behaviour. Platform-policy assertions in the comments are not treated as verified implementation requirements.
 
 The next read-only model/UX contract must include:
 
@@ -96,3 +96,22 @@ The next read-only model/UX contract must include:
 - Optional later semantic models behind explicit data/provider disclosure. No direct LLM filesystem authority, content upload, broad disk-access request or silent cloud fallback.
 
 Sequence: bounded read-only inventory/model → deterministic evidence-backed relationships → Disk Map and evidence drill-down → read-only coherent plans → independently reviewed transaction/recovery semantics → separately gated application on synthetic fixtures. Existing copy mode is a restricted experiment alongside this path, not a reason to skip it. A new model owner and UX owner should agree on the structured schema before implementing relationship-specific views.
+
+
+## Review repair checkpoint
+
+Independent source and ordinary read-only review found five gaps: a stale API test blocked CI before screenshots; three core errors invited unavailable recovery; history refresh kept a restarted backend's stale token; scan capability was ignored; and several read-only messages implied copying. All are repaired in this checkpoint. Explicit refresh now renews session/capabilities and reads history before unlocking work, with no automatic retry. Missing/unsupported scan capability is fail-closed while history stays usable. The engine changes are only three message strings (AST structure verified unchanged); no mutation policy or recovery implementation changed.
+
+Local repair verification: 34 UI tests, frontend formatting, JavaScript syntax, one focused default-UI API test and focused backend lint passed. The initial exact-head CI run `37502869039` failed the former “Guided copies” content assertion and produced no browser artifact. New exact-head CI and image review are still required. Reviewer testing remains ordinary read-only behaviour; no prohibited probe or experimental operation is required for confirmation.
+
+
+## First-party competitor check, 6 October 2026
+
+These are advertised capabilities and asking prices, not measured reliability, sales or retention. No competing software was purchased, installed or tested.
+
+- [Cosmos US listing](https://apps.apple.com/us/app/cosmos-ai-files-assistant/id6759027625?mt=12): $24.99; advertises local organisation, approval/undo, search and learning. Recent releases include project grouping and broader document analysis, so project-oriented organisation is already represented.
+- [Gather US listing](https://apps.apple.com/us/app/gather-smart-file-manager/id6786433086?mt=12): free tier and $9.99 one-time Pro purchase; advertises on-device analysis, rules, simulation, history and individual/batch/session undo.
+- [MintFolder Local](https://app.mintfolder.ai/local?lang=en): advertises review, collision checks, batch journalling and interrupted-operation recovery. Its stated last-batch undo is not evidence of arbitrary historical recovery.
+- [Tidium listing](https://apps.apple.com/pl/app/tidium-ai-file-organizer/id6788663430?mt=12): advertises content-aware organisation, renaming/search, duplicate cleanup and previews, with local processing by default and optional cloud processing. This Polish listing is not a US price source.
+
+The read-only Disk Model/Map is a coherent direction, not an uncontested feature gap. Differentiation must be demonstrated through useful project/version relationships, transparent uncertainty and trustworthy handling of messy storage. A feature checklist or an “AI organiser” label does not establish that value.

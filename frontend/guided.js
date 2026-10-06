@@ -3,10 +3,11 @@
   const $ = (id) => document.getElementById(id);
   let token;
   let copyEnabled = false;
+  let scanEnabled = false;
   let busy = false;
   let current = null;
   let generation = 0;
-  let mustRefresh = false;
+  let mustRefresh = true;
   let detailCounter = 0;
   const status = (message, kind = "info") => {
     $("status").textContent = message;
@@ -40,6 +41,12 @@
     }[plan.state] || "Saved record needs checking");
   function capabilities(value) {
     copyEnabled = value?.copy_apply?.enabled === true;
+    scanEnabled = value?.scan?.enabled === true;
+    $("scan-availability").hidden = scanEnabled;
+    $("scan-availability").textContent =
+      value?.scan?.enabled === false
+        ? "Scanning is unavailable on this platform. This bounded preview requires supported macOS/Linux file APIs. Saved history is still available."
+        : "Scanning support has not been confirmed. Refresh session and history to reconnect. Saved history remains available when the local app can be reached.";
     $("safety-title").textContent = copyEnabled
       ? "Synthetic development mode: copying enabled, removal unavailable."
       : "Read-only preview. Copying is not enabled.";
@@ -59,19 +66,33 @@
           }
     );
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || `Request failed (${response.status}).`);
+    if (!response.ok) {
+      const error = new Error(data.error || `Request failed (${response.status}).`);
+      error.status = response.status;
+      throw error;
+    }
     return data;
+  }
+  async function loadSession() {
+    const data = await api("session");
+    if (typeof data.token !== "string" || !data.token)
+      throw new Error("The local app did not provide a valid session.");
+    token = data.token;
+    capabilities(data.capabilities);
   }
   function setBusy(value) {
     busy = value;
-    $("scan").disabled = value || !token || mustRefresh;
-    $("refresh").disabled = value || !token;
+    $("scan").disabled = value || !token || !scanEnabled || mustRefresh;
+    $("refresh").disabled = value;
     $("root").disabled = value;
     $("goals").disabled = value;
     $("preview").setAttribute("aria-busy", String(value));
     document.querySelectorAll(".operation-button").forEach((button) => {
       button.disabled =
-        value || mustRefresh || (button._approval && (!button._approval.checked || !copyEnabled));
+        value ||
+        mustRefresh ||
+        (button._needsScan && !scanEnabled) ||
+        (button._approval && (!button._approval.checked || !copyEnabled));
     });
   }
   async function run(work) {
@@ -80,7 +101,15 @@
     try {
       await work();
     } catch (error) {
-      status(`${error.message} Refresh history to check the latest saved result.`, "error");
+      if (error.status === 403) {
+        token = null;
+        mustRefresh = true;
+        closePreview();
+      }
+      status(
+        `${error.message} Refresh session and history before trying again. No request is retried automatically.`,
+        "error"
+      );
     } finally {
       setBusy(false);
     }
@@ -185,9 +214,15 @@
       "secondary operation-button"
     );
     button.type = "button";
+    button._needsScan = true;
+    button.disabled = !scanEnabled;
     button.onclick = () => {
-      if (busy || mustRefresh) return;
-      closePreview("Folder selected. Scan again to check its current files before copying.");
+      if (busy || mustRefresh || !scanEnabled) return;
+      closePreview(
+        copyEnabled
+          ? "Folder selected. Scan again to check its current files before reviewing a new copy request."
+          : "Folder selected. Scan again for a current read-only overview. Copying remains disabled."
+      );
       $("root").value = plan.root;
       focus($("root"));
     };
@@ -331,7 +366,7 @@
     effects.append(
       node(
         "p",
-        `This will copy all ${plan.actions.length} listed files. Filtering the list does not select a subset. No original will be moved, renamed or removed.`,
+        `This proposed layout would copy all ${plan.actions.length} listed files. Filtering the list does not select a subset. No original will be moved, renamed or removed.`,
         "scope-note"
       )
     );
@@ -492,7 +527,7 @@
   });
   $("scan-form").onsubmit = (event) => {
     event.preventDefault();
-    if (busy || mustRefresh || !token) return;
+    if (busy || mustRefresh || !token || !scanEnabled) return;
     closePreview();
     const version = ++generation;
     run(async () => {
@@ -508,19 +543,23 @@
   };
   $("refresh").onclick = () =>
     run(async () => {
+      mustRefresh = true;
+      token = null;
       closePreview();
+      await loadSession();
       await history();
       mustRefresh = false;
       status(
-        "History refreshed. Check the latest result before deciding what to do. Any copy request needs a newly reviewed plan."
+        copyEnabled
+          ? "Session and history refreshed. Check the latest result before deciding what to do. Any copy request needs a newly reviewed plan."
+          : "Session and history refreshed. Saved snapshots do not show current folder changes. Scan again for a current read-only overview when scanning is supported."
       );
     });
   setBusy(true);
-  api("session")
-    .then(async (data) => {
-      token = data.token;
-      capabilities(data.capabilities);
+  loadSession()
+    .then(async () => {
       await history();
+      mustRefresh = false;
     })
     .catch((error) =>
       status(
