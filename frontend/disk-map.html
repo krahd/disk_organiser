@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; connect-src 'none'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Disk Organiser · Read-only Disk Map</title>
+    <link rel="icon" href="images/logo.svg" />
+    <link rel="stylesheet" href="disk-map.css" />
+    <script src="model-assets/bundled.js" defer></script>
+    <script src="disk-map-model.js" defer></script>
+    <script src="disk-map.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#open-title">Skip to opening a model</a>
+    <header class="shell masthead">
+      <a class="brand" href="guided.html"><img src="images/logo.svg" alt="" />Disk Organiser</a>
+      <span class="privacy-pill">Read-only · In this tab</span>
+    </header>
+    <main class="shell">
+      <section class="welcome" aria-labelledby="page-title">
+        <p class="eyebrow">DISK MAP · LOCAL INTEGRATION PREVIEW</p>
+        <h1 id="page-title">See the patterns. Check the evidence.</h1>
+        <p>
+          Explore the folders, file relationships and unanswered questions in a Disk Model export. A
+          possible project or version family is a hypothesis you can inspect.
+        </p>
+        <p class="boundary">
+          This viewer does not scan your drive, contact a model, or change files. Organisation and
+          recovery actions are unavailable.
+        </p>
+      </section>
+      <section class="open-panel" aria-labelledby="open-title">
+        <div>
+          <h2 id="open-title" tabindex="-1">Open a storage snapshot</h2>
+          <p>
+            Start with fabricated example data, or open a Disk Model v1 JSON export. Its structure
+            and references are checked before display.
+          </p>
+          <div class="open-actions">
+            <button id="example" type="button">Explore synthetic example</button>
+            <label class="file-label" for="model-file"
+              >Open a model export<input
+                id="model-file"
+                type="file"
+                accept=".json,application/json"
+                aria-describedby="import-help"
+            /></label>
+          </div>
+          <p id="import-help" class="muted">
+            Up to 8 MiB and 20,000 entries. Read locally, never uploaded. Exports may contain
+            private paths, metadata and hashes. Nothing is saved to browser storage.
+          </p>
+        </div>
+        <div class="session-actions">
+          <button id="cancel-import" type="button" class="secondary" hidden>Cancel opening</button>
+          <button id="clear-model" type="button" class="secondary" disabled>Clear this tab</button>
+        </div>
+      </section>
+      <p id="map-status" role="status" aria-live="polite" aria-atomic="true">
+        No model is open. Your files have not been inspected.
+      </p>
+      <section id="map-content" hidden aria-labelledby="map-title">
+        <div class="snapshot-heading">
+          <div>
+            <p id="model-origin" class="eyebrow"></p>
+            <h2 id="map-title" tabindex="-1">Storage snapshot</h2>
+          </div>
+          <span class="privacy-pill">No actions can run</span>
+        </div>
+        <div id="coverage-banner" class="notice"></div>
+        <div id="storage-summary" class="metrics"></div>
+        <details id="scope-details">
+          <summary>Scope, freshness and measurement limits</summary>
+          <div id="scope-content"></div>
+        </details>
+        <div class="explorer">
+          <section class="browse" aria-labelledby="browse-title">
+            <h2 id="browse-title" tabindex="-1">Explore the model</h2>
+            <div class="tabs" role="tablist" aria-label="Model views">
+              <button
+                type="button"
+                id="tab-findings"
+                role="tab"
+                aria-selected="true"
+                aria-controls="map-results"
+                tabindex="0"
+                data-view="findings"
+              >
+                Questions
+              </button>
+              <button
+                type="button"
+                id="tab-directories"
+                role="tab"
+                aria-selected="false"
+                aria-controls="map-results"
+                tabindex="-1"
+                data-view="directories"
+              >
+                Folders
+              </button>
+              <button
+                type="button"
+                id="tab-relationships"
+                role="tab"
+                aria-selected="false"
+                aria-controls="map-results"
+                tabindex="-1"
+                data-view="relationships"
+              >
+                Relationships
+              </button>
+              <button
+                type="button"
+                id="tab-entries"
+                role="tab"
+                aria-selected="false"
+                aria-controls="map-results"
+                tabindex="-1"
+                data-view="entries"
+              >
+                All entries
+              </button>
+              <button
+                type="button"
+                id="tab-plans"
+                role="tab"
+                aria-selected="false"
+                aria-controls="map-results"
+                tabindex="-1"
+                data-view="plans"
+              >
+                Review choices
+              </button>
+            </div>
+            <div class="filters">
+              <label for="map-search"
+                >Find a path, group or question<input
+                  type="search"
+                  id="map-search"
+                  autocomplete="off"
+                  placeholder="Search this view"
+              /></label>
+              <label for="map-filter"
+                >Show<select id="map-filter">
+                  <option value="all">All questions</option>
+                </select></label
+              >
+            </div>
+            <p id="view-explanation" class="muted"></p>
+            <p id="result-count" role="status" aria-live="polite"></p>
+            <div id="map-results" role="tabpanel" aria-labelledby="tab-findings" tabindex="0"></div>
+            <div class="pagination">
+              <button id="previous-page" type="button" class="secondary">Previous 25</button
+              ><button id="next-page" type="button" class="secondary">Next 25</button>
+            </div>
+          </section>
+          <section id="map-detail" class="detail" hidden aria-labelledby="detail-title">
+            <div class="detail-actions">
+              <button id="detail-back" type="button" class="secondary" hidden>
+                Back to previous detail</button
+              ><button id="detail-close" type="button" class="secondary">Close details</button>
+            </div>
+            <h2 id="detail-title" tabindex="-1"></h2>
+            <div id="detail-content"></div>
+          </section>
+        </div>
+      </section>
+      <section class="empty-guidance" id="empty-guidance" aria-labelledby="limits-title">
+        <h2 id="limits-title">Understanding before organisation</h2>
+        <ol>
+          <li>See what was observed and what the scan missed</li>
+          <li>Open a hypothesis to see its evidence and uncertainty</li>
+          <li>Compare read-only review choices while every file stays unchanged</li>
+        </ol>
+        <p>
+          A matching name or hash does not establish a preferred version, a reliable backup or a
+          file that is safe to remove. This preview makes no recoverable-space estimate.
+        </p>
+      </section>
+    </main>
+    <footer class="shell">
+      Imported observations are not verified against the current disk. No upload, model request,
+      file operation or automatic persistence occurs here.
+      <a href="guided.html">Return to the bounded folder preview</a>
+    </footer>
+  </body>
+</html>

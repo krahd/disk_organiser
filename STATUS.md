@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 14:51
+Last updated: 2026-10-06 16:59
 
 ## Project purpose
 
@@ -172,6 +172,26 @@ npx playwright test frontend/visual
 
 - Final wording CI at `b1c3f2e` passed the same backend/browser checks and 35 UI tests. Image inspection then identified an evidence-capture race with asynchronous history expansion. Screenshot helpers now wait for idle except the deliberately held loading state, and assert PNG height matches stable document height. This is a test-only capture correction; current exact-head evidence is recorded on PR 12.
 
+## Read-only Disk Map import integration
+
+- Separate source-only integration based on accepted guided PR 12 `27b3c676` and the model-owned files from published `96c58ba4`. The accepted PR/source is unchanged; the producer has its own separately approved draft PR 13. This checkpoint creates no PR and enables no mutation or recovery.
+- Nine model-owned source/test/schema/fixture/document files are copied byte-for-byte. Existing shared guided STATUS/documentation is retained and extended rather than replaced by the model branch's older copies.
+- `frontend/disk-map.html`, `disk-map.js`, `disk-map-model.js` and `disk-map.css` add an import-only model viewer linked from the existing guided page. No backend routes, scanner hooks, root-scope capabilities, copy flags or recovery semantics change.
+- The viewer exposes evidence-backed findings, possible folder roles, version/content relationships, neutral entries, qualified logical/allocation measures and non-executable review alternatives. It does not invent project understanding, backup health or coherent organisation plans.
+- Imports are bounded, validated and kept only in tab memory. Invalid/oversized/interrupted imports preserve the accepted view; Clear invalidates pending results and removes rendered private labels. Text is never interpreted as HTML or used as a URL.
+- Canonical schema/fixture browser assets and a reproducible parity checker are included. Strict contract validation plus reference/accounting checks precede display. Unsupported schema vocabulary fails closed.
+- Verification is checkpointed explicitly: the previously cancelled chain was approved and passed at local baseline `b79b807` (83 tests, asset parity, formatting). Current source-review repairs have 99 tests plus 59 unchanged producer tests passing; final formatting, source preservation, exact-commit browser/pixel evidence and fresh independent confirmation are tracked separately. Ten static browser scenarios are prepared.
+- Read `docs/ux/DISK-MAP-IMPORT-CHECKPOINT.md` for precise import/privacy limits, acceptance criteria, provenance and the next review boundary. This is a bounded export viewer, not an integrated live-drive scanner or release.
+
+## Disk Map source-review repair boundary
+
+- The partial local integration was preserved as `b79b807`; the cancelled helper/format/test chain was rerun only after explicit approval and completed successfully. Historical passes are not attributed to later source.
+- Imports now decode/parse/validate in a fixed local Web Worker; cancellation terminates it. Text, collection, reference and rendered-DOM budgets reject unmanageable inputs before replacement. The accepted model is retained while a new view is prepared off-DOM and committed atomically.
+- Unique-path search avoids repeated member-path expansion. Lists, evidence and member pages expose display limits and omitted counts. Long labels wrap, and paging preserves keyboard focus when Next disappears.
+- Recursive directory accounting and coverage reconcile with the parent graph and recorded gaps. Scan completion, change categories and hash-state summaries are checked for contradictions.
+- Same-object aliases are checked for consistent size/allocation/fingerprints before totals, independent of order. Exact large integer observations are retained without deriving authority from inode/device numbers.
+- Producer source/schema/fixtures remain byte-identical to `96c58ba4`; backend routes and all mutation/root-scope guards remain identical to accepted PR 12. No new PR, deployment or real-user operation belongs to this source-only checkpoint.
+
 ## Recent changes
 
 - Backend Python dependencies now pin `modelito==1.4.1` in both `backend/requirements.txt` and `backend/requirements-locked.txt` (from `1.2.2`) to align with the latest upstream release.
@@ -270,4 +290,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 14:51
+Last updated: 2026-10-06 16:59

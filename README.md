@@ -56,6 +56,12 @@ frontend API base at runtime by setting `window._DISK_ORGANISER_API_BASE`.
 - Revisit local history with explicit stale-session, unsupported-platform and unavailable-recovery states.
 - No AI or external services in this guided workflow. The broader read-only Disk Map remains future work.
 
+## Read-only Disk Map export preview
+
+The separate integration preview at `/ui/disk-map.html` opens a Disk Model v1 export or bundled synthetic example. It presents selected-root coverage, logical versus allocated/unknown storage, possible project/archive/inbox roles, file relationships, evidence and non-executable review choices. It does not scan, mutate files or contact a model. Imports stay in tab memory and are not uploaded. [Read the import/privacy limits and current verification](docs/ux/DISK-MAP-IMPORT-CHECKPOINT.md).
+
+This remains a structured observation viewer, not complete project understanding or a coherent reorganisation engine. The producer CLI/library is documented in [Disk Model v1](docs/DISK-MODEL-V1.md). Opening a JSON export never grants access to the paths it contains.
+
 ## Retained experimental interfaces
 
 The legacy interface is retained outside default navigation. It includes duplicate detection, directory visualisation, optional model-generated plans and chat refinement, and backup/move/undo infrastructure. These are not the default guided experience or a safety guarantee. Legacy mutation routes are separately disabled by default; release and real-folder acceptance remain held. See [the current boundaries](docs/GUIDED-COPIES.md).
