@@ -23,3 +23,10 @@
 3. Review the synthetic-browser-evidence artifact: desktop/mobile exact preview and persisted recovery. No source-user files may be added to fixtures.
 4. Request an independent safety review of stale/race boundaries, interrupted journal states, copy ownership, original-preserving recovery and UI approvals. Implement findings on the same dedicated branch and rerun affected checks.
 5. Remaining product work: native Windows guided operations, macOS filesystem/device acceptance, broader metadata/cloud/network handling, bounded async scan/cancel UX, and separately audited move/delete semantics. Do not claim a release or complete all-product acceptance from this checkpoint.
+
+## Remote checkpoint and CI repair
+
+- Draft PR: https://github.com/krahd/disk_organiser/pull/11
+- Initial implementation SHA: `2000c2cba31c0ceb81eb5fcbff17796472bdd974`, remotely read back.
+- Initial PR CI run `37497015208` passed the Python dependency audit, then exposed a collection error in the preserved pre-existing safety test because Linux changed into `backend/` before importing the `backend` package. Both OS jobs now invoke `python -m pytest -q backend/tests` from the repository root, matching local verification. This preserves the regression test rather than deleting it.
+- Replacement exact-head CI is pending after this focused workflow repair. Do not treat the initial failed run as current green evidence.

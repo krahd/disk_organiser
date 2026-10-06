@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 13:34
+Last updated: 2026-10-06 13:38
 
 ## Project purpose
 
@@ -141,6 +141,7 @@ npx playwright test frontend/visual
 
 ## Guided implementation checkpoint (2026-10-06)
 
+- CI now runs Python tests from the repository root on both operating systems to retain package-import compatibility with the preserved safety regression tests. Initial PR run failed collection before this fix; current evidence is in the checkpoint.
 - All filesystem API routes reject cross-origin browser requests and non-localhost Host values, including retained legacy routes.
 - Default UI: new `frontend/guided.html`, `guided.css`, `guided.js`, with exact previews, skipped reasons, separate approvals and persistent history. No external resources or model calls.
 - New `backend/guided.py` performs only bounded top-level copies, preserving originals, using no-follow descriptors, exclusive destination creation, SHA-256 verification, durable journal checkpoints, whole-plan stale checks and fail-closed recovery. It supports POSIX only; Windows is explicitly unsupported for this workflow.
@@ -249,4 +250,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 13:34
+Last updated: 2026-10-06 13:38
