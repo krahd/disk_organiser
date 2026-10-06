@@ -521,7 +521,7 @@ def test_failed_hash_attempts_consume_file_read_budget(tmp_path, monkeypatch):
     def rewrite(fd, size):
         chunk = real_read(fd, size)
         for name in ("a", "b", "c"):
-            (tmp_path / name).write_bytes(b"5678")
+            (tmp_path / name).write_bytes(b"56789")
         return chunk
 
     monkeypatch.setattr(dm.os, "read", rewrite)
@@ -547,7 +547,7 @@ def test_stale_hardlink_invalidates_previously_verified_alias(tmp_path, monkeypa
         chunk = real_read(fd, size)
         calls += 1
         if calls == 2:
-            source.write_bytes(b"5678")
+            source.write_bytes(b"56789")
         return chunk
 
     monkeypatch.setattr(dm.os, "read", rewrite_second)

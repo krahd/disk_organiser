@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 14:40
+Last updated: 2026-10-06 14:46
 
 ## Project purpose
 
@@ -234,10 +234,14 @@ the synthetic fixture and metadata/hash/cancelled temporary-tree exports using a
 existing environment validator. The initial independent review found seven edge cases involving ancestor renames,
 hard-link freshness, hash attempts, unknown identities, subtree coverage and
 import/schema validation. All have fixes and regression tests; independent recheck
-is pending. This is a WIP checkpoint, not safety or release acceptance. Exact-commit
-remote CI is pending publication. No new dependency was added.
+passed. This is a WIP checkpoint, not safety or release acceptance. Initial remote
+CI passed Windows backend/OpenAPI; Ubuntu passed 228 tests and found two race
+fixtures relying on fine timestamp resolution. Fixtures now use guaranteed size
+changes; exact-head repeat CI is pending. No production check was weakened and no
+new dependency was added. Local status-diagram browser rendering was blocked by
+container socket permissions; visual diagram QA remains unverified.
 
-Remaining: independent review, dedicated read-only UI/API integration, Windows
+Remaining: exact-head CI, dedicated read-only UI/API integration, Windows
 traversal (currently explicit abstention), real-platform acceptance, persistent
 paged indexing and resumable scans, broader contextual relationships, optional
 local semantics and editable grouping plans. Existing transaction/recovery gates,
@@ -310,4 +314,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 14:40
+Last updated: 2026-10-06 14:46

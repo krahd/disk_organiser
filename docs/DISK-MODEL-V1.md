@@ -212,7 +212,9 @@ conversion into unique physical storage or recoverable space. `physical_bytes`
 and `recoverable_bytes` are always null.
 
 A scan is not an atomic snapshot. Fingerprint checks can detect many changes but
-cannot establish hostile-concurrent-writer safety. Changed traversed ancestors
+cannot establish hostile-concurrent-writer safety. Same-size writes within a
+filesystem timestamp interval can evade metadata freshness checks; the model must
+never be used as action-time proof that a file is unchanged. Changed traversed ancestors
 invalidate descendant confidence. Unreadable, disappeared, stale, excluded,
 unsupported and unvisited states remain explicit; no empty/deleted inference is
 made from absent observations. Cloud placeholders and network mounts cannot be
@@ -278,3 +280,28 @@ no new production or test dependency was added. Exact-commit remote CI and an
 independent review remain required before any broader integration or readiness
 claim. No private research, user-disk inventory, credentials or contents are
 included in the committed fixture or documentation.
+
+## Reviewed checkpoint and CI
+
+The independent correction review re-ran the original disposable reproductions
+and accepted all seven corrections: root-ancestor address changes, stale hard-link
+aliases, failed hash attempts consuming budgets, unknown file-object identity,
+per-directory partial coverage, full import validation and stricter schema rules.
+No mutation-capable imports or executable generated alternatives were found.
+This is scoped code evidence, not real-platform or release acceptance.
+
+Local verification: 59 focused tests and 230 backend tests passed, scoped lint
+passed and all 44 OpenAPI routes were covered. Standard JSON Schema validation
+passed positive and negative cases. A 2,051-entry synthetic metadata scan read no
+content and a 100-entry cap produced a partial inventory.
+
+The initial [WIP push CI](https://github.com/krahd/disk_organiser/actions/runs/37505717398)
+passed Windows backend/OpenAPI checks. Ubuntu passed 228 tests and failed two new
+race-fixture expectations because equal-size writes can retain an equal timestamp
+at that filesystem's resolution. The fixtures now make guaranteed size changes;
+no production check was weakened. Exact-head repeat CI remains pending. Windows
+results cover pure contracts and explicit scanning abstention, not Windows disk
+traversal. The inherited guided/UI CI is separately owned.
+
+The local browser attempt to render the new status SVG could not launch because
+container socket operations were unavailable; diagram visual QA is unverified.
