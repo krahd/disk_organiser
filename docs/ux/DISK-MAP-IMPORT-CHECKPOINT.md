@@ -64,6 +64,14 @@ Verification history, with explicit boundaries:
 
 Ten browser scenarios are specified in `frontend/visual/disk-map-runtime.spec.js`, serving local static assets only. There is no scanner or action API. They cover the original desktop/mobile/privacy/import flows plus complexity rejection with a live main-thread heartbeat, long labels/enlarged text, full member pagination/focus, and injected detached-render failure. Screenshots assert stable full-page height. The exact source-branch run and actual pixel inspection must be reported separately after publication; they have not been replaced by unit tests or this source audit.
 
+### Published baseline and selector repair
+
+The ordinary [CI run at `e0cb4e1`](https://github.com/krahd/disk_organiser/actions/runs/37523207811) passed 230 Linux backend tests, 181 Windows backend tests with 49 skipped, 100 frontend tests, both dependency audits, formatting, YAML consumer compatibility and both OpenAPI checks. Chromium passed 20 of 22 scenarios. The two failures stopped at `#scope-details summary`, which matched both the outer scope disclosure and its nested exclusions/error disclosure. Unknown-allocation/future-clock freshness and long-label/enlarged-text pixels were therefore not established by that run.
+
+Both selectors now use `#scope-details > summary`. This restores the intended test target without changing application behaviour or weakening an assertion. After the old checkout became unavailable, the repair was reconstructed from the published source and exact CI failures; its Git blob is `d02124f643113f63cd6987f14381da77b4e3429f`, matching the previously recorded repair prefix. The prior local-only commit/tree were not available remotely, so this documentation is a current reconstruction rather than a claim to have recovered their exact bytes.
+
+Fresh local verification on 2026-10-06 passed 100 frontend tests across six suites, full frontend formatting, canonical raw-asset/browser-bundle parity, YAML consumer compatibility and JavaScript syntax. Local Chromium could not launch because sandbox socket creation was denied; no scenario or pixel result is claimed for that attempt, and the restriction was not bypassed. The ordinary CI run on the saved final head and its downloaded artifacts must establish the remaining browser and pixel evidence separately. No test specification is deleted or skipped by this repair, and no production source, model contract or mutation/recovery guard changes.
+
 Review criteria:
 
 - Canonical model source/schema/fixture bytes are preserved; schema interpretation has no silent unsupported rules.

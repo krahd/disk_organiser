@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 16:59
+Last updated: 2026-10-06 21:40
 
 ## Project purpose
 
@@ -180,7 +180,7 @@ npx playwright test frontend/visual
 - The viewer exposes evidence-backed findings, possible folder roles, version/content relationships, neutral entries, qualified logical/allocation measures and non-executable review alternatives. It does not invent project understanding, backup health or coherent organisation plans.
 - Imports are bounded, validated and kept only in tab memory. Invalid/oversized/interrupted imports preserve the accepted view; Clear invalidates pending results and removes rendered private labels. Text is never interpreted as HTML or used as a URL.
 - Canonical schema/fixture browser assets and a reproducible parity checker are included. Strict contract validation plus reference/accounting checks precede display. Unsupported schema vocabulary fails closed.
-- Verification is checkpointed explicitly: the previously cancelled chain was approved and passed at local baseline `b79b807` (83 tests, asset parity, formatting). Current source-review repairs have 99 tests plus 59 unchanged producer tests passing; final formatting, source preservation, exact-commit browser/pixel evidence and fresh independent confirmation are tracked separately. Ten static browser scenarios are prepared.
+- Verification is checkpointed explicitly: the previously cancelled chain was approved and passed at local baseline `b79b807` (83 tests, asset parity, formatting). Source-review repairs have 100 tests plus 59 unchanged producer tests passing. The published `e0cb4e1` CI run passed Linux 230, Windows 181 with 49 skipped, 100 frontend tests, dependency audits, formatting and OpenAPI checks; Chromium passed 20 of 22 scenarios. Both browser failures were ambiguous nested-summary test selectors, not an acceptance pass. The selector repair and final-head browser/pixel gates are recorded below.
 - Read `docs/ux/DISK-MAP-IMPORT-CHECKPOINT.md` for precise import/privacy limits, acceptance criteria, provenance and the next review boundary. This is a bounded export viewer, not an integrated live-drive scanner or release.
 
 ## Disk Map source-review repair boundary
@@ -193,6 +193,13 @@ npx playwright test frontend/visual
 - Producer source/schema/fixtures remain byte-identical to `96c58ba4`; backend routes and all mutation/root-scope guards remain identical to accepted PR 12. No new PR, deployment or real-user operation belongs to this source-only checkpoint.
 
 ## Recent changes
+
+### Disk Map browser-selector checkpoint, 2026-10-06
+
+- Two test selectors now target `#scope-details > summary`, excluding the nested exclusions/error disclosure. No production UI, model, backend, dependency or safety boundary changed.
+- The earlier local-only selector repair was reconstructed from published source and the failing CI trace after its checkout became unavailable. The repaired test blob is `d02124f643113f63cd6987f14381da77b4e3429f`, matching its recorded prefix. The former local commit/tree were not present remotely; the documentation here records the current verification rather than claiming byte-identical recovery of those documents.
+- Fresh local checks on the reconstructed source: 100 frontend tests across six suites, full frontend formatting, canonical asset parity, YAML consumer compatibility and JavaScript syntax passed. A local Chromium attempt could not launch because the execution sandbox denied socket creation; no browser scenario or pixel pass is attributed to that attempt, and it was not bypassed.
+- Ordinary CI on the saved final head and its screenshot artifacts remain the browser gate. Unknown allocation/future-clock freshness, observed zero, long labels and enlarged text require the previously blocked scenarios to complete and their pixels to be inspected. Independent review remains required before expanding scope. Mutations and automatic recovery removal remain disabled; PR 12 and draft PR 13 are unchanged.
 
 - Backend Python dependencies now pin `modelito==1.4.1` in both `backend/requirements.txt` and `backend/requirements-locked.txt` (from `1.2.2`) to align with the latest upstream release.
 - Backend Python dependencies were then advanced to `modelito==1.4.3` in both dependency pin files to track the new upstream latest version.
@@ -290,4 +297,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 16:59
+Last updated: 2026-10-06 21:40

@@ -198,7 +198,7 @@ test("unknown accounting is different from an observed zero and stale freshness 
   await expect(page.locator(".metric").filter({ hasText: "Known allocated bytes" })).toContainText(
     "Unknown"
   );
-  await page.locator("#scope-details summary").click();
+  await page.locator("#scope-details > summary").click();
   await expect(page.locator("#scope-content")).toContainText("Freshness is unknown");
   await screenshot(page, info, "disk-map-unknown-allocation.png");
   await open(page, emptySnapshot(), "zero-observed-files.json");
@@ -347,7 +347,7 @@ test("long labels wrap at narrow width and enlarged text while evidence remains 
   );
   const finding = data.findings.find((f) => f.evidence_ids.includes(data.evidence[0].id));
   await open(page, data, "LongFilename".repeat(19) + ".json");
-  await page.locator("#scope-details summary").click();
+  await page.locator("#scope-details > summary").click();
   await page
     .locator("#map-results article")
     .filter({ hasText: finding.title })
