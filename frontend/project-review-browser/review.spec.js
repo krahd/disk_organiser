@@ -21,6 +21,60 @@ async function noOverflow(page) {
   expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.width + 1);
 }
 
+async function clickZoomedReview(page, testInfo) {
+  const button = page.locator("#review-button");
+  await expect(button).toBeVisible();
+  await expect(button).toBeEnabled();
+  // The locked browser/locator combination failed hit-testing at root CSS zoom.
+  // Diagnose and verify the browser's actual hit target before a normal pointer
+  // click; never force a locator click or invoke the control through JavaScript.
+  await button.evaluate((node) => node.scrollIntoView({ block: "center", inline: "center" }));
+  const geometry = await button.evaluate((node) => {
+    const rect = node.getBoundingClientRect();
+    const zoom = Number.parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+    const centre = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    const candidates = [
+      { source: "DOM viewport rectangle", ...centre },
+      { source: "CSS-zoom-scaled rectangle", x: centre.x * zoom, y: centre.y * zoom },
+    ].map((point) => {
+      const target = document.elementFromPoint(point.x, point.y);
+      return {
+        ...point,
+        hit: target && target.id,
+        buttonHit: target === node || node.contains(target),
+      };
+    });
+    return {
+      zoom,
+      rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+      viewport: { width: innerWidth, height: innerHeight },
+      candidates,
+    };
+  });
+  await testInfo.attach("zoom-pointer-geometry.json", {
+    body: Buffer.from(JSON.stringify(geometry, null, 2)),
+    contentType: "application/json",
+  });
+  const point = geometry.candidates.find(
+    (candidate) =>
+      candidate.buttonHit &&
+      candidate.x >= 0 &&
+      candidate.y >= 0 &&
+      candidate.x < geometry.viewport.width &&
+      candidate.y < geometry.viewport.height
+  );
+  expect(point, JSON.stringify(geometry)).toBeTruthy();
+  expect(
+    await page.evaluate(({ x, y }) => {
+      const target = document.elementFromPoint(x, y);
+      const node = document.getElementById("review-button");
+      return target === node || node.contains(target);
+    }, point)
+  ).toBe(true);
+  await page.mouse.click(point.x, point.y);
+  await expect(page.locator("#status")).toContainText("Draft reviewed");
+}
+
 test("actual desktop review uses the Python evaluator and presents exact paths", async ({
   page,
 }, testInfo) => {
@@ -112,7 +166,7 @@ test("200 percent rendered zoom and narrow reflow have no horizontal overflow", 
     document.documentElement.style.zoom = "2";
   });
   await page.locator("#destination-folder").fill("A long but valid folder name for Harbour");
-  await review(page);
+  await clickZoomedReview(page, testInfo);
   await noOverflow(page);
   await screenshot(page, testInfo, "desktop-rendered-200-percent.png");
   await page.evaluate(() => {

@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 23:05
+Last updated: 2026-10-06 23:12
 
 ## Project purpose
 
@@ -48,7 +48,7 @@ The main product direction is drive/project administration, organisation and bac
 - Drafts remain in tab memory. Every review uses the immutable fixture revision/digest; successive projected reviews do not advance a hidden server state. Edits, scenario changes, reload and dismissal invalidate pending success/error responses and previous results.
 - All results remain non-executable, with null authority, unavailable undo, no source-erasure permission and false live backup/restore verification. No existing default app, navigation, execution, recovery, observation or provider code changes.
 - Local verification: 68 unchanged evaluator tests, 20 new HTTP contract tests, 119 copied-frontend Jest tests (19 new UI tests), full copied-frontend Prettier check and Python compilation passed. Seven isolated browser specifications parse and list successfully. No aggregate backend or native hardware claim is made for this local partial checkout.
-- Local Chromium launch is blocked by the environment's socket permission (`Operation not permitted`); no alternate local bypass was attempted. Actual local screens and browser passes are not claimed. A separate isolated demo CI workflow runs the HTTP tests on Linux/Windows and Chromium screenshots using only the synthetic server. Exact-head remote results and fresh independent review are pending at this source freeze.
+- Local Chromium launch is blocked by the environment's socket permission (`Operation not permitted`); no alternate local bypass was attempted. Actual local screens and browser passes are not claimed. A separate isolated demo CI workflow runs the HTTP tests on Linux/Windows and Chromium screenshots using only the synthetic server. On source `63150c5`, remote HTTP contracts passed on Linux and Windows; six of seven Chromium flows passed. The 200% CSS-zoom pointer locator failed before overflow/320-pixel checks. Actual failure pixels show the Review button unobstructed. A narrow browser-harness revision now records DOM hit coordinates and requires an unforced pointer click on the verified visible target; runtime/evaluator source is unchanged. Final exact-head browser CI and independent re-review remain pending.
 - Browser specifications include keyboard flow, desktop/mobile, 320-pixel reflow and actual rendered 200% CSS zoom; the latter is not native browser-UI zoom. Native zoom, screen-reader behaviour and representative hardware remain unverified.
 - Run commands, API contract, revision semantics, test boundaries and remaining gates: [interaction demo](docs/drive-administration/INTERACTION-DEMO.md). No new dependency, merge, deployment, provider account, release or store submission.
 
@@ -344,4 +344,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 23:05
+Last updated: 2026-10-06 23:12
