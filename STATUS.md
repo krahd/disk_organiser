@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 14:36
+Last updated: 2026-10-06 14:45
 
 ## Project purpose
 
@@ -158,7 +158,7 @@ npx playwright test frontend/visual
 - Exact effects are searchable and paged at 25 rows. Filters never select a subset, and browsing revokes previous approval. Synthetic-development approval names the complete plan count and unavailable recovery.
 - Saved snapshots are historical; read-only mode never suggests rescanning enables copying. Restarted or stale synthetic-development plans require a new scan. Default builds show no approval control.
 - Native keyboard controls, focus return on closing, mobile action cards, loading/error/empty states and the 500-entry limit are covered in the test specifications.
-- Local verification: 4 Jest suites / 34 tests passed, full frontend formatting and JavaScript syntax checks passed. Nine real Flask/Chromium scenarios are prepared for ordinary CI with disposable synthetic files only; new screenshot review and independent review remain pending. No restricted local runtime was bypassed.
+- Local verification: 4 Jest suites / 35 tests passed, full frontend formatting and JavaScript syntax checks passed. Nine real Flask/Chromium scenarios are prepared for ordinary CI with disposable synthetic files only; exact final-head evidence is recorded on PR 12; independent confirmation remains required. No restricted local runtime was bypassed.
 - Read the product audit, acceptance criteria, Disk Map evidence contract and durable backlog in `docs/ux/FOLDER-UNDERSTANDING-2026-10-06.md`. Scripted comprehension checks are not a participant study or assistive-technology acceptance.
 
 ## Read-only UX review repairs
@@ -168,7 +168,7 @@ npx playwright test frontend/visual
 - Explicit refresh reloads session token and capabilities before history, clears prior previews, and never resubmits the failed request. Initial load and failed refresh stay blocked until both reads succeed. History refresh remains available after a connection failure.
 - Unsupported or missing scan capability disables scanning and explains the platform limit while preserving history. Read-only rescans and proposed effects no longer imply that copying becomes enabled.
 - Three core error strings now direct users to retain all data and inspect the saved result manually; automatic removal remains unavailable. AST comparison verifies no engine change except string contents. Focused backend lint passes.
-- README and guided UI distinguish the current read-only experience from retained disabled legacy actions and optional synthetic development copy tests. Current-head CI, actual screenshots and independent confirmation remain pending.
+- README and guided UI distinguish the current read-only experience from retained disabled legacy actions and optional synthetic development copy tests. Repair CI at `e7fb60a` passed: Linux 171, Windows 151 passed / 20 skipped, UI 34 and real Chromium 12 tests. Its 13 screenshot files were checksum-verified and visually inspected. Screenshot review led to singular-count, neutral step-label and unsupported-empty-history wording refinements, with 35 local UI tests passing. Final-head CI and image evidence are recorded on PR 12; independent confirmation remains required.
 
 ## Recent changes
 
@@ -268,4 +268,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 14:36
+Last updated: 2026-10-06 14:45

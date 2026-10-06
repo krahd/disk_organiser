@@ -51,7 +51,7 @@ No filesystem/API/schema change, new dependency, telemetry, model request, remot
 | Large lists do not bury the full scope | 25 rows, search, counts, full-plan warning, no implicit selection |
 | External services remain off | Browser request allowlist observes only the synthetic localhost server |
 
-Local executed checks: 4 Jest suites, 34 tests passed; full frontend Prettier check passed. Browser specifications are added but must pass on the final published commit; this document does not convert a build or unit test into a visual test. The restricted local runtime was not bypassed.
+Local executed checks: 4 Jest suites, 35 tests passed; full frontend Prettier check passed. Browser specifications are added but must pass on the final published commit; this document does not convert a build or unit test into a visual test. The restricted local runtime was not bypassed.
 
 Browser evidence specification: real Flask + Chromium, freshly generated synthetic files only. Captures desktop overview/exact preview, 390 px preview, retained results, closed preview, no supported entries, 500-file filtered preview, loading, uncertain result, restarted read-only plan and a final default-mode read-only build. Nine scenarios are specified, including a read-only backend restart without page reload and an unsupported-scan capability response. Images must be inspected after the exact-head CI run. These scripted walkthroughs do not constitute observed beginner-user or assistive-technology research.
 
@@ -115,3 +115,12 @@ These are advertised capabilities and asking prices, not measured reliability, s
 - [Tidium listing](https://apps.apple.com/pl/app/tidium-ai-file-organizer/id6788663430?mt=12): advertises content-aware organisation, renaming/search, duplicate cleanup and previews, with local processing by default and optional cloud processing. This Polish listing is not a US price source.
 
 The read-only Disk Model/Map is a coherent direction, not an uncontested feature gap. Differentiation must be demonstrated through useful project/version relationships, transparent uncertainty and trustworthy handling of messy storage. A feature checklist or an “AI organiser” label does not establish that value.
+
+
+## Rendered review evidence
+
+[Repair CI 37505119893](https://github.com/krahd/disk_organiser/actions/runs/37505119893) passed at `e7fb60a90e12c3156135708f9339695b1be52c17`: Linux 171 tests; Windows 151 passed / 20 unsupported skipped; 34 UI tests; 12 Chromium tests (nine guided scenarios plus three retained browser tests). Both audits, formatting and OpenAPI checks passed. [Artifact 11431556871](https://github.com/krahd/disk_organiser/actions/runs/37505119893/artifacts/11431556871) was downloaded and SHA-256 verified (`ab7a7db31b386c4495d0362e3b8e1fe99bc5b649ee5133f77515736b3b6d938f`); all 13 screenshot files were visually inspected.
+
+The rendered states show legible desktop comparisons, stacked 390 px exact-path cards, preserved focus, visible full-plan scope under filtering, unavailable copy controls in default mode, explanatory unsupported-platform and session-reconnected states, and retained history without removal controls. No clipping or horizontal overflow was observed in these fixture views. Long history remains vertically verbose and belongs to the backlog; this is not a beginner participant study, screen-reader certification or physical-device acceptance.
+
+That pixel review prompted a final wording pass: singular copy/folder counts, a neutral “Inspect exact paths” step, and no instruction to start a scan in unsupported empty history. Local UI coverage is now 35 tests. The exact final-head rerun and screenshot evidence are recorded on [draft PR 12](https://github.com/krahd/disk_organiser/pull/12), rather than attributing the predecessor's green run to later source. Independent confirmation is still required.

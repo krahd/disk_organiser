@@ -24,7 +24,7 @@
     if (n < 1048576) return `${(n / 1024).toFixed(2)} KiB`;
     return `${(n / 1048576).toFixed(2)} MiB`;
   };
-  const amount = (count, word) => `${count} ${word}${count === 1 ? "" : "s"}`;
+  const amount = (count, word, plural = `${word}s`) => `${count} ${count === 1 ? word : plural}`;
   const focus = (element) => element.focus({ preventScroll: false });
   const goal = () => document.querySelector('input[name="goal"]:checked').value;
   const category = (action) => action.destination.split("/")[1] || "Other";
@@ -150,8 +150,8 @@
       count.textContent = matches.length
         ? `Showing ${start + 1}–${Math.min(start + 25, matches.length)} of ${
             matches.length
-          } matching files. Full plan: ${actions.length} copies.`
-        : `No matching files. Full plan: ${actions.length} copies.`;
+          } matching files. Full plan: ${amount(actions.length, "copy", "copies")}.`
+        : `No matching files. Full plan: ${amount(actions.length, "copy", "copies")}.`;
       const table = node("table");
       const caption = node(
         "caption",
@@ -341,9 +341,10 @@
       node("h4", "Try a separate file-type layout"),
       node(
         "p",
-        `${plan.actions.length} copies grouped into ${groups.size} folders. Uses ${bytes(
-          plan.bytes
-        )} extra data; requires ${bytes(
+        `${amount(plan.actions.length, "copy", "copies")} grouped into ${amount(
+          groups.size,
+          "folder"
+        )}. Uses ${bytes(plan.bytes)} extra data; requires ${bytes(
           plan.required_bytes
         )} free including reserve. Originals stay where they are.`
       )
@@ -366,7 +367,10 @@
     effects.append(
       node(
         "p",
-        `This proposed layout would copy all ${plan.actions.length} listed files. Filtering the list does not select a subset. No original will be moved, renamed or removed.`,
+        `This proposed layout would copy the ${amount(
+          plan.actions.length,
+          "listed file"
+        )}. Filtering the list does not select a subset. No original will be moved, renamed or removed.`,
         "scope-note"
       )
     );
@@ -416,12 +420,16 @@
         approval,
         node(
           "span",
-          `I reviewed the complete plan of ${plan.actions.length} copies, including files hidden by filters or other pages. This folder is local and unsynchronised, not a network drive. No other app is editing it. I understand automatic removal is unavailable.`
+          `I reviewed the complete plan of ${amount(
+            plan.actions.length,
+            "copy",
+            "copies"
+          )}, including files hidden by filters or other pages. This folder is local and unsynchronised, not a network drive. No other app is editing it. I understand automatic removal is unavailable.`
         )
       );
       const apply = node(
         "button",
-        `Create ${plan.actions.length} reviewed copies`,
+        `Create ${amount(plan.actions.length, "reviewed copy", "reviewed copies")}`,
         "operation-button"
       );
       apply.id = "apply";
@@ -452,13 +460,17 @@
             mustRefresh = true;
             closePreview();
             throw new Error(
-              `The copy result is not confirmed. ${error.message} Do not submit another copy request until you refresh history.`
+              `The copy result is not confirmed. ${error.message}. Do not submit another copy request until you refresh history.`
             );
           }
           closePreview();
           status(
             result.state === "completed"
-              ? `Verified ${result.actions.length} copies. Originals kept. Inspect the output in saved results. Automatic copy removal is unavailable.`
+              ? `Verified ${amount(
+                  result.actions.length,
+                  "copy",
+                  "copies"
+                )}. Originals kept. Inspect the output in saved results. Automatic copy removal is unavailable.`
               : `Copying did not complete. Originals and any generated copies are retained. ${
                   result.error || "Check the saved result before continuing."
                 }`,
@@ -489,12 +501,24 @@
       ? `${data.blocked_records} saved records could not be validated. Their files and history are retained. They cannot authorise copying or removal; do not delete them based on this screen.`
       : "";
     if (!data.plans.length)
-      list.append(node("p", "No readable plans yet. Start with a folder overview above.", "muted"));
+      list.append(
+        node(
+          "p",
+          scanEnabled
+            ? "No readable plans yet. Start with a folder overview above."
+            : "No readable saved plans are available on this computer.",
+          "muted"
+        )
+      );
     data.plans.forEach((plan) => {
       const item = node("article", undefined, "history-item");
       item.append(
         node("h3", stateName(plan)),
-        node("p", `${plan.actions.length} planned copies · ${plan.root}`, "folder-path")
+        node(
+          "p",
+          `${amount(plan.actions.length, "planned copy", "planned copies")} · ${plan.root}`,
+          "folder-path"
+        )
       );
       if (plan.state !== "preview") {
         item.append(
@@ -550,7 +574,9 @@
       await history();
       mustRefresh = false;
       status(
-        copyEnabled
+        !scanEnabled
+          ? "Session and history refreshed. Scanning is unavailable here; you can review any readable saved plans."
+          : copyEnabled
           ? "Session and history refreshed. Check the latest result before deciding what to do. Any copy request needs a newly reviewed plan."
           : "Session and history refreshed. Saved snapshots do not show current folder changes. Scan again for a current read-only overview when scanning is supported."
       );

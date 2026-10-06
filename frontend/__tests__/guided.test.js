@@ -284,3 +284,20 @@ test("empty read-only overview rescan and exact layout use conditional wording",
   );
   expect(document.getElementById("preview").textContent).not.toContain("This will copy");
 });
+
+test("single-file counts and unsupported empty history stay comprehensible", async () => {
+  await scan();
+  expect(document.getElementById("preview").textContent).toContain("1 copy grouped into 1 folder");
+  expect(document.getElementById("preview").textContent).toContain("Full plan: 1 copy.");
+  expect(document.getElementById("apply").textContent).toBe("Create 1 reviewed copy");
+  runtimeCapabilities = { scan: { enabled: false }, copy_apply: { enabled: false } };
+  document.getElementById("refresh").click();
+  await flush();
+  expect(document.getElementById("history").textContent).toContain(
+    "No readable saved plans are available"
+  );
+  expect(document.getElementById("status").textContent).toContain("Scanning is unavailable here");
+  expect(document.getElementById("history").textContent).not.toContain(
+    "Start with a folder overview"
+  );
+});
