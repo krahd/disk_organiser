@@ -62,7 +62,7 @@ Verification history, with explicit boundaries:
 - After explicit approval, the exact format/sync/test chain completed on 2026-10-06 at 19:21 UTC: canonical raw-asset/browser-bundle parity, 83 tests and full frontend formatting passed at that preserved baseline.
 - The current R1–R4 repair source has 100 tests across six suites passing, plus 59 unchanged canonical model tests. The parity checker and JavaScript syntax checks pass. Full frontend formatting and whitespace checks also pass before source preservation. These are local execution results, not browser or release acceptance.
 
-Ten browser scenarios are specified in `frontend/visual/disk-map-runtime.spec.js`, serving local static assets only. There is no scanner or action API. They cover the original desktop/mobile/privacy/import flows plus complexity rejection with a live main-thread heartbeat, long labels/enlarged text, full member pagination/focus, and injected detached-render failure. Screenshots assert stable full-page height. The exact source-branch run and actual pixel inspection must be reported separately after publication; they have not been replaced by unit tests or this source audit.
+Ten browser scenarios are specified in `frontend/visual/disk-map-runtime.spec.js`, serving local static assets only. There is no scanner or action API. They cover the original desktop/mobile/privacy/import flows plus complexity rejection with a live main-thread heartbeat, long labels/enlarged text, full member pagination/focus, and injected detached-render failure. Screenshots assert stable full-page height. The exact source-branch run and actual pixel inspection are recorded below; they are separate from unit tests and source audit.
 
 ### Published baseline and selector repair
 
@@ -70,7 +70,7 @@ The ordinary [CI run at `e0cb4e1`](https://github.com/krahd/disk_organiser/actio
 
 Both selectors now use `#scope-details > summary`. This restores the intended test target without changing application behaviour or weakening an assertion. After the old checkout became unavailable, the repair was reconstructed from the published source and exact CI failures; its Git blob is `d02124f643113f63cd6987f14381da77b4e3429f`, matching the previously recorded repair prefix. The prior local-only commit/tree were not available remotely, so this documentation is a current reconstruction rather than a claim to have recovered their exact bytes.
 
-Fresh local verification on 2026-10-06 passed 100 frontend tests across six suites, full frontend formatting, canonical raw-asset/browser-bundle parity, YAML consumer compatibility and JavaScript syntax. Local Chromium could not launch because sandbox socket creation was denied; no scenario or pixel result is claimed for that attempt, and the restriction was not bypassed. The ordinary CI run on the saved final head and its downloaded artifacts must establish the remaining browser and pixel evidence separately. No test specification is deleted or skipped by this repair, and no production source, model contract or mutation/recovery guard changes.
+Fresh local verification on 2026-10-06 passed 100 frontend tests across six suites, full frontend formatting, canonical raw-asset/browser-bundle parity, YAML consumer compatibility and JavaScript syntax. Local Chromium could not launch because sandbox socket creation was denied; no scenario or pixel result is claimed for that attempt, and the restriction was not bypassed. The ordinary CI and downloaded-artifact evidence below establish the browser and pixel results separately. No test specification is deleted or skipped by this repair, and no production source, model contract or mutation/recovery guard changes.
 
 Review criteria:
 
@@ -83,9 +83,18 @@ Review criteria:
 - Search/paging do not alter source scope or imply a selected action subset.
 - The current read-only integration is useful on its own and remains separate from mutation/recovery acceptance.
 
+## Accepted read-only checkpoint
+
+Independent review accepts the bounded read-only slice at `fd9d2c11933eee88b424524709fcbabe0ddcb259`, with no blocking source, CI, artifact-identity or pixel finding. The later documentation-only acceptance commit does not change the tested runtime or attribute the earlier run to a different commit.
+
+- [CI run 37535618344](https://github.com/krahd/disk_organiser/actions/runs/37535618344) is successful on that exact head: Linux 230 passed; Windows 181 passed, 49 skipped; Jest 100 passed; Chromium 22 passed, including all ten Disk Map scenarios. Audits, formatting, YAML compatibility and both 44-route OpenAPI checks passed. The existing preview-modal snapshot remains excluded by the unchanged CI command.
+- [Artifact 11445849175](https://github.com/krahd/disk_organiser/actions/runs/37535618344/artifacts/11445849175), `synthetic-browser-evidence`, contains 28 PNGs including 15 Disk Map images. ZIP size: 15,912,913 bytes. SHA-256: `1100851dedbcfabf1833b5e23cb71e49d2032f85a7802467de6534012a1150b1`. This digest matches GitHub metadata, the upload log and downloaded bytes.
+- Independent review checked every extracted PNG against the ZIP and manifest hashes/dimensions, then inspected the meaningful states in all 15 Disk Map screenshots at readable scale. The four previously missing images establish unknown allocation/future-clock freshness, observed zero, narrow long labels and 200% enlarged text. Their dimensions are respectively 1024×3932, 1024×1649, 390×15122 and 390×53604.
+- Unknown values remain distinct from zero; the future-clock freshness warning and evidence omission notices remain visible. No clipping, overlap or misleading certainty was found. Non-blocking polish remains: two-column metrics break words awkwardly at 200%, and ten long evidence summaries create very tall pages. These are separate usability improvements, not grounds to broaden model or filesystem authority.
+
 ## Next review round, before expansion
 
-Obtain fresh independent source/ordinary read-only/browser review of this slice. Correct findings before adding a live scan connection or more interpretation. No real-user data, provider calls, deployment, Apple upload, billing or release belongs to this checkpoint.
+Keep follow-on read-only usability changes separately frozen, tested and independently reviewed. Acceptance here does not cover a live scan connection, additional interpretation, mutation or recovery deletion. No real-user data, provider calls, deployment, Apple upload, billing or release belongs to this checkpoint.
 
 Remaining product work includes clearer priority/order for questions, participant comprehension sessions, screen-reader and browser diversity, larger indexed/persistent models, guided user corrections, coherent multi-step reorganisation plans, and a separately reviewed transaction/recovery design. The evidence-first direction is coherent but not an uncontested market feature; see the first-party competitor check in `FOLDER-UNDERSTANDING-2026-10-06.md`.
 

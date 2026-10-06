@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 21:40
+Last updated: 2026-10-06 21:56
 
 ## Project purpose
 
@@ -199,7 +199,9 @@ npx playwright test frontend/visual
 - Two test selectors now target `#scope-details > summary`, excluding the nested exclusions/error disclosure. No production UI, model, backend, dependency or safety boundary changed.
 - The earlier local-only selector repair was reconstructed from published source and the failing CI trace after its checkout became unavailable. The repaired test blob is `d02124f643113f63cd6987f14381da77b4e3429f`, matching its recorded prefix. The former local commit/tree were not present remotely; the documentation here records the current verification rather than claiming byte-identical recovery of those documents.
 - Fresh local checks on the reconstructed source: 100 frontend tests across six suites, full frontend formatting, canonical asset parity, YAML consumer compatibility and JavaScript syntax passed. A local Chromium attempt could not launch because the execution sandbox denied socket creation; no browser scenario or pixel pass is attributed to that attempt, and it was not bypassed.
-- Ordinary CI on the saved final head and its screenshot artifacts remain the browser gate. Unknown allocation/future-clock freshness, observed zero, long labels and enlarged text require the previously blocked scenarios to complete and their pixels to be inspected. Independent review remains required before expanding scope. Mutations and automatic recovery removal remain disabled; PR 12 and draft PR 13 are unchanged.
+- The bounded read-only checkpoint is independently accepted at tested head `fd9d2c11933eee88b424524709fcbabe0ddcb259`. [Ordinary CI run 37535618344](https://github.com/krahd/disk_organiser/actions/runs/37535618344) passed Linux 230, Windows 181 with 49 skipped, 100 frontend tests and all 22 Chromium scenarios, plus audits, formatting and both 44-route OpenAPI checks. The unchanged CI command excludes the existing preview-modal baseline test.
+- The [synthetic browser artifact](https://github.com/krahd/disk_organiser/actions/runs/37535618344/artifacts/11445849175) contains 28 PNGs, including 15 Disk Map screenshots. Its ZIP SHA-256 is `1100851dedbcfabf1833b5e23cb71e49d2032f85a7802467de6534012a1150b1`. Independent review verified artifact identity and all PNG bytes/hashes/dimensions, then inspected all 15 Disk Map images at readable scale. Unknown allocation/future-clock freshness, observed zero, long labels and enlarged text are established without a blocking source, CI or pixel finding.
+- This documentation-only acceptance update records the tested source head above; it does not relabel that run as testing a later commit. Separate read-only polish is proposed for enlarged-text metric columns and long evidence disclosure. The current extreme fixture produces 15,122px/53,604px pages at normal/enlarged text. This remains outside participant, assistive-technology or release acceptance. Mutations and automatic recovery removal remain disabled; PR 12 and draft PR 13 are unchanged.
 
 - Backend Python dependencies now pin `modelito==1.4.1` in both `backend/requirements.txt` and `backend/requirements-locked.txt` (from `1.2.2`) to align with the latest upstream release.
 - Backend Python dependencies were then advanced to `modelito==1.4.3` in both dependency pin files to track the new upstream latest version.
@@ -297,4 +299,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 21:40
+Last updated: 2026-10-06 21:56
