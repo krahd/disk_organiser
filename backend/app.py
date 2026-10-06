@@ -216,14 +216,19 @@ else:
 # The guided surface is local, same-origin and independent of model providers.
 try:
     from backend.guided import GuidedStore, GuidedError
+    from backend.guided_schema import JournalError
 except ImportError:
     from guided import GuidedStore, GuidedError
+    from guided_schema import JournalError
 
 GUIDED_TOKEN = secrets.token_urlsafe(32)
 
 
 def _guided_store():
-    return GuidedStore(data_path("guided.sqlite"))
+    return GuidedStore(
+        data_path("guided.sqlite"),
+        allow_copy=os.getenv("DISK_ORGANISER_ENABLE_GUIDED_COPIES") == "1",
+    )
 
 
 @app.before_request
@@ -236,6 +241,12 @@ def protect_local_api():
     origin = request.headers.get("Origin")
     if origin and origin != request.host_url.rstrip("/"):
         return jsonify({"error": "Use the local same-origin application."}), 403
+    legacy_mutations = {"/api/organise/execute", "/api/organise/undo",
+                        "/api/recycle/cleanup", "/api/recycle/delete_op"}
+    if request.path in legacy_mutations and os.getenv("DISK_ORGANISER_ENABLE_LEGACY_MUTATIONS") != "1":
+        data = request.get_json(silent=True)
+        if not isinstance(data, dict) or data.get("dry_run") is not True:
+            return jsonify({"error": "Read-only mode: legacy file mutations are disabled."}), 409
     if not request.path.startswith("/api/guided/"):
         return None
     if request.method == "POST":
@@ -261,7 +272,7 @@ def guided_private_response(response):
 
 @app.route("/api/guided/session", methods=["GET"])
 def guided_session():
-    return jsonify({"token": GUIDED_TOKEN})
+    return jsonify({"token": GUIDED_TOKEN, "capabilities": _guided_store().capabilities()})
 
 
 @app.route("/api/guided/plans", methods=["GET", "POST"])
@@ -269,12 +280,12 @@ def guided_plans():
     try:
         store = _guided_store()
         if request.method == "GET":
-            return jsonify({"plans": store.history()})
+            return jsonify(store.history())
         data = request.get_json()
         if not isinstance(data, dict):
             raise GuidedError("Expected a JSON object with a folder path.")
-        return jsonify(store.scan(data.get("root")))
-    except (GuidedError, OSError) as exc:
+        return jsonify(store.describe(store.scan(data.get("root"))))
+    except (JournalError, OSError) as exc:
         return jsonify({"error": str(exc)}), 409
 
 
@@ -284,8 +295,9 @@ def guided_apply(plan_id):
         data = request.get_json()
         if not isinstance(data, dict):
             raise GuidedError("Expected explicit approval.")
-        return jsonify(_guided_store().apply(plan_id, data.get("approved"), data.get("local_only")))
-    except (GuidedError, OSError) as exc:
+        store = _guided_store()
+        return jsonify(store.describe(store.apply(plan_id, data.get("approved"), data.get("local_only"))))
+    except (JournalError, OSError) as exc:
         return jsonify({"error": str(exc)}), 409
 
 
@@ -296,7 +308,7 @@ def guided_recover(plan_id):
         if not isinstance(data, dict):
             raise GuidedError("Expected explicit recovery approval.")
         return jsonify(_guided_store().recover(plan_id, data.get("approved")))
-    except (GuidedError, OSError) as exc:
+    except (JournalError, OSError) as exc:
         return jsonify({"error": str(exc)}), 409
 
 

@@ -276,11 +276,8 @@
     },
     "/api/guided/plans/{plan_id}/recover": {
       "post": {
-        "summary": "Local guided copy workflow; see docs/GUIDED-COPIES.md",
+        "summary": "Recovery removal disabled; validate record and retain all data",
         "responses": {
-          "200": {
-            "description": "Journalled plan/result"
-          },
           "403": {
             "description": "Local origin or token required"
           },

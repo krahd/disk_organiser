@@ -2,11 +2,12 @@
 
 Originals are never renamed, unlinked or modified. POSIX descriptor-relative
 operations avoid traversing links; unsupported platforms fail closed. A journal
-is evidence, not a backup: recovery refuses anything it cannot prove unchanged.
+is evidence, not a backup: automatic recovery removal is disabled because stored metadata cannot prove ownership.
 """
 from __future__ import annotations
 
 import contextlib
+from collections import OrderedDict
 import hashlib
 import json
 import os
@@ -16,16 +17,22 @@ import stat
 import time
 import uuid
 
-MAX_FILES = 500
-MAX_BYTES = 1024 ** 3
-RESERVE_BYTES = 16 * 1024 ** 2
-CATEGORIES = {
-    'Documents': {'.pdf', '.txt', '.md', '.docx', '.odt', '.csv', '.xlsx'},
-    'Images': {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.heic'},
-    'Audio': {'.wav', '.mp3', '.aiff', '.flac', '.m4a', '.ogg'},
-    'Video': {'.mp4', '.mov', '.mkv', '.webm'},
-    'Archives': {'.zip', '.tar', '.gz', '.7z'},
-}
+try:
+    from backend import guided_schema as schema
+except ImportError:
+    import guided_schema as schema
+
+MAX_FILES = schema.MAX_FILES
+MAX_BYTES = schema.MAX_BYTES
+RESERVE_BYTES = schema.RESERVE_BYTES
+CATEGORIES = schema.CATEGORIES
+# Only a preview produced by this process may authorise copies. Persistent JSON
+# is untrusted, even if all its fields are structurally valid. Restart means rescan.
+_TRUSTED_PREVIEWS = OrderedDict()
+MAX_TRUSTED_PREVIEWS = 128
+RECOVERY_DISABLED = ('Automatic recovery removal is disabled: a saved journal alone cannot prove file ownership. '
+                     'All originals, generated copies and journal data are retained. Inspect copies manually.')
+
 CLOUD_NAMES = {'onedrive', 'dropbox', 'google drive', 'googledrive', 'icloud',
                'cloudstorage', 'mobile documents'}
 LIMITS = ('Copies top-level regular files only; originals stay in place. '
@@ -35,7 +42,7 @@ LIMITS = ('Copies top-level regular files only; originals stay in place. '
           'Keep a separate backup; never erase source media based on this report.')
 
 
-class GuidedError(Exception):
+class GuidedError(schema.JournalError):
     """An expected safe stop that can be shown to the user."""
 
 
@@ -68,6 +75,7 @@ def open_root(path):
         raise GuidedError('Choose an absolute local folder path.')
     if '..' in Path(path).parts:
         raise GuidedError('Parent traversal is not supported; choose the direct folder path.')
+    schema.root_path(path)
     fd = os.open('/', os.O_RDONLY | os.O_DIRECTORY)
     try:
         for part in Path(path).parts[1:]:
@@ -83,6 +91,7 @@ def open_root(path):
 
 
 def fingerprint(fd, name):
+    schema.leaf(name)
     before = os.stat(name, dir_fd=fd, follow_symlinks=False)
     if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1:
         raise GuidedError('Links, hard links and special files are not supported.')
@@ -121,6 +130,7 @@ def fingerprint(fd, name):
 
 
 def _exists(fd, name):
+    schema.leaf(name)
     try:
         os.stat(name, dir_fd=fd, follow_symlinks=False)
         return True
@@ -133,8 +143,9 @@ def _sync(fd):
 
 
 class GuidedStore:
-    def __init__(self, db_path):
+    def __init__(self, db_path, allow_copy=False):
         self.db_path = str(db_path)
+        self.allow_copy = allow_copy is True and supported()
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
         with self.connection() as con:
             con.execute('CREATE TABLE IF NOT EXISTS guided (id TEXT PRIMARY KEY, payload TEXT NOT NULL)')
@@ -163,20 +174,72 @@ class GuidedStore:
                 fcntl.flock(handle, fcntl.LOCK_UN)
 
     def save(self, plan):
+        payload = schema.canonical(plan)
         with self.connection() as con:
-            con.execute('INSERT OR REPLACE INTO guided VALUES (?,?)', (plan['id'], json.dumps(plan)))
+            con.execute('INSERT OR REPLACE INTO guided VALUES (?,?)', (plan['id'], payload))
+
+    def _preview_key(self, plan_id):
+        return (os.path.abspath(self.db_path), plan_id)
+
+    def _remember_preview(self, plan):
+        key = self._preview_key(plan['id'])
+        _TRUSTED_PREVIEWS[key] = hashlib.sha256(schema.canonical(plan).encode()).digest()
+        _TRUSTED_PREVIEWS.move_to_end(key)
+        while len(_TRUSTED_PREVIEWS) > MAX_TRUSTED_PREVIEWS:
+            _TRUSTED_PREVIEWS.popitem(last=False)
+
+    def _fresh_preview(self, plan):
+        return (_TRUSTED_PREVIEWS.get(self._preview_key(plan['id']))
+                == hashlib.sha256(schema.canonical(plan).encode()).digest()
+                and time.time() - plan['created'] <= 3600)
+
+    def capabilities(self):
+        return {
+            'default_mode': 'read_only',
+            'mode': 'synthetic_copy_testing' if self.allow_copy else 'read_only',
+            'scan': {'enabled': supported(), 'scope': 'selected-root top-level inventory and local hashes'},
+            'copy_apply': {
+                'enabled': self.allow_copy,
+                'status': 'synthetic_testing_only' if self.allow_copy else 'disabled_by_default',
+                'reason': 'Acceptance is held. Copy testing needs explicit operator opt-in and fresh preview approval.',
+            },
+            'recovery': {'enabled': False, 'reason': RECOVERY_DISABLED},
+            'disk_model': {'status': 'not_implemented',
+                           'reason': 'This narrow preview is not the planned structured read-only Disk Model.'},
+            'remote_inference': {'enabled': False},
+            'limits': {'entries': MAX_FILES, 'bytes': MAX_BYTES, 'recursive': False},
+            'uncertainties': ['No universal cloud/network detection', 'No semantic content understanding',
+                              'No authenticated recovery ownership', 'No metadata-preserving copy guarantee',
+                              'No hostile concurrent-writer or mount-replacement guarantee',
+                              'Windows guided operations unsupported', 'Representative macOS acceptance pending'],
+        }
+
+    def describe(self, plan):
+        schema.validate(plan)
+        result = json.loads(schema.canonical(plan))
+        result['can_apply'] = self.allow_copy and plan['state'] == 'preview' and self._fresh_preview(plan)
+        result['recovery_available'] = False
+        result['recovery_notice'] = RECOVERY_DISABLED
+        return result
 
     def get(self, plan_id):
         with self.connection() as con:
             row = con.execute('SELECT payload FROM guided WHERE id=?', (plan_id,)).fetchone()
         if not row:
             raise GuidedError('Plan not found. Refresh history or scan again.')
-        return json.loads(row[0])
+        return schema.decode(row[0], plan_id)
 
     def history(self):
         with self.connection() as con:
-            rows = con.execute('SELECT payload FROM guided ORDER BY rowid DESC LIMIT 50')
-            return [json.loads(row[0]) for row in rows]
+            rows = con.execute('SELECT id, payload FROM guided ORDER BY rowid DESC LIMIT 50').fetchall()
+        plans, blocked = [], 0
+        for plan_id, payload in rows:
+            try:
+                plans.append(self.describe(schema.decode(payload, plan_id)))
+            except schema.JournalError:
+                blocked += 1
+        return {'plans': plans, 'blocked_records': blocked, 'recovery_notice': RECOVERY_DISABLED,
+                'capabilities': self.capabilities()}
 
     def scan(self, root):
         with open_root(root) as fd:
@@ -189,8 +252,9 @@ class GuidedStore:
                     names.append(entry.name)
             names.sort()
             plan_id = uuid.uuid4().hex
-            plan = {'id': plan_id, 'root': os.path.normpath(root), 'root_identity': identity(os.fstat(fd)),
-                    'output': 'Organised-' + plan_id[:12], 'state': 'preview', 'created': time.time(),
+            plan = {'schema_version': schema.SCHEMA_VERSION, 'id': plan_id,
+                    'root': os.path.normpath(root), 'root_identity': identity(os.fstat(fd)),
+                    'output': schema.output_for(plan_id), 'state': 'preview', 'created': time.time(),
                     'actions': [], 'skipped': [], 'directories': {}, 'limitations': LIMITS,
                     'bytes': 0, 'error': None}
             for name in names:
@@ -204,7 +268,7 @@ class GuidedStore:
                     if plan['bytes'] > MAX_BYTES:
                         raise GuidedError('Folder exceeds the 1 GiB first-version limit; choose a smaller folder.')
                     plan['actions'].append({'source': name, 'category': category,
-                                            'destination': f"{plan['output']}/{category}/{name}",
+                                            'destination': schema.destination_for(plan_id, name),
                                             'reason': f"{suffix} extension → {category}; content is not interpreted",
                                             'fingerprint': fp, 'state': 'planned', 'owned': None})
                 except (GuidedError, OSError) as exc:
@@ -221,6 +285,7 @@ class GuidedStore:
                 raise GuidedError('Output folder already exists; scan again.')
             plan['required_bytes'] = plan['bytes'] + RESERVE_BYTES
             self.save(plan)
+            self._remember_preview(plan)
             return plan
 
     def _root_matches(self, plan, fd):
@@ -228,6 +293,10 @@ class GuidedStore:
             raise GuidedError('Selected folder was replaced. No further changes are permitted.')
 
     def _create_dir(self, plan, parent, name, key):
+        schema.validate(plan)
+        schema.leaf(name)
+        schema.require(name == (schema.output_for(plan['id']) if key == '.' else key))
+        schema.require(key == '.' or key in schema.CATEGORIES)
         os.mkdir(name, mode=0o700, dir_fd=parent)
         _sync(parent)
         fd = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
@@ -239,14 +308,9 @@ class GuidedStore:
             raise
         return fd
 
-    def _open_owned_dir(self, plan, parent, name, key):
-        fd = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
-        if identity(os.fstat(fd)) != plan['directories'].get(key):
-            os.close(fd)
-            raise GuidedError('Generated folder ownership cannot be verified; inspect it manually.')
-        return fd
-
     def apply(self, plan_id, approved=False, local_only=False):
+        if not self.allow_copy:
+            raise GuidedError('Read-only mode: copying is disabled. Safety acceptance remains held.')
         if approved is not True or local_only is not True:
             raise GuidedError('Explicit approval and confirmation of a local, unsynchronised folder are required.')
         if not supported():
@@ -257,11 +321,15 @@ class GuidedStore:
                 return plan  # idempotent response to an uncertain/repeated submission
             if plan['state'] != 'preview' or not plan['actions']:
                 raise GuidedError('Plan cannot be applied. Recover an interrupted operation or create a new preview.')
+            if time.time() - plan['created'] > 3600:
+                raise GuidedError('Preview expired after one hour. Scan again.')
+            if not self._fresh_preview(plan):
+                raise GuidedError('Preview authorisation cannot be verified in this process. '
+                                  'Scan again before applying.')
+            output_name = schema.output_for(plan['id'])
             with open_root(plan['root']) as root:
                 self._root_matches(plan, root)
-                if time.time() - plan['created'] > 3600:
-                    raise GuidedError('Preview expired after one hour. Scan again.')
-                if _exists(root, plan['output']):
+                if _exists(root, output_name):
                     raise GuidedError('Destination now exists. Nothing was overwritten; scan again.')
                 for action in plan['actions']:
                     if fingerprint(root, action['source']) != action['fingerprint']:
@@ -269,12 +337,13 @@ class GuidedStore:
                 fs = os.fstatvfs(root)
                 if fs.f_bavail * fs.f_frsize < plan['required_bytes']:
                     raise GuidedError('Insufficient free space for all copies plus a 16 MiB safety reserve.')
+                _TRUSTED_PREVIEWS.pop(self._preview_key(plan['id']), None)
                 plan['state'] = 'applying'
                 self.save(plan)  # durable intent before the first filesystem mutation
                 output = None
                 try:
-                    output = self._create_dir(plan, root, plan['output'], '.')
-                    for category in sorted({a['category'] for a in plan['actions']}):
+                    output = self._create_dir(plan, root, output_name, '.')
+                    for category in sorted({schema.category_for(a['source']) for a in plan['actions']}):
                         folder = self._create_dir(plan, output, category, category)
                         try:
                             for action in [a for a in plan['actions'] if a['category'] == category]:
@@ -334,87 +403,8 @@ class GuidedStore:
         self.save(plan)
 
     def recover(self, plan_id, approved=False):
-        if approved is not True:
-            raise GuidedError('Explicit approval to remove only verified generated copies is required.')
-        if not supported():
-            raise GuidedError('This platform does not support guided recovery.')
-        with self.lock():
-            plan = self.get(plan_id)
-            if plan['state'] == 'undone':
-                return plan
-            if plan['state'] not in {'completed', 'applying', 'interrupted', 'recovery_blocked', 'recovering'}:
-                raise GuidedError('This plan has no applied copies to recover.')
-            plan['state'] = 'recovering'
-            plan['error'] = None
-            self.save(plan)
-            conflicts = []
-            try:
-                with open_root(plan['root']) as root:
-                    self._root_matches(plan, root)
-                    if not _exists(root, plan['output']):
-                        # Root disappearance is safe; do not search elsewhere or recreate it.
-                        plan['state'] = 'undone'
-                        self.save(plan)
-                        return plan
-                    output = self._open_owned_dir(plan, root, plan['output'], '.')
-                    try:
-                        for action in reversed(plan['actions']):
-                            if action['state'] == 'undone':
-                                continue
-                            folder = None
-                            try:
-                                if not _exists(output, action['category']):
-                                    continue
-                                folder = self._open_owned_dir(plan, output, action['category'], action['category'])
-                                name = action['source']
-                                if not _exists(folder, name):
-                                    action['state'] = 'undone'
-                                    self.save(plan)
-                                    continue
-                                current = fingerprint(folder, name)
-                                if current['stamp'][:2] != action['owned']:
-                                    raise GuidedError('Copy was replaced or its ownership was not journalled.')
-                                # Partial or edited copies are deliberately left for manual inspection.
-                                if current['sha256'] != action['fingerprint']['sha256']:
-                                    raise GuidedError('Copy is incomplete or changed. Retained for manual inspection.')
-                                if fingerprint(root, name) != action['fingerprint']:
-                                    raise GuidedError('Original changed or disappeared. Retaining the generated copy.')
-                                # Final lstat check before unlink; untrusted concurrent writers are unsupported.
-                                if stamp(os.stat(name, dir_fd=folder, follow_symlinks=False)) != current['stamp']:
-                                    raise GuidedError('Copy changed during recovery.')
-                                os.unlink(name, dir_fd=folder)
-                                _sync(folder)
-                                action['state'] = 'undone'
-                                self.save(plan)
-                            except (OSError, GuidedError) as exc:
-                                conflicts.append({'path': action['destination'], 'reason': str(exc)})
-                            finally:
-                                if folder is not None:
-                                    os.close(folder)
-                        # Only our inode-verified empty directories can be removed. User additions stay.
-                        for category in sorted(plan['directories']):
-                            if category == '.' or not _exists(output, category):
-                                continue
-                            fd = self._open_owned_dir(plan, output, category, category)
-                            os.close(fd)
-                            try:
-                                os.rmdir(category, dir_fd=output)
-                                _sync(output)
-                            except OSError as exc:
-                                conflicts.append({'path': category, 'reason': str(exc)})
-                    finally:
-                        os.close(output)
-                    try:
-                        # Recheck ownership immediately before the empty-directory removal.
-                        fd = self._open_owned_dir(plan, root, plan['output'], '.')
-                        os.close(fd)
-                        os.rmdir(plan['output'], dir_fd=root)
-                        _sync(root)
-                    except OSError as exc:
-                        conflicts.append({'path': plan['output'], 'reason': str(exc)})
-            except (OSError, GuidedError) as exc:
-                conflicts.append({'path': plan['output'], 'reason': str(exc)})
-            plan['conflicts'] = conflicts
-            plan['state'] = 'recovery_blocked' if conflicts else 'undone'
-            self.save(plan)
-            return plan
+        # Deliberately no selected-folder I/O, unlink/rmdir, journal mutation,
+        # schema migration or automatic cleanup. Structural validity is not proof
+        # that a persisted inode/ownership claim was originally created by us.
+        self.get(plan_id)
+        raise GuidedError(RECOVERY_DISABLED)

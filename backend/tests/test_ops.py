@@ -15,7 +15,8 @@ sys.path.insert(0, ROOT)
 app = importlib.import_module("backend.app")
 
 
-def test_preview_execute_undo(tmp_path):
+def test_preview_execute_undo(tmp_path, monkeypatch):
+    monkeypatch.setenv("DISK_ORGANISER_ENABLE_LEGACY_MUTATIONS", "1")
     d = tmp_path / "ops"
     d.mkdir()
     a = d / "a.txt"
@@ -83,7 +84,8 @@ def test_background_scan_thread(tmp_path):
     assert status is not None
     assert status.get("status") == "finished"
 
-def test_execute_revalidates_paths_after_symlink_change(tmp_path):
+def test_execute_revalidates_paths_after_symlink_change(tmp_path, monkeypatch):
+    monkeypatch.setenv("DISK_ORGANISER_ENABLE_LEGACY_MUTATIONS", "1")
     root = tmp_path / "root"
     outside = tmp_path / "outside"
     target = root / "target"

@@ -130,12 +130,12 @@ Comprehensive verification commands
 See [GUIDED-COPIES.md](GUIDED-COPIES.md) for safety boundaries and recovery states.
 All filesystem API routes now require localhost/same-origin requests, including legacy routes. `/api/guided/` responses are no-store. Separate-origin frontend deployment is unsupported. POST requires JSON and `X-Guided-Token` from GET `/api/guided/session`.
 
-- GET `/api/guided/session`: process token for the local UI.
-- GET `/api/guided/plans`: latest 50 durable plans.
+- GET `/api/guided/session`: process token and `capabilities` for the local UI. Read-only is default; experimental copy testing requires the explicit startup flag. Recovery and remote inference remain disabled, and the structured Disk Model is reported as not yet implemented.
+- GET `/api/guided/plans`: `{plans, blocked_records, recovery_notice, capabilities}` for the latest 50 records. Invalid/unsupported records are retained and counted, never executed. Described plans include `can_apply`, `recovery_available:false`, and `recovery_notice`.
 - POST `/api/guided/plans`: `{"root":"/absolute/local/folder"}`; read-only source scan and saved exact preview.
-- POST `/api/guided/plans/{plan_id}/apply`: `{"approved":true,"local_only":true}`; copies only, originals retained.
-- POST `/api/guided/plans/{plan_id}/recover`: `{"approved":true}`; remove only provably unchanged generated copies, with conflict paths otherwise.
+- POST `/api/guided/plans/{plan_id}/apply`: `{"approved":true,"local_only":true}`; copies only, originals retained. Requires a fresh unchanged in-process preview after complete persisted-schema validation; restart/expiry/alteration requires rescan.
+- POST `/api/guided/plans/{plan_id}/recover`: currently always stops with 409 after record validation. Automatic removal is disabled; all files and journal data are retained.
 
 Approval requires literal JSON booleans. Expected safety stops return 409. A 200
-response can contain `interrupted` or `recovery_blocked`; inspect the state, errors
+response can contain `interrupted`; inspect the state, errors
 and conflicts rather than treating HTTP success as filesystem completion.

@@ -13,7 +13,8 @@ app = importlib.import_module("backend.app")
 op_store = importlib.import_module("backend.op_store")
 
 
-def test_ai_suggest_preview_execute_undo(tmp_path):
+def test_ai_suggest_preview_execute_undo(tmp_path, monkeypatch):
+    monkeypatch.setenv("DISK_ORGANISER_ENABLE_LEGACY_MUTATIONS", "1")
     # isolate op storage to temp location to avoid repo pollution
     ops_file = tmp_path / "ops.json"
     backups = tmp_path / "ops_backups"
@@ -79,3 +80,4 @@ def test_ai_suggest_preview_execute_undo(tmp_path):
     assert "restored" in uj
     # original file restored
     assert os.path.exists(moved["from"])
+

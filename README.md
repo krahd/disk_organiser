@@ -1,6 +1,8 @@
 # Disk Organiser
 
-Disk Organiser is a local-first prototype. Its default guided workflow scans a chosen local folder, explains an exact extension-based copy plan, requires approval, verifies copies and supports bounded recovery. Originals stay in place; no disk space is reclaimed.
+> Safety acceptance is held. Independent review found a persisted-journal trust flaw in the earlier copy-first candidate. Defensive repair validates all saved data, makes the app read-only by default, requires a fresh in-process preview for explicitly opted-in synthetic copy tests, and disables automatic recovery removal. Keep all originals, copies and journals. See [current safety limits](docs/GUIDED-COPIES.md) before synthetic development use.
+
+Disk Organiser is a local-first prototype. Its default guided workflow scans a chosen local folder, explains an exact extension-based copy plan, requires approval, verifies copies and retains all data when recovery cannot be safely established. Originals stay in place; no disk space is reclaimed.
 
 The first version supports top-level regular files on macOS/Linux, up to 500 entries and 1 GiB. It excludes cloud/synced/network folders, links and metadata-preserving copies. [Read the workflow and recovery limits](docs/GUIDED-COPIES.md) before use. Guided mode uses no AI or external services. Legacy analysis/move/delete interfaces remain experimental and are outside the guided guarantees.
 

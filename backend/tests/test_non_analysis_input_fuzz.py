@@ -64,8 +64,9 @@ app = importlib.import_module("backend.app")
     ],
 )
 def test_non_analysis_routes_reject_malformed_payloads(
-    endpoint, body, expected_status, expected_error_substring
+    endpoint, body, expected_status, expected_error_substring, monkeypatch
 ):
+    monkeypatch.setenv("DISK_ORGANISER_ENABLE_LEGACY_MUTATIONS", "1")
     client = app.app.test_client()
     response = client.post(endpoint, json=body)
 
@@ -204,3 +205,4 @@ def test_preferences_write_rejects_non_object_preferences_field():
     response = client.post("/api/preferences", json={"preferences": ["bad"]})
     assert response.status_code == 400
     assert "invalid preferences" in str(response.get_json().get("error"))
+

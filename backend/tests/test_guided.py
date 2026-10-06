@@ -20,7 +20,7 @@ class GuidedTests(unittest.TestCase):
         self.root.mkdir()
         (self.root / 'a.txt').write_bytes(b'alpha')
         (self.root / 'b.png').write_bytes(b'synthetic image bytes')
-        self.store = GuidedStore(self.base / 'state' / 'guided.sqlite')
+        self.store = GuidedStore(self.base / 'state' / 'guided.sqlite', allow_copy=True)
 
     def plan(self):
         return self.store.scan(str(self.root))
@@ -31,7 +31,7 @@ class GuidedTests(unittest.TestCase):
     def dest(self, p, index=0):
         return self.root / p['actions'][index]['destination']
 
-    def test_scan_preview_apply_verified_and_undo_after_restart(self):
+    def test_scan_preview_apply_verified_and_recovery_retains_files_after_restart(self):
         p = self.plan()
         self.assertEqual(p['state'], 'preview')
         self.assertFalse((self.root / p['output']).exists())
@@ -40,10 +40,14 @@ class GuidedTests(unittest.TestCase):
         self.assertEqual(self.apply(p)['state'], 'completed')
         for a in p['actions']:
             self.assertEqual((self.root / a['source']).read_bytes(), (self.root / a['destination']).read_bytes())
-        restarted = GuidedStore(self.store.db_path)
-        self.assertEqual(restarted.recover(p['id'], True)['state'], 'undone')
-        self.assertEqual(restarted.recover(p['id'], True)['state'], 'undone')
-        self.assertEqual(sorted(x.name for x in self.root.iterdir()), ['a.txt', 'b.png'])
+        restarted = GuidedStore(self.store.db_path, allow_copy=True)
+        before = restarted.get(p['id'])
+        for _ in range(2):
+            with self.assertRaisesRegex(GuidedError, 'disabled'):
+                restarted.recover(p['id'], True)
+        self.assertEqual(restarted.get(p['id']), before)
+        self.assertTrue((self.root / p['output']).exists())
+        self.assertEqual((self.root / 'a.txt').read_bytes(), b'alpha')
 
     def test_approval_is_literal_boolean_and_no_mutation_without_it(self):
         p = self.plan()
@@ -129,7 +133,8 @@ class GuidedTests(unittest.TestCase):
             result = self.apply(p)
         self.assertEqual(result['state'], 'interrupted')
         self.assertEqual((self.root / 'a.txt').read_bytes(), b'alpha')
-        self.assertEqual(self.store.recover(p['id'], True)['state'], 'recovery_blocked')
+        with self.assertRaisesRegex(GuidedError, 'disabled'):
+            self.store.recover(p['id'], True)
         self.assertTrue(self.dest(p).exists())  # uncertain partial file is retained
 
     def test_journal_failure_before_first_mutation(self):
@@ -152,37 +157,46 @@ class GuidedTests(unittest.TestCase):
         with mock.patch.object(self.store, '_copy', side_effect=interrupted):
             with self.assertRaises(KeyboardInterrupt):
                 self.apply(p)
-        restarted = GuidedStore(self.store.db_path)
+        restarted = GuidedStore(self.store.db_path, allow_copy=True)
         self.assertEqual(restarted.get(p['id'])['state'], 'applying')
         with self.assertRaises(GuidedError):
             restarted.apply(p['id'], True, True)
-        self.assertEqual(restarted.recover(p['id'], True)['state'], 'undone')
+        with self.assertRaisesRegex(GuidedError, 'disabled'):
+            restarted.recover(p['id'], True)
+        self.assertTrue((self.root / p['output']).exists())
 
     def test_edited_copy_or_changed_original_not_removed(self):
         p = self.plan()
         self.apply(p)
         self.dest(p).write_bytes(b'user edit')
         (self.root / 'b.png').write_bytes(b'new original')
-        result = self.store.recover(p['id'], True)
-        self.assertEqual(result['state'], 'recovery_blocked')
+        with self.assertRaisesRegex(GuidedError, 'disabled'):
+            self.store.recover(p['id'], True)
         self.assertEqual(self.dest(p).read_bytes(), b'user edit')
         self.assertTrue(self.dest(p, 1).exists())
 
-    def test_recovery_links_and_replaced_folders_not_followed(self):
+    def test_recovery_never_opens_selected_folder_or_removes_anything(self):
         p = self.plan()
         self.apply(p)
-        folder = self.root / p['output'] / 'Documents'
-        folder.rename(self.base / 'saved')
-        folder.symlink_to(self.base / 'saved', target_is_directory=True)
-        self.assertEqual(self.store.recover(p['id'], True)['state'], 'recovery_blocked')
-        self.assertEqual((self.base / 'saved' / 'a.txt').read_bytes(), b'alpha')
+        before = self.store.get(p['id'])
+        with mock.patch.object(guided, 'open_root') as roots, \
+                mock.patch.object(guided.os, 'unlink') as unlink, \
+                mock.patch.object(guided.os, 'rmdir') as rmdir:
+            with self.assertRaisesRegex(GuidedError, 'disabled'):
+                self.store.recover(p['id'], True)
+            roots.assert_not_called()
+            unlink.assert_not_called()
+            rmdir.assert_not_called()
+        self.assertEqual(self.store.get(p['id']), before)
+        self.assertEqual(self.dest(p).read_bytes(), b'alpha')
 
     def test_unjournalled_output_and_user_additions_retained(self):
         p = self.plan()
         self.apply(p)
         extra = self.root / p['output'] / 'my-notes.txt'
         extra.write_text('user addition')
-        self.assertEqual(self.store.recover(p['id'], True)['state'], 'recovery_blocked')
+        with self.assertRaisesRegex(GuidedError, 'disabled'):
+            self.store.recover(p['id'], True)
         self.assertEqual(extra.read_text(), 'user addition')
 
     def test_preview_expiry_and_bounds(self):

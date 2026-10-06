@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 13:44
+Last updated: 2026-10-06 14:16
 
 ## Project purpose
 
@@ -8,7 +8,7 @@ Disk Organiser is a local-first filesystem organisation tool. It analyses user-s
 
 ## Current implementation state
 
-The default `/ui/` entry now serves bounded, local-only guided copies. See [GUIDED-COPIES.md](docs/GUIDED-COPIES.md) for exact supported cases and recovery bounds. Originals are retained, every destination is previewed, and apply and recovery have separate explicit approvals.
+The default `/ui/` entry now serves bounded, local-only guided copies. See [GUIDED-COPIES.md](docs/GUIDED-COPIES.md) for exact supported cases and recovery bounds. Originals are retained, every destination is previewed, and copy application has explicit approval. Automatic recovery removal is disabled pending ownership design and independent confirmation.
 
 The previous experimental interface remains available at `/ui/index.html`, outside default navigation, with:
 
@@ -139,19 +139,18 @@ npx playwright test frontend/visual
 - `docs/openapi.json`: OpenAPI specification.
 - `scripts/validate_openapi.py`: route/spec drift check.
 
-## Guided implementation checkpoint (2026-10-06)
+## Current safety hold and sustained development
 
-- CI now runs Python tests from the repository root on both operating systems to retain package-import compatibility with the preserved safety regression tests. Initial PR run failed collection before this fix; current evidence is in the checkpoint.
-- All filesystem API routes reject cross-origin browser requests and non-localhost Host values, including retained legacy routes.
-- Real synthetic runtime CI passed on Linux and Windows at `7a4ab232`; all 4 browser tests passed and screenshots were inspected. Final refinements improve mobile path review, exact small-file byte display and framing protection. Check the draft PR for the latest exact-head result.
-- Default UI: new `frontend/guided.html`, `guided.css`, `guided.js`, with exact previews, skipped reasons, separate approvals and persistent history. No external resources or model calls.
-- New `backend/guided.py` performs only bounded top-level copies, preserving originals, using no-follow descriptors, exclusive destination creation, SHA-256 verification, durable journal checkpoints, whole-plan stale checks and fail-closed recovery. It supports POSIX only; Windows is explicitly unsupported for this workflow.
-- Unknown ownership, incomplete/edited copies, modified originals, replaced directories, user additions and unsupported cases are retained for manual inspection. Recovery cannot promise to reverse arbitrary external changes.
-- Legacy permanent-delete fallback removed from file deletion and operation-backup deletion. Failed/missing trash retains backup history; cleanup uses trash rather than permanent file deletion. Existing legacy move/undo race and overwrite risks are not solved by this bounded change and remain outside default navigation.
-- Preserves the two existing safety commits through `c7b39fb3ea1fb3b53f709ab63eb0b7d7c883a991`: canonical-root validation and execute-time revalidation.
-- Four demonstrated Python advisory fixes and development-tool dependency repairs are documented in `docs/DEPENDENCY-REPAIR.md`.
-- Local synthetic backend/UI tests and CI runtime evidence are recorded in `docs/IMPLEMENTATION-CHECKPOINT.md`. Local browser/socket restrictions are not bypassed; the real-browser runtime suite executes only on ordinary scoped GitHub CI.
-- MIT remains unchanged. Commercial wrapper/paid eligibility holds are unchanged. No merge, release, live deployment, source-media erasure or Apple Store upload.
+- Independent review found a critical persisted-journal trust flaw in candidate `7ff5390`. Earlier green CI is not safety acceptance. Do not treat that candidate as safe for user data.
+- `backend/guided_schema.py` now validates the complete versioned journal without filesystem I/O; derived names, field types, states, byte totals and identity relationships must all agree. Malformed and old records are retained and counted as blocked.
+- Read-only is now the default. Capabilities explicitly distinguish current scan scope, disabled mutation/recovery, missing structured Disk Model and uncertainty. Copy fixture testing needs operator opt-in; legacy execute/undo/backup-removal APIs are separately disabled by default.
+- Copy application additionally requires an unchanged canonical preview digest held in process memory from the user's current scan. Saved JSON cannot restore authority after restart, alteration, expiry or cache eviction. Rescan is required.
+- Automatic recovery removal is disabled. The endpoint validates the record and stops without selected-folder I/O, unlink/rmdir or journal mutation. All originals, output and recovery data remain. Journal assertions alone cannot prove app ownership.
+- Local defensive-core verification: 171 backend tests passed, guided schema/engine/test lint passed, 44 OpenAPI routes passed. Frontend contract integration and permitted independent confirmation remain pending.
+- Backend corruption checks are benign data-only or mock selected-folder I/O. The previously blocked review operation is not reproduced. Permitted independent confirmation is required before acceptance.
+- A separate guided experience slice is aligning the frontend and browser tests with `can_apply`, disabled recovery, blocked records and uncertain submissions. Integration remains a gate.
+- Sustained core safety, organisation logic, UX and reliability work is tracked in `docs/SAFETY-ACCEPTANCE-BACKLOG.md`; file ownership and contracts are in `docs/ARCHITECTURE-AND-OWNERSHIP.md`.
+- MIT and commercial-wrapper holds remain unchanged. No merge, release, deployment or Apple Store upload.
 
 ## Recent changes
 
@@ -251,4 +250,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 13:44
+Last updated: 2026-10-06 14:16

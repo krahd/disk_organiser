@@ -1,36 +1,46 @@
-# Guided-copy implementation checkpoint
+# Disk Organiser implementation checkpoint
 
-## Scope and ancestry
+Updated: 2026-10-06. Active state: safety repair and read-only product development. Independent acceptance is held.
 
-- Repository: `krahd/disk_organiser`; main observed at `c01668510b3b8e8e899390d1e3a0c1a74ad79db3`.
-- Preserve existing safety branch `ai/workspace/disk-organiser-fs-safety-20261005-c7`, head `c7b39fb3ea1fb3b53f709ab63eb0b7d7c883a991`, as parent of the new dedicated branch `codex/safe-guided-organisation-20261006`.
-- Copy-first POSIX workflow only; no mutation of real user data during implementation. All fixtures are synthetic temporary files. See `GUIDED-COPIES.md` for product and recovery limits.
-- Draft review checkpoint, not full-product/commercial acceptance. MIT rights, commercial wrapper and distribution holds are unchanged. No Apple uploads, merge, release or deployment.
+## Current defensive core checkpoint
 
-## Verification so far
+The candidate at `7ff5390a5401a674c77ccff743212b2297e1ca9d` is not accepted as safe: independent review found a persisted-journal authority flaw. Earlier passing CI and screenshots below are historical functional evidence only.
 
-- Local full pinned-environment backend suite: 116 tests passed. Focused flake8 on the guided engine and new Python test files passed.
-- Local UI unit tests: 4 suites, 23 tests pass, including preview/approval/repeated-click handling, filename escaping and interrupted-request messaging.
-- OpenAPI route coverage: 44 routes passed. Full frontend Prettier check passed.
-- Python audit: `pip-audit -r backend/requirements-locked.txt` found no known vulnerabilities after four targeted fixes.
-- Node audit: zero vulnerabilities after tested development-tool updates and a narrow js-yaml 4.3.2 override. YAML consumer compatibility passed.
-- Real runtime UI/screenshot suite: executed on ordinary GitHub CI with synthetic fixtures; see the exact-revision evidence below. The restricted local browser environment was not bypassed.
+The current repair introduces a complete pure schema, derived leaf-only destinations, a fresh in-process preview authority check, read-only defaults and explicit capability/uncertainty reporting. Automatic recovery removal is disabled; originals, copies, partial outputs and journals are retained. Malformed/old journal records are never executed or silently migrated.
 
-## Resume and independent review
+- Local pinned backend suite: 171 tests passed
+- Guided engine/schema/test flake8: passed
+- OpenAPI: 44 routes passed
+- Source diff whitespace: passed
+- Frontend safety-state integration: separately owned and pending
+- Independent confirmation of the repaired boundary: pending
 
-1. Verify the dedicated remote branch and draft PR head before changes.
-2. Check CI for that exact SHA. Require Linux backend, Windows legacy/backend suite, dependency audits, formatting, UI unit tests and real Flask/Playwright synthetic flow. Windows guided tests skip intentionally.
-3. Review the synthetic-browser-evidence artifact: desktop/mobile exact preview and persisted recovery. No source-user files may be added to fixtures.
-4. Request an independent safety review of stale/race boundaries, interrupted journal states, copy ownership, original-preserving recovery and UI approvals. Implement findings on the same dedicated branch and rerun affected checks.
-5. Remaining product work: native Windows guided operations, macOS filesystem/device acceptance, broader metadata/cloud/network handling, bounded async scan/cancel UX, and separately audited move/delete semantics. Do not claim a release or complete all-product acceptance from this checkpoint.
+See [SAFETY-REPAIR-2026-10-06.md](SAFETY-REPAIR-2026-10-06.md) for exact changes, benign checks and residual gates. The repair does not reproduce the previously blocked review operation. A backend-only checkpoint may fail the old recovery-enabled browser expectation until the explicit UI integration lands; this must not be hidden or treated as a pass.
 
-## Remote checkpoint and CI repair
+## Repository and integration
 
-- Draft PR: https://github.com/krahd/disk_organiser/pull/11
-- Initial implementation SHA: `2000c2cba31c0ceb81eb5fcbff17796472bdd974`, remotely read back.
-- Initial PR CI run `37497015208` passed the Python dependency audit, then exposed a collection error in the preserved pre-existing safety test because Linux changed into `backend/` before importing the `backend` package. Both OS jobs now invoke `python -m pytest -q backend/tests` from the repository root, matching local verification. This preserves the regression test rather than deleting it.
-- Repaired implementation SHA `7a4ab232e79f34818e3e7a5534f2aaedaa47f434`: [PR CI 37497309003](https://github.com/krahd/disk_organiser/actions/runs/37497309003) and [push CI 37497302056](https://github.com/krahd/disk_organiser/actions/runs/37497302056) both passed.
-- At that revision: Linux 115 backend tests passed; Windows 96 passed / 19 explicitly unsupported guided tests skipped; 23 UI unit tests passed; both dependency audits, formatting, OpenAPI and all 4 browser tests passed.
-- [Synthetic screenshot artifact](https://github.com/krahd/disk_organiser/actions/runs/37497309003/artifacts/11428097333), SHA-256 `ddbdbff454f59a7dc9ab921430af12a583e999bfc375a1c292db368628ed1ce9`, was downloaded and its desktop preview, mobile preview and recovered-state images were visually inspected. Artifact retention is 14 days.
-- Screenshot review led to a final focused refinement: mobile action cards instead of horizontal table scrolling, non-zero byte display for small files, and reviewable copy paths before recovery. All UI pages also deny framing, including the retained legacy interface. Local regression coverage is now 116 backend tests and 23 UI tests.
-- The final refinement's exact-head CI is checked after publication and recorded in the PR conversation. Do not attribute the predecessor's green result to later code without that check.
+- Repository: `krahd/disk_organiser`
+- Draft integration PR: https://github.com/krahd/disk_organiser/pull/11
+- Dedicated branch: `codex/safe-guided-organisation-20261006`
+- Main observed at `c01668510b3b8e8e899390d1e3a0c1a74ad79db3`
+- Preserved prior safety ancestry: `c7b39fb3ea1fb3b53f709ab63eb0b7d7c883a991`
+- Exact publication SHA and subsequent CI results are recorded in the PR conversation; verify the current head before any follow-on change.
+
+[ARCHITECTURE-AND-OWNERSHIP.md](ARCHITECTURE-AND-OWNERSHIP.md) assigns disjoint core, UX, read-only model and reliability paths. [SAFETY-ACCEPTANCE-BACKLOG.md](SAFETY-ACCEPTANCE-BACKLOG.md) defines durable outcomes and acceptance gates. Do not overwrite another slice's files when integrating.
+
+## Historical functional evidence, not safety acceptance
+
+At `7ff5390a5401a674c77ccff743212b2297e1ca9d`, [PR CI 37498120176](https://github.com/krahd/disk_organiser/actions/runs/37498120176) and [push CI 37498113047](https://github.com/krahd/disk_organiser/actions/runs/37498113047) passed: Linux 116 backend tests, Windows 97 passed/19 skipped, 23 UI tests, four browser tests, audits, formatting and OpenAPI. The [synthetic screenshot artifact](https://github.com/krahd/disk_organiser/actions/runs/37498120176/artifacts/11428193219) had ZIP SHA-256 `a55677fbe14204c12f9237cc4ce9088dd7ad462ead9d690561c7bf1cc58a5d54`. Screenshots were inspected and drove mobile path/byte-display improvements.
+
+Those checks missed the persisted-data flaw. They must not be reused as proof that the old recovery deletion is safe or that the new contract has been integrated.
+
+## Resume sequence
+
+1. Verify the latest PR head and apply only explicitly owned paths.
+2. Integrate the capability-aware read-only UX and its revised real-runtime tests, retaining the complete backend regression suite.
+3. Run exact-head backend, unit, dependency audit, formatting, OpenAPI and benign synthetic browser checks. Record supported/skipped platforms and inspect screenshots.
+4. Obtain permitted independent confirmation of the schema/fresh-preview/no-removal boundary. Address findings before acceptance.
+5. Continue the separate structured read-only Disk Model, explainable relationships, coherent read-only plans and long-run reliability work. Do not turn their output into direct filesystem or LLM operation authority.
+6. Keep automatic recovery removal and ordinary mutation defaults disabled until their separate gates are met. Cross-volume offload, representative macOS acceptance, native Windows guided support and commercial distribution remain open.
+
+MIT rights and commercial-wrapper holds are unchanged. No main merge, release, live deployment or Apple upload.
