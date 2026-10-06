@@ -1,4 +1,6 @@
 const { test, expect } = require("@playwright/test");
+const fs = require("fs");
+const path = require("path");
 
 async function open(page) {
   await page.goto("/");
@@ -51,8 +53,11 @@ async function clickZoomedReview(page, testInfo) {
       candidates,
     };
   });
+  const geometryPath = testInfo.outputPath("zoom-pointer-geometry.json");
+  fs.mkdirSync(path.dirname(geometryPath), { recursive: true });
+  fs.writeFileSync(geometryPath, JSON.stringify(geometry, null, 2) + "\n");
   await testInfo.attach("zoom-pointer-geometry.json", {
-    body: Buffer.from(JSON.stringify(geometry, null, 2)),
+    path: geometryPath,
     contentType: "application/json",
   });
   const point = geometry.candidates.find(
