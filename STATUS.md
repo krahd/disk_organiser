@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 14:16
+Last updated: 2026-10-06 14:19
 
 ## Project purpose
 
@@ -8,7 +8,7 @@ Disk Organiser is a local-first filesystem organisation tool. It analyses user-s
 
 ## Current implementation state
 
-The default `/ui/` entry now serves bounded, local-only guided copies. See [GUIDED-COPIES.md](docs/GUIDED-COPIES.md) for exact supported cases and recovery bounds. Originals are retained, every destination is previewed, and copy application has explicit approval. Automatic recovery removal is disabled pending ownership design and independent confirmation.
+The default `/ui/` entry serves a bounded local-only file-type overview and read-only comparison of the existing layout with an exact copy plan. Copy execution is disabled by default; explicit synthetic-development opt-in and a fresh approved plan are required for fixture testing. Automatic recovery removal is unavailable. See [GUIDED-COPIES.md](docs/GUIDED-COPIES.md) for the safety boundary and [the UX audit and contract](docs/ux/FOLDER-UNDERSTANDING-2026-10-06.md) for scope, acceptance criteria and staged product work.
 
 The previous experimental interface remains available at `/ui/index.html`, outside default navigation, with:
 
@@ -27,7 +27,7 @@ Near-duplicate detection is content-aware and includes filename/token similarity
 
 ## Active focus
 
-The active bounded first-version focus is guided copy organisation and honest recovery. It is not a complete drive-cleanup product or commercial release. Dedicated Windows guided support, hostile concurrent-write protection, universal cloud/network detection and representative macOS hardware acceptance remain open. Remote inference is never used by the guided surface.
+The main product direction is a read-only, evidence-backed Disk Model and Disk Map before coherent plans and a separately reviewed action layer. The current frontend checkpoint is only a top-level file-type overview; it does not implement project, version or cross-drive understanding. It is not a complete drive-cleanup product or commercial release. Dedicated Windows guided support, hostile concurrent-write protection, universal cloud/network detection and representative macOS hardware acceptance remain open. Remote inference is never used by the guided surface.
 
 ## Architecture overview
 
@@ -79,7 +79,7 @@ The diagram below describes the retained legacy analysis architecture. The new d
 
 ### Flow chart
 
-The flow chart below describes the legacy analysis lifecycle, not a certification of its filesystem safety. The default guided lifecycle is scan → saved exact preview → explicit local-folder approval → original verification → journalled copies → output verification → explicit conflict-aware recovery.
+The flow chart below describes the legacy analysis lifecycle, not a certification of its filesystem safety. The default guided lifecycle is scan → file-type overview → compare current layout with read-only copy plan → inspect exact paths. Synthetic-development copy testing additionally requires fresh explicit approval and verification. Automatic recovery removal is unavailable.
 
 <svg xmlns="http://www.w3.org/2000/svg" width="1040" height="360" viewBox="0 0 1040 360" role="img" aria-labelledby="disk-flow-title disk-flow-desc">
   <title id="disk-flow-title">Disk Organiser safe operation flow</title>
@@ -148,9 +148,18 @@ npx playwright test frontend/visual
 - Automatic recovery removal is disabled. The endpoint validates the record and stops without selected-folder I/O, unlink/rmdir or journal mutation. All originals, output and recovery data remain. Journal assertions alone cannot prove app ownership.
 - Local defensive-core verification: 171 backend tests passed, guided schema/engine/test lint passed, 44 OpenAPI routes passed. Frontend contract integration and permitted independent confirmation remain pending.
 - Backend corruption checks are benign data-only or mock selected-folder I/O. The previously blocked review operation is not reproduced. Permitted independent confirmation is required before acceptance.
-- A separate guided experience slice is aligning the frontend and browser tests with `can_apply`, disabled recovery, blocked records and uncertain submissions. Integration remains a gate.
+- The guided experience now consumes strict session and per-plan capabilities, retains blocked-record notices, has no recovery controls and locks unconfirmed submissions until a successful history refresh. Exact-head browser validation and independent review remain gates.
 - Sustained core safety, organisation logic, UX and reliability work is tracked in `docs/SAFETY-ACCEPTANCE-BACKLOG.md`; file ownership and contracts are in `docs/ARCHITECTURE-AND-OWNERSHIP.md`.
 - MIT and commercial-wrapper holds remain unchanged. No merge, release, deployment or Apple Store upload.
+
+## Guided understanding UX checkpoint
+
+- Intent-first overview: understand what is here or explore a copy layout. Counts, logical copy data, exclusions and extension-only inference limits precede paths. Keeping the existing layout sends no file operation.
+- Exact effects are searchable and paged at 25 rows. Filters never select a subset, and browsing revokes previous approval. Synthetic-development approval names the complete plan count and unavailable recovery.
+- Saved snapshots are historical; read-only mode never suggests rescanning enables copying. Restarted or stale synthetic-development plans require a new scan. Default builds show no approval control.
+- Native keyboard controls, focus return on closing, mobile action cards, loading/error/empty states and the 500-entry limit are covered in the test specifications.
+- Local verification: 4 Jest suites / 31 tests passed, full frontend formatting and JavaScript syntax checks passed. Seven real Flask/Chromium scenarios are prepared for ordinary CI with disposable synthetic files only; new screenshot review and independent review remain pending. No restricted local runtime was bypassed.
+- Read the product audit, acceptance criteria, Disk Map evidence contract and durable backlog in `docs/ux/FOLDER-UNDERSTANDING-2026-10-06.md`. Scripted comprehension checks are not a participant study or assistive-technology acceptance.
 
 ## Recent changes
 
@@ -250,4 +259,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 14:16
+Last updated: 2026-10-06 14:19

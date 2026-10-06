@@ -3,45 +3,71 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Disk Organiser · Guided copies</title>
+    <title>Disk Organiser · Understand your folder</title>
     <link rel="icon" href="images/logo.svg" />
     <link rel="stylesheet" href="guided.css" />
     <script src="guided.js" defer></script>
   </head>
   <body>
+    <a class="skip-link" href="#choose-title">Skip to folder choices</a>
     <header>
       <img src="images/logo.svg" alt="" />
       <div>
-        <p class="eyebrow">DISK ORGANISER</p>
-        <h1>A clearer folder. Originals kept.</h1>
+        <p class="eyebrow">DISK ORGANISER · EARLY PREVIEW</p>
+        <h1>Understand your folder. Choose what happens.</h1>
       </div>
       <span class="badge">Local only · No AI</span>
     </header>
     <main>
-      <section class="intro">
-        <h2>Organise a copy, then decide</h2>
+      <section class="intro" aria-labelledby="intro-title">
+        <h2 id="intro-title">Start with a file-type overview</h2>
         <p>
-          Group documents, images, audio, video and archives by file extension. Review every
-          destination before anything is copied. Your originals stay exactly where they are.
+          See which file types are here, what this version cannot understand, and whether a separate
+          organised copy would help. Scanning does not change your files.
         </p>
         <ol class="steps">
-          <li>Choose a folder</li>
-          <li>Review the exact plan</li>
-          <li>Approve copies</li>
+          <li>Understand the folder</li>
+          <li>Compare your choices</li>
+          <li>Review before copying</li>
         </ol>
-        <p class="notice">
-          This uses extra disk space. It does not clear space or identify duplicates. Use a separate
-          backup. Never erase source media based on this report.
-        </p>
       </section>
-      <section aria-labelledby="choose-title">
-        <h2 id="choose-title">1. Choose a local folder</h2>
-        <p>
-          Top-level files only, up to 500 entries and 1 GiB. macOS and Linux only. Close other apps
-          editing this folder.
+      <aside class="notice" aria-labelledby="safety-title">
+        <h2 id="safety-title">Read-only preview. Copying is not enabled.</h2>
+        <p id="mode-description">
+          You can inspect a local file-type overview and compare a proposed copy layout. This build
+          will not apply that layout. The wider Disk Map, project relationships and reviewed
+          transaction/recovery layer are still being developed.
         </p>
+      </aside>
+      <section aria-labelledby="choose-title">
+        <h2 id="choose-title" tabindex="-1">1. What would help with this folder?</h2>
         <form id="scan-form">
+          <fieldset id="goals">
+            <legend>Choose a starting point</legend>
+            <div class="choices">
+              <label class="choice"
+                ><input type="radio" name="goal" value="understand" checked /><span
+                  ><strong>Understand what is here</strong
+                  ><small
+                    >See a local file-type overview. Stop there if that is enough.</small
+                  ></span
+                ></label
+              >
+              <label class="choice"
+                ><input type="radio" name="goal" value="copies" /><span
+                  ><strong>Explore an organised copy</strong
+                  ><small
+                    >Compare a file-type layout with leaving this folder as it is.</small
+                  ></span
+                ></label
+              >
+            </div>
+          </fieldset>
           <label for="root">Absolute folder path</label>
+          <p id="path-help" class="muted">
+            Paste the full path to one fully local, unsynchronised folder. A folder picker is not
+            available yet.
+          </p>
           <div class="input-row">
             <input
               id="root"
@@ -50,30 +76,48 @@
               placeholder="/path/to/a/local/folder"
               autocomplete="off"
               spellcheck="false"
+              aria-describedby="path-help scope-help"
             /><button type="submit" id="scan">Scan and preview</button>
           </div>
+          <p id="scope-help" class="muted">
+            macOS/Linux · Top-level files only · Up to 500 entries and 1 GiB. Close other apps
+            editing this folder. Scans read file contents locally to verify hashes; they do not
+            interpret the contents.
+          </p>
         </form>
-        <p class="muted">
-          Cloud-synced folders, placeholders, network drives, links, nested folders and unrecognised
-          file types are unsupported. File metadata and access-control lists are not preserved;
-          generated copies are private to your account.
-        </p>
+        <details>
+          <summary>Check what this first version can safely inspect</summary>
+          <p>
+            Use a fully local folder. Cloud-synced folders, placeholders, network drives, links and
+            special files are unsupported. Nested folders and unrecognised file types are left out,
+            with reasons.
+          </p>
+          <p>
+            Copies do not preserve Finder tags, timestamps, permissions, extended attributes or
+            access-control lists. Copies are private to your account. No files, names or contents
+            are sent to a model or external service by this workflow.
+          </p>
+        </details>
       </section>
-      <p id="status" role="status" aria-live="polite"></p>
+      <p id="status" role="status" aria-live="polite" aria-atomic="true"></p>
       <section id="preview" aria-labelledby="preview-title" hidden></section>
       <section aria-labelledby="history-title">
         <div class="section-heading">
-          <h2 id="history-title">History and recovery</h2>
-          <button type="button" id="refresh" class="secondary">Refresh</button>
+          <h2 id="history-title">Saved plans and results</h2>
+          <button type="button" id="refresh" class="secondary">Refresh history</button>
         </div>
         <p class="muted">
-          The latest 50 plans are saved locally. Interrupted work is never resumed automatically.
-          Recovery removes only verified generated copies when their original is unchanged. Edited,
-          incomplete or replaced files stay for manual inspection.
+          The latest 50 plans are saved on this computer. A saved plan is a record, not proof that
+          its files are still unchanged. After an app restart, scan again before copying. Nothing
+          resumes automatically.
         </p>
+        <p id="history-notice" class="notice" hidden></p>
         <div id="history"></div>
       </section>
     </main>
-    <footer>Preview first. No remote inference. No automatic cleanup.</footer>
+    <footer>
+      File-type overview today. A read-only Disk Map with project and version relationships remains
+      future work.
+    </footer>
   </body>
 </html>
