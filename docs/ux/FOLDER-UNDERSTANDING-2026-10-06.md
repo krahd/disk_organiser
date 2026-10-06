@@ -124,3 +124,8 @@ The read-only Disk Model/Map is a coherent direction, not an uncontested feature
 The rendered states show legible desktop comparisons, stacked 390 px exact-path cards, preserved focus, visible full-plan scope under filtering, unavailable copy controls in default mode, explanatory unsupported-platform and session-reconnected states, and retained history without removal controls. No clipping or horizontal overflow was observed in these fixture views. Long history remains vertically verbose and belongs to the backlog; this is not a beginner participant study, screen-reader certification or physical-device acceptance.
 
 That pixel review prompted a final wording pass: singular copy/folder counts, a neutral “Inspect exact paths” step, and no instruction to start a scan in unsupported empty history. Local UI coverage is now 35 tests. The exact final-head rerun and screenshot evidence are recorded on [draft PR 12](https://github.com/krahd/disk_organiser/pull/12), rather than attributing the predecessor's green run to later source. Independent confirmation is still required.
+
+
+### Screenshot capture synchronisation
+
+The wording revision `b1c3f2e` passed [CI 37506088067](https://github.com/krahd/disk_organiser/actions/runs/37506088067), including 35 UI and 12 Chromium tests. Its artifact was checksum-verified and inspected, which revealed one full-page capture racing the history response: the document grew after screenshot dimensions were measured. The screenshot helper now waits for the completed UI state (except intentionally paused loading), checks the PNG height against document height, and verifies the height stays stable through capture. This changes test evidence collection only. Review should use the latest exact-head artifact linked in PR 12.

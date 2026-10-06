@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 14:45
+Last updated: 2026-10-06 14:51
 
 ## Project purpose
 
@@ -170,6 +170,8 @@ npx playwright test frontend/visual
 - Three core error strings now direct users to retain all data and inspect the saved result manually; automatic removal remains unavailable. AST comparison verifies no engine change except string contents. Focused backend lint passes.
 - README and guided UI distinguish the current read-only experience from retained disabled legacy actions and optional synthetic development copy tests. Repair CI at `e7fb60a` passed: Linux 171, Windows 151 passed / 20 skipped, UI 34 and real Chromium 12 tests. Its 13 screenshot files were checksum-verified and visually inspected. Screenshot review led to singular-count, neutral step-label and unsupported-empty-history wording refinements, with 35 local UI tests passing. Final-head CI and image evidence are recorded on PR 12; independent confirmation remains required.
 
+- Final wording CI at `b1c3f2e` passed the same backend/browser checks and 35 UI tests. Image inspection then identified an evidence-capture race with asynchronous history expansion. Screenshot helpers now wait for idle except the deliberately held loading state, and assert PNG height matches stable document height. This is a test-only capture correction; current exact-head evidence is recorded on PR 12.
+
 ## Recent changes
 
 - Backend Python dependencies now pin `modelito==1.4.1` in both `backend/requirements.txt` and `backend/requirements-locked.txt` (from `1.2.2`) to align with the latest upstream release.
@@ -268,4 +270,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 14:45
+Last updated: 2026-10-06 14:51

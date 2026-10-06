@@ -57,7 +57,13 @@ async function scan(page, root, copies = false) {
   await expect(page.getByRole("heading", { name: "2. Understand this folder" })).toBeVisible();
 }
 async function screenshot(page, testInfo, name) {
-  await page.screenshot({ path: testInfo.outputPath(name), fullPage: true });
+  // History can expand after the overview heading appears. Capture completed
+  // states only once the whole operation is idle; loading is intentionally held.
+  if (name !== "guided-loading.png") await expect(page.locator("#refresh")).toBeEnabled();
+  const height = await page.evaluate(() => document.documentElement.scrollHeight);
+  const png = await page.screenshot({ path: testInfo.outputPath(name), fullPage: true });
+  expect(png.readUInt32BE(20)).toBe(height);
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(height);
 }
 test.beforeAll(async () => {
   base = fs.mkdtempSync(path.join(os.tmpdir(), "disk-guided-ux-"));
