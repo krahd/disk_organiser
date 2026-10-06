@@ -1,5 +1,5 @@
 blinker==1.9.0
-click==8.3.2
+click==8.3.3
 croniter==6.2.2
 filelock==3.29.0
 flake8==7.3.0
@@ -15,12 +15,12 @@ mccabe==0.7.0
 modelito==1.4.3
 numpy==2.4.4
 packaging==26.1
-Pillow==12.2.0
+Pillow==12.3.0
 pluggy==1.6.0
 pycodestyle==2.14.0
 pyflakes==3.4.0
 Pygments==2.20.0
-pypdf==6.10.2
+pypdf==6.19.0
 PyWavelets==1.9.0
 pytest==9.0.3
 python-dateutil==2.9.0.post0
@@ -29,5 +29,6 @@ rq==2.8.0
 scipy==1.17.1
 Send2Trash==2.1.0
 six==1.17.0
-Werkzeug==3.1.8
+Werkzeug==3.1.9
 xxhash==3.6.0
+

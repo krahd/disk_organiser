@@ -1,13 +1,8 @@
 # Disk Organiser
 
-Disk Organiser is a small prototype for visualising and safely organising files on a
-local filesystem. It provides:
+Disk Organiser is a local-first prototype. Its default guided workflow scans a chosen local folder, explains an exact extension-based copy plan, requires approval, verifies copies and supports bounded recovery. Originals stay in place; no disk space is reclaimed.
 
-- A Flask backend API for scanning, finding duplicates, and applying safe
-	organise operations (with backups).
-- A minimal static frontend for quick visualisation, grouped previews, and conversational refinement.
-- Optional AI-assisted suggestions via pluggable model wrappers.
-- Preview-first semantic analysis with typed reversible actions: moves, stale-file removal, symlink proposals.
+The first version supports top-level regular files on macOS/Linux, up to 500 entries and 1 GiB. It excludes cloud/synced/network folders, links and metadata-preserving copies. [Read the workflow and recovery limits](docs/GUIDED-COPIES.md) before use. Guided mode uses no AI or external services. Legacy analysis/move/delete interfaces remain experimental and are outside the guided guarantees.
 
 This repository contains the backend API under `backend/` and the frontend in
 `frontend/`.
@@ -40,7 +35,7 @@ pip install -r backend/requirements.txt
 python backend/app.py
 ```
 
-Open `frontend/index.html` in a browser. The frontend uses relative `/api` paths
+Open `http://127.0.0.1:5000/ui/` in a browser. The frontend uses relative `/api` paths
 by default. For local development run the backend with `python backend/app.py`
 (default API: `http://127.0.0.1:5000`). When running in Docker the backend runs
 on port `8000` (see `Dockerfile` / `docker-compose.yml`). You can override the
@@ -129,4 +124,5 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 ## Disclaimer
 
 This software is provided "AS IS", without warranty of any kind, express or implied. Use at your own risk.
+
 

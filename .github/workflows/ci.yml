@@ -90,6 +90,7 @@ jobs:
       - name: Run unit tests (Jest)
         run: |
           npm test --silent
+          npm run test:dependency-compat
 
       - name: Install Playwright apt dependencies
         if: runner.os == 'Linux'
@@ -106,3 +107,13 @@ jobs:
           # visual specs load local frontend/index.html directly (no external server required)
           # skip modal snapshot that lacks baseline in CI
           npx playwright test frontend/visual --grep-invert "preview modal"
+
+
+      - name: Save synthetic browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-browser-evidence
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 14

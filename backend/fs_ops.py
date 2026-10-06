@@ -9,7 +9,6 @@ preview of actions that would be taken when `dry_run=True`.
 from __future__ import annotations
 
 import os
-import shutil
 import uuid
 import importlib
 from pathlib import Path
@@ -269,7 +268,8 @@ def delete_path(path: str) -> None:
     if send2trash:
         send2trash(path)
         return
-    if os.path.isdir(path) and not os.path.islink(path):
-        shutil.rmtree(path)
-    else:
-        os.unlink(path)
+    raise RuntimeError(
+        "Trash support is unavailable. Nothing was deleted. Install Send2Trash "
+        "and retry, or manage this file manually in your file manager."
+    )
+

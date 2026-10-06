@@ -8,7 +8,12 @@ gunicorn
 filelock
 xxhash
 send2trash
-Pillow
+Pillow>=12.3.0
 ImageHash
-pypdf
+pypdf>=6.19.0
 modelito==1.4.3
+
+
+# Minimum fixed Click release for CLI dependencies.
+click>=8.3.3
+Werkzeug>=3.1.9

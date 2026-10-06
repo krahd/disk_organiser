@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-05-12 03:25
+Last updated: 2026-10-06 13:34
 
 ## Project purpose
 
@@ -8,7 +8,9 @@ Disk Organiser is a local-first filesystem organisation tool. It analyses user-s
 
 ## Current implementation state
 
-The repository currently has an implemented end-to-end semantic organisation workflow:
+The default `/ui/` entry now serves bounded, local-only guided copies. See [GUIDED-COPIES.md](docs/GUIDED-COPIES.md) for exact supported cases and recovery bounds. Originals are retained, every destination is previewed, and apply and recovery have separate explicit approvals.
+
+The previous experimental interface remains available at `/ui/index.html`, outside default navigation, with:
 
 - Flask backend under `backend/`
 - vanilla JavaScript frontend under `frontend/`
@@ -25,7 +27,7 @@ Near-duplicate detection is content-aware and includes filename/token similarity
 
 ## Active focus
 
-The project is currently focused on hardening semantic analysis, optional OCR/embedding capability reporting, frontend analysis-flow coverage, cross-platform filesystem behaviour, and runtime safety guarantees.
+The active bounded first-version focus is guided copy organisation and honest recovery. It is not a complete drive-cleanup product or commercial release. Dedicated Windows guided support, hostile concurrent-write protection, universal cloud/network detection and representative macOS hardware acceptance remain open. Remote inference is never used by the guided surface.
 
 ## Architecture overview
 
@@ -33,7 +35,7 @@ The backend scans allowed roots, builds file contexts, uses provider-backed or h
 
 ### Architecture diagram
 
-The diagram shows the current backend/frontend architecture and safety boundary.
+The diagram below describes the retained legacy analysis architecture. The new default guided path is `frontend/guided.js` → local token/origin-checked Flask API → `backend/guided.py` → SQLite journal and descriptor-relative copy/verification. It does not call the model, legacy executor or legacy backup store.
 
 <svg xmlns="http://www.w3.org/2000/svg" width="1020" height="500" viewBox="0 0 1020 500" role="img" aria-labelledby="disk-arch-title disk-arch-desc">
   <title id="disk-arch-title">Disk Organiser architecture</title>
@@ -77,7 +79,7 @@ The diagram shows the current backend/frontend architecture and safety boundary.
 
 ### Flow chart
 
-The flow chart shows the safe analysis-to-execution lifecycle.
+The flow chart below describes the legacy analysis lifecycle, not a certification of its filesystem safety. The default guided lifecycle is scan → saved exact preview → explicit local-folder approval → original verification → journalled copies → output verification → explicit conflict-aware recovery.
 
 <svg xmlns="http://www.w3.org/2000/svg" width="1040" height="360" viewBox="0 0 1040 360" role="img" aria-labelledby="disk-flow-title disk-flow-desc">
   <title id="disk-flow-title">Disk Organiser safe operation flow</title>
@@ -137,6 +139,18 @@ npx playwright test frontend/visual
 - `docs/openapi.json`: OpenAPI specification.
 - `scripts/validate_openapi.py`: route/spec drift check.
 
+## Guided implementation checkpoint (2026-10-06)
+
+- All filesystem API routes reject cross-origin browser requests and non-localhost Host values, including retained legacy routes.
+- Default UI: new `frontend/guided.html`, `guided.css`, `guided.js`, with exact previews, skipped reasons, separate approvals and persistent history. No external resources or model calls.
+- New `backend/guided.py` performs only bounded top-level copies, preserving originals, using no-follow descriptors, exclusive destination creation, SHA-256 verification, durable journal checkpoints, whole-plan stale checks and fail-closed recovery. It supports POSIX only; Windows is explicitly unsupported for this workflow.
+- Unknown ownership, incomplete/edited copies, modified originals, replaced directories, user additions and unsupported cases are retained for manual inspection. Recovery cannot promise to reverse arbitrary external changes.
+- Legacy permanent-delete fallback removed from file deletion and operation-backup deletion. Failed/missing trash retains backup history; cleanup uses trash rather than permanent file deletion. Existing legacy move/undo race and overwrite risks are not solved by this bounded change and remain outside default navigation.
+- Preserves the two existing safety commits through `c7b39fb3ea1fb3b53f709ab63eb0b7d7c883a991`: canonical-root validation and execute-time revalidation.
+- Four demonstrated Python advisory fixes and development-tool dependency repairs are documented in `docs/DEPENDENCY-REPAIR.md`.
+- Local synthetic backend/UI tests and CI runtime evidence are recorded in `docs/IMPLEMENTATION-CHECKPOINT.md`. Local browser/socket restrictions are not bypassed; the real-browser runtime suite executes only on ordinary scoped GitHub CI.
+- MIT remains unchanged. Commercial wrapper/paid eligibility holds are unchanged. No merge, release, live deployment, source-media erasure or Apple Store upload.
+
 ## Recent changes
 
 - Backend Python dependencies now pin `modelito==1.4.1` in both `backend/requirements.txt` and `backend/requirements-locked.txt` (from `1.2.2`) to align with the latest upstream release.
@@ -169,6 +183,9 @@ npx playwright test frontend/visual
 - Public project website content and visual design were refreshed in `docs/index.html` and `docs/assets/style.css` with clearer safety messaging and updated quick-start links.
 
 ## Tests and verification status
+
+Current guided-copy results: see `docs/IMPLEMENTATION-CHECKPOINT.md`. Older results below remain historical evidence and do not establish current release readiness.
+
 
 Previously recorded successful checks:
 
@@ -232,4 +249,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-05-12 03:25
+Last updated: 2026-10-06 13:34

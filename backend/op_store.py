@@ -370,6 +370,8 @@ def undo_op(op_id: str, dry_run: bool = False) -> dict:
 
 
 def cleanup_recycle(retention_days: int = 30, dry_run: bool = False) -> dict:
+    if not dry_run and not send2trash:
+        raise OSError("Trash support is unavailable. Recycled backups were retained.")
     now = time.time()
     cutoff = now - (retention_days * 24 * 3600)
     removed = 0
@@ -395,7 +397,7 @@ def cleanup_recycle(retention_days: int = 30, dry_run: bool = False) -> dict:
                             to_remove.append(
                                 {"path": fp, "size": size, "mtime": os.path.getmtime(fp)})
                         else:
-                            os.remove(fp)
+                            send2trash(fp)
                             removed += 1
                 except (OSError, PermissionError):
                     continue
@@ -440,20 +442,15 @@ def delete_op(op_id: str, dry_run: bool = False):
                         files.append({"path": fp})
         return {"op_id": op_id, "dry_run": True, "files": files}
 
+    # Keep operation history until its backups have been safely sent to trash.
+    # A missing/failed trash implementation must never become permanent deletion.
+    if bdir and os.path.exists(bdir):
+        if not send2trash:
+            raise OSError("Trash support is unavailable. Backups and history were retained.")
+        send2trash(bdir)
     conn = _connect()
     cur = conn.cursor()
     cur.execute("DELETE FROM ops WHERE id=?", (op_id,))
     conn.commit()
     conn.close()
-    try:
-        if bdir and os.path.exists(bdir):
-            try:
-                if send2trash:
-                    send2trash(bdir)
-                else:
-                    shutil.rmtree(bdir)
-            except Exception:
-                shutil.rmtree(bdir)
-    except (OSError, shutil.Error):
-        pass
     return True

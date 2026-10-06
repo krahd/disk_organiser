@@ -211,6 +211,84 @@
       "get": {
         "summary": "Serve packaged frontend asset"
       }
+    },
+    "/api/guided/session": {
+      "get": {
+        "summary": "Local guided copy workflow; see docs/GUIDED-COPIES.md",
+        "responses": {
+          "200": {
+            "description": "Journalled plan/result"
+          },
+          "403": {
+            "description": "Local origin or token required"
+          },
+          "409": {
+            "description": "Safe stop; read error and refresh history"
+          }
+        }
+      }
+    },
+    "/api/guided/plans": {
+      "get": {
+        "summary": "Local guided copy workflow; see docs/GUIDED-COPIES.md",
+        "responses": {
+          "200": {
+            "description": "Journalled plan/result"
+          },
+          "403": {
+            "description": "Local origin or token required"
+          },
+          "409": {
+            "description": "Safe stop; read error and refresh history"
+          }
+        }
+      },
+      "post": {
+        "summary": "Local guided copy workflow; see docs/GUIDED-COPIES.md",
+        "responses": {
+          "200": {
+            "description": "Journalled plan/result"
+          },
+          "403": {
+            "description": "Local origin or token required"
+          },
+          "409": {
+            "description": "Safe stop; read error and refresh history"
+          }
+        }
+      }
+    },
+    "/api/guided/plans/{plan_id}/apply": {
+      "post": {
+        "summary": "Local guided copy workflow; see docs/GUIDED-COPIES.md",
+        "responses": {
+          "200": {
+            "description": "Journalled plan/result"
+          },
+          "403": {
+            "description": "Local origin or token required"
+          },
+          "409": {
+            "description": "Safe stop; read error and refresh history"
+          }
+        }
+      }
+    },
+    "/api/guided/plans/{plan_id}/recover": {
+      "post": {
+        "summary": "Local guided copy workflow; see docs/GUIDED-COPIES.md",
+        "responses": {
+          "200": {
+            "description": "Journalled plan/result"
+          },
+          "403": {
+            "description": "Local origin or token required"
+          },
+          "409": {
+            "description": "Safe stop; read error and refresh history"
+          }
+        }
+      }
     }
   }
 }

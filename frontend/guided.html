@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Disk Organiser · Guided copies</title>
+    <link rel="icon" href="images/logo.svg" />
+    <link rel="stylesheet" href="guided.css" />
+    <script src="guided.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <img src="images/logo.svg" alt="" />
+      <div>
+        <p class="eyebrow">DISK ORGANISER</p>
+        <h1>A clearer folder. Originals kept.</h1>
+      </div>
+      <span class="badge">Local only · No AI</span>
+    </header>
+    <main>
+      <section class="intro">
+        <h2>Organise a copy, then decide</h2>
+        <p>
+          Group documents, images, audio, video and archives by file extension. Review every
+          destination before anything is copied. Your originals stay exactly where they are.
+        </p>
+        <ol class="steps">
+          <li>Choose a folder</li>
+          <li>Review the exact plan</li>
+          <li>Approve copies</li>
+        </ol>
+        <p class="notice">
+          This uses extra disk space. It does not clear space or identify duplicates. Use a separate
+          backup. Never erase source media based on this report.
+        </p>
+      </section>
+      <section aria-labelledby="choose-title">
+        <h2 id="choose-title">1. Choose a local folder</h2>
+        <p>
+          Top-level files only, up to 500 entries and 1 GiB. macOS and Linux only. Close other apps
+          editing this folder.
+        </p>
+        <form id="scan-form">
+          <label for="root">Absolute folder path</label>
+          <div class="input-row">
+            <input
+              id="root"
+              name="root"
+              required
+              placeholder="/path/to/a/local/folder"
+              autocomplete="off"
+              spellcheck="false"
+            /><button type="submit" id="scan">Scan and preview</button>
+          </div>
+        </form>
+        <p class="muted">
+          Cloud-synced folders, placeholders, network drives, links, nested folders and unrecognised
+          file types are unsupported. File metadata and access-control lists are not preserved;
+          generated copies are private to your account.
+        </p>
+      </section>
+      <p id="status" role="status" aria-live="polite"></p>
+      <section id="preview" aria-labelledby="preview-title" hidden></section>
+      <section aria-labelledby="history-title">
+        <div class="section-heading">
+          <h2 id="history-title">History and recovery</h2>
+          <button type="button" id="refresh" class="secondary">Refresh</button>
+        </div>
+        <p class="muted">
+          The latest 50 plans are saved locally. Interrupted work is never resumed automatically.
+          Recovery removes only verified generated copies when their original is unchanged. Edited,
+          incomplete or replaced files stay for manual inspection.
+        </p>
+        <div id="history"></div>
+      </section>
+    </main>
+    <footer>Preview first. No remote inference. No automatic cleanup.</footer>
+  </body>
+</html>

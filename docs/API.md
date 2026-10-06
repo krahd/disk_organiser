@@ -123,3 +123,19 @@ Comprehensive verification commands
 - `npm test --silent`
 - `npm run format:check`
 - `npm run start` (in one terminal) and `npm run test:visual` (in another)
+
+
+## Guided copy-first organisation
+
+See [GUIDED-COPIES.md](GUIDED-COPIES.md) for safety boundaries and recovery states.
+All filesystem API routes now require localhost/same-origin requests, including legacy routes. `/api/guided/` responses are no-store. Separate-origin frontend deployment is unsupported. POST requires JSON and `X-Guided-Token` from GET `/api/guided/session`.
+
+- GET `/api/guided/session`: process token for the local UI.
+- GET `/api/guided/plans`: latest 50 durable plans.
+- POST `/api/guided/plans`: `{"root":"/absolute/local/folder"}`; read-only source scan and saved exact preview.
+- POST `/api/guided/plans/{plan_id}/apply`: `{"approved":true,"local_only":true}`; copies only, originals retained.
+- POST `/api/guided/plans/{plan_id}/recover`: `{"approved":true}`; remove only provably unchanged generated copies, with conflict paths otherwise.
+
+Approval requires literal JSON booleans. Expected safety stops return 409. A 200
+response can contain `interrupted` or `recovery_blocked`; inspect the state, errors
+and conflicts rather than treating HTTP success as filesystem completion.

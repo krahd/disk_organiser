@@ -12,6 +12,8 @@ import importlib.util
 import json
 import logging
 import os
+import secrets
+from urllib.parse import urlsplit
 import shutil
 import sys
 import threading
@@ -191,7 +193,7 @@ FRONTEND_DIR = _frontend_dir()
 @app.route("/ui/")
 def ui_index():
     """Serve the customer-facing Disk Organiser application."""
-    return send_from_directory(FRONTEND_DIR, "index.html")
+    return send_from_directory(FRONTEND_DIR, "guided.html")
 
 
 @app.route("/ui/<path:asset>")
@@ -211,6 +213,90 @@ if cors_allowed:
     CORS(app, resources={r"/api/*": {"origins": origins}})
 else:
     CORS(app)
+# The guided surface is local, same-origin and independent of model providers.
+try:
+    from backend.guided import GuidedStore, GuidedError
+except ImportError:
+    from guided import GuidedStore, GuidedError
+
+GUIDED_TOKEN = secrets.token_urlsafe(32)
+
+
+def _guided_store():
+    return GuidedStore(data_path("guided.sqlite"))
+
+
+@app.before_request
+def protect_local_api():
+    if not request.path.startswith("/api/"):
+        return None
+    host = urlsplit("http://" + request.host).hostname
+    if host not in {"127.0.0.1", "localhost", "::1"}:
+        return jsonify({"error": "The filesystem API is available on localhost only."}), 403
+    origin = request.headers.get("Origin")
+    if origin and origin != request.host_url.rstrip("/"):
+        return jsonify({"error": "Use the local same-origin application."}), 403
+    if not request.path.startswith("/api/guided/"):
+        return None
+    if request.method == "POST":
+        request.max_content_length = 16384
+        if request.headers.get("X-Guided-Token") != GUIDED_TOKEN or not request.is_json:
+            return jsonify({"error": "Refresh the local application before making changes."}), 403
+        if request.content_length and request.content_length > 16384:
+            return jsonify({"error": "Guided request is too large."}), 413
+    return None
+
+
+@app.after_request
+def guided_private_response(response):
+    if request.path.startswith("/api/guided/") or request.path in {"/ui/", "/ui/guided.html"}:
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none'; base-uri 'none'"
+    return response
+
+
+@app.route("/api/guided/session", methods=["GET"])
+def guided_session():
+    return jsonify({"token": GUIDED_TOKEN})
+
+
+@app.route("/api/guided/plans", methods=["GET", "POST"])
+def guided_plans():
+    try:
+        store = _guided_store()
+        if request.method == "GET":
+            return jsonify({"plans": store.history()})
+        data = request.get_json()
+        if not isinstance(data, dict):
+            raise GuidedError("Expected a JSON object with a folder path.")
+        return jsonify(store.scan(data.get("root")))
+    except (GuidedError, OSError) as exc:
+        return jsonify({"error": str(exc)}), 409
+
+
+@app.route("/api/guided/plans/<plan_id>/apply", methods=["POST"])
+def guided_apply(plan_id):
+    try:
+        data = request.get_json()
+        if not isinstance(data, dict):
+            raise GuidedError("Expected explicit approval.")
+        return jsonify(_guided_store().apply(plan_id, data.get("approved"), data.get("local_only")))
+    except (GuidedError, OSError) as exc:
+        return jsonify({"error": str(exc)}), 409
+
+
+@app.route("/api/guided/plans/<plan_id>/recover", methods=["POST"])
+def guided_recover(plan_id):
+    try:
+        data = request.get_json()
+        if not isinstance(data, dict):
+            raise GuidedError("Expected explicit recovery approval.")
+        return jsonify(_guided_store().recover(plan_id, data.get("approved")))
+    except (GuidedError, OSError) as exc:
+        return jsonify({"error": str(exc)}), 409
+
+
 logger = logging.getLogger(__name__)
 MAINT_FILE = data_path("maintenance_status.json")
 
@@ -639,7 +725,6 @@ def api_organise_execute():
         selected_set = {int(index) for index in selected_actions if isinstance(index, int)}
         normalized_actions = [action for idx, action in enumerate(
             normalized_actions) if idx in selected_set]
-
     execution_roots = op.get("metadata", {}).get("paths")
     if execution_roots:
         try:
@@ -1545,4 +1630,5 @@ if __name__ == "__main__":
     should_open_browser = open_browser == "1" or (frozen and open_browser != "0")
     if should_open_browser:
         threading.Timer(0.8, lambda: webbrowser.open(f"http://127.0.0.1:{port}/ui/")).start()
-    app.run(host="127.0.0.1", port=port, debug=not frozen, use_reloader=False)
+    app.run(host="127.0.0.1", port=port, debug=os.getenv("DISK_ORGANISER_DEBUG") == "1", use_reloader=False)
+
