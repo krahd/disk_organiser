@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="demo-process-token" content="__DEMO_PROCESS_TOKEN__" />
+    <title>Organise and protect Harbour · Disk Organiser</title>
+    <link rel="stylesheet" href="/project-review-demo.css" />
+    <script src="/project-review-demo.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to project review</a>
+    <div class="simulation-banner">Simulated project; no drives or providers connected</div>
+    <header class="masthead">
+      <p class="brand">DISK ORGANISER <span>PROJECT WORKSPACE</span></p>
+      <span class="pill">Synthetic review</span>
+    </header>
+    <main id="main">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">ORGANISATION + PROTECTION</p>
+        <h1 id="page-title">Organise and protect Harbour</h1>
+        <p class="lede">
+          Decide what belongs to the project, choose its proposed home, and inspect what still needs
+          attention.
+        </p>
+        <p class="muted">
+          Changes stay in this tab. Reviewing a proposal does not copy, move, back up or restore
+          files.
+        </p>
+        <div class="scenario-control">
+          <label for="scenario">Packaged scenario</label>
+          <select id="scenario">
+            <option value="harbour-reference">Harbour · declared complete evidence</option>
+            <option value="harbour-uncertain">Harbour · missing and uncertain evidence</option>
+          </select>
+          <button id="reload" type="button" class="secondary">Reload scenario</button>
+        </div>
+        <p id="fixture-date" class="provenance"></p>
+      </section>
+      <nav class="step-nav" aria-label="Review steps">
+        <a href="#members-heading"><span>01</span> Project members</a>
+        <a href="#destination-heading"><span>02</span> Proposed home</a>
+        <a href="#review-heading"><span>03</span> Layout &amp; protection</a>
+      </nav>
+      <p id="status" class="status" role="status" aria-live="polite">Loading packaged scenario…</p>
+      <p id="error" class="error" role="alert" hidden></p>
+      <form id="decision-form">
+        <fieldset id="decision-fields" disabled>
+          <section class="panel" aria-labelledby="members-heading">
+            <div class="section-heading">
+              <span class="step-number">01</span>
+              <div>
+                <h2 id="members-heading" tabindex="-1">Check the project members</h2>
+                <p>
+                  Suggestions are a starting point. Include missing material or remove unrelated
+                  files.
+                </p>
+              </div>
+            </div>
+            <div id="members" class="members"></div>
+            <p class="note">
+              Dependencies are declared in this fixture. They have not been discovered from an
+              application or verified on a drive.
+            </p>
+          </section>
+          <section class="panel" aria-labelledby="destination-heading">
+            <div class="section-heading">
+              <span class="step-number">02</span>
+              <div>
+                <h2 id="destination-heading" tabindex="-1">Choose the proposed home</h2>
+                <p>
+                  The proposal preserves the project’s internal folder structure and retains every
+                  source.
+                </p>
+              </div>
+            </div>
+            <div class="destination-grid">
+              <div>
+                <label for="destination-volume">Destination volume</label>
+                <select id="destination-volume"></select>
+                <label for="destination-folder">Relative folder on that volume</label>
+                <input
+                  id="destination-folder"
+                  type="text"
+                  required
+                  maxlength="240"
+                  autocomplete="off"
+                  spellcheck="false"
+                  aria-describedby="folder-help"
+                />
+                <p id="folder-help" class="muted">
+                  Example: Client projects/Harbour. No absolute paths or parent traversal.
+                </p>
+                <p id="destination-facts" class="note"></p>
+                <p class="muted">
+                  Choosing the current source folder is checked as a collision. Keeping the layout
+                  unchanged is not implemented as a proposal.
+                </p>
+              </div>
+              <div class="current-layout">
+                <h3>Current layout · fixture reference</h3>
+                <ul id="current-layout"></ul>
+              </div>
+            </div>
+          </section>
+        </fieldset>
+        <div class="decision-actions">
+          <button id="review-button" type="submit" disabled>Review proposed layout</button>
+          <button id="dismiss" type="button" class="secondary" disabled>Dismiss proposal</button>
+          <p>Dismiss restores this scenario’s reference decision.</p>
+        </div>
+      </form>
+      <section class="panel review-panel" aria-labelledby="review-heading">
+        <div class="section-heading">
+          <span class="step-number">03</span>
+          <div>
+            <h2 id="review-heading" tabindex="-1">Layout &amp; protection review</h2>
+            <p id="review-caption">The reference review will appear here.</p>
+          </div>
+        </div>
+        <div id="review-content"></div>
+      </section>
+      <footer>
+        <p>No execution authority · Undo unavailable · Source erasure never permitted</p>
+        <p>
+          Fabricated evidence demonstrates review rules. Live backup and restore verification remain
+          false.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 22:46
+Last updated: 2026-10-06 23:05
 
 ## Project purpose
 
@@ -37,11 +37,46 @@ The main product direction is drive/project administration, organisation and bac
 - Dated official-provider research recommends software plus customer-owned storage first, optional referral revenue second, and qualified reseller/white-label service later. No provider account, secret, agreement, purchase or live integration is introduced.
 - Verification for the exact prototype and independent-review boundary is recorded in [the slice verification](docs/drive-administration/VERIFICATION.md). A separate two-OS standard-library workflow tests the isolated source; publication does not imply that its remote run has passed.
 - Independent review accepts the bounded v3 synthetic contract after source-identity, Unicode and restore-history repairs. Local and independent verification are detailed in the slice verification document.
-- Next: add a synthetic review UI with editable membership/destination, then separately qualify native observation and authenticated backup evidence. Execution/recovery design, representative hardware and commercial-readiness gates remain distinct.
+- A separate synthetic review UI now implements editable membership/destination and the three-step Harbour decision loop. Its source and validation boundary are described below. Native observation, authenticated backup evidence, execution/recovery design, representative hardware and commercial-readiness gates remain distinct.
+
+## Synthetic project interaction checkpoint
+
+- Standalone `frontend/project-review-demo.html`, `.js`, `.css` and `prototypes/drive_administration/demo_server.py` implement the simulated “Organise and protect Harbour” decision loop. The permanent banner identifies the simulation and disconnected drives/providers.
+- Membership suggestions/corrections and declared dependencies, a proposed volume/relative folder, side-by-side exact current/proposed paths, readable blockers, logical capacity/reserve, per-target/version backup evidence, scoped restore results and unresolved alerts are exposed. Dates, methods, fixture clock and uncertainty remain visible.
+- Review calls the accepted Python evaluator; there is no JavaScript rule clone. Dismiss returns the immutable reference decision and focus. Same-home selection retains the honest occupied-path blocker; no successful keep-current/no-op contract is invented.
+- Exactly two packaged scenarios and five allowlisted HTTP paths. Loopback address/exact host, same-origin checks, ephemeral process token, bounded strict decision JSON and restrictive CSP protect the isolated server. There are no arbitrary imports, uploads, filesystem/provider operations or editable backup evidence. Only three fixed frontend assets are read at app creation.
+- Drafts remain in tab memory. Every review uses the immutable fixture revision/digest; successive projected reviews do not advance a hidden server state. Edits, scenario changes, reload and dismissal invalidate pending success/error responses and previous results.
+- All results remain non-executable, with null authority, unavailable undo, no source-erasure permission and false live backup/restore verification. No existing default app, navigation, execution, recovery, observation or provider code changes.
+- Local verification: 68 unchanged evaluator tests, 20 new HTTP contract tests, 119 copied-frontend Jest tests (19 new UI tests), full copied-frontend Prettier check and Python compilation passed. Seven isolated browser specifications parse and list successfully. No aggregate backend or native hardware claim is made for this local partial checkout.
+- Local Chromium launch is blocked by the environment's socket permission (`Operation not permitted`); no alternate local bypass was attempted. Actual local screens and browser passes are not claimed. A separate isolated demo CI workflow runs the HTTP tests on Linux/Windows and Chromium screenshots using only the synthetic server. Exact-head remote results and fresh independent review are pending at this source freeze.
+- Browser specifications include keyboard flow, desktop/mobile, 320-pixel reflow and actual rendered 200% CSS zoom; the latter is not native browser-UI zoom. Native zoom, screen-reader behaviour and representative hardware remain unverified.
+- Run commands, API contract, revision semantics, test boundaries and remaining gates: [interaction demo](docs/drive-administration/INTERACTION-DEMO.md). No new dependency, merge, deployment, provider account, release or store submission.
 
 ## Architecture overview
 
 The backend scans allowed roots, builds file contexts, uses provider-backed or heuristic planning to produce typed actions, stores operations, serves grouped previews, executes selected actions safely, and supports undo. The frontend drives the analysis, preview, refinement, and execution workflow.
+
+### Isolated synthetic interaction architecture
+
+The standalone demo has no connection to the default or legacy execution paths below. A tab-local decision revises a packaged fixture; all results return as non-executable evidence.
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="180" viewBox="0 0 1000 180" role="img" aria-labelledby="demo-arch-title demo-arch-desc">
+  <title id="demo-arch-title">Isolated synthetic review</title>
+  <desc id="demo-arch-desc">The tab-local draft calls the loopback demo server, which reviews one of two packaged fixtures using the pure-data evaluator. No executor is connected.</desc>
+  <defs><marker id="demo-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" /></marker></defs>
+  <rect x="20" y="40" width="260" height="90" rx="8" fill="none" stroke="black" />
+  <text x="150" y="72" text-anchor="middle" font-size="15">Tab-local membership / home</text>
+  <text x="150" y="97" text-anchor="middle" font-size="13">Review or dismiss a proposal</text>
+  <line x1="280" y1="85" x2="350" y2="85" stroke="black" marker-end="url(#demo-arrow)" />
+  <rect x="350" y="40" width="260" height="90" rx="8" fill="none" stroke="black" />
+  <text x="480" y="72" text-anchor="middle" font-size="15">Isolated loopback Flask app</text>
+  <text x="480" y="97" text-anchor="middle" font-size="13">Origin / token / bounded edits</text>
+  <line x1="610" y1="85" x2="680" y2="85" stroke="black" marker-end="url(#demo-arrow)" />
+  <rect x="680" y="40" width="300" height="90" rx="8" fill="none" stroke="black" />
+  <text x="830" y="72" text-anchor="middle" font-size="15">Two fixtures + pure-data evaluator</text>
+  <text x="830" y="97" text-anchor="middle" font-size="13">No files, providers or executor</text>
+  <text x="500" y="161" text-anchor="middle" font-size="13">Returned review: exact proposal, blockers and fabricated protection evidence only</text>
+</svg>
 
 ### Architecture diagram
 
@@ -309,4 +344,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 22:46
+Last updated: 2026-10-06 23:05

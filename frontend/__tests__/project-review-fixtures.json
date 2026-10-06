@@ -1,0 +1,749 @@
+{
+  "harbour-reference": {
+    "scenario_id": "harbour-reference",
+    "reference_revision": 1,
+    "reference_digest": "eb1171de86a4be7ddef1bc0c8651485434270b6f37fa24cce098d34d89bc0605",
+    "fixture_as_of": "2026-10-06T22:00:00Z",
+    "project": {
+      "id": "harbour",
+      "label": "Harbour film project",
+      "candidate_member_ids": [
+        "edit",
+        "media",
+        "notes"
+      ]
+    },
+    "entries": [
+      {
+        "id": "edit",
+        "volume_id": "working",
+        "path": "Projects/Harbour/edit.project",
+        "project_path": "edit.project",
+        "kind": "file",
+        "bytes": 4000,
+        "version": "synthetic-v1-edit",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "dependencies": [
+          "media",
+          "notes"
+        ],
+        "dependency_coverage": "declared_complete",
+        "link_count": 1
+      },
+      {
+        "id": "media",
+        "volume_id": "working",
+        "path": "Projects/Harbour/Media/clip.mov",
+        "project_path": "Media/clip.mov",
+        "kind": "file",
+        "bytes": 12000000,
+        "version": "synthetic-v1-media",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "dependencies": [],
+        "dependency_coverage": "declared_complete",
+        "link_count": 1
+      },
+      {
+        "id": "notes",
+        "volume_id": "working",
+        "path": "Projects/Harbour/Notes/brief.txt",
+        "project_path": "Notes/brief.txt",
+        "kind": "file",
+        "bytes": 1000,
+        "version": "synthetic-v1-notes",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "dependencies": [],
+        "dependency_coverage": "declared_complete",
+        "link_count": 1
+      },
+      {
+        "id": "extra",
+        "volume_id": "working",
+        "path": "Projects/Harbour/Exports/delivery.mov",
+        "project_path": "Exports/delivery.mov",
+        "kind": "file",
+        "bytes": 500000,
+        "version": "synthetic-v1-extra",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "dependencies": [],
+        "dependency_coverage": "declared_complete",
+        "link_count": 1
+      }
+    ],
+    "volumes": [
+      {
+        "id": "working",
+        "label": "Working SSD",
+        "state": "online",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "coverage": "complete",
+        "case_sensitive": false,
+        "unicode_normalization": "NFC",
+        "free_bytes": 900000000,
+        "failure_domain": "physical-device-working"
+      },
+      {
+        "id": "archive",
+        "label": "Archive drive",
+        "state": "online",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "coverage": "complete",
+        "case_sensitive": false,
+        "unicode_normalization": "NFC",
+        "free_bytes": 900000000,
+        "failure_domain": "physical-device-archive"
+      },
+      {
+        "id": "shelf",
+        "label": "Offline shelf drive",
+        "state": "offline",
+        "observed_at": "2026-09-01T12:00:00Z",
+        "coverage": "unknown",
+        "case_sensitive": null,
+        "unicode_normalization": "unknown",
+        "free_bytes": null,
+        "failure_domain": "physical-device-shelf"
+      }
+    ],
+    "targets": [
+      {
+        "id": "local-backup",
+        "label": "Separate local backup drive",
+        "kind": "local",
+        "failure_domain": "physical-device-backup",
+        "region": null
+      },
+      {
+        "id": "cloud-backup",
+        "label": "Proposed EU object-storage backup",
+        "kind": "object_storage",
+        "failure_domain": "cloud-account-example",
+        "region": "EU example; not connected"
+      }
+    ],
+    "decision": {
+      "member_ids": [
+        "edit",
+        "media",
+        "notes"
+      ],
+      "destination_volume_id": "archive",
+      "destination_folder": "Client projects/Harbour",
+      "acknowledged": true
+    },
+    "review": {
+      "schema_version": "disk-administration-review/v1",
+      "synthetic": true,
+      "executable": false,
+      "execution_authority": null,
+      "undo_available": false,
+      "source_safe_to_erase": false,
+      "revision": 1,
+      "input_digest": "eb1171de86a4be7ddef1bc0c8651485434270b6f37fa24cce098d34d89bc0605",
+      "status": "reviewable_proposal_only",
+      "project_id": "harbour",
+      "member_ids": [
+        "edit",
+        "media",
+        "notes"
+      ],
+      "membership_corrections": {
+        "added": [],
+        "removed": []
+      },
+      "proposed_changes": [
+        {
+          "member_id": "edit",
+          "proposal": "copy_with_project_structure",
+          "source": {
+            "volume_id": "working",
+            "relative_path": "Projects/Harbour/edit.project",
+            "version": "synthetic-v1-edit"
+          },
+          "destination": {
+            "volume_id": "archive",
+            "relative_path": "Client projects/Harbour/edit.project"
+          },
+          "source_retained": true
+        },
+        {
+          "member_id": "media",
+          "proposal": "copy_with_project_structure",
+          "source": {
+            "volume_id": "working",
+            "relative_path": "Projects/Harbour/Media/clip.mov",
+            "version": "synthetic-v1-media"
+          },
+          "destination": {
+            "volume_id": "archive",
+            "relative_path": "Client projects/Harbour/Media/clip.mov"
+          },
+          "source_retained": true
+        },
+        {
+          "member_id": "notes",
+          "proposal": "copy_with_project_structure",
+          "source": {
+            "volume_id": "working",
+            "relative_path": "Projects/Harbour/Notes/brief.txt",
+            "version": "synthetic-v1-notes"
+          },
+          "destination": {
+            "volume_id": "archive",
+            "relative_path": "Client projects/Harbour/Notes/brief.txt"
+          },
+          "source_retained": true
+        }
+      ],
+      "blockers": [],
+      "capacity": {
+        "known_logical_copy_bytes": 12005000,
+        "unknown_size_member_ids": [],
+        "reserve_bytes": 64000000,
+        "required_destination_bytes": 76005000,
+        "observed_free_bytes": 900000000,
+        "reclaimed_bytes": 0,
+        "physical_allocation_prediction": null
+      },
+      "protection": {
+        "configured_target_ids": [
+          "cloud-backup",
+          "local-backup"
+        ],
+        "members": [
+          {
+            "member_id": "edit",
+            "observations": [
+              {
+                "backup_id": "cloud-config-only",
+                "target_id": "cloud-backup",
+                "evidence_level": "declared_configuration",
+                "snapshot_id": "no-live-snapshot",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": true,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": false
+              },
+              {
+                "backup_id": "local-content-evidence",
+                "target_id": "local-backup",
+                "evidence_level": "content_verified",
+                "snapshot_id": "synthetic-snapshot-1",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": true,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": true
+              }
+            ],
+            "independent_fixture_copy_domains": 1,
+            "policy_satisfied_in_fixture": true
+          },
+          {
+            "member_id": "media",
+            "observations": [
+              {
+                "backup_id": "cloud-config-only",
+                "target_id": "cloud-backup",
+                "evidence_level": "declared_configuration",
+                "snapshot_id": "no-live-snapshot",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": true,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": false
+              },
+              {
+                "backup_id": "local-content-evidence",
+                "target_id": "local-backup",
+                "evidence_level": "content_verified",
+                "snapshot_id": "synthetic-snapshot-1",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": true,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": true
+              }
+            ],
+            "independent_fixture_copy_domains": 1,
+            "policy_satisfied_in_fixture": true
+          },
+          {
+            "member_id": "notes",
+            "observations": [
+              {
+                "backup_id": "cloud-config-only",
+                "target_id": "cloud-backup",
+                "evidence_level": "declared_configuration",
+                "snapshot_id": "no-live-snapshot",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": true,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": false
+              },
+              {
+                "backup_id": "local-content-evidence",
+                "target_id": "local-backup",
+                "evidence_level": "content_verified",
+                "snapshot_id": "synthetic-snapshot-1",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": true,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": true
+              }
+            ],
+            "independent_fixture_copy_domains": 1,
+            "policy_satisfied_in_fixture": true
+          }
+        ],
+        "restore_observations": [
+          {
+            "restore_id": "local-project-restore",
+            "scope": "project",
+            "check": "bytes_and_app",
+            "backup_id": "local-content-evidence",
+            "target_id": "local-backup",
+            "snapshot_id": "synthetic-snapshot-1",
+            "completed_at": "2026-10-06T22:00:00Z",
+            "meets_required_check": true,
+            "invalidated_by_later_or_ambiguous_evidence": false,
+            "outcome": "passed",
+            "fresh": true,
+            "matching_member_ids": [
+              "edit",
+              "media",
+              "notes"
+            ],
+            "satisfies_project_fixture_restore": true
+          }
+        ],
+        "restore_alerts": [],
+        "required_restore_check": "bytes_and_app",
+        "project_restore_satisfied_in_fixture": true,
+        "live_backup_verified": false,
+        "live_restore_verified": false
+      },
+      "limitations": [
+        "Synthetic records demonstrate rules, never real backup or restore proof.",
+        "Configuration, provider success, content verification and restore tests are distinct evidence.",
+        "Declared dependency completeness is a reviewed assertion, not application validation.",
+        "A past restore exercise does not prove this proposed new layout opens correctly in its application.",
+        "Failure-domain labels do not prove off-site, ransomware or account isolation.",
+        "No mutation, commands, credentials, provider calls or durable recovery mechanism exist here.",
+        "A future executor must independently revalidate sources, targets, permissions, capacity and approval."
+      ]
+    },
+    "synthetic": true,
+    "executable": false,
+    "execution_authority": null,
+    "undo_available": false,
+    "source_safe_to_erase": false,
+    "live_backup_verified": false,
+    "live_restore_verified": false
+  },
+  "harbour-uncertain": {
+    "scenario_id": "harbour-uncertain",
+    "reference_revision": 1,
+    "reference_digest": "1c88339197b37f243b19669de85ac4d022eda4eaecbea89d589b698f99ab4f21",
+    "fixture_as_of": "2026-10-06T22:00:00Z",
+    "project": {
+      "id": "harbour",
+      "label": "Harbour film project",
+      "candidate_member_ids": [
+        "edit",
+        "media",
+        "notes"
+      ]
+    },
+    "entries": [
+      {
+        "id": "edit",
+        "volume_id": "working",
+        "path": "Projects/Harbour/edit.project",
+        "project_path": "edit.project",
+        "kind": "file",
+        "bytes": 4000,
+        "version": "synthetic-v1-edit",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "dependencies": [
+          "media",
+          "notes"
+        ],
+        "dependency_coverage": "unknown",
+        "link_count": 1
+      },
+      {
+        "id": "media",
+        "volume_id": "working",
+        "path": "Projects/Harbour/Media/clip.mov",
+        "project_path": "Media/clip.mov",
+        "kind": "placeholder",
+        "bytes": null,
+        "version": "synthetic-v1-media",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "dependencies": [],
+        "dependency_coverage": "declared_complete",
+        "link_count": 1
+      },
+      {
+        "id": "notes",
+        "volume_id": "working",
+        "path": "Projects/Harbour/Notes/brief.txt",
+        "project_path": "Notes/brief.txt",
+        "kind": "file",
+        "bytes": 1000,
+        "version": "synthetic-v1-notes",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "dependencies": [],
+        "dependency_coverage": "declared_complete",
+        "link_count": 1
+      },
+      {
+        "id": "extra",
+        "volume_id": "working",
+        "path": "Projects/Harbour/Exports/delivery.mov",
+        "project_path": "Exports/delivery.mov",
+        "kind": "file",
+        "bytes": 500000,
+        "version": "synthetic-v1-extra",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "dependencies": [],
+        "dependency_coverage": "declared_complete",
+        "link_count": 1
+      }
+    ],
+    "volumes": [
+      {
+        "id": "working",
+        "label": "Working SSD",
+        "state": "online",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "coverage": "complete",
+        "case_sensitive": false,
+        "unicode_normalization": "NFC",
+        "free_bytes": 900000000,
+        "failure_domain": "physical-device-working"
+      },
+      {
+        "id": "archive",
+        "label": "Archive drive",
+        "state": "online",
+        "observed_at": "2026-10-06T22:00:00Z",
+        "coverage": "complete",
+        "case_sensitive": false,
+        "unicode_normalization": "NFC",
+        "free_bytes": 900000000,
+        "failure_domain": "physical-device-archive"
+      },
+      {
+        "id": "shelf",
+        "label": "Offline shelf drive",
+        "state": "offline",
+        "observed_at": "2026-09-01T12:00:00Z",
+        "coverage": "unknown",
+        "case_sensitive": null,
+        "unicode_normalization": "unknown",
+        "free_bytes": null,
+        "failure_domain": "physical-device-shelf"
+      }
+    ],
+    "targets": [
+      {
+        "id": "local-backup",
+        "label": "Separate local backup drive",
+        "kind": "local",
+        "failure_domain": "physical-device-backup",
+        "region": null
+      },
+      {
+        "id": "cloud-backup",
+        "label": "Proposed EU object-storage backup",
+        "kind": "object_storage",
+        "failure_domain": "cloud-account-example",
+        "region": "EU example; not connected"
+      }
+    ],
+    "decision": {
+      "member_ids": [
+        "edit",
+        "media",
+        "notes"
+      ],
+      "destination_volume_id": "archive",
+      "destination_folder": "Client projects/Harbour",
+      "acknowledged": true
+    },
+    "review": {
+      "schema_version": "disk-administration-review/v1",
+      "synthetic": true,
+      "executable": false,
+      "execution_authority": null,
+      "undo_available": false,
+      "source_safe_to_erase": false,
+      "revision": 1,
+      "input_digest": "1c88339197b37f243b19669de85ac4d022eda4eaecbea89d589b698f99ab4f21",
+      "status": "blocked_review",
+      "project_id": "harbour",
+      "member_ids": [
+        "edit",
+        "media",
+        "notes"
+      ],
+      "membership_corrections": {
+        "added": [],
+        "removed": []
+      },
+      "proposed_changes": [
+        {
+          "member_id": "edit",
+          "proposal": "copy_with_project_structure",
+          "source": {
+            "volume_id": "working",
+            "relative_path": "Projects/Harbour/edit.project",
+            "version": "synthetic-v1-edit"
+          },
+          "destination": {
+            "volume_id": "archive",
+            "relative_path": "Client projects/Harbour/edit.project"
+          },
+          "source_retained": true
+        },
+        {
+          "member_id": "media",
+          "proposal": "copy_with_project_structure",
+          "source": {
+            "volume_id": "working",
+            "relative_path": "Projects/Harbour/Media/clip.mov",
+            "version": "synthetic-v1-media"
+          },
+          "destination": {
+            "volume_id": "archive",
+            "relative_path": "Client projects/Harbour/Media/clip.mov"
+          },
+          "source_retained": true
+        },
+        {
+          "member_id": "notes",
+          "proposal": "copy_with_project_structure",
+          "source": {
+            "volume_id": "working",
+            "relative_path": "Projects/Harbour/Notes/brief.txt",
+            "version": "synthetic-v1-notes"
+          },
+          "destination": {
+            "volume_id": "archive",
+            "relative_path": "Client projects/Harbour/Notes/brief.txt"
+          },
+          "source_retained": true
+        }
+      ],
+      "blockers": [
+        {
+          "code": "project_dependencies_unknown",
+          "member_ids": [
+            "edit"
+          ]
+        },
+        {
+          "code": "unsupported_placeholder",
+          "member_ids": [
+            "media"
+          ]
+        },
+        {
+          "code": "required_capacity_unknown",
+          "member_ids": [
+            "media"
+          ]
+        },
+        {
+          "code": "verified_independent_copy_requirement_unmet",
+          "member_ids": [
+            "notes"
+          ]
+        },
+        {
+          "code": "project_restore_evidence_requirement_unmet",
+          "member_ids": [
+            "edit",
+            "media",
+            "notes"
+          ]
+        }
+      ],
+      "capacity": {
+        "known_logical_copy_bytes": 5000,
+        "unknown_size_member_ids": [
+          "media"
+        ],
+        "reserve_bytes": 64000000,
+        "required_destination_bytes": null,
+        "observed_free_bytes": 900000000,
+        "reclaimed_bytes": 0,
+        "physical_allocation_prediction": null
+      },
+      "protection": {
+        "configured_target_ids": [
+          "cloud-backup",
+          "local-backup"
+        ],
+        "members": [
+          {
+            "member_id": "edit",
+            "observations": [
+              {
+                "backup_id": "cloud-config-only",
+                "target_id": "cloud-backup",
+                "evidence_level": "declared_configuration",
+                "snapshot_id": "no-live-snapshot",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": true,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": false
+              },
+              {
+                "backup_id": "local-content-evidence",
+                "target_id": "local-backup",
+                "evidence_level": "content_verified",
+                "snapshot_id": "synthetic-snapshot-1",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": true,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": true
+              }
+            ],
+            "independent_fixture_copy_domains": 1,
+            "policy_satisfied_in_fixture": true
+          },
+          {
+            "member_id": "media",
+            "observations": [
+              {
+                "backup_id": "cloud-config-only",
+                "target_id": "cloud-backup",
+                "evidence_level": "declared_configuration",
+                "snapshot_id": "no-live-snapshot",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": true,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": false
+              },
+              {
+                "backup_id": "local-content-evidence",
+                "target_id": "local-backup",
+                "evidence_level": "content_verified",
+                "snapshot_id": "synthetic-snapshot-1",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": true,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": true
+              }
+            ],
+            "independent_fixture_copy_domains": 1,
+            "policy_satisfied_in_fixture": true
+          },
+          {
+            "member_id": "notes",
+            "observations": [
+              {
+                "backup_id": "cloud-config-only",
+                "target_id": "cloud-backup",
+                "evidence_level": "declared_configuration",
+                "snapshot_id": "no-live-snapshot",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": true,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": false
+              },
+              {
+                "backup_id": "local-content-evidence",
+                "target_id": "local-backup",
+                "evidence_level": "content_verified",
+                "snapshot_id": "synthetic-snapshot-1",
+                "observed_at": "2026-10-06T22:00:00Z",
+                "matches_current_fixture_version": false,
+                "fresh": true,
+                "complete": true,
+                "current_snapshot_evidence": true,
+                "independent_declared_domain": true,
+                "counts_for_fixture_copy_requirement": false
+              }
+            ],
+            "independent_fixture_copy_domains": 0,
+            "policy_satisfied_in_fixture": false
+          }
+        ],
+        "restore_observations": [
+          {
+            "restore_id": "local-project-restore",
+            "scope": "sample",
+            "check": "bytes_and_app",
+            "backup_id": "local-content-evidence",
+            "target_id": "local-backup",
+            "snapshot_id": "synthetic-snapshot-1",
+            "completed_at": "2026-10-06T22:00:00Z",
+            "meets_required_check": true,
+            "invalidated_by_later_or_ambiguous_evidence": false,
+            "outcome": "passed",
+            "fresh": true,
+            "matching_member_ids": [
+              "edit"
+            ],
+            "satisfies_project_fixture_restore": false
+          }
+        ],
+        "restore_alerts": [],
+        "required_restore_check": "bytes_and_app",
+        "project_restore_satisfied_in_fixture": false,
+        "live_backup_verified": false,
+        "live_restore_verified": false
+      },
+      "limitations": [
+        "Synthetic records demonstrate rules, never real backup or restore proof.",
+        "Configuration, provider success, content verification and restore tests are distinct evidence.",
+        "Declared dependency completeness is a reviewed assertion, not application validation.",
+        "A past restore exercise does not prove this proposed new layout opens correctly in its application.",
+        "Failure-domain labels do not prove off-site, ransomware or account isolation.",
+        "No mutation, commands, credentials, provider calls or durable recovery mechanism exist here.",
+        "A future executor must independently revalidate sources, targets, permissions, capacity and approval."
+      ]
+    },
+    "synthetic": true,
+    "executable": false,
+    "execution_authority": null,
+    "undo_available": false,
+    "source_safe_to_erase": false,
+    "live_backup_verified": false,
+    "live_restore_verified": false
+  }
+}
