@@ -1,0 +1,24 @@
+name: Project administration review
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-contract:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test isolated synthetic administration review
+        working-directory: prototypes/drive_administration
+        run: python -m unittest discover -v

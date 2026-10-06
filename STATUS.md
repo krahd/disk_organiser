@@ -1,10 +1,10 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 21:56
+Last updated: 2026-10-06 22:46
 
 ## Project purpose
 
-Disk Organiser is a local-first filesystem organisation tool. It analyses user-selected folders, proposes typed organisation actions, previews them before execution, and preserves reversible operation history through backups and undo support.
+Disk Organiser is intended to help people understand and administer their drives, organise projects without breaking their dependencies, maintain storage policies, and control backup targets, coverage and recovery. Optional provider integrations and resale are part of the longer-term commercial direction. The current prototypes implement only bounded parts of this vision; real-drive mutation, automatic recovery deletion and sale readiness remain held.
 
 ## Current implementation state
 
@@ -27,7 +27,17 @@ Near-duplicate detection is content-aware and includes filename/token similarity
 
 ## Active focus
 
-The main product direction is a read-only, evidence-backed Disk Model and Disk Map before coherent plans and a separately reviewed action layer. The current frontend checkpoint is only a top-level file-type overview; it does not implement project, version or cross-drive understanding. It is not a complete drive-cleanup product or commercial release. Dedicated Windows guided support, hostile concurrent-write protection, universal cloud/network detection and representative macOS hardware acceptance remain open. Remote inference is never used by the guided surface.
+The main product direction is drive/project administration, organisation and backup control. A map, duplicate detector or observation model may support those jobs, but does not define the product. The next bounded capability is an editable project-organisation and protection review: intended membership and destination, dependency/collision checks, exact proposed effects, version-scoped backup evidence, restore scope and cost/capacity implications. See [the roadmap](docs/DRIVE-ADMINISTRATION-ROADMAP.md). This direction supersedes the map-as-main-product interpretation in historical UX notes without revoking the independently accepted read-only checkpoint. The new local pure-data prototype is synthetic-only and non-executable; it is not a complete organiser, integrated backup service or commercial release. Dedicated Windows guided support, hostile concurrent-write protection, cloud/network handling and representative hardware acceptance remain open. Remote inference is never used by the guided surface.
+
+## Project administration planning checkpoint
+
+- Source-only prototype under `prototypes/drive_administration/`: explicit user correction of project membership/destination, revision checks, structure-preserving proposals, source/destination uncertainty, dependency and collision blockers, capacity and backup/restore evidence review.
+- Configuration, provider reports, snapshot manifests, content verification and restore exercises stay distinct. Sample restoration never establishes whole-project restoration; stale or contradictory evidence cannot authorise action. All supplied evidence is fabricated.
+- Every result is non-executable: no operation authority, no live backup/restore verification, no undo support or safe-to-erase claim. No existing app route, frontend/default navigation, observation model or execution/recovery flag changes.
+- Dated official-provider research recommends software plus customer-owned storage first, optional referral revenue second, and qualified reseller/white-label service later. No provider account, secret, agreement, purchase or live integration is introduced.
+- Verification for the exact prototype and independent-review boundary is recorded in [the slice verification](docs/drive-administration/VERIFICATION.md). A separate two-OS standard-library workflow tests the isolated source; publication does not imply that its remote run has passed.
+- Independent review accepts the bounded v3 synthetic contract after source-identity, Unicode and restore-history repairs. Local and independent verification are detailed in the slice verification document.
+- Next: add a synthetic review UI with editable membership/destination, then separately qualify native observation and authenticated backup evidence. Execution/recovery design, representative hardware and commercial-readiness gates remain distinct.
 
 ## Architecture overview
 
@@ -299,4 +309,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 21:56
+Last updated: 2026-10-06 22:46

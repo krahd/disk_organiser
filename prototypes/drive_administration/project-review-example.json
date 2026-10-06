@@ -1,0 +1,189 @@
+{
+  "schema_version": "disk-administration-synthetic/v1",
+  "synthetic": true,
+  "now": "2026-10-06T22:00:00Z",
+  "revision": 1,
+  "volumes": [
+    {
+      "id": "working",
+      "label": "Working SSD",
+      "state": "online",
+      "observed_at": "2026-10-06T22:00:00Z",
+      "coverage": "complete",
+      "case_sensitive": false,
+      "unicode_normalization": "NFC",
+      "free_bytes": 900000000,
+      "failure_domain": "physical-device-working"
+    },
+    {
+      "id": "archive",
+      "label": "Archive drive",
+      "state": "online",
+      "observed_at": "2026-10-06T22:00:00Z",
+      "coverage": "complete",
+      "case_sensitive": false,
+      "unicode_normalization": "NFC",
+      "free_bytes": 900000000,
+      "failure_domain": "physical-device-archive"
+    },
+    {
+      "id": "shelf",
+      "label": "Offline shelf drive",
+      "state": "offline",
+      "observed_at": "2026-09-01T12:00:00Z",
+      "coverage": "unknown",
+      "case_sensitive": null,
+      "unicode_normalization": "unknown",
+      "free_bytes": null,
+      "failure_domain": "physical-device-shelf"
+    }
+  ],
+  "entries": [
+    {
+      "id": "edit",
+      "volume_id": "working",
+      "path": "Projects/Harbour/edit.project",
+      "project_path": "edit.project",
+      "kind": "file",
+      "bytes": 4000,
+      "version": "synthetic-v1-edit",
+      "observed_at": "2026-10-06T22:00:00Z",
+      "dependencies": [
+        "media",
+        "notes"
+      ],
+      "dependency_coverage": "declared_complete",
+      "link_count": 1
+    },
+    {
+      "id": "media",
+      "volume_id": "working",
+      "path": "Projects/Harbour/Media/clip.mov",
+      "project_path": "Media/clip.mov",
+      "kind": "file",
+      "bytes": 12000000,
+      "version": "synthetic-v1-media",
+      "observed_at": "2026-10-06T22:00:00Z",
+      "dependencies": [],
+      "dependency_coverage": "declared_complete",
+      "link_count": 1
+    },
+    {
+      "id": "notes",
+      "volume_id": "working",
+      "path": "Projects/Harbour/Notes/brief.txt",
+      "project_path": "Notes/brief.txt",
+      "kind": "file",
+      "bytes": 1000,
+      "version": "synthetic-v1-notes",
+      "observed_at": "2026-10-06T22:00:00Z",
+      "dependencies": [],
+      "dependency_coverage": "declared_complete",
+      "link_count": 1
+    },
+    {
+      "id": "extra",
+      "volume_id": "working",
+      "path": "Projects/Harbour/Exports/delivery.mov",
+      "project_path": "Exports/delivery.mov",
+      "kind": "file",
+      "bytes": 500000,
+      "version": "synthetic-v1-extra",
+      "observed_at": "2026-10-06T22:00:00Z",
+      "dependencies": [],
+      "dependency_coverage": "declared_complete",
+      "link_count": 1
+    }
+  ],
+  "project": {
+    "id": "harbour",
+    "label": "Harbour film project",
+    "candidate_member_ids": [
+      "edit",
+      "media",
+      "notes"
+    ]
+  },
+  "decision": {
+    "member_ids": [
+      "edit",
+      "media",
+      "notes"
+    ],
+    "destination_volume_id": "archive",
+    "destination_folder": "Client projects/Harbour",
+    "acknowledged": true
+  },
+  "targets": [
+    {
+      "id": "local-backup",
+      "label": "Separate local backup drive",
+      "kind": "local",
+      "failure_domain": "physical-device-backup",
+      "region": null
+    },
+    {
+      "id": "cloud-backup",
+      "label": "Proposed EU object-storage backup",
+      "kind": "object_storage",
+      "failure_domain": "cloud-account-example",
+      "region": "EU example; not connected"
+    }
+  ],
+  "policy": {
+    "target_ids": [
+      "local-backup",
+      "cloud-backup"
+    ],
+    "max_evidence_age_hours": 24,
+    "max_restore_age_hours": 168,
+    "max_inventory_age_hours": 2,
+    "required_independent_copies": 1,
+    "require_project_restore": true,
+    "required_restore_check": "bytes_and_app",
+    "reserve_bytes": 64000000
+  },
+  "backups": [
+    {
+      "id": "local-content-evidence",
+      "target_id": "local-backup",
+      "snapshot_id": "synthetic-snapshot-1",
+      "observed_at": "2026-10-06T22:00:00Z",
+      "level": "content_verified",
+      "complete": true,
+      "entry_versions": {
+        "edit": "synthetic-v1-edit",
+        "media": "synthetic-v1-media",
+        "notes": "synthetic-v1-notes"
+      }
+    },
+    {
+      "id": "cloud-config-only",
+      "target_id": "cloud-backup",
+      "snapshot_id": "no-live-snapshot",
+      "observed_at": "2026-10-06T22:00:00Z",
+      "level": "declared_configuration",
+      "complete": true,
+      "entry_versions": {
+        "edit": "synthetic-v1-edit",
+        "media": "synthetic-v1-media",
+        "notes": "synthetic-v1-notes"
+      }
+    }
+  ],
+  "restores": [
+    {
+      "id": "local-project-restore",
+      "backup_id": "local-content-evidence",
+      "completed_at": "2026-10-06T22:00:00Z",
+      "scope": "project",
+      "outcome": "passed",
+      "check": "bytes_and_app",
+      "entry_versions": {
+        "edit": "synthetic-v1-edit",
+        "media": "synthetic-v1-media",
+        "notes": "synthetic-v1-notes"
+      }
+    }
+  ]
+}
