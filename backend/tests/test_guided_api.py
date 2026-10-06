@@ -98,3 +98,10 @@ def test_legacy_routes_also_reject_cross_origin_filesystem_access(client):
     assert response.status_code == 403
     response = client.post('/api/organise/execute', json={}, headers={'Host': 'evil.example'})
     assert response.status_code == 403
+
+
+def test_all_ui_pages_disallow_clickjacking(client):
+    for path in ['/ui/', '/ui/index.html']:
+        response = client.get(path)
+        assert response.headers['X-Frame-Options'] == 'DENY'
+        assert "frame-ancestors 'none'" in response.headers['Content-Security-Policy']

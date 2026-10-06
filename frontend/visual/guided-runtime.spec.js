@@ -60,6 +60,13 @@ test("guided real scan, approval, verified copies, reload and recovery", async (
     fullPage: true,
   });
   await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page
+      .locator("#preview td")
+      .first()
+      .evaluate((el) => getComputedStyle(el).display)
+  ).toBe("block");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
   await page.screenshot({ path: testInfo.outputPath("guided-mobile-preview.png"), fullPage: true });
   await page.locator("#approve").check();
   await page.locator("#apply").click();

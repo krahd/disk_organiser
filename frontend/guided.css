@@ -206,3 +206,34 @@ details {
     align-items: start;
   }
 }
+
+@media (max-width: 650px) {
+  .table-wrap table,
+  .table-wrap tbody,
+  .table-wrap tr,
+  .table-wrap td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+  .table-wrap thead {
+    display: none;
+  }
+  .table-wrap tr {
+    border: 1px solid #d9e2e0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    padding: 8px;
+  }
+  .table-wrap td {
+    border: 0;
+    padding: 8px;
+  }
+  .table-wrap td::before {
+    content: attr(data-label);
+    display: block;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #50636b;
+  }
+}

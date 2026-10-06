@@ -52,6 +52,8 @@ test("preview uses text nodes and cannot apply without explicit approval", async
   await scan();
   expect(document.getElementById("preview").textContent).toContain("<script>.txt");
   expect(document.getElementById("preview").querySelector("script")).toBeNull();
+  expect(document.getElementById("preview").textContent).toContain("5 B");
+  expect(document.querySelector('td[data-label="Why / size"]')).not.toBeNull();
   const button = document.getElementById("apply");
   expect(button.disabled).toBe(true);
   button.click();

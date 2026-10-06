@@ -14,7 +14,11 @@
     if (className) el.className = className;
     return el;
   };
-  const bytes = (n) => `${(n / 1048576).toFixed(2)} MiB`;
+  const bytes = (n) => {
+    if (n < 1024) return `${n} B`;
+    if (n < 1048576) return `${(n / 1024).toFixed(2)} KiB`;
+    return `${(n / 1048576).toFixed(2)} MiB`;
+  };
   async function api(path, body) {
     const response = await fetch(
       `/api/guided/${path}`,
@@ -72,6 +76,11 @@
         node("td", action.source),
         node("td", action.destination),
         node("td", `${action.reason}. ${bytes(action.fingerprint.size)}`)
+      );
+      ["Original (kept)", "New copy, relative to chosen folder", "Why / size"].forEach(
+        (label, index) => {
+          row.children[index].dataset.label = label;
+        }
       );
       body.append(row);
     });
@@ -185,6 +194,12 @@
           plan.state
         )
       ) {
+        const paths = node("details");
+        paths.append(
+          node("summary", "Review this plan’s copy paths before recovery"),
+          table(plan.actions)
+        );
+        item.append(paths);
         const label = node("label", undefined, "check");
         const checkbox = node("input");
         checkbox.type = "checkbox";

@@ -249,6 +249,9 @@ def protect_local_api():
 
 @app.after_request
 def guided_private_response(response):
+    if request.path.startswith("/ui/"):
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Content-Security-Policy"] = "frame-ancestors 'none'"
     if request.path.startswith("/api/guided/") or request.path in {"/ui/", "/ui/guided.html"}:
         response.headers["Cache-Control"] = "no-store"
         response.headers["X-Content-Type-Options"] = "nosniff"
