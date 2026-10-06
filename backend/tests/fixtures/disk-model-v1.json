@@ -1,0 +1,1991 @@
+{
+  "aggregates": {
+    "allocation_unknown_objects": 1,
+    "by_extension_category": {
+      "creative_projects": {
+        "entry_count": 2,
+        "logical_bytes": 42
+      },
+      "documents": {
+        "entry_count": 4,
+        "logical_bytes": 106
+      },
+      "other": {
+        "entry_count": 3,
+        "logical_bytes": 1748
+      }
+    },
+    "distinct_observed_file_objects": 8,
+    "hard_link_alias_paths": 1,
+    "known_allocated_bytes_by_observed_object": 28672,
+    "logical_bytes_by_observed_object": 1871,
+    "logical_bytes_by_path": 1896,
+    "object_identity_unknown_paths": 0,
+    "observed_regular_files": 9,
+    "partial": true,
+    "physical_bytes": null,
+    "recoverable_bytes": null,
+    "status_counts": {
+      "observed": 15,
+      "unreadable": 1
+    },
+    "uncertainties": [
+      "Logical bytes count file lengths, not unique physical storage.",
+      "Stat allocation may include shared extents, compression or filesystem-specific accounting.",
+      "No recoverable-space estimate or safe-to-delete determination is made.",
+      "Unobserved entries and links outside these roots are not included.",
+      "Object-level totals are unknown when object identity is unavailable."
+    ]
+  },
+  "analysis_coverage": {
+    "findings_omitted": 0,
+    "max_findings": 400,
+    "max_relationships": 2000,
+    "relationships_omitted": 0,
+    "semantic_content_analysis": false
+  },
+  "changes": {
+    "added": [
+      "entry_1d97ab9cbcf7c2340f80a56e",
+      "entry_21874104f293ae8a65f8aab4",
+      "entry_30323bcd4e21a2a13eef20bf",
+      "entry_448cbfd607fb757ff47e3615",
+      "entry_6f84ee62c3a9a484852f0374",
+      "entry_7c33e462ef682fb0d094d4ea",
+      "entry_815125d6c9d2ffc0388f373a",
+      "entry_8e0254a8859d43501ff0ba98",
+      "entry_98070566f30b9156f73d495e",
+      "entry_a53fdd6c3e25366ba4509c63",
+      "entry_bba030de591134adb89d1423",
+      "entry_cd3ab2e5f18e30cbf6d921b1",
+      "entry_d61f91f63ea9d4e2f5815ad3",
+      "entry_ebc100ee0e93374774d26af4",
+      "entry_fd13c1a9fed3bb1e0b5e668e",
+      "entry_ff55aa4d4605716a06ee1a5f"
+    ],
+    "changed": [],
+    "comparable": false,
+    "hashes_reused": 0,
+    "no_longer_observed": [],
+    "previous_scan_id": null,
+    "uncertainties": [
+      "Unchanged metadata does not prove unchanged content.",
+      "Entry IDs track root-relative addresses, not rename history."
+    ],
+    "unchanged_metadata": [],
+    "unverified_absent": []
+  },
+  "directories": [
+    {
+      "confidence": "unknown",
+      "coverage": {
+        "complete": false,
+        "reasons": [
+          "descendant_coverage_incomplete"
+        ]
+      },
+      "direct_member_ids": [
+        "entry_21874104f293ae8a65f8aab4",
+        "entry_d61f91f63ea9d4e2f5815ad3",
+        "entry_98070566f30b9156f73d495e",
+        "entry_7c33e462ef682fb0d094d4ea",
+        "entry_6f84ee62c3a9a484852f0374"
+      ],
+      "entry_id": "entry_1d97ab9cbcf7c2340f80a56e",
+      "logical_bytes": 1896,
+      "observed_files": 9,
+      "role_hypotheses": [],
+      "uncertain_entries": 1,
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    },
+    {
+      "confidence": "hypothesis",
+      "coverage": {
+        "complete": true,
+        "reasons": []
+      },
+      "direct_member_ids": [
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_bba030de591134adb89d1423"
+      ],
+      "entry_id": "entry_21874104f293ae8a65f8aab4",
+      "logical_bytes": 50,
+      "observed_files": 2,
+      "role_hypotheses": [
+        {
+          "confidence": "hypothesis",
+          "evidence_ids": [
+            "evidence_5045bace24b0c85d1328c5cf"
+          ],
+          "role": "archive"
+        }
+      ],
+      "uncertain_entries": 0,
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    },
+    {
+      "confidence": "unknown",
+      "coverage": {
+        "complete": false,
+        "reasons": [
+          "descendant_not_observed"
+        ]
+      },
+      "direct_member_ids": [
+        "entry_30323bcd4e21a2a13eef20bf",
+        "entry_fd13c1a9fed3bb1e0b5e668e"
+      ],
+      "entry_id": "entry_6f84ee62c3a9a484852f0374",
+      "logical_bytes": 24,
+      "observed_files": 1,
+      "role_hypotheses": [],
+      "uncertain_entries": 1,
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    },
+    {
+      "confidence": "hypothesis",
+      "coverage": {
+        "complete": true,
+        "reasons": []
+      },
+      "direct_member_ids": [
+        "entry_ebc100ee0e93374774d26af4",
+        "entry_815125d6c9d2ffc0388f373a",
+        "entry_a53fdd6c3e25366ba4509c63"
+      ],
+      "entry_id": "entry_7c33e462ef682fb0d094d4ea",
+      "logical_bytes": 66,
+      "observed_files": 3,
+      "role_hypotheses": [
+        {
+          "confidence": "hypothesis",
+          "evidence_ids": [
+            "evidence_391d989f7602e1930b0cbd7f"
+          ],
+          "role": "project"
+        }
+      ],
+      "uncertain_entries": 0,
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    },
+    {
+      "confidence": "hypothesis",
+      "coverage": {
+        "complete": true,
+        "reasons": []
+      },
+      "direct_member_ids": [
+        "entry_8e0254a8859d43501ff0ba98",
+        "entry_ff55aa4d4605716a06ee1a5f"
+      ],
+      "entry_id": "entry_98070566f30b9156f73d495e",
+      "logical_bytes": 56,
+      "observed_files": 2,
+      "role_hypotheses": [
+        {
+          "confidence": "hypothesis",
+          "evidence_ids": [
+            "evidence_b8876ad7d52c341175738e8c"
+          ],
+          "role": "inbox"
+        }
+      ],
+      "uncertain_entries": 0,
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    },
+    {
+      "confidence": "hypothesis",
+      "coverage": {
+        "complete": true,
+        "reasons": []
+      },
+      "direct_member_ids": [
+        "entry_448cbfd607fb757ff47e3615"
+      ],
+      "entry_id": "entry_d61f91f63ea9d4e2f5815ad3",
+      "logical_bytes": 1700,
+      "observed_files": 1,
+      "role_hypotheses": [
+        {
+          "confidence": "hypothesis",
+          "evidence_ids": [
+            "evidence_d9ab2a7d36f46df1b36e3814"
+          ],
+          "role": "cache"
+        }
+      ],
+      "uncertain_entries": 0,
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "allocated_bytes": null,
+      "allocation_source": "unknown",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 1,
+        "link_count": 1,
+        "mode": 16832,
+        "mtime_ns": 1767225600000000000,
+        "size": 0
+      },
+      "hash": {
+        "algorithm": null,
+        "status": "disabled",
+        "value": null
+      },
+      "id": "entry_1d97ab9cbcf7c2340f80a56e",
+      "kind": "directory",
+      "link_count": 1,
+      "logical_bytes": null,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_e61b9f584dbe27741cef6e9e",
+      "parent_id": null,
+      "relative_path": ".",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": null,
+      "allocation_source": "unknown",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 6,
+        "link_count": 1,
+        "mode": 16832,
+        "mtime_ns": 1767225600000000000,
+        "size": 0
+      },
+      "hash": {
+        "algorithm": null,
+        "status": "disabled",
+        "value": null
+      },
+      "id": "entry_21874104f293ae8a65f8aab4",
+      "kind": "directory",
+      "link_count": 1,
+      "logical_bytes": null,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_628f9dfd091bd46739b5753c",
+      "parent_id": "entry_1d97ab9cbcf7c2340f80a56e",
+      "relative_path": "Archive",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": 4096,
+      "allocation_source": "stat_blocks_512",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 7,
+        "link_count": 2,
+        "mode": 33152,
+        "mtime_ns": 1767225600000000000,
+        "size": 25
+      },
+      "hash": {
+        "algorithm": "sha256",
+        "status": "verified",
+        "value": "8abfcbbd226f14211d77f40d98de2fb93bf860d8eab3dfb51fd37dba3976a770"
+      },
+      "id": "entry_cd3ab2e5f18e30cbf6d921b1",
+      "kind": "file",
+      "link_count": 2,
+      "logical_bytes": 25,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_e3a5d9dba7d2450037d3d7d3",
+      "parent_id": "entry_21874104f293ae8a65f8aab4",
+      "relative_path": "Archive/reference-alias.txt",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": 4096,
+      "allocation_source": "stat_blocks_512",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 7,
+        "link_count": 2,
+        "mode": 33152,
+        "mtime_ns": 1767225600000000000,
+        "size": 25
+      },
+      "hash": {
+        "algorithm": "sha256",
+        "status": "verified",
+        "value": "8abfcbbd226f14211d77f40d98de2fb93bf860d8eab3dfb51fd37dba3976a770"
+      },
+      "id": "entry_bba030de591134adb89d1423",
+      "kind": "file",
+      "link_count": 2,
+      "logical_bytes": 25,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_e3a5d9dba7d2450037d3d7d3",
+      "parent_id": "entry_21874104f293ae8a65f8aab4",
+      "relative_path": "Archive/reference.txt",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": null,
+      "allocation_source": "unknown",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 11,
+        "link_count": 1,
+        "mode": 16832,
+        "mtime_ns": 1767225600000000000,
+        "size": 0
+      },
+      "hash": {
+        "algorithm": null,
+        "status": "disabled",
+        "value": null
+      },
+      "id": "entry_d61f91f63ea9d4e2f5815ad3",
+      "kind": "directory",
+      "link_count": 1,
+      "logical_bytes": null,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_8f98e47e89f92dae8a3cc37d",
+      "parent_id": "entry_1d97ab9cbcf7c2340f80a56e",
+      "relative_path": "Cache",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": 4096,
+      "allocation_source": "stat_blocks_512",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 12,
+        "link_count": 1,
+        "mode": 33152,
+        "mtime_ns": 1767225600000000000,
+        "size": 1700
+      },
+      "hash": {
+        "algorithm": "sha256",
+        "status": "verified",
+        "value": "96bfe925616d638f3a23890a2388b64fa6e1f706051e839d9a2fb84cfa240b8b"
+      },
+      "id": "entry_448cbfd607fb757ff47e3615",
+      "kind": "file",
+      "link_count": 1,
+      "logical_bytes": 1700,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_c02a9ff79b1273d85b1ac7d3",
+      "parent_id": "entry_d61f91f63ea9d4e2f5815ad3",
+      "relative_path": "Cache/preview.bin",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": null,
+      "allocation_source": "unknown",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 8,
+        "link_count": 1,
+        "mode": 16832,
+        "mtime_ns": 1767225600000000000,
+        "size": 0
+      },
+      "hash": {
+        "algorithm": null,
+        "status": "disabled",
+        "value": null
+      },
+      "id": "entry_98070566f30b9156f73d495e",
+      "kind": "directory",
+      "link_count": 1,
+      "logical_bytes": null,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_d51c1a6f9bfc1cad62b64cf3",
+      "parent_id": "entry_1d97ab9cbcf7c2340f80a56e",
+      "relative_path": "Inbox",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": 4096,
+      "allocation_source": "stat_blocks_512",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 10,
+        "link_count": 1,
+        "mode": 33152,
+        "mtime_ns": 1767225600000000000,
+        "size": 31
+      },
+      "hash": {
+        "algorithm": "sha256",
+        "status": "verified",
+        "value": "060f304918c83688490c0c5be3f97b066bdee10fed3a27d77b4bf888008586dc"
+      },
+      "id": "entry_8e0254a8859d43501ff0ba98",
+      "kind": "file",
+      "link_count": 1,
+      "logical_bytes": 31,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_17c4b27ce8d2e34e7cbde58d",
+      "parent_id": "entry_98070566f30b9156f73d495e",
+      "relative_path": "Inbox/receipt.pdf",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": 4096,
+      "allocation_source": "stat_blocks_512",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 9,
+        "link_count": 1,
+        "mode": 33152,
+        "mtime_ns": 1767225600000000000,
+        "size": 25
+      },
+      "hash": {
+        "algorithm": "sha256",
+        "status": "verified",
+        "value": "8abfcbbd226f14211d77f40d98de2fb93bf860d8eab3dfb51fd37dba3976a770"
+      },
+      "id": "entry_ff55aa4d4605716a06ee1a5f",
+      "kind": "file",
+      "link_count": 1,
+      "logical_bytes": 25,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_2f7f8c46c6df263fc1de1189",
+      "parent_id": "entry_98070566f30b9156f73d495e",
+      "relative_path": "Inbox/reference-copy.txt",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": null,
+      "allocation_source": "unknown",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 2,
+        "link_count": 1,
+        "mode": 16832,
+        "mtime_ns": 1767225600000000000,
+        "size": 0
+      },
+      "hash": {
+        "algorithm": null,
+        "status": "disabled",
+        "value": null
+      },
+      "id": "entry_7c33e462ef682fb0d094d4ea",
+      "kind": "directory",
+      "link_count": 1,
+      "logical_bytes": null,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_49a64717d5d4cb19952e6eac",
+      "parent_id": "entry_1d97ab9cbcf7c2340f80a56e",
+      "relative_path": "Project Aurora",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": 4096,
+      "allocation_source": "stat_blocks_512",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 4,
+        "link_count": 1,
+        "mode": 33152,
+        "mtime_ns": 1767225600000000000,
+        "size": 21
+      },
+      "hash": {
+        "algorithm": "sha256",
+        "status": "verified",
+        "value": "fdeb67b21a3d53af760c3479620341e867eaf1073901192abac44451c231c85b"
+      },
+      "id": "entry_ebc100ee0e93374774d26af4",
+      "kind": "file",
+      "link_count": 1,
+      "logical_bytes": 21,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_aa5507f9e57ee8a21e59299d",
+      "parent_id": "entry_7c33e462ef682fb0d094d4ea",
+      "relative_path": "Project Aurora/design_v1.blend",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": 4096,
+      "allocation_source": "stat_blocks_512",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 5,
+        "link_count": 1,
+        "mode": 33152,
+        "mtime_ns": 1767225600000000000,
+        "size": 21
+      },
+      "hash": {
+        "algorithm": "sha256",
+        "status": "verified",
+        "value": "b580299168ac571a1a00ff88390386bf28a289f0d23a5fa333dc257435f8b5fd"
+      },
+      "id": "entry_815125d6c9d2ffc0388f373a",
+      "kind": "file",
+      "link_count": 1,
+      "logical_bytes": 21,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_65111ec74aa1c4b8a9680ca2",
+      "parent_id": "entry_7c33e462ef682fb0d094d4ea",
+      "relative_path": "Project Aurora/design_v2.blend",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": 4096,
+      "allocation_source": "stat_blocks_512",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 3,
+        "link_count": 1,
+        "mode": 33152,
+        "mtime_ns": 1767225600000000000,
+        "size": 24
+      },
+      "hash": {
+        "algorithm": "sha256",
+        "status": "verified",
+        "value": "c432736722123fee5067ce64a4453a26c6194b452a55cb4ffd613041ce642216"
+      },
+      "id": "entry_a53fdd6c3e25366ba4509c63",
+      "kind": "file",
+      "link_count": 1,
+      "logical_bytes": 24,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_2335c54ffe3749ceafac20ee",
+      "parent_id": "entry_7c33e462ef682fb0d094d4ea",
+      "relative_path": "Project Aurora/pyproject.toml",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": null,
+      "allocation_source": "unknown",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 13,
+        "link_count": 1,
+        "mode": 16832,
+        "mtime_ns": 1767225600000000000,
+        "size": 0
+      },
+      "hash": {
+        "algorithm": null,
+        "status": "disabled",
+        "value": null
+      },
+      "id": "entry_6f84ee62c3a9a484852f0374",
+      "kind": "directory",
+      "link_count": 1,
+      "logical_bytes": null,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_bad58488a69164b0820522ff",
+      "parent_id": "entry_1d97ab9cbcf7c2340f80a56e",
+      "relative_path": "unclassified",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": null,
+      "allocation_source": "unknown",
+      "ctime_ns": null,
+      "fingerprint": null,
+      "hash": {
+        "algorithm": null,
+        "status": "disabled",
+        "value": null
+      },
+      "id": "entry_30323bcd4e21a2a13eef20bf",
+      "kind": "unknown",
+      "link_count": null,
+      "logical_bytes": null,
+      "mtime_ns": null,
+      "object_id": null,
+      "parent_id": "entry_6f84ee62c3a9a484852f0374",
+      "relative_path": "unclassified/not-readable.data",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "unreadable",
+      "uncertainties": []
+    },
+    {
+      "allocated_bytes": null,
+      "allocation_source": "unknown",
+      "ctime_ns": 1767225600000000000,
+      "fingerprint": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 14,
+        "link_count": 1,
+        "mode": 33152,
+        "mtime_ns": 1767225600000000000,
+        "size": 24
+      },
+      "hash": {
+        "algorithm": "sha256",
+        "status": "verified",
+        "value": "a03a042ea87c86d2787658935b55f1d2cceb679845dcb303188efc6a186667c2"
+      },
+      "id": "entry_fd13c1a9fed3bb1e0b5e668e",
+      "kind": "file",
+      "link_count": 1,
+      "logical_bytes": 24,
+      "mtime_ns": 1767225600000000000,
+      "object_id": "object_90c7f45d8a158705c650c578",
+      "parent_id": "entry_6f84ee62c3a9a484852f0374",
+      "relative_path": "unclassified/unknown.data",
+      "root_id": "root_d691e552fd740ba4b1c60cbd",
+      "status": "observed",
+      "uncertainties": []
+    }
+  ],
+  "evidence": [
+    {
+      "confidence": "observed",
+      "id": "evidence_391d989f7602e1930b0cbd7f",
+      "kind": "project_marker_names",
+      "member_ids": [
+        "entry_7c33e462ef682fb0d094d4ea",
+        "entry_a53fdd6c3e25366ba4509c63"
+      ],
+      "observations": {
+        "marker_names": [
+          "pyproject.toml"
+        ]
+      }
+    },
+    {
+      "confidence": "observed",
+      "id": "evidence_5045bace24b0c85d1328c5cf",
+      "kind": "directory_name",
+      "member_ids": [
+        "entry_21874104f293ae8a65f8aab4"
+      ],
+      "observations": {
+        "matched_role_label": "archive",
+        "name": "archive"
+      }
+    },
+    {
+      "confidence": "observed",
+      "id": "evidence_5565dab267a4ed6ee721a64f",
+      "kind": "scan_coverage",
+      "member_ids": [
+        "entry_30323bcd4e21a2a13eef20bf"
+      ],
+      "observations": {
+        "coverage": {
+          "atomic_snapshot": false,
+          "complete_within_policy": false,
+          "entries_observed": 16,
+          "hash_attempts": 9,
+          "hash_status_counts": {
+            "verified": 9
+          },
+          "hashed_bytes": 1896,
+          "hashed_files": 9,
+          "status_counts": {
+            "observed": 15,
+            "unreadable": 1
+          },
+          "stop_reason": null
+        },
+        "errors": [
+          {
+            "entry_id": "entry_30323bcd4e21a2a13eef20bf",
+            "errno": 13,
+            "kind": "PermissionError"
+          }
+        ],
+        "exclusions": [],
+        "status": "partial"
+      }
+    },
+    {
+      "confidence": "observed",
+      "id": "evidence_5d16d9007a5554620117281e",
+      "kind": "full_content_hash_match",
+      "member_ids": [
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_bba030de591134adb89d1423",
+        "entry_ff55aa4d4605716a06ee1a5f"
+      ],
+      "observations": {
+        "algorithm": "sha256",
+        "digest": "8abfcbbd226f14211d77f40d98de2fb93bf860d8eab3dfb51fd37dba3976a770",
+        "distinct_observed_objects": 2,
+        "logical_bytes_each": 25,
+        "verified_in_this_scan": true
+      }
+    },
+    {
+      "confidence": "observed",
+      "id": "evidence_7a3bf4684430c72f653faab4",
+      "kind": "same_observed_file_object",
+      "member_ids": [
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_bba030de591134adb89d1423"
+      ],
+      "observations": {
+        "object_id": "object_e3a5d9dba7d2450037d3d7d3",
+        "observed_paths": 2,
+        "reported_link_count": [
+          2
+        ]
+      }
+    },
+    {
+      "confidence": "observed",
+      "id": "evidence_b7a41755657c423275e6e913",
+      "kind": "older_modification_times",
+      "member_ids": [
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_bba030de591134adb89d1423",
+        "entry_448cbfd607fb757ff47e3615",
+        "entry_8e0254a8859d43501ff0ba98",
+        "entry_ff55aa4d4605716a06ee1a5f",
+        "entry_ebc100ee0e93374774d26af4",
+        "entry_815125d6c9d2ffc0388f373a",
+        "entry_a53fdd6c3e25366ba4509c63",
+        "entry_fd13c1a9fed3bb1e0b5e668e"
+      ],
+      "observations": {
+        "cutoff": "2026-04-09T12:00:00+00:00",
+        "threshold_days": 180,
+        "timestamp_field": "mtime_ns"
+      }
+    },
+    {
+      "confidence": "observed",
+      "id": "evidence_b8876ad7d52c341175738e8c",
+      "kind": "directory_name",
+      "member_ids": [
+        "entry_98070566f30b9156f73d495e"
+      ],
+      "observations": {
+        "matched_role_label": "inbox",
+        "name": "inbox"
+      }
+    },
+    {
+      "confidence": "observed",
+      "id": "evidence_bed750c0acc919e593e8511e",
+      "kind": "name_family_pattern",
+      "member_ids": [
+        "entry_ebc100ee0e93374774d26af4",
+        "entry_815125d6c9d2ffc0388f373a"
+      ],
+      "observations": {
+        "filenames": [
+          "design_v1.blend",
+          "design_v2.blend"
+        ],
+        "normalised_stem": "design",
+        "same_parent_and_extension": true
+      }
+    },
+    {
+      "confidence": "observed",
+      "id": "evidence_d9ab2a7d36f46df1b36e3814",
+      "kind": "directory_name",
+      "member_ids": [
+        "entry_d61f91f63ea9d4e2f5815ad3"
+      ],
+      "observations": {
+        "matched_role_label": "cache",
+        "name": "cache"
+      }
+    },
+    {
+      "confidence": "observed",
+      "id": "evidence_e8c15f15fc58bf9a0a0c1699",
+      "kind": "largest_observed_files",
+      "member_ids": [
+        "entry_448cbfd607fb757ff47e3615",
+        "entry_8e0254a8859d43501ff0ba98",
+        "entry_bba030de591134adb89d1423",
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_ff55aa4d4605716a06ee1a5f",
+        "entry_a53fdd6c3e25366ba4509c63",
+        "entry_fd13c1a9fed3bb1e0b5e668e",
+        "entry_815125d6c9d2ffc0388f373a",
+        "entry_ebc100ee0e93374774d26af4"
+      ],
+      "observations": {
+        "logical_bytes": {
+          "entry_448cbfd607fb757ff47e3615": 1700,
+          "entry_815125d6c9d2ffc0388f373a": 21,
+          "entry_8e0254a8859d43501ff0ba98": 31,
+          "entry_a53fdd6c3e25366ba4509c63": 24,
+          "entry_bba030de591134adb89d1423": 25,
+          "entry_cd3ab2e5f18e30cbf6d921b1": 25,
+          "entry_ebc100ee0e93374774d26af4": 21,
+          "entry_fd13c1a9fed3bb1e0b5e668e": 24,
+          "entry_ff55aa4d4605716a06ee1a5f": 25
+        },
+        "ranking_limit": 10
+      }
+    }
+  ],
+  "findings": [
+    {
+      "confidence": "hypothesis",
+      "counter_evidence": [],
+      "evidence_ids": [
+        "evidence_b8876ad7d52c341175738e8c"
+      ],
+      "id": "finding_0d3b5c55b3bdd5b13f037fce",
+      "kind": "directory_role",
+      "member_ids": [
+        "entry_98070566f30b9156f73d495e"
+      ],
+      "title": "Possible directory role: inbox",
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    },
+    {
+      "confidence": "hypothesis",
+      "counter_evidence": [],
+      "evidence_ids": [
+        "evidence_391d989f7602e1930b0cbd7f"
+      ],
+      "id": "finding_3c9a93d619f3fd01cc360465",
+      "kind": "directory_role",
+      "member_ids": [
+        "entry_7c33e462ef682fb0d094d4ea"
+      ],
+      "title": "Possible directory role: project",
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    },
+    {
+      "confidence": "hypothesis",
+      "counter_evidence": [],
+      "evidence_ids": [
+        "evidence_d9ab2a7d36f46df1b36e3814"
+      ],
+      "id": "finding_55ff74b79543985a72dcd70b",
+      "kind": "directory_role",
+      "member_ids": [
+        "entry_d61f91f63ea9d4e2f5815ad3"
+      ],
+      "title": "Possible directory role: cache",
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    },
+    {
+      "confidence": "hypothesis",
+      "counter_evidence": [],
+      "evidence_ids": [
+        "evidence_bed750c0acc919e593e8511e"
+      ],
+      "id": "finding_60f6e3f168060715a2f57593",
+      "kind": "version_like_names",
+      "member_ids": [
+        "entry_ebc100ee0e93374774d26af4",
+        "entry_815125d6c9d2ffc0388f373a"
+      ],
+      "title": "Names suggest a possible version or export family",
+      "uncertainties": [
+        "Related names do not prove version lineage, quality, completeness or intent.",
+        "The latest modification time does not identify the preferred version."
+      ]
+    },
+    {
+      "confidence": "observed",
+      "counter_evidence": [],
+      "evidence_ids": [
+        "evidence_e8c15f15fc58bf9a0a0c1699"
+      ],
+      "id": "finding_8b51088fdc1798ad193ef71b",
+      "kind": "largest_observed_files",
+      "member_ids": [
+        "entry_448cbfd607fb757ff47e3615",
+        "entry_8e0254a8859d43501ff0ba98",
+        "entry_bba030de591134adb89d1423",
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_ff55aa4d4605716a06ee1a5f",
+        "entry_a53fdd6c3e25366ba4509c63",
+        "entry_fd13c1a9fed3bb1e0b5e668e",
+        "entry_815125d6c9d2ffc0388f373a",
+        "entry_ebc100ee0e93374774d26af4"
+      ],
+      "title": "Largest observed files by logical size",
+      "uncertainties": [
+        "Large files are not necessarily unwanted.",
+        "The ranking covers only successfully observed files."
+      ]
+    },
+    {
+      "confidence": "observed",
+      "counter_evidence": [],
+      "evidence_ids": [
+        "evidence_b7a41755657c423275e6e913"
+      ],
+      "id": "finding_a4f376fe22268b9da1a0a7ba",
+      "kind": "older_modification_times",
+      "member_ids": [
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_bba030de591134adb89d1423",
+        "entry_448cbfd607fb757ff47e3615",
+        "entry_8e0254a8859d43501ff0ba98",
+        "entry_ff55aa4d4605716a06ee1a5f",
+        "entry_ebc100ee0e93374774d26af4",
+        "entry_815125d6c9d2ffc0388f373a",
+        "entry_a53fdd6c3e25366ba4509c63",
+        "entry_fd13c1a9fed3bb1e0b5e668e"
+      ],
+      "title": "Modification times older than 180 days",
+      "uncertainties": [
+        "Modification time does not show last use, usefulness or whether work is dormant.",
+        "Copied or manually edited timestamps may not reflect material age."
+      ]
+    },
+    {
+      "confidence": "observed",
+      "counter_evidence": [],
+      "evidence_ids": [
+        "evidence_5d16d9007a5554620117281e"
+      ],
+      "id": "finding_ae7d5bced7ae6edef5d7ab09",
+      "kind": "exact_content_match",
+      "member_ids": [
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_bba030de591134adb89d1423",
+        "entry_ff55aa4d4605716a06ee1a5f"
+      ],
+      "title": "Matching full-file hashes across distinct objects",
+      "uncertainties": [
+        "Byte-identical observations do not establish which copy is authoritative or safe to delete.",
+        "Content can change after hashing; shared physical extents are unknown."
+      ]
+    },
+    {
+      "confidence": "unknown",
+      "counter_evidence": [],
+      "evidence_ids": [
+        "evidence_5565dab267a4ed6ee721a64f"
+      ],
+      "id": "finding_b1fdc1bdb7594cc2ffb4ea6d",
+      "kind": "incomplete_inventory",
+      "member_ids": [
+        "entry_30323bcd4e21a2a13eef20bf"
+      ],
+      "title": "Some storage could not be characterised",
+      "uncertainties": [
+        "Missing observations cannot be interpreted as empty folders or deleted files."
+      ]
+    },
+    {
+      "confidence": "hypothesis",
+      "counter_evidence": [],
+      "evidence_ids": [
+        "evidence_5045bace24b0c85d1328c5cf"
+      ],
+      "id": "finding_c5855a2bfe1c06dbeb8cb944",
+      "kind": "directory_role",
+      "member_ids": [
+        "entry_21874104f293ae8a65f8aab4"
+      ],
+      "title": "Possible directory role: archive",
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    }
+  ],
+  "plan_alternatives": [
+    {
+      "alternatives": [
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "keep_current_structure",
+          "label": "Keep the current structure",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_5d16d9007a5554620117281e"
+              ],
+              "id": "step_ce457cbb33c4bdbcc62b5ffb",
+              "member_ids": [
+                "entry_cd3ab2e5f18e30cbf6d921b1",
+                "entry_bba030de591134adb89d1423",
+                "entry_ff55aa4d4605716a06ee1a5f"
+              ],
+              "type": "keep_unchanged"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_cd3ab2e5f18e30cbf6d921b1",
+            "entry_bba030de591134adb89d1423",
+            "entry_ff55aa4d4605716a06ee1a5f"
+          ]
+        },
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "review_grouping",
+          "label": "Review the evidence and describe a possible grouping",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_5d16d9007a5554620117281e"
+              ],
+              "id": "step_58562b5bdb420e95775f6fce",
+              "member_ids": [
+                "entry_cd3ab2e5f18e30cbf6d921b1",
+                "entry_bba030de591134adb89d1423",
+                "entry_ff55aa4d4605716a06ee1a5f"
+              ],
+              "type": "inspect_evidence"
+            },
+            {
+              "depends_on": [
+                "step_58562b5bdb420e95775f6fce"
+              ],
+              "evidence_ids": [
+                "evidence_5d16d9007a5554620117281e"
+              ],
+              "id": "step_551f497ef3e858684f4e9982",
+              "member_ids": [
+                "entry_cd3ab2e5f18e30cbf6d921b1",
+                "entry_bba030de591134adb89d1423",
+                "entry_ff55aa4d4605716a06ee1a5f"
+              ],
+              "type": "ask_about_intent"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_cd3ab2e5f18e30cbf6d921b1",
+            "entry_bba030de591134adb89d1423",
+            "entry_ff55aa4d4605716a06ee1a5f"
+          ]
+        }
+      ],
+      "executable": false,
+      "finding_ids": [
+        "finding_ae7d5bced7ae6edef5d7ab09"
+      ],
+      "id": "plan_132dde48cf362004e1689939",
+      "kind": "read_only_review_alternatives",
+      "outside_scope": "All other observed entries remain unchanged.",
+      "reasons": [
+        "Matching full-file hashes across distinct objects"
+      ],
+      "scope_member_ids": [
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_bba030de591134adb89d1423",
+        "entry_ff55aa4d4605716a06ee1a5f"
+      ],
+      "uncertainties": [
+        "Byte-identical observations do not establish which copy is authoritative or safe to delete.",
+        "Content can change after hashing; shared physical extents are unknown."
+      ]
+    },
+    {
+      "alternatives": [
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "keep_current_structure",
+          "label": "Keep the current structure",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_bed750c0acc919e593e8511e"
+              ],
+              "id": "step_f89142bc130e52f1581d0b37",
+              "member_ids": [
+                "entry_ebc100ee0e93374774d26af4",
+                "entry_815125d6c9d2ffc0388f373a"
+              ],
+              "type": "keep_unchanged"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_ebc100ee0e93374774d26af4",
+            "entry_815125d6c9d2ffc0388f373a"
+          ]
+        },
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "review_grouping",
+          "label": "Review the evidence and describe a possible grouping",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_bed750c0acc919e593e8511e"
+              ],
+              "id": "step_95432c8c4ef9e093c9d79234",
+              "member_ids": [
+                "entry_ebc100ee0e93374774d26af4",
+                "entry_815125d6c9d2ffc0388f373a"
+              ],
+              "type": "inspect_evidence"
+            },
+            {
+              "depends_on": [
+                "step_95432c8c4ef9e093c9d79234"
+              ],
+              "evidence_ids": [
+                "evidence_bed750c0acc919e593e8511e"
+              ],
+              "id": "step_79bebcde42409b4e434904f4",
+              "member_ids": [
+                "entry_ebc100ee0e93374774d26af4",
+                "entry_815125d6c9d2ffc0388f373a"
+              ],
+              "type": "ask_about_intent"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_ebc100ee0e93374774d26af4",
+            "entry_815125d6c9d2ffc0388f373a"
+          ]
+        }
+      ],
+      "executable": false,
+      "finding_ids": [
+        "finding_60f6e3f168060715a2f57593"
+      ],
+      "id": "plan_355f3c4d6e5c7e4f70591895",
+      "kind": "read_only_review_alternatives",
+      "outside_scope": "All other observed entries remain unchanged.",
+      "reasons": [
+        "Names suggest a possible version or export family"
+      ],
+      "scope_member_ids": [
+        "entry_ebc100ee0e93374774d26af4",
+        "entry_815125d6c9d2ffc0388f373a"
+      ],
+      "uncertainties": [
+        "Related names do not prove version lineage, quality, completeness or intent.",
+        "The latest modification time does not identify the preferred version."
+      ]
+    },
+    {
+      "alternatives": [
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "keep_current_structure",
+          "label": "Keep the current structure",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_b7a41755657c423275e6e913"
+              ],
+              "id": "step_80f7efa0738e5bdb6d466cde",
+              "member_ids": [
+                "entry_cd3ab2e5f18e30cbf6d921b1",
+                "entry_bba030de591134adb89d1423",
+                "entry_448cbfd607fb757ff47e3615",
+                "entry_8e0254a8859d43501ff0ba98",
+                "entry_ff55aa4d4605716a06ee1a5f",
+                "entry_ebc100ee0e93374774d26af4",
+                "entry_815125d6c9d2ffc0388f373a",
+                "entry_a53fdd6c3e25366ba4509c63",
+                "entry_fd13c1a9fed3bb1e0b5e668e"
+              ],
+              "type": "keep_unchanged"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_cd3ab2e5f18e30cbf6d921b1",
+            "entry_bba030de591134adb89d1423",
+            "entry_448cbfd607fb757ff47e3615",
+            "entry_8e0254a8859d43501ff0ba98",
+            "entry_ff55aa4d4605716a06ee1a5f",
+            "entry_ebc100ee0e93374774d26af4",
+            "entry_815125d6c9d2ffc0388f373a",
+            "entry_a53fdd6c3e25366ba4509c63",
+            "entry_fd13c1a9fed3bb1e0b5e668e"
+          ]
+        },
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "review_grouping",
+          "label": "Review the evidence and describe a possible grouping",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_b7a41755657c423275e6e913"
+              ],
+              "id": "step_8e4c9efbd18e9bac00b53de3",
+              "member_ids": [
+                "entry_cd3ab2e5f18e30cbf6d921b1",
+                "entry_bba030de591134adb89d1423",
+                "entry_448cbfd607fb757ff47e3615",
+                "entry_8e0254a8859d43501ff0ba98",
+                "entry_ff55aa4d4605716a06ee1a5f",
+                "entry_ebc100ee0e93374774d26af4",
+                "entry_815125d6c9d2ffc0388f373a",
+                "entry_a53fdd6c3e25366ba4509c63",
+                "entry_fd13c1a9fed3bb1e0b5e668e"
+              ],
+              "type": "inspect_evidence"
+            },
+            {
+              "depends_on": [
+                "step_8e4c9efbd18e9bac00b53de3"
+              ],
+              "evidence_ids": [
+                "evidence_b7a41755657c423275e6e913"
+              ],
+              "id": "step_6d67a1c2771069d11b2e4b81",
+              "member_ids": [
+                "entry_cd3ab2e5f18e30cbf6d921b1",
+                "entry_bba030de591134adb89d1423",
+                "entry_448cbfd607fb757ff47e3615",
+                "entry_8e0254a8859d43501ff0ba98",
+                "entry_ff55aa4d4605716a06ee1a5f",
+                "entry_ebc100ee0e93374774d26af4",
+                "entry_815125d6c9d2ffc0388f373a",
+                "entry_a53fdd6c3e25366ba4509c63",
+                "entry_fd13c1a9fed3bb1e0b5e668e"
+              ],
+              "type": "ask_about_intent"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_cd3ab2e5f18e30cbf6d921b1",
+            "entry_bba030de591134adb89d1423",
+            "entry_448cbfd607fb757ff47e3615",
+            "entry_8e0254a8859d43501ff0ba98",
+            "entry_ff55aa4d4605716a06ee1a5f",
+            "entry_ebc100ee0e93374774d26af4",
+            "entry_815125d6c9d2ffc0388f373a",
+            "entry_a53fdd6c3e25366ba4509c63",
+            "entry_fd13c1a9fed3bb1e0b5e668e"
+          ]
+        }
+      ],
+      "executable": false,
+      "finding_ids": [
+        "finding_a4f376fe22268b9da1a0a7ba"
+      ],
+      "id": "plan_431f81fdef8686868b93d702",
+      "kind": "read_only_review_alternatives",
+      "outside_scope": "All other observed entries remain unchanged.",
+      "reasons": [
+        "Modification times older than 180 days"
+      ],
+      "scope_member_ids": [
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_bba030de591134adb89d1423",
+        "entry_448cbfd607fb757ff47e3615",
+        "entry_8e0254a8859d43501ff0ba98",
+        "entry_ff55aa4d4605716a06ee1a5f",
+        "entry_ebc100ee0e93374774d26af4",
+        "entry_815125d6c9d2ffc0388f373a",
+        "entry_a53fdd6c3e25366ba4509c63",
+        "entry_fd13c1a9fed3bb1e0b5e668e"
+      ],
+      "uncertainties": [
+        "Modification time does not show last use, usefulness or whether work is dormant.",
+        "Copied or manually edited timestamps may not reflect material age."
+      ]
+    },
+    {
+      "alternatives": [
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "keep_current_structure",
+          "label": "Keep the current structure",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_d9ab2a7d36f46df1b36e3814"
+              ],
+              "id": "step_b2764f41a2c00206d093b29f",
+              "member_ids": [
+                "entry_d61f91f63ea9d4e2f5815ad3"
+              ],
+              "type": "keep_unchanged"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_d61f91f63ea9d4e2f5815ad3"
+          ]
+        },
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "review_grouping",
+          "label": "Review the evidence and describe a possible grouping",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_d9ab2a7d36f46df1b36e3814"
+              ],
+              "id": "step_1145d5eb5a0fb5d8d05ef7ec",
+              "member_ids": [
+                "entry_d61f91f63ea9d4e2f5815ad3"
+              ],
+              "type": "inspect_evidence"
+            },
+            {
+              "depends_on": [
+                "step_1145d5eb5a0fb5d8d05ef7ec"
+              ],
+              "evidence_ids": [
+                "evidence_d9ab2a7d36f46df1b36e3814"
+              ],
+              "id": "step_1cf0f5651ce221d2a2538699",
+              "member_ids": [
+                "entry_d61f91f63ea9d4e2f5815ad3"
+              ],
+              "type": "ask_about_intent"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_d61f91f63ea9d4e2f5815ad3"
+          ]
+        }
+      ],
+      "executable": false,
+      "finding_ids": [
+        "finding_55ff74b79543985a72dcd70b"
+      ],
+      "id": "plan_8008d84dc887119ea03328c4",
+      "kind": "read_only_review_alternatives",
+      "outside_scope": "All other observed entries remain unchanged.",
+      "reasons": [
+        "Possible directory role: cache"
+      ],
+      "scope_member_ids": [
+        "entry_d61f91f63ea9d4e2f5815ad3"
+      ],
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    },
+    {
+      "alternatives": [
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "keep_current_structure",
+          "label": "Keep the current structure",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_391d989f7602e1930b0cbd7f"
+              ],
+              "id": "step_2c133792760dc2fb8ff325ed",
+              "member_ids": [
+                "entry_7c33e462ef682fb0d094d4ea"
+              ],
+              "type": "keep_unchanged"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_7c33e462ef682fb0d094d4ea"
+          ]
+        },
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "review_grouping",
+          "label": "Review the evidence and describe a possible grouping",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_391d989f7602e1930b0cbd7f"
+              ],
+              "id": "step_95f338207dd7df81b9fabf7c",
+              "member_ids": [
+                "entry_7c33e462ef682fb0d094d4ea"
+              ],
+              "type": "inspect_evidence"
+            },
+            {
+              "depends_on": [
+                "step_95f338207dd7df81b9fabf7c"
+              ],
+              "evidence_ids": [
+                "evidence_391d989f7602e1930b0cbd7f"
+              ],
+              "id": "step_e525d3ae7c75e98fe6005814",
+              "member_ids": [
+                "entry_7c33e462ef682fb0d094d4ea"
+              ],
+              "type": "ask_about_intent"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_7c33e462ef682fb0d094d4ea"
+          ]
+        }
+      ],
+      "executable": false,
+      "finding_ids": [
+        "finding_3c9a93d619f3fd01cc360465"
+      ],
+      "id": "plan_a01d3246f67046bccf9f516e",
+      "kind": "read_only_review_alternatives",
+      "outside_scope": "All other observed entries remain unchanged.",
+      "reasons": [
+        "Possible directory role: project"
+      ],
+      "scope_member_ids": [
+        "entry_7c33e462ef682fb0d094d4ea"
+      ],
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    },
+    {
+      "alternatives": [
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "keep_current_structure",
+          "label": "Keep the current structure",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_b8876ad7d52c341175738e8c"
+              ],
+              "id": "step_25c9d7a0dab27a2a22919908",
+              "member_ids": [
+                "entry_98070566f30b9156f73d495e"
+              ],
+              "type": "keep_unchanged"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_98070566f30b9156f73d495e"
+          ]
+        },
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "review_grouping",
+          "label": "Review the evidence and describe a possible grouping",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_b8876ad7d52c341175738e8c"
+              ],
+              "id": "step_611c17815ebd7a20a3543505",
+              "member_ids": [
+                "entry_98070566f30b9156f73d495e"
+              ],
+              "type": "inspect_evidence"
+            },
+            {
+              "depends_on": [
+                "step_611c17815ebd7a20a3543505"
+              ],
+              "evidence_ids": [
+                "evidence_b8876ad7d52c341175738e8c"
+              ],
+              "id": "step_a78445fe765d3b183cb303bd",
+              "member_ids": [
+                "entry_98070566f30b9156f73d495e"
+              ],
+              "type": "ask_about_intent"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_98070566f30b9156f73d495e"
+          ]
+        }
+      ],
+      "executable": false,
+      "finding_ids": [
+        "finding_0d3b5c55b3bdd5b13f037fce"
+      ],
+      "id": "plan_b1de0a85d452e4c1f877ec57",
+      "kind": "read_only_review_alternatives",
+      "outside_scope": "All other observed entries remain unchanged.",
+      "reasons": [
+        "Possible directory role: inbox"
+      ],
+      "scope_member_ids": [
+        "entry_98070566f30b9156f73d495e"
+      ],
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    },
+    {
+      "alternatives": [
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "keep_current_structure",
+          "label": "Keep the current structure",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_e8c15f15fc58bf9a0a0c1699"
+              ],
+              "id": "step_a5270d6012dd32e8e05ab574",
+              "member_ids": [
+                "entry_448cbfd607fb757ff47e3615",
+                "entry_8e0254a8859d43501ff0ba98",
+                "entry_bba030de591134adb89d1423",
+                "entry_cd3ab2e5f18e30cbf6d921b1",
+                "entry_ff55aa4d4605716a06ee1a5f",
+                "entry_a53fdd6c3e25366ba4509c63",
+                "entry_fd13c1a9fed3bb1e0b5e668e",
+                "entry_815125d6c9d2ffc0388f373a",
+                "entry_ebc100ee0e93374774d26af4"
+              ],
+              "type": "keep_unchanged"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_448cbfd607fb757ff47e3615",
+            "entry_8e0254a8859d43501ff0ba98",
+            "entry_bba030de591134adb89d1423",
+            "entry_cd3ab2e5f18e30cbf6d921b1",
+            "entry_ff55aa4d4605716a06ee1a5f",
+            "entry_a53fdd6c3e25366ba4509c63",
+            "entry_fd13c1a9fed3bb1e0b5e668e",
+            "entry_815125d6c9d2ffc0388f373a",
+            "entry_ebc100ee0e93374774d26af4"
+          ]
+        },
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "review_grouping",
+          "label": "Review the evidence and describe a possible grouping",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_e8c15f15fc58bf9a0a0c1699"
+              ],
+              "id": "step_3bd5842801962a6a446642b5",
+              "member_ids": [
+                "entry_448cbfd607fb757ff47e3615",
+                "entry_8e0254a8859d43501ff0ba98",
+                "entry_bba030de591134adb89d1423",
+                "entry_cd3ab2e5f18e30cbf6d921b1",
+                "entry_ff55aa4d4605716a06ee1a5f",
+                "entry_a53fdd6c3e25366ba4509c63",
+                "entry_fd13c1a9fed3bb1e0b5e668e",
+                "entry_815125d6c9d2ffc0388f373a",
+                "entry_ebc100ee0e93374774d26af4"
+              ],
+              "type": "inspect_evidence"
+            },
+            {
+              "depends_on": [
+                "step_3bd5842801962a6a446642b5"
+              ],
+              "evidence_ids": [
+                "evidence_e8c15f15fc58bf9a0a0c1699"
+              ],
+              "id": "step_d1d84b103b06326416f8cea0",
+              "member_ids": [
+                "entry_448cbfd607fb757ff47e3615",
+                "entry_8e0254a8859d43501ff0ba98",
+                "entry_bba030de591134adb89d1423",
+                "entry_cd3ab2e5f18e30cbf6d921b1",
+                "entry_ff55aa4d4605716a06ee1a5f",
+                "entry_a53fdd6c3e25366ba4509c63",
+                "entry_fd13c1a9fed3bb1e0b5e668e",
+                "entry_815125d6c9d2ffc0388f373a",
+                "entry_ebc100ee0e93374774d26af4"
+              ],
+              "type": "ask_about_intent"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_448cbfd607fb757ff47e3615",
+            "entry_8e0254a8859d43501ff0ba98",
+            "entry_bba030de591134adb89d1423",
+            "entry_cd3ab2e5f18e30cbf6d921b1",
+            "entry_ff55aa4d4605716a06ee1a5f",
+            "entry_a53fdd6c3e25366ba4509c63",
+            "entry_fd13c1a9fed3bb1e0b5e668e",
+            "entry_815125d6c9d2ffc0388f373a",
+            "entry_ebc100ee0e93374774d26af4"
+          ]
+        }
+      ],
+      "executable": false,
+      "finding_ids": [
+        "finding_8b51088fdc1798ad193ef71b"
+      ],
+      "id": "plan_d454ff20d11365dd3452df50",
+      "kind": "read_only_review_alternatives",
+      "outside_scope": "All other observed entries remain unchanged.",
+      "reasons": [
+        "Largest observed files by logical size"
+      ],
+      "scope_member_ids": [
+        "entry_448cbfd607fb757ff47e3615",
+        "entry_8e0254a8859d43501ff0ba98",
+        "entry_bba030de591134adb89d1423",
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_ff55aa4d4605716a06ee1a5f",
+        "entry_a53fdd6c3e25366ba4509c63",
+        "entry_fd13c1a9fed3bb1e0b5e668e",
+        "entry_815125d6c9d2ffc0388f373a",
+        "entry_ebc100ee0e93374774d26af4"
+      ],
+      "uncertainties": [
+        "Large files are not necessarily unwanted.",
+        "The ranking covers only successfully observed files."
+      ]
+    },
+    {
+      "alternatives": [
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "keep_current_structure",
+          "label": "Keep the current structure",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_5045bace24b0c85d1328c5cf"
+              ],
+              "id": "step_af69ef337b736dbeb078b9be",
+              "member_ids": [
+                "entry_21874104f293ae8a65f8aab4"
+              ],
+              "type": "keep_unchanged"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_21874104f293ae8a65f8aab4"
+          ]
+        },
+        {
+          "expected_consequences": {
+            "additional_content_reads": 0,
+            "filesystem_changes": 0
+          },
+          "id": "review_grouping",
+          "label": "Review the evidence and describe a possible grouping",
+          "steps": [
+            {
+              "depends_on": [],
+              "evidence_ids": [
+                "evidence_5045bace24b0c85d1328c5cf"
+              ],
+              "id": "step_3e525693614b7b6b2f051f0b",
+              "member_ids": [
+                "entry_21874104f293ae8a65f8aab4"
+              ],
+              "type": "inspect_evidence"
+            },
+            {
+              "depends_on": [
+                "step_3e525693614b7b6b2f051f0b"
+              ],
+              "evidence_ids": [
+                "evidence_5045bace24b0c85d1328c5cf"
+              ],
+              "id": "step_9604238c68d85b2285f6ae74",
+              "member_ids": [
+                "entry_21874104f293ae8a65f8aab4"
+              ],
+              "type": "ask_about_intent"
+            }
+          ],
+          "uncertain_member_ids": [],
+          "unchanged_member_ids": [
+            "entry_21874104f293ae8a65f8aab4"
+          ]
+        }
+      ],
+      "executable": false,
+      "finding_ids": [
+        "finding_c5855a2bfe1c06dbeb8cb944"
+      ],
+      "id": "plan_eefa8f602404df239ea42678",
+      "kind": "read_only_review_alternatives",
+      "outside_scope": "All other observed entries remain unchanged.",
+      "reasons": [
+        "Possible directory role: archive"
+      ],
+      "scope_member_ids": [
+        "entry_21874104f293ae8a65f8aab4"
+      ],
+      "uncertainties": [
+        "Directory names and marker names do not prove purpose or current activity.",
+        "Logical totals count paths, including multiple hard links.",
+        "Zero observed bytes in an incomplete subtree does not establish emptiness."
+      ]
+    }
+  ],
+  "read_only": true,
+  "relationships": [
+    {
+      "confidence": "observed",
+      "evidence_ids": [
+        "evidence_7a3bf4684430c72f653faab4"
+      ],
+      "id": "relationship_2cc0ef9a3cf0d0a0ba32d0bc",
+      "kind": "hard_link_paths",
+      "member_ids": [
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_bba030de591134adb89d1423"
+      ],
+      "uncertainties": [
+        "Inode identity is only an observation; it is not permanent identity.",
+        "Unobserved hard links may exist outside selected roots."
+      ]
+    },
+    {
+      "confidence": "hypothesis",
+      "evidence_ids": [
+        "evidence_bed750c0acc919e593e8511e"
+      ],
+      "id": "relationship_60f6e3f168060715a2f57593",
+      "kind": "version_like_names",
+      "member_ids": [
+        "entry_ebc100ee0e93374774d26af4",
+        "entry_815125d6c9d2ffc0388f373a"
+      ],
+      "uncertainties": [
+        "Related names do not prove version lineage, quality, completeness or intent.",
+        "The latest modification time does not identify the preferred version."
+      ]
+    },
+    {
+      "confidence": "observed",
+      "evidence_ids": [
+        "evidence_5d16d9007a5554620117281e"
+      ],
+      "id": "relationship_ae7d5bced7ae6edef5d7ab09",
+      "kind": "exact_content_match",
+      "member_ids": [
+        "entry_cd3ab2e5f18e30cbf6d921b1",
+        "entry_bba030de591134adb89d1423",
+        "entry_ff55aa4d4605716a06ee1a5f"
+      ],
+      "uncertainties": [
+        "Byte-identical observations do not establish which copy is authoritative or safe to delete.",
+        "Content can change after hashing; shared physical extents are unknown."
+      ]
+    }
+  ],
+  "scan": {
+    "coverage": {
+      "atomic_snapshot": false,
+      "complete_within_policy": false,
+      "entries_observed": 16,
+      "hash_attempts": 9,
+      "hash_status_counts": {
+        "verified": 9
+      },
+      "hashed_bytes": 1896,
+      "hashed_files": 9,
+      "status_counts": {
+        "observed": 15,
+        "unreadable": 1
+      },
+      "stop_reason": null
+    },
+    "errors": [
+      {
+        "entry_id": "entry_30323bcd4e21a2a13eef20bf",
+        "errno": 13,
+        "kind": "PermissionError"
+      }
+    ],
+    "exclusions": [],
+    "hash_policy": "bounded_sha256",
+    "id": "scan_f2cfc3bcbba9cad7f33fec7b",
+    "limits": {
+      "cross_filesystems": false,
+      "exclude_names": [],
+      "hash_files": true,
+      "max_depth": 32,
+      "max_directory_entries": 5000,
+      "max_entries": 20000,
+      "max_hash_file_bytes": 16777216,
+      "max_hash_files": 1000,
+      "max_hash_total_bytes": 67108864,
+      "max_seconds": 30.0
+    },
+    "roots": [
+      {
+        "id": "root_d691e552fd740ba4b1c60cbd",
+        "identity": {
+          "ctime_ns": 1767225600000000000,
+          "device": 1,
+          "inode": 1,
+          "link_count": 1,
+          "mode": 16832,
+          "mtime_ns": 1767225600000000000,
+          "size": 0
+        },
+        "path": "/synthetic/disk-map-demo",
+        "status": "observed"
+      }
+    ],
+    "started_at": "2026-10-06T12:00:00+00:00",
+    "status": "partial",
+    "uncertainties": [
+      "This is a synthetic demonstration, not a scan of a real disk."
+    ]
+  },
+  "schema_version": "disk-model/v1",
+  "synthetic": true
+}

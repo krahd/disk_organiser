@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 14:16
+Last updated: 2026-10-06 14:40
 
 ## Project purpose
 
@@ -27,7 +27,7 @@ Near-duplicate detection is content-aware and includes filename/token similarity
 
 ## Active focus
 
-The active bounded first-version focus is guided copy organisation and honest recovery. It is not a complete drive-cleanup product or commercial release. Dedicated Windows guided support, hostile concurrent-write protection, universal cloud/network detection and representative macOS hardware acceptance remain open. Remote inference is never used by the guided surface.
+The active product focus is read-only storage understanding, inspectable evidence and coherent review plans. The separate guided action prototype remains restricted pending its safety acceptance work. It is not a complete drive-cleanup product or commercial release. Dedicated Windows guided support, hostile concurrent-write protection, universal cloud/network detection and representative macOS hardware acceptance remain open. Remote inference is never used by the guided surface.
 
 ## Architecture overview
 
@@ -143,7 +143,7 @@ npx playwright test frontend/visual
 
 - Independent review found a critical persisted-journal trust flaw in candidate `7ff5390`. Earlier green CI is not safety acceptance. Do not treat that candidate as safe for user data.
 - `backend/guided_schema.py` now validates the complete versioned journal without filesystem I/O; derived names, field types, states, byte totals and identity relationships must all agree. Malformed and old records are retained and counted as blocked.
-- Read-only is now the default. Capabilities explicitly distinguish current scan scope, disabled mutation/recovery, missing structured Disk Model and uncertainty. Copy fixture testing needs operator opt-in; legacy execute/undo/backup-removal APIs are separately disabled by default.
+- Read-only is now the default. Capabilities explicitly distinguish current scan scope, disabled mutation/recovery, a not-yet-integrated structured Disk Model and uncertainty. Copy fixture testing needs operator opt-in; legacy execute/undo/backup-removal APIs are separately disabled by default.
 - Copy application additionally requires an unchanged canonical preview digest held in process memory from the user's current scan. Saved JSON cannot restore authority after restart, alteration, expiry or cache eviction. Rescan is required.
 - Automatic recovery removal is disabled. The endpoint validates the record and stops without selected-folder I/O, unlink/rmdir or journal mutation. All originals, output and recovery data remain. Journal assertions alone cannot prove app ownership.
 - Local defensive-core verification: 171 backend tests passed, guided schema/engine/test lint passed, 44 OpenAPI routes passed. Frontend contract integration and permitted independent confirmation remain pending.
@@ -182,6 +182,66 @@ npx playwright test frontend/visual
 - Malformed-input fuzzing now covers lower-traffic write paths in Ollama lifecycle and preferences writes, including explicit timeout validation for `/api/ollama/start`, `/api/ollama/pull`, and `/api/ollama/serve`, and object-shape validation for `POST /api/preferences`.
 - `backend/tests/test_non_analysis_input_fuzz.py` now includes 19 route-level malformed-input cases spanning organise/recycle/scan-index/maintenance plus Ollama and preferences writes.
 - Public project website content and visual design were refreshed in `docs/index.html` and `docs/assets/style.css` with clearer safety messaging and updated quick-start links.
+
+## Read-only Disk Model v1 checkpoint
+
+The new standalone `backend/disk_model*.py` library and CLI implement bounded
+metadata-first storage understanding. This slice does not change Flask routes,
+guided mutation code or the current frontend. The API capability remains
+`disk_model.status = not_implemented` until a separately reviewed integration.
+See [DISK-MODEL-V1.md](docs/DISK-MODEL-V1.md) for the architecture, schema, audit,
+commands, limitations and acceptance backlog.
+
+Implemented: explicit selected roots; POSIX descriptor-relative no-follow
+traversal; stable root-relative IDs; partial/unreadable/disappeared/stale and
+unsupported observations; opt-in bounded SHA-256; hard-link-aware logical totals;
+nullable allocation; evidence-backed filename families, directory-role hypotheses,
+size/mtime findings; non-executable review alternatives; incremental metadata
+deltas; cancellation/progress; deterministic query/export; synthetic viewer data.
+No remote inference, content parser, persistent scan database or filesystem
+mutation authority is added. `physical_bytes` and `recoverable_bytes` remain null.
+
+The following diagram is the new independent read-only data flow. The retained
+legacy diagrams above do not describe this model or certify the action layer.
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="190" viewBox="0 0 1000 190" role="img" aria-labelledby="model-title model-desc">
+  <title id="model-title">Read-only Disk Model data flow</title>
+  <desc id="model-desc">Explicit roots feed a bounded no-follow scanner, pure evidence analysis and a JSON export for a separately integrated viewer. No action executor is connected.</desc>
+  <defs><marker id="model-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" /></marker></defs>
+  <rect x="20" y="45" width="180" height="85" rx="8" fill="none" stroke="black" />
+  <text x="110" y="77" text-anchor="middle" font-size="14">Explicit selected roots</text>
+  <text x="110" y="103" text-anchor="middle" font-size="12">Metadata-first access</text>
+  <rect x="260" y="45" width="180" height="85" rx="8" fill="none" stroke="black" />
+  <text x="350" y="77" text-anchor="middle" font-size="14">Bounded observations</text>
+  <text x="350" y="103" text-anchor="middle" font-size="12">Optional budgeted hashes</text>
+  <rect x="500" y="45" width="210" height="85" rx="8" fill="none" stroke="black" />
+  <text x="605" y="77" text-anchor="middle" font-size="14">Pure evidence analysis</text>
+  <text x="605" y="103" text-anchor="middle" font-size="12">Hypotheses and uncertainty</text>
+  <rect x="770" y="45" width="210" height="85" rx="8" fill="none" stroke="black" />
+  <text x="875" y="77" text-anchor="middle" font-size="14">Read-only JSON contract</text>
+  <text x="875" y="103" text-anchor="middle" font-size="12">Query and viewer integration</text>
+  <line x1="200" y1="87" x2="260" y2="87" stroke="black" marker-end="url(#model-arrow)" />
+  <line x1="440" y1="87" x2="500" y2="87" stroke="black" marker-end="url(#model-arrow)" />
+  <line x1="710" y1="87" x2="770" y2="87" stroke="black" marker-end="url(#model-arrow)" />
+  <text x="500" y="169" text-anchor="middle" font-size="13">No action-executor connection; alternatives cannot change files.</text>
+</svg>
+
+Current model verification: 59 focused tests and the full 230-test backend suite
+passed; scoped Python lint and 44-route OpenAPI validation passed. A synthetic
+2,051-entry metadata-only scan completed with zero content bytes read; a separate
+100-entry limit returned an explicitly partial inventory. JSON Schema 2020-12 was checked against
+the synthetic fixture and metadata/hash/cancelled temporary-tree exports using an
+existing environment validator. The initial independent review found seven edge cases involving ancestor renames,
+hard-link freshness, hash attempts, unknown identities, subtree coverage and
+import/schema validation. All have fixes and regression tests; independent recheck
+is pending. This is a WIP checkpoint, not safety or release acceptance. Exact-commit
+remote CI is pending publication. No new dependency was added.
+
+Remaining: independent review, dedicated read-only UI/API integration, Windows
+traversal (currently explicit abstention), real-platform acceptance, persistent
+paged indexing and resumable scans, broader contextual relationships, optional
+local semantics and editable grouping plans. Existing transaction/recovery gates,
+commercial/licensing holds and default mutation restrictions are unchanged.
 
 ## Tests and verification status
 
@@ -250,4 +310,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 14:16
+Last updated: 2026-10-06 14:40
