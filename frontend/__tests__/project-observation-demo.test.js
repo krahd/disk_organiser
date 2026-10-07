@@ -81,7 +81,7 @@ beforeEach(async () => {
   pageListeners = [];
   const add = window.addEventListener.bind(window);
   jest.spyOn(window, "addEventListener").mockImplementation((name, listener, ...args) => {
-    if (name === "pageshow") pageListeners.push(listener);
+    if (["pageshow", "pagehide"].includes(name)) pageListeners.push([name, listener]);
     add(name, listener, ...args);
   });
   fetchMock = jest.fn().mockResolvedValue(response(fixture));
@@ -89,7 +89,7 @@ beforeEach(async () => {
   await demo.ready;
 });
 afterEach(() => {
-  for (const listener of pageListeners) window.removeEventListener("pageshow", listener);
+  for (const [name, listener] of pageListeners) window.removeEventListener(name, listener);
   jest.restoreAllMocks();
 });
 
@@ -475,4 +475,378 @@ test("Aurora member cards use an intrinsic minimum instead of fixed narrow zoom 
   const rule = css.match(/#observation-members\s*\{([^}]+)\}/);
   expect(rule).not.toBeNull();
   expect(rule[1]).toContain("repeat(auto-fit, minmax(min(100%, 26rem), 1fr))");
+});
+
+test("Save review is unavailable for the initial reference", () => {
+  expect(id("save")).not.toBeNull();
+  expect(id("save").disabled).toBe(true);
+  expect(id("save-status").textContent).toContain("Review the current intent first");
+});
+
+describe("Save current explicit review", () => {
+  let blobs;
+  let downloads;
+  let createURL;
+  let revokeURL;
+  let originalCreate;
+  let originalRevoke;
+  const readBlob = (blob) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsText(blob);
+    });
+  async function accept(folder = fixture.decision.destination_folder, value = reviewed(folder)) {
+    input("folder", folder);
+    fetchMock.mockResolvedValueOnce(response(value));
+    submit();
+    await settle();
+    expect(id("status").textContent).toContain("Draft reviewed");
+    expect(id("save").disabled).toBe(false);
+    return value;
+  }
+  async function report() {
+    id("save").click();
+    return JSON.parse(await readBlob(blobs[blobs.length - 1]));
+  }
+  beforeEach(() => {
+    blobs = [];
+    downloads = [];
+    originalCreate = Object.getOwnPropertyDescriptor(window.URL, "createObjectURL");
+    originalRevoke = Object.getOwnPropertyDescriptor(window.URL, "revokeObjectURL");
+    createURL = jest.fn((blob) => {
+      blobs.push(blob);
+      return `blob:synthetic-download-${blobs.length}`;
+    });
+    revokeURL = jest.fn();
+    Object.defineProperty(window.URL, "createObjectURL", {
+      configurable: true,
+      writable: true,
+      value: createURL,
+    });
+    Object.defineProperty(window.URL, "revokeObjectURL", {
+      configurable: true,
+      writable: true,
+      value: revokeURL,
+    });
+    jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function () {
+      downloads.push({ href: this.href, filename: this.download });
+    });
+  });
+  afterEach(() => {
+    window.dispatchEvent(new PageTransitionEvent("pagehide"));
+    if (originalCreate) Object.defineProperty(window.URL, "createObjectURL", originalCreate);
+    else delete window.URL.createObjectURL;
+    if (originalRevoke) Object.defineProperty(window.URL, "revokeObjectURL", originalRevoke);
+    else delete window.URL.revokeObjectURL;
+  });
+  test("exports a versioned safe display report of the exact accepted decision and evidence", async () => {
+    const value = await accept("Reviewed layout");
+    const saved = await report();
+    expect(saved).toMatchObject({
+      schema_version: "disk-administration-observation-review-export/v1",
+      report_kind: "synthetic_display_report",
+      canonical_observation_export: false,
+      replayable: false,
+      synthetic: true,
+      read_only: true,
+      executable: false,
+      execution_authority: null,
+      undo_available: false,
+      source_safe_to_erase: false,
+      live_backup_verified: false,
+      live_restore_verified: false,
+      source_revision: 1,
+      decision_revision: 2,
+      observation_digest: value.observation_digest,
+      reference_decision_digest: value.reference_decision_digest,
+      decision_digest: value.draft.decision_digest,
+      decision: value.decision,
+    });
+    expect(saved.review.members.map((member) => member.entry_id)).toEqual(value.draft.member_ids);
+    expect(saved.review.members.map((member) => member.intended.relative_path)).toEqual(
+      value.draft.members.map((member) => member.intended.relative_path)
+    );
+    expect(saved.review.capacity).toMatchObject({
+      known_recorded_path_logical_bytes: 66,
+      known_logical_copy_bytes: null,
+      required_destination_bytes: null,
+      observed_free_bytes: null,
+      physical_allocation_prediction: null,
+      reclaimed_bytes: 0,
+      unknown_size_members: [],
+    });
+    expect(saved.review.protection).toEqual(value.draft.protection);
+    expect(
+      saved.review.blockers.map(({ recorded_path_labels, explanation, ...issue }) => issue)
+    ).toEqual(value.draft.blockers);
+    expect(saved.review.limitations).toEqual(value.draft.limitations);
+    expect(saved.review.source_scope).toEqual({
+      recorded_roots: fixture.roots.map(({ id, path, status }) => ({ id, path, status })),
+      scan_id: value.draft.observation_scope.scan.id,
+      scan_status: "partial",
+      entry_count: 32,
+      recorded_error_count: 2,
+      recorded_exclusion_count: 0,
+    });
+    expect(blobs[0].type).toBe("application/json");
+    expect(downloads[0].filename).toMatch(/^disk-organiser-aurora-review-r2-[a-f0-9]{12}\.json$/);
+    expect(id("save-status").textContent).toContain("Download requested");
+    expect(id("save-status").textContent).not.toContain("saved successfully");
+  });
+  test("excludes tokens, headers, unrelated nested state and large undisplayed fingerprints", async () => {
+    const value = reviewed();
+    value.token = "TOP_SECRET";
+    value.headers = { "X-Demo-Token": "HEADER_SECRET" };
+    value.decision.headers = "DECISION_SECRET";
+    value.draft.extra = "DRAFT_SECRET";
+    value.draft.capacity.token = "CAPACITY_SECRET";
+    value.draft.protection.headers = "PROTECTION_SECRET";
+    value.draft.blockers[0].credentials = "ISSUE_SECRET";
+    await accept(fixture.decision.destination_folder, value);
+    document.body.dataset.secret = "DOM_SECRET";
+    const saved = await report();
+    const text = JSON.stringify(saved);
+    for (const forbidden of [
+      "TOP_SECRET",
+      "HEADER_SECRET",
+      "DECISION_SECRET",
+      "DRAFT_SECRET",
+      "CAPACITY_SECRET",
+      "PROTECTION_SECRET",
+      "ISSUE_SECRET",
+      "DOM_SECRET",
+      "__DEMO_PROCESS_TOKEN__",
+      '"fingerprint":',
+      "object_id",
+      "ctime_ns",
+      "inode",
+      "credentials",
+      "headers",
+      "token",
+    ])
+      expect(text).not.toContain(forbidden);
+    expect(Number.isSafeInteger(value.draft.members[0].observation.ctime_ns)).toBe(false);
+    expect(saved.review.members[0].volume_id).toBeNull();
+    expect(Object.keys(saved.review.members[0])).toEqual([
+      "entry_id",
+      "project_path",
+      "placement",
+      "source_retained",
+      "volume_id",
+      "content_version",
+      "dependency_coverage",
+      "source",
+      "intended",
+      "recorded_kind",
+      "recorded_logical_bytes",
+      "recorded_status",
+      "recorded_hash_status",
+    ]);
+  });
+  for (const action of [
+    "edit",
+    "membership",
+    "path",
+    "dismiss",
+    "reload",
+    "pagehide",
+    "persisted navigation",
+  ])
+    test(`cannot export after ${action}`, async () => {
+      await accept();
+      if (action === "edit") input("folder", "Unreviewed");
+      if (action === "membership") input("member-3", true);
+      if (action === "path") input("path-0", "Unreviewed.blend");
+      if (action === "dismiss") id("dismiss").click();
+      if (action === "reload") {
+        id("reload").click();
+        await settle();
+      }
+      if (action === "pagehide") window.dispatchEvent(new PageTransitionEvent("pagehide"));
+      if (action === "persisted navigation") {
+        window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+        await settle();
+      }
+      expect(id("save").disabled).toBe(true);
+      id("save").dispatchEvent(new Event("click"));
+      expect(createURL).not.toHaveBeenCalled();
+    });
+  test("detects a control value change even without an input event", async () => {
+    await accept();
+    id("folder").value = "Unannounced change";
+    id("save").click();
+    expect(createURL).not.toHaveBeenCalled();
+    expect(id("save").disabled).toBe(true);
+    expect(id("review-content").children).toHaveLength(0);
+  });
+  test("pending, failed and late responses cannot export an old accepted result", async () => {
+    await accept();
+    const wait = deferred();
+    fetchMock.mockReturnValueOnce(wait.promise);
+    submit();
+    expect(id("save").disabled).toBe(true);
+    id("save").dispatchEvent(new Event("click"));
+    expect(createURL).not.toHaveBeenCalled();
+    input("folder", "Newer draft");
+    wait.resolve(response(reviewed()));
+    await settle();
+    expect(id("save").disabled).toBe(true);
+    fetchMock.mockResolvedValueOnce(response({ error: "Stale" }, 409));
+    submit();
+    await settle();
+    expect(id("save").disabled).toBe(true);
+    id("save").dispatchEvent(new Event("click"));
+    expect(createURL).not.toHaveBeenCalled();
+  });
+  test("a late reference after a newer reload cannot enable saving", async () => {
+    await accept();
+    const old = deferred();
+    fetchMock.mockReturnValueOnce(old.promise);
+    id("reload").click();
+    id("reload").click();
+    await settle();
+    old.resolve(response(fixture));
+    await settle();
+    expect(id("save").disabled).toBe(true);
+    expect(createURL).not.toHaveBeenCalled();
+  });
+  test("repeated clicks create exact same report and revoke each URL once", async () => {
+    await accept();
+    id("save").click();
+    id("save").click();
+    expect(downloads).toHaveLength(2);
+    expect(document.querySelectorAll("a[download]")).toHaveLength(0);
+    expect(await readBlob(blobs[0])).toBe(await readBlob(blobs[1]));
+    await settle();
+    expect(revokeURL.mock.calls.map(([url]) => url).sort()).toEqual([
+      "blob:synthetic-download-1",
+      "blob:synthetic-download-2",
+    ]);
+    id("dismiss").click();
+    expect(revokeURL).toHaveBeenCalledTimes(2);
+  });
+  test("editing immediately after activation releases its URL and prevents another export", async () => {
+    await accept();
+    id("save").click();
+    input("folder", "Edited after click");
+    expect(revokeURL).toHaveBeenCalledWith("blob:synthetic-download-1");
+    await settle();
+    expect(revokeURL).toHaveBeenCalledTimes(1);
+    id("save").click();
+    expect(downloads).toHaveLength(1);
+  });
+  test("page cleanup revokes an outstanding URL once", async () => {
+    await accept();
+    id("save").click();
+    window.dispatchEvent(new PageTransitionEvent("pagehide"));
+    expect(revokeURL).toHaveBeenCalledTimes(1);
+    await settle();
+    expect(revokeURL).toHaveBeenCalledTimes(1);
+  });
+  test("object URL creation failure retains the accepted review for retry", async () => {
+    await accept();
+    createURL.mockImplementationOnce(() => {
+      throw new Error("Synthetic creation failure");
+    });
+    id("save").click();
+    expect(id("save-status").textContent).toContain("could not be started");
+    expect(id("save").disabled).toBe(false);
+    expect(revokeURL).not.toHaveBeenCalled();
+    await report();
+    expect(downloads).toHaveLength(1);
+  });
+  test("activation failure removes the anchor and releases the URL", async () => {
+    await accept();
+    HTMLAnchorElement.prototype.click.mockImplementationOnce(() => {
+      throw new Error("Synthetic activation failure");
+    });
+    id("save").click();
+    expect(id("save-status").textContent).toContain("could not be started");
+    expect(document.querySelectorAll("a[download]")).toHaveLength(0);
+    expect(revokeURL).toHaveBeenCalledTimes(1);
+    await report();
+    expect(downloads).toHaveLength(1);
+  });
+  test("cleanup failure is reported and retried on page cleanup", async () => {
+    await accept();
+    revokeURL.mockImplementationOnce(() => {
+      throw new Error("Synthetic cleanup failure");
+    });
+    id("save").click();
+    await settle();
+    expect(id("save-status").textContent).toContain("cleanup failed");
+    window.dispatchEvent(new PageTransitionEvent("pagehide"));
+    expect(revokeURL).toHaveBeenCalledTimes(2);
+  });
+  test("HTML-looking names remain JSON data and cannot alter the safe filename", async () => {
+    const folder = '<img src=x onerror="alert(1)">';
+    await accept(folder);
+    const saved = await report();
+    expect(saved.decision.destination_folder).toBe(folder);
+    expect(downloads[0].filename).not.toContain("img");
+    expect(document.querySelector("img")).toBeNull();
+  });
+  test("new successful intent replaces the export, never the older snapshot", async () => {
+    await accept("First decision");
+    const first = await report();
+    await accept("Second decision");
+    const second = await report();
+    expect(first.decision.destination_folder).toBe("First decision");
+    expect(second.decision.destination_folder).toBe("Second decision");
+    expect(JSON.stringify(second)).not.toContain("First decision");
+  });
+  test("an edit during activation cannot revive save status or release a URL twice", async () => {
+    await accept();
+    HTMLAnchorElement.prototype.click.mockImplementationOnce(() =>
+      input("folder", "Changed during activation")
+    );
+    id("save").click();
+    await settle();
+    expect(id("save-status").textContent).toContain("Review the current intent first");
+    expect(id("save").disabled).toBe(true);
+    expect(revokeURL).toHaveBeenCalledTimes(1);
+  });
+  test("page cleanup during a failed activation releases the URL only once", async () => {
+    await accept();
+    HTMLAnchorElement.prototype.click.mockImplementationOnce(() => {
+      window.dispatchEvent(new PageTransitionEvent("pagehide"));
+      throw new Error("Activation interrupted");
+    });
+    id("save").click();
+    await settle();
+    expect(revokeURL).toHaveBeenCalledTimes(1);
+    expect(id("save").disabled).toBe(true);
+  });
+  test("Blob creation failure offers retry without a URL or accepted-state loss", async () => {
+    await accept();
+    jest.spyOn(window, "Blob").mockImplementationOnce(() => {
+      throw new Error("Synthetic Blob failure");
+    });
+    id("save").click();
+    expect(id("save-status").textContent).toContain("could not be started");
+    expect(createURL).not.toHaveBeenCalled();
+    expect(id("save").disabled).toBe(false);
+    window.Blob.mockRestore();
+    await report();
+    expect(downloads).toHaveLength(1);
+  });
+  for (const control of ["folder", "root", "member", "path"])
+    test(`silent ${control} changes during a pending review cannot be bound to an old report`, async () => {
+      await accept();
+      const wait = deferred();
+      fetchMock.mockReturnValueOnce(wait.promise);
+      submit();
+      if (control === "folder") id("folder").value = "Silently newer intent";
+      if (control === "root") id("root").value = fixture.roots[0].id;
+      if (control === "member") id("member-3").checked = true;
+      if (control === "path") id("path-0").value = "Silent/path.blend";
+      wait.resolve(response(reviewed()));
+      await settle();
+      expect(id("save").disabled).toBe(true);
+      expect(id("review-content").children).toHaveLength(0);
+      id("save").dispatchEvent(new Event("click"));
+      expect(createURL).not.toHaveBeenCalled();
+    });
 });

@@ -40,6 +40,10 @@
     const fields = byId("observation-fields");
     const reviewButton = byId("observation-review-button");
     const dismissButton = byId("observation-dismiss");
+    const saveButton = byId("observation-save");
+    const win = doc.defaultView;
+    let acceptedExport = null;
+    const downloadURLs = new Map();
     let reference = null;
     let generation = 0;
     let controller = null;
@@ -60,7 +64,27 @@
       byId("observation-error").textContent = text || "";
       byId("observation-error").hidden = !text;
     }
+    function releaseDownload(url) {
+      if (!downloadURLs.has(url)) return;
+      const timer = downloadURLs.get(url);
+      if (timer !== undefined) win.clearTimeout(timer);
+      try {
+        win.URL.revokeObjectURL(url);
+        downloadURLs.delete(url);
+      } catch (_failure) {
+        byId("observation-save-status").textContent =
+          "Temporary download cleanup failed. Reload this page.";
+      }
+    }
+    function clearExport() {
+      acceptedExport = null;
+      saveButton.disabled = true;
+      byId("observation-save-status").textContent =
+        "Review the current intent first to enable saving.";
+      for (const url of downloadURLs.keys()) releaseDownload(url);
+    }
     function invalidate() {
+      clearExport();
       generation += 1;
       if (controller) controller.abort();
       controller = null;
@@ -292,6 +316,218 @@
       markMembers();
       rootFacts();
     }
+    function currentIntent() {
+      return {
+        member_paths: Array.from(controls, ([entry_id, control]) =>
+          control.check.checked ? { entry_id, project_path: control.path.value } : null
+        ).filter(Boolean),
+        destination_root_id: byId("observation-root").value,
+        destination_folder: byId("observation-folder").value,
+      };
+    }
+    function exportScalar(value) {
+      if (
+        value === null ||
+        typeof value === "string" ||
+        typeof value === "boolean" ||
+        Number.isSafeInteger(value)
+      )
+        return value;
+      throw new Error(
+        "The displayed report contains an unsupported value. Review again before saving."
+      );
+    }
+    function selectScalars(value, names) {
+      return Object.fromEntries(names.map((name) => [name, exportScalar(value[name])]));
+    }
+    function issueText(issue, draft) {
+      const scope =
+        issue.member_ids.length === draft.member_ids.length &&
+        new Set(issue.member_ids).size === draft.member_ids.length &&
+        issue.member_ids.every((id) => draft.member_ids.includes(id))
+          ? "All selected members."
+          : issue.member_ids.length
+          ? `Members: ${issue.member_ids.map(memberName).join(", ")}.`
+          : "";
+      return `${GAPS[issue.code] || `Review issue: ${issue.code.replaceAll("_", " ")}.`} ${scope}`;
+    }
+    function displayReport(value) {
+      const draft = value.draft;
+      // Construct every container explicitly. Never export a response object,
+      // request options, undisplayed fingerprints, or unknown nested metadata.
+      return {
+        schema_version: "disk-administration-observation-review-export/v1",
+        report_kind: "synthetic_display_report",
+        canonical_observation_export: false,
+        replayable: false,
+        ...selectScalars(value, [
+          "synthetic",
+          "read_only",
+          "executable",
+          "execution_authority",
+          "undo_available",
+          "source_safe_to_erase",
+          "live_backup_verified",
+          "live_restore_verified",
+          "scenario_id",
+          "source_revision",
+          "observation_digest",
+          "reference_decision_digest",
+          "decision_revision",
+        ]),
+        decision_digest: exportScalar(draft.decision_digest),
+        decision: {
+          ...selectScalars(value.decision, [
+            "project_id",
+            "project_label",
+            "acknowledged",
+            "destination_root_id",
+            "destination_folder",
+          ]),
+          member_paths: value.decision.member_paths.map((member) =>
+            selectScalars(member, ["entry_id", "project_path"])
+          ),
+        },
+        review: {
+          ...selectScalars(draft, ["status", "evaluated_at", "recorded_scan_freshness"]),
+          members: draft.members.map((member) => ({
+            ...selectScalars(member, [
+              "entry_id",
+              "project_path",
+              "placement",
+              "source_retained",
+              "volume_id",
+              "content_version",
+              "dependency_coverage",
+            ]),
+            source: {
+              ...selectScalars(member.source, ["root_id", "relative_path"]),
+              root_label: exportScalar(rootName(member.source.root_id)),
+            },
+            intended: {
+              ...selectScalars(member.intended, ["root_id", "relative_path"]),
+              root_label: exportScalar(rootName(member.intended.root_id)),
+            },
+            recorded_kind: exportScalar(member.observation.kind),
+            recorded_logical_bytes: exportScalar(member.observation.logical_bytes),
+            recorded_status: exportScalar(member.observation.status),
+            recorded_hash_status: exportScalar(member.observation.hash.status),
+          })),
+          capacity: {
+            ...selectScalars(draft.capacity, [
+              "known_recorded_path_logical_bytes",
+              "known_logical_copy_bytes",
+              "required_destination_bytes",
+              "observed_free_bytes",
+              "physical_allocation_prediction",
+              "reclaimed_bytes",
+            ]),
+            unknown_size_members: draft.capacity.unknown_size_member_ids.map((id) => ({
+              entry_id: exportScalar(id),
+              recorded_path_label: exportScalar(memberName(id)),
+            })),
+          },
+          protection: selectScalars(draft.protection, [
+            "configured_target_ids",
+            "independent_copy_count",
+            "project_restore_satisfied",
+            "live_backup_verified",
+            "live_restore_verified",
+          ]),
+          blockers: draft.blockers.map((issue) => ({
+            explanation: issueText(issue, draft),
+            code: exportScalar(issue.code),
+            member_ids: issue.member_ids.map(exportScalar),
+            root_ids: issue.root_ids.map(exportScalar),
+            recorded_path_labels: issue.member_ids.map((id) => exportScalar(memberName(id))),
+          })),
+          source_scope: {
+            recorded_roots: reference.roots.map((root) =>
+              selectScalars(root, ["id", "path", "status"])
+            ),
+            scan_id: exportScalar(draft.observation_scope.scan.id),
+            scan_status: exportScalar(draft.observation_scope.scan.status),
+            entry_count: exportScalar(draft.observation_scope.entry_count),
+            recorded_error_count: draft.observation_scope.scan.errors.length,
+            recorded_exclusion_count: draft.observation_scope.scan.exclusions.length,
+          },
+          limitations: draft.limitations.map(exportScalar),
+        },
+      };
+    }
+    function decisionIntent(decision) {
+      return {
+        member_paths: decision.member_paths,
+        destination_root_id: decision.destination_root_id,
+        destination_folder: decision.destination_folder,
+      };
+    }
+    function rememberExport(value) {
+      const intent = decisionIntent(value.decision);
+      if (!sameJSON(intent, currentIntent())) {
+        changed();
+        return false;
+      }
+      const report = displayReport(value);
+      acceptedExport = {
+        generation,
+        intent: JSON.stringify(intent),
+        json: JSON.stringify(report, null, 2) + "\n",
+        filename: `disk-organiser-aurora-review-r${
+          value.decision_revision
+        }-${value.draft.decision_digest.slice(0, 12)}.json`,
+      };
+      saveButton.disabled = false;
+      byId("observation-save-status").textContent =
+        "This displayed synthetic review can be saved locally. It cannot be replayed.";
+      return true;
+    }
+    function saveReview() {
+      if (!acceptedExport || pending || acceptedExport.generation !== generation) return;
+      if (acceptedExport.intent !== JSON.stringify(currentIntent())) {
+        changed();
+        return;
+      }
+      const snapshot = acceptedExport;
+      let url = null;
+      let anchor = null;
+      try {
+        const blob = new win.Blob([snapshot.json], { type: "application/json" });
+        url = win.URL.createObjectURL(blob);
+        downloadURLs.set(url, undefined);
+        if (
+          acceptedExport !== snapshot ||
+          snapshot.generation !== generation ||
+          snapshot.intent !== JSON.stringify(currentIntent())
+        ) {
+          changed();
+          releaseDownload(url);
+          return;
+        }
+        anchor = doc.createElement("a");
+        anchor.href = url;
+        anchor.download = snapshot.filename;
+        anchor.hidden = true;
+        doc.body.append(anchor);
+        anchor.click();
+        if (acceptedExport === snapshot)
+          byId("observation-save-status").textContent =
+            "Download requested. If cancelled, this reviewed draft is still available to save again.";
+        // Release after activation, unless an edit/navigation already released it.
+        if (downloadURLs.has(url))
+          downloadURLs.set(
+            url,
+            win.setTimeout(() => releaseDownload(url), 0)
+          );
+      } catch (_failure) {
+        if (url) releaseDownload(url);
+        if (acceptedExport === snapshot)
+          byId("observation-save-status").textContent =
+            "Download could not be started. The reviewed draft is unchanged; try Save again.";
+      } finally {
+        if (anchor) anchor.remove();
+      }
+    }
     function section(parent, title, intro) {
       const node = append(parent, "section", undefined, "review-section");
       append(node, "h3", title);
@@ -399,21 +635,7 @@
         `${draft.blockers.length} issues remain visible. Changing the layout cannot clear missing identity or protection evidence.`
       );
       const list = append(gaps, "ul");
-      for (const issue of draft.blockers) {
-        const scope =
-          issue.member_ids.length === draft.member_ids.length &&
-          new Set(issue.member_ids).size === draft.member_ids.length &&
-          issue.member_ids.every((id) => draft.member_ids.includes(id))
-            ? "All selected members."
-            : issue.member_ids.length
-            ? `Members: ${issue.member_ids.map(memberName).join(", ")}.`
-            : "";
-        append(
-          list,
-          "li",
-          `${GAPS[issue.code] || `Review issue: ${issue.code.replaceAll("_", " ")}.`} ${scope}`
-        );
-      }
+      for (const issue of draft.blockers) append(list, "li", issueText(issue, draft));
       const limits = append(content, "details");
       append(limits, "summary", "Source scope, limitations and review identity");
       append(
@@ -617,11 +839,7 @@
         expected_source_revision: reference.source_revision,
         expected_observation_digest: reference.observation_digest,
         expected_reference_decision_digest: reference.reference_decision_digest,
-        member_paths: Array.from(controls, ([entry_id, control]) =>
-          control.check.checked ? { entry_id, project_path: control.path.value } : null
-        ).filter(Boolean),
-        destination_root_id: byId("observation-root").value,
-        destination_folder: byId("observation-folder").value,
+        ...currentIntent(),
       };
       pending = true;
       reviewButton.disabled = true;
@@ -664,7 +882,12 @@
           throw new Error("Unexpected observation reference or decision. Reload this page.");
         }
         assertProjection(value, reference);
+        if (!sameJSON(decisionIntent(value.decision), currentIntent())) {
+          changed();
+          return;
+        }
         renderDraft(value, false);
+        if (!rememberExport(value)) return;
         status("Draft reviewed. Identity, capacity and protection still need evidence.");
         byId("observation-review-heading").focus();
       } catch (failure) {
@@ -695,6 +918,8 @@
     fields.addEventListener("change", changed);
     byId("observation-reload").addEventListener("click", loadReference);
     dismissButton.addEventListener("click", dismiss);
+    saveButton.addEventListener("click", saveReview);
+    if (win) win.addEventListener("pagehide", invalidate);
     if (doc.defaultView)
       doc.defaultView.addEventListener("pageshow", (event) => {
         if (event.persisted) loadReference();

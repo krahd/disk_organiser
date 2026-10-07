@@ -121,6 +121,25 @@
           </div>
         </div>
         <div id="observation-review-content"></div>
+        <div class="decision-actions">
+          <button
+            id="observation-save"
+            type="button"
+            class="secondary"
+            aria-describedby="observation-save-help"
+            disabled
+          >
+            Save reviewed draft (JSON)
+          </button>
+          <p id="observation-save-status" role="status" aria-live="polite">
+            Review the current intent first to enable saving.
+          </p>
+        </div>
+        <p id="observation-save-help" class="muted">
+          Local synthetic display report only. Not a canonical observation export, not replayable,
+          and never permission to copy, restore or erase files. Nothing is uploaded or saved
+          automatically.
+        </p>
       </section>
       <footer>
         <p>

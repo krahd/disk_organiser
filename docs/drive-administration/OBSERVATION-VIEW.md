@@ -14,7 +14,7 @@ python prototypes/drive_administration/demo_server.py --port 8765
 
 The permanent banner identifies synthetic observations and disconnected drives/providers. Harbour's two fixtures, evaluator outputs, styles and controls are preserved. A scoped Aurora-only intrinsic grid rule keeps member labels readable at enlarged scale. The default application and its 44-route OpenAPI contract are unchanged; the separate demo routes are documented here and in [the interaction contract](INTERACTION-DEMO.md).
 
-No arbitrary import, file picker, upload, native scanning, provider call, filesystem mutation, execution/recovery, autosave, export, deployment or real-observation flag conversion is added. **Save review** is a later bounded follow-on, not part of this implementation.
+The observation-view checkpoint added no arbitrary import, file picker, upload, native scanning, provider call, filesystem mutation, execution/recovery, autosave, export, deployment or real-observation flag conversion. This observation-view checkpoint itself has no export. The later [Save review slice](SAVE-REVIEW.md) adds only a current, successful explicit display-report download; its verification is separate.
 
 ## Fixed source and explicit intent
 
@@ -102,4 +102,4 @@ Keyboard edits/review/dismissal, stale responses after edit/dismiss/reload, stal
 
 ## Next boundary
 
-After this interaction is accepted, the next useful bounded improvement is a user-initiated **Save review** download of the exact displayed accepted synthetic review, revision-bound and explicitly non-executable. It must not save pending, edited, errored or stale results or process tokens, and must not introduce import, execution or autosave authority. Native volume identity, permissioned scanning, authenticated backup evidence, real execution/recovery and commercial readiness remain separately held.
+The later [Save review slice](SAVE-REVIEW.md) implements a user-initiated display-report download of the exact currently displayed successful explicit synthetic review, revision-bound and non-executable. Its source/browser acceptance is separate from this observation-view checkpoint. It must not save pending, edited, errored or stale results or process tokens, and must not introduce import, execution or autosave authority. Native volume identity, permissioned scanning, authenticated backup evidence, real execution/recovery and commercial readiness remain separately held.
