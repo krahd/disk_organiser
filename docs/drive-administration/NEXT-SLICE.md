@@ -133,7 +133,7 @@ These tests exercise the new pure contract only. They do not test the original g
 1. Land this as an isolated source-only prototype with no app route/default-navigation change. Preserve both mutation flags OFF and automatic recovery removal unavailable.
 2. Add its standard-library tests to CI for Linux and Windows. Do not confuse cross-platform pure-data success with scanning/execution support.
 3. Implement the review-only app form with synthetic inputs; test text-only rendering, keyboard flow, user correction, stale edit, no-op/keep-current choice and interruption. Inspect rendered browser results before claiming UI acceptance.
-4. Add a bounded adapter from the existing observation model. Preserve incomplete coverage and its identity limits; do not flatten hypotheses into confirmed project membership.
+4. Add a bounded adapter from the existing observation model. Preserve incomplete coverage and its identity limits; do not flatten hypotheses into confirmed project membership. The [synthetic observation-draft adapter](OBSERVATION-DRAFT-ADAPTER.md) is the bounded first bridge: it retains explicit member/path intent and missing-evidence blockers without manufacturing volumes or a successful planner review. Native observations and UI import remain separately gated.
 5. Independently design the live evidence trust boundary and permissioned native project/volume access. No mutation or provider control follows merely from review UI completion.
 
 Proposed later API naming, not implemented: a review endpoint and a revision endpoint under `/api/administration/`. Their initial dependencies must be pure planner and validator modules; never import the legacy operation store to obtain a preview, because that module initialises persistent state on import.

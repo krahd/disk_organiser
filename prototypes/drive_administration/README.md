@@ -20,3 +20,5 @@ The exact current home can produce explicit `keep_current` entries when declared
 The cost module is an explicitly incomplete illustration with dated public prices, clear unit assumptions and omitted costs. It is not a quote.
 
 See [the slice contract](../../docs/drive-administration/NEXT-SLICE.md), [product roadmap](../../docs/DRIVE-ADMINISTRATION-ROADMAP.md), [provider research](../../docs/drive-administration/PROVIDER-ECONOMICS.md) and [verification limits](../../docs/drive-administration/VERIFICATION.md).
+
+The separate [observation draft adapter](../../docs/drive-administration/OBSERVATION-DRAFT-ADAPTER.md) maps canonical synthetic exports and explicit member/path intent into an incomplete review draft. Observed roots are not volumes; missing identity, capacity, dependencies and protection evidence remain blocking. It does not call this planner or introduce an import route.
