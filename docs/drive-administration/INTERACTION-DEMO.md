@@ -4,7 +4,7 @@
 
 This standalone interaction demonstrates a small part of the drive-administration product: decide which files belong to Harbour, choose a proposed home, then read the layout, dependency, capacity and protection consequences. A map supports that decision; it is not the product endpoint.
 
-The permanent page banner says **Simulated project; no drives or providers connected**. Only the two existing packaged synthetic fixtures can be loaded. No scanning, file picker, arbitrary document import, upload, provider credential, telemetry, external request, execution, restore, undo or recovery-deletion route is present. The existing default app, navigation, backend and execution/recovery gates are unchanged.
+The permanent page banner says **Simulated project; no drives or providers connected**. The Harbour form loads only its two existing packaged synthetic fixtures. The separate [Aurora observation view](OBSERVATION-VIEW.md) adds one fixed canonical-derived synthetic scenario; it does not add import. No scanning, file picker, arbitrary document import, upload, provider credential, telemetry, external request, execution, restore, undo or recovery-deletion route is present. The existing default app, navigation, backend and execution/recovery gates are unchanged.
 
 The example contains fabricated dated backup and restore records. A fixture claim never becomes live verification. Every result, including errors, has `executable: false`, `execution_authority: null`, `undo_available: false`, `source_safe_to_erase: false`, `live_backup_verified: false` and `live_restore_verified: false`.
 
@@ -19,7 +19,7 @@ python prototypes/drive_administration/demo_server.py --port 8765
 
 Open `http://127.0.0.1:8765/` in the same computer's browser. `localhost`, a different Host header, proxy publication and non-loopback clients are deliberately rejected. Stop the process to end the demo. This is a development-only server, not a production deployment.
 
-`create_demo_app()` is separate from `backend.app`, `guided` and `op_store`. It loads exactly three named frontend assets once during creation. It makes no request-time filesystem or network calls. No draft is stored on disk or in the Flask process; drafts live only in the current page's memory. Reload, scenario switch and back/forward cache restoration discard the draft. The ephemeral process token is regenerated on restart and is never stored in browser storage or logs.
+`create_demo_app()` is separate from `backend.app`, `guided` and `op_store`. It loads exactly five named frontend assets once during creation (the original three plus Aurora HTML/script). It makes no request-time filesystem or network calls. No draft is stored on disk or in the Flask process; drafts live only in the current page's memory. Reload, scenario switch and back/forward cache restoration discard the draft. The ephemeral process token is regenerated on restart and is never stored in browser storage or logs.
 
 ## Three-step decision loop
 
@@ -31,7 +31,7 @@ Open `http://127.0.0.1:8765/` in the same computer's browser. `localhost`, a dif
 
 ## HTTP contract
 
-Only five paths exist:
+The original Harbour contract has these five paths:
 
 | Method | Path | Purpose |
 | --- | --- | --- |
@@ -40,6 +40,8 @@ Only five paths exist:
 | GET | `/project-review-demo.css` | Fixed stylesheet asset |
 | GET | `/api/reference?scenario_id=harbour-reference` | Immutable reference, with `harbour-uncertain` as the only other accepted ID |
 | POST | `/api/review` | Evaluate bounded membership/destination edits |
+
+The [Aurora contract](OBSERVATION-VIEW.md#http-contract) adds four explicitly allowlisted paths, for nine in total, under the same guards. It accepts only the fixed observation scenario and explicit member/path intent.
 
 All access requires a loopback remote address and the exact configured `http://127.0.0.1:PORT` host. Cross-site Origin and Fetch Metadata are rejected. APIs require `X-Demo-Token`; POST also requires an exact same-origin Origin header. No CORS permission is granted. Responses use a restrictive CSP, no-store, nosniff, no-referrer, frame denial and disabled camera/microphone/geolocation permissions. Assets cannot be selected by a client-supplied path, and errors do not reflect route paths or filesystem details.
 
@@ -74,7 +76,7 @@ npm run format:check
 npx playwright test --config playwright.project-review.config.js
 ```
 
-The new HTTP tests live in a non-package subdirectory so the existing standard-library-only evaluator workflow runs the pure-data planner/cost tests without importing Flask. The current keep-current candidate has 100 pure-data tests; the counts below are historical checkpoints. The isolated demo workflow installs the existing dependency lock and tests HTTP contracts on Linux and Windows, then runs Jest and Chromium against only this synthetic loopback server. No production app is started. Browser traces are disabled; screenshot artifacts contain only synthetic page content.
+The new HTTP tests live in a non-package subdirectory so the existing standard-library-only evaluator workflow runs the pure-data planner/cost tests without importing Flask. The pure-data suite now has 140 tests after the observation adapter; the counts below are historical checkpoints. Aurora verification is recorded separately in [its checkpoint](OBSERVATION-VIEW.md). The isolated demo workflow installs the existing dependency lock and tests HTTP contracts on Linux and Windows, then runs Jest and Chromium against only this synthetic loopback server. No production app is started. Browser traces are disabled; screenshot artifacts contain only synthetic page content.
 
 Local results at source freeze: 68 evaluator tests, 20 HTTP tests and 19 focused UI tests passed. Full copied-frontend Jest and formatting results are recorded in `STATUS.md`. Seven browser specifications were parsed and listed, but local Chromium could not launch because the execution environment denied its socket operation. No alternate launch or bypass was attempted. No local screen, browser pass or native hardware check is claimed. On source `63150c5`, both remote HTTP jobs passed and six of seven Chromium flows passed. The 200% CSS-zoom locator click failed before overflow and 320-pixel reflow checks were reached. Its actual screenshot shows an unobstructed Review button. The narrowly revised harness records the raw/scaled DOM rectangle and `elementFromPoint` evidence, requires an in-viewport hit on the visible enabled button, then performs an ordinary mouse click. It never uses force-click or programmatic control activation. All outcome, overflow and screenshot assertions remain. On source `74e5dde`, [isolated run 37545358916](https://github.com/krahd/disk_organiser/actions/runs/37545358916) passed Linux/Windows HTTP contracts and all seven browser flows, reaching the zoom, overflow and 320-pixel assertions. The subsequent evidence-only edit writes the numeric geometry JSON to the uploaded test-output directory, since an in-memory attachment alone was absent from the artifact. It does not change the pointer test or runtime. The final source/evidence checkpoint `83b42ffc947cfef5e9717c82047531a4f18ee96a` is independently accepted for this bounded synthetic interaction. All three exact-head workflows completed successfully: [aggregate CI](https://github.com/krahd/disk_organiser/actions/runs/37545756445), [evaluator](https://github.com/krahd/disk_organiser/actions/runs/37545756447) and [isolated UI](https://github.com/krahd/disk_organiser/actions/runs/37545756460). The documentation-only closeout preserves every runtime and test blob from that tested source.
 

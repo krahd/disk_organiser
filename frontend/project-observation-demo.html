@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="demo-process-token" content="__DEMO_PROCESS_TOKEN__" />
+    <title>Review Aurora observations · Disk Organiser</title>
+    <link rel="stylesheet" href="/project-review-demo.css" />
+    <script src="/project-observation-demo.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to observation review</a>
+    <div class="simulation-banner">Synthetic observations; no drives or providers connected</div>
+    <header class="masthead">
+      <p class="brand">DISK ORGANISER <span>PROJECT WORKSPACE</span></p>
+      <a href="/">Harbour project review</a>
+    </header>
+    <main id="main">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">OBSERVATIONS → PROJECT INTENT</p>
+        <h1 id="page-title">Review Aurora across recorded roots</h1>
+        <p class="lede">
+          Choose explicit members and intended paths. See what the recorded observations can tell
+          you, and what remains Unknown.
+        </p>
+        <p class="muted">
+          An observed root is a recorded folder scope, not a verified physical drive. This draft
+          cannot establish a copy, a no-op, backup coverage or a restore.
+        </p>
+        <button id="observation-reload" type="button" class="secondary">
+          Reload Aurora reference
+        </button>
+        <p id="observation-clock" class="provenance"></p>
+        <p id="observation-scope" class="note"></p>
+      </section>
+      <nav class="step-nav" aria-label="Observation review steps">
+        <a href="#observation-members-heading"><span>01</span> Choose members</a>
+        <a href="#observation-destination-heading"><span>02</span> Intended location</a>
+        <a href="#observation-review-heading"><span>03</span> Evidence gaps</a>
+      </nav>
+      <p id="observation-status" class="status" role="status" aria-live="polite">
+        Loading Aurora observations…
+      </p>
+      <p id="observation-error" class="error" role="alert" hidden></p>
+      <form id="observation-form">
+        <fieldset id="observation-fields" disabled>
+          <section class="panel" aria-labelledby="observation-members-heading">
+            <div class="section-heading">
+              <span class="step-number">01</span>
+              <div>
+                <h2 id="observation-members-heading" tabindex="-1">
+                  Choose explicit project members
+                </h2>
+                <p>
+                  These are eight fixed example choices. Folder roles and matching hashes do not
+                  choose membership for you. Edit each included member’s intended project-relative
+                  path.
+                </p>
+              </div>
+            </div>
+            <div id="observation-members" class="targets"></div>
+          </section>
+          <section class="panel" aria-labelledby="observation-destination-heading">
+            <div class="section-heading">
+              <span class="step-number">02</span>
+              <div>
+                <h2 id="observation-destination-heading" tabindex="-1">
+                  Choose the intended location
+                </h2>
+                <p>
+                  This records intent only. Actual drive identity, current availability, naming
+                  rules and free space remain Unknown.
+                </p>
+              </div>
+            </div>
+            <div class="destination-grid">
+              <div>
+                <label for="observation-root">Intended observed root</label>
+                <select id="observation-root"></select>
+                <label for="observation-folder">Relative intended folder</label>
+                <input
+                  id="observation-folder"
+                  type="text"
+                  required
+                  maxlength="240"
+                  autocomplete="off"
+                  spellcheck="false"
+                  aria-describedby="observation-folder-help"
+                />
+                <p id="observation-folder-help" class="muted">
+                  Relative intent only, without parent traversal. Matching a recorded address does
+                  not prove a safe no-op.
+                </p>
+                <p id="observation-root-facts" class="note"></p>
+              </div>
+              <div class="current-layout">
+                <h3>Recorded root scopes</h3>
+                <div id="observation-roots"></div>
+              </div>
+            </div>
+          </section>
+        </fieldset>
+        <div class="decision-actions">
+          <button id="observation-review-button" type="submit" disabled>
+            Review observation draft
+          </button>
+          <button id="observation-dismiss" type="button" class="secondary" disabled>
+            Dismiss changes
+          </button>
+          <p>Dismiss restores the fixed Aurora reference decision.</p>
+        </div>
+      </form>
+      <section class="panel review-panel" aria-labelledby="observation-review-heading">
+        <div class="section-heading">
+          <span class="step-number">03</span>
+          <div>
+            <h2 id="observation-review-heading" tabindex="-1">
+              Review intent and missing evidence
+            </h2>
+            <p id="observation-caption">The reference draft will appear here.</p>
+          </div>
+        </div>
+        <div id="observation-review-content"></div>
+      </section>
+      <footer>
+        <p>
+          No execution authority · No copy or no-op established · Undo unavailable · Source erasure
+          never permitted
+        </p>
+        <p>
+          Physical drive identity, current versions, dependencies, capacity and protection need
+          separate evidence. Live backup and restore verification remain false.
+        </p>
+        <p><a href="/">Return to the Harbour project review</a></p>
+      </footer>
+    </main>
+  </body>
+</html>

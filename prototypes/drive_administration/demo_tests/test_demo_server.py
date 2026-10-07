@@ -48,10 +48,11 @@ class DemoServerTests(unittest.TestCase):
             self.assertFalse(result["protection"]["live_backup_verified"])
             self.assertFalse(result["protection"]["live_restore_verified"])
 
-    def test_only_five_routes_and_three_fixed_assets(self):
+    def test_only_nine_routes_and_five_fixed_assets(self):
         self.assertEqual({rule.rule for rule in self.app.url_map.iter_rules()},
-                         {"/", "/project-review-demo.js", "/project-review-demo.css", "/api/reference", "/api/review"})
-        for path in ("/", "/project-review-demo.js", "/project-review-demo.css"):
+                         {"/", "/project-review-demo.js", "/project-review-demo.css", "/api/reference", "/api/review",
+                          "/observation-draft", "/project-observation-demo.js", "/api/observation/reference", "/api/observation/review"})
+        for path in ("/", "/project-review-demo.js", "/project-review-demo.css", "/observation-draft", "/project-observation-demo.js"):
             response = self.get(path)
             self.assertEqual(response.status_code, 200)
             self.assertIn("default-src 'none'", response.headers["Content-Security-Policy"])

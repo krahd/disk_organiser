@@ -22,3 +22,5 @@ The cost module is an explicitly incomplete illustration with dated public price
 See [the slice contract](../../docs/drive-administration/NEXT-SLICE.md), [product roadmap](../../docs/DRIVE-ADMINISTRATION-ROADMAP.md), [provider research](../../docs/drive-administration/PROVIDER-ECONOMICS.md) and [verification limits](../../docs/drive-administration/VERIFICATION.md).
 
 The separate [observation draft adapter](../../docs/drive-administration/OBSERVATION-DRAFT-ADAPTER.md) maps canonical synthetic exports and explicit member/path intent into an incomplete review draft. Observed roots are not volumes; missing identity, capacity, dependencies and protection evidence remain blocking. It does not call this planner or introduce an import route.
+
+The isolated [Aurora observation view](../../docs/drive-administration/OBSERVATION-VIEW.md) connects one fixed synthetic multi-root scenario to explicit membership/path decisions. Start `python prototypes/drive_administration/demo_server.py --port 8765` from the repository root, then open `/observation-draft`. It never accepts user-supplied observation exports and keeps all identity/protection gaps Unknown.

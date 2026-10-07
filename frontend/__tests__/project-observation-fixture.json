@@ -1,0 +1,977 @@
+{
+  "choices": [
+    {
+      "default_project_path": "design_v1.blend",
+      "entry": {
+        "allocated_bytes": 4096,
+        "allocation_source": "stat_blocks_512",
+        "ctime_ns": 1767225600000000000,
+        "fingerprint": {
+          "ctime_ns": 1767225600000000000,
+          "device": 1,
+          "inode": 4,
+          "link_count": 1,
+          "mode": 33152,
+          "mtime_ns": 1767225600000000000,
+          "size": 21
+        },
+        "hash": {
+          "algorithm": "sha256",
+          "status": "verified",
+          "value": "fdeb67b21a3d53af760c3479620341e867eaf1073901192abac44451c231c85b"
+        },
+        "id": "entry_ebc100ee0e93374774d26af4",
+        "kind": "file",
+        "link_count": 1,
+        "logical_bytes": 21,
+        "mtime_ns": 1767225600000000000,
+        "object_id": "object_aa5507f9e57ee8a21e59299d",
+        "parent_id": "entry_7c33e462ef682fb0d094d4ea",
+        "relative_path": "Project Aurora/design_v1.blend",
+        "root_id": "root_d691e552fd740ba4b1c60cbd",
+        "status": "observed",
+        "uncertainties": []
+      },
+      "reference_included": true
+    },
+    {
+      "default_project_path": "design_v2.blend",
+      "entry": {
+        "allocated_bytes": 4096,
+        "allocation_source": "stat_blocks_512",
+        "ctime_ns": 1767225600000000000,
+        "fingerprint": {
+          "ctime_ns": 1767225600000000000,
+          "device": 1,
+          "inode": 5,
+          "link_count": 1,
+          "mode": 33152,
+          "mtime_ns": 1767225600000000000,
+          "size": 21
+        },
+        "hash": {
+          "algorithm": "sha256",
+          "status": "stale",
+          "value": null
+        },
+        "id": "secondary_entry_815125d6c9d2ffc0388f373a",
+        "kind": "file",
+        "link_count": 1,
+        "logical_bytes": 21,
+        "mtime_ns": 1767225600000000000,
+        "object_id": "object_65111ec74aa1c4b8a9680ca2",
+        "parent_id": "secondary_entry_7c33e462ef682fb0d094d4ea",
+        "relative_path": "Project Aurora/design_v2.blend",
+        "root_id": "root_synthetic_aurora_secondary",
+        "status": "stale",
+        "uncertainties": [
+          "Fabricated last-known record; current availability is unverified."
+        ]
+      },
+      "reference_included": true
+    },
+    {
+      "default_project_path": "pyproject.toml",
+      "entry": {
+        "allocated_bytes": 4096,
+        "allocation_source": "stat_blocks_512",
+        "ctime_ns": 1767225600000000000,
+        "fingerprint": {
+          "ctime_ns": 1767225600000000000,
+          "device": 1,
+          "inode": 3,
+          "link_count": 1,
+          "mode": 33152,
+          "mtime_ns": 1767225600000000000,
+          "size": 24
+        },
+        "hash": {
+          "algorithm": "sha256",
+          "status": "verified",
+          "value": "c432736722123fee5067ce64a4453a26c6194b452a55cb4ffd613041ce642216"
+        },
+        "id": "entry_a53fdd6c3e25366ba4509c63",
+        "kind": "file",
+        "link_count": 1,
+        "logical_bytes": 24,
+        "mtime_ns": 1767225600000000000,
+        "object_id": "object_2335c54ffe3749ceafac20ee",
+        "parent_id": "entry_7c33e462ef682fb0d094d4ea",
+        "relative_path": "Project Aurora/pyproject.toml",
+        "root_id": "root_d691e552fd740ba4b1c60cbd",
+        "status": "observed",
+        "uncertainties": []
+      },
+      "reference_included": true
+    },
+    {
+      "default_project_path": "Unresolved/not-readable.data",
+      "entry": {
+        "allocated_bytes": null,
+        "allocation_source": "unknown",
+        "ctime_ns": null,
+        "fingerprint": null,
+        "hash": {
+          "algorithm": null,
+          "status": "disabled",
+          "value": null
+        },
+        "id": "entry_30323bcd4e21a2a13eef20bf",
+        "kind": "unknown",
+        "link_count": null,
+        "logical_bytes": null,
+        "mtime_ns": null,
+        "object_id": null,
+        "parent_id": "entry_6f84ee62c3a9a484852f0374",
+        "relative_path": "unclassified/not-readable.data",
+        "root_id": "root_d691e552fd740ba4b1c60cbd",
+        "status": "unreadable",
+        "uncertainties": []
+      },
+      "reference_included": false
+    },
+    {
+      "default_project_path": "Notes/receipt.pdf",
+      "entry": {
+        "allocated_bytes": 4096,
+        "allocation_source": "stat_blocks_512",
+        "ctime_ns": 1767225600000000000,
+        "fingerprint": {
+          "ctime_ns": 1767225600000000000,
+          "device": 1,
+          "inode": 10,
+          "link_count": 1,
+          "mode": 33152,
+          "mtime_ns": 1767225600000000000,
+          "size": 31
+        },
+        "hash": {
+          "algorithm": "sha256",
+          "status": "stale",
+          "value": null
+        },
+        "id": "secondary_entry_8e0254a8859d43501ff0ba98",
+        "kind": "file",
+        "link_count": 1,
+        "logical_bytes": 31,
+        "mtime_ns": 1767225600000000000,
+        "object_id": "object_17c4b27ce8d2e34e7cbde58d",
+        "parent_id": "secondary_entry_98070566f30b9156f73d495e",
+        "relative_path": "Inbox/receipt.pdf",
+        "root_id": "root_synthetic_aurora_secondary",
+        "status": "stale",
+        "uncertainties": [
+          "Fabricated last-known record; current availability is unverified."
+        ]
+      },
+      "reference_included": false
+    },
+    {
+      "default_project_path": "Reference/reference.txt",
+      "entry": {
+        "allocated_bytes": 4096,
+        "allocation_source": "stat_blocks_512",
+        "ctime_ns": 1767225600000000000,
+        "fingerprint": {
+          "ctime_ns": 1767225600000000000,
+          "device": 1,
+          "inode": 7,
+          "link_count": 2,
+          "mode": 33152,
+          "mtime_ns": 1767225600000000000,
+          "size": 25
+        },
+        "hash": {
+          "algorithm": "sha256",
+          "status": "verified",
+          "value": "8abfcbbd226f14211d77f40d98de2fb93bf860d8eab3dfb51fd37dba3976a770"
+        },
+        "id": "entry_bba030de591134adb89d1423",
+        "kind": "file",
+        "link_count": 2,
+        "logical_bytes": 25,
+        "mtime_ns": 1767225600000000000,
+        "object_id": "object_e3a5d9dba7d2450037d3d7d3",
+        "parent_id": "entry_21874104f293ae8a65f8aab4",
+        "relative_path": "Archive/reference.txt",
+        "root_id": "root_d691e552fd740ba4b1c60cbd",
+        "status": "observed",
+        "uncertainties": []
+      },
+      "reference_included": false
+    },
+    {
+      "default_project_path": "Reference/reference-alias.txt",
+      "entry": {
+        "allocated_bytes": 4096,
+        "allocation_source": "stat_blocks_512",
+        "ctime_ns": 1767225600000000000,
+        "fingerprint": {
+          "ctime_ns": 1767225600000000000,
+          "device": 1,
+          "inode": 7,
+          "link_count": 2,
+          "mode": 33152,
+          "mtime_ns": 1767225600000000000,
+          "size": 25
+        },
+        "hash": {
+          "algorithm": "sha256",
+          "status": "verified",
+          "value": "8abfcbbd226f14211d77f40d98de2fb93bf860d8eab3dfb51fd37dba3976a770"
+        },
+        "id": "entry_cd3ab2e5f18e30cbf6d921b1",
+        "kind": "file",
+        "link_count": 2,
+        "logical_bytes": 25,
+        "mtime_ns": 1767225600000000000,
+        "object_id": "object_e3a5d9dba7d2450037d3d7d3",
+        "parent_id": "entry_21874104f293ae8a65f8aab4",
+        "relative_path": "Archive/reference-alias.txt",
+        "root_id": "root_d691e552fd740ba4b1c60cbd",
+        "status": "observed",
+        "uncertainties": []
+      },
+      "reference_included": false
+    },
+    {
+      "default_project_path": "Unclassified/unknown.data",
+      "entry": {
+        "allocated_bytes": null,
+        "allocation_source": "unknown",
+        "ctime_ns": 1767225600000000000,
+        "fingerprint": {
+          "ctime_ns": 1767225600000000000,
+          "device": 1,
+          "inode": 14,
+          "link_count": 1,
+          "mode": 33152,
+          "mtime_ns": 1767225600000000000,
+          "size": 24
+        },
+        "hash": {
+          "algorithm": "sha256",
+          "status": "stale",
+          "value": null
+        },
+        "id": "secondary_entry_fd13c1a9fed3bb1e0b5e668e",
+        "kind": "file",
+        "link_count": 1,
+        "logical_bytes": 24,
+        "mtime_ns": 1767225600000000000,
+        "object_id": "object_90c7f45d8a158705c650c578",
+        "parent_id": "secondary_entry_6f84ee62c3a9a484852f0374",
+        "relative_path": "unclassified/unknown.data",
+        "root_id": "root_synthetic_aurora_secondary",
+        "status": "stale",
+        "uncertainties": [
+          "Fabricated last-known record; current availability is unverified."
+        ]
+      },
+      "reference_included": false
+    }
+  ],
+  "decision": {
+    "acknowledged": true,
+    "destination_folder": "Projects/Aurora",
+    "destination_root_id": "root_synthetic_aurora_secondary",
+    "member_paths": [
+      {
+        "entry_id": "entry_ebc100ee0e93374774d26af4",
+        "project_path": "design_v1.blend"
+      },
+      {
+        "entry_id": "secondary_entry_815125d6c9d2ffc0388f373a",
+        "project_path": "design_v2.blend"
+      },
+      {
+        "entry_id": "entry_a53fdd6c3e25366ba4509c63",
+        "project_path": "pyproject.toml"
+      }
+    ],
+    "project_id": "aurora",
+    "project_label": "Aurora project"
+  },
+  "decision_revision": 1,
+  "draft": {
+    "blockers": [
+      {
+        "code": "physical_volume_identity_unestablished",
+        "member_ids": [
+          "entry_a53fdd6c3e25366ba4509c63",
+          "entry_ebc100ee0e93374774d26af4",
+          "secondary_entry_815125d6c9d2ffc0388f373a"
+        ],
+        "root_ids": [
+          "root_d691e552fd740ba4b1c60cbd",
+          "root_synthetic_aurora_secondary"
+        ]
+      },
+      {
+        "code": "volume_name_semantics_unknown",
+        "member_ids": [
+          "entry_a53fdd6c3e25366ba4509c63",
+          "entry_ebc100ee0e93374774d26af4",
+          "secondary_entry_815125d6c9d2ffc0388f373a"
+        ],
+        "root_ids": [
+          "root_d691e552fd740ba4b1c60cbd",
+          "root_synthetic_aurora_secondary"
+        ]
+      },
+      {
+        "code": "current_root_availability_unverified",
+        "member_ids": [
+          "entry_a53fdd6c3e25366ba4509c63",
+          "entry_ebc100ee0e93374774d26af4",
+          "secondary_entry_815125d6c9d2ffc0388f373a"
+        ],
+        "root_ids": [
+          "root_d691e552fd740ba4b1c60cbd",
+          "root_synthetic_aurora_secondary"
+        ]
+      },
+      {
+        "code": "content_version_unverified",
+        "member_ids": [
+          "entry_a53fdd6c3e25366ba4509c63",
+          "entry_ebc100ee0e93374774d26af4",
+          "secondary_entry_815125d6c9d2ffc0388f373a"
+        ],
+        "root_ids": []
+      },
+      {
+        "code": "project_dependencies_unknown",
+        "member_ids": [
+          "entry_a53fdd6c3e25366ba4509c63",
+          "entry_ebc100ee0e93374774d26af4",
+          "secondary_entry_815125d6c9d2ffc0388f373a"
+        ],
+        "root_ids": []
+      },
+      {
+        "code": "backup_evidence_unavailable",
+        "member_ids": [
+          "entry_a53fdd6c3e25366ba4509c63",
+          "entry_ebc100ee0e93374774d26af4",
+          "secondary_entry_815125d6c9d2ffc0388f373a"
+        ],
+        "root_ids": []
+      },
+      {
+        "code": "restore_evidence_unavailable",
+        "member_ids": [
+          "entry_a53fdd6c3e25366ba4509c63",
+          "entry_ebc100ee0e93374774d26af4",
+          "secondary_entry_815125d6c9d2ffc0388f373a"
+        ],
+        "root_ids": []
+      },
+      {
+        "code": "destination_capacity_unknown",
+        "member_ids": [],
+        "root_ids": [
+          "root_synthetic_aurora_secondary"
+        ]
+      },
+      {
+        "code": "observation_scope_incomplete",
+        "member_ids": [
+          "entry_a53fdd6c3e25366ba4509c63",
+          "entry_ebc100ee0e93374774d26af4",
+          "secondary_entry_815125d6c9d2ffc0388f373a"
+        ],
+        "root_ids": [
+          "root_d691e552fd740ba4b1c60cbd",
+          "root_synthetic_aurora_secondary"
+        ]
+      },
+      {
+        "code": "root_not_observed",
+        "member_ids": [],
+        "root_ids": [
+          "root_synthetic_aurora_secondary"
+        ]
+      },
+      {
+        "code": "member_not_observed",
+        "member_ids": [
+          "secondary_entry_815125d6c9d2ffc0388f373a"
+        ],
+        "root_ids": [
+          "root_synthetic_aurora_secondary"
+        ]
+      }
+    ],
+    "capacity": {
+      "known_logical_copy_bytes": null,
+      "known_recorded_path_logical_bytes": 66,
+      "observed_free_bytes": null,
+      "physical_allocation_prediction": null,
+      "reclaimed_bytes": 0,
+      "required_destination_bytes": null,
+      "unknown_size_member_ids": []
+    },
+    "decision_digest": "74f52670a8649e918fae80bb32dca819b2d5e647233fb34f9e8202cab96ec25d",
+    "evaluated_at": "2026-10-06T12:00:00+00:00",
+    "executable": false,
+    "execution_authority": null,
+    "limitations": [
+      "Synthetic observations and root fingerprints do not authenticate physical volumes or current files.",
+      "Root labels, address IDs, hashes and object aliases do not establish volume identity or independent protection.",
+      "Recorded logical bytes count selected paths, including aliases; they are not required copy space or physical allocation.",
+      "Role, project and duplicate hypotheses never select members or confirm dependencies.",
+      "Snapshot freshness is measured from its recorded start time, not per-entry observation or live availability.",
+      "A complete scan is bounded by its recorded policy and is not an atomic whole-drive snapshot.",
+      "Missing members after partial or unavailable observations are not confirmed deletions.",
+      "This incomplete draft is not a planner review and cannot establish a copy, no-op, backup, restore or execution permission."
+    ],
+    "max_observation_age_hours": 2,
+    "member_ids": [
+      "entry_a53fdd6c3e25366ba4509c63",
+      "entry_ebc100ee0e93374774d26af4",
+      "secondary_entry_815125d6c9d2ffc0388f373a"
+    ],
+    "members": [
+      {
+        "content_version": null,
+        "dependency_coverage": "unknown",
+        "entry_id": "entry_a53fdd6c3e25366ba4509c63",
+        "intended": {
+          "relative_path": "Projects/Aurora/pyproject.toml",
+          "root_id": "root_synthetic_aurora_secondary"
+        },
+        "observation": {
+          "allocated_bytes": 4096,
+          "allocation_source": "stat_blocks_512",
+          "ctime_ns": 1767225600000000000,
+          "fingerprint": {
+            "ctime_ns": 1767225600000000000,
+            "device": 1,
+            "inode": 3,
+            "link_count": 1,
+            "mode": 33152,
+            "mtime_ns": 1767225600000000000,
+            "size": 24
+          },
+          "hash": {
+            "algorithm": "sha256",
+            "status": "verified",
+            "value": "c432736722123fee5067ce64a4453a26c6194b452a55cb4ffd613041ce642216"
+          },
+          "id": "entry_a53fdd6c3e25366ba4509c63",
+          "kind": "file",
+          "link_count": 1,
+          "logical_bytes": 24,
+          "mtime_ns": 1767225600000000000,
+          "object_id": "object_2335c54ffe3749ceafac20ee",
+          "parent_id": "entry_7c33e462ef682fb0d094d4ea",
+          "relative_path": "Project Aurora/pyproject.toml",
+          "root_id": "root_d691e552fd740ba4b1c60cbd",
+          "status": "observed",
+          "uncertainties": []
+        },
+        "placement": "proposed_address_requires_review",
+        "project_path": "pyproject.toml",
+        "source": {
+          "relative_path": "Project Aurora/pyproject.toml",
+          "root_id": "root_d691e552fd740ba4b1c60cbd"
+        },
+        "source_retained": true,
+        "volume_id": null
+      },
+      {
+        "content_version": null,
+        "dependency_coverage": "unknown",
+        "entry_id": "entry_ebc100ee0e93374774d26af4",
+        "intended": {
+          "relative_path": "Projects/Aurora/design_v1.blend",
+          "root_id": "root_synthetic_aurora_secondary"
+        },
+        "observation": {
+          "allocated_bytes": 4096,
+          "allocation_source": "stat_blocks_512",
+          "ctime_ns": 1767225600000000000,
+          "fingerprint": {
+            "ctime_ns": 1767225600000000000,
+            "device": 1,
+            "inode": 4,
+            "link_count": 1,
+            "mode": 33152,
+            "mtime_ns": 1767225600000000000,
+            "size": 21
+          },
+          "hash": {
+            "algorithm": "sha256",
+            "status": "verified",
+            "value": "fdeb67b21a3d53af760c3479620341e867eaf1073901192abac44451c231c85b"
+          },
+          "id": "entry_ebc100ee0e93374774d26af4",
+          "kind": "file",
+          "link_count": 1,
+          "logical_bytes": 21,
+          "mtime_ns": 1767225600000000000,
+          "object_id": "object_aa5507f9e57ee8a21e59299d",
+          "parent_id": "entry_7c33e462ef682fb0d094d4ea",
+          "relative_path": "Project Aurora/design_v1.blend",
+          "root_id": "root_d691e552fd740ba4b1c60cbd",
+          "status": "observed",
+          "uncertainties": []
+        },
+        "placement": "proposed_address_requires_review",
+        "project_path": "design_v1.blend",
+        "source": {
+          "relative_path": "Project Aurora/design_v1.blend",
+          "root_id": "root_d691e552fd740ba4b1c60cbd"
+        },
+        "source_retained": true,
+        "volume_id": null
+      },
+      {
+        "content_version": null,
+        "dependency_coverage": "unknown",
+        "entry_id": "secondary_entry_815125d6c9d2ffc0388f373a",
+        "intended": {
+          "relative_path": "Projects/Aurora/design_v2.blend",
+          "root_id": "root_synthetic_aurora_secondary"
+        },
+        "observation": {
+          "allocated_bytes": 4096,
+          "allocation_source": "stat_blocks_512",
+          "ctime_ns": 1767225600000000000,
+          "fingerprint": {
+            "ctime_ns": 1767225600000000000,
+            "device": 1,
+            "inode": 5,
+            "link_count": 1,
+            "mode": 33152,
+            "mtime_ns": 1767225600000000000,
+            "size": 21
+          },
+          "hash": {
+            "algorithm": "sha256",
+            "status": "stale",
+            "value": null
+          },
+          "id": "secondary_entry_815125d6c9d2ffc0388f373a",
+          "kind": "file",
+          "link_count": 1,
+          "logical_bytes": 21,
+          "mtime_ns": 1767225600000000000,
+          "object_id": "object_65111ec74aa1c4b8a9680ca2",
+          "parent_id": "secondary_entry_7c33e462ef682fb0d094d4ea",
+          "relative_path": "Project Aurora/design_v2.blend",
+          "root_id": "root_synthetic_aurora_secondary",
+          "status": "stale",
+          "uncertainties": [
+            "Fabricated last-known record; current availability is unverified."
+          ]
+        },
+        "placement": "proposed_address_requires_review",
+        "project_path": "design_v2.blend",
+        "source": {
+          "relative_path": "Project Aurora/design_v2.blend",
+          "root_id": "root_synthetic_aurora_secondary"
+        },
+        "source_retained": true,
+        "volume_id": null
+      }
+    ],
+    "observation_digest": "bfb69cc9dfdc4c0a0714bfdfc3104757dbdf555e937e01176616575b8b2eadb0",
+    "observation_scope": {
+      "analysis_coverage": {
+        "findings_omitted": 0,
+        "max_findings": 400,
+        "max_relationships": 2000,
+        "relationships_omitted": 0,
+        "semantic_content_analysis": false
+      },
+      "entry_count": 32,
+      "reported_changes": {
+        "added": [
+          "entry_1d97ab9cbcf7c2340f80a56e",
+          "entry_21874104f293ae8a65f8aab4",
+          "entry_30323bcd4e21a2a13eef20bf",
+          "entry_448cbfd607fb757ff47e3615",
+          "entry_6f84ee62c3a9a484852f0374",
+          "entry_7c33e462ef682fb0d094d4ea",
+          "entry_815125d6c9d2ffc0388f373a",
+          "entry_8e0254a8859d43501ff0ba98",
+          "entry_98070566f30b9156f73d495e",
+          "entry_a53fdd6c3e25366ba4509c63",
+          "entry_bba030de591134adb89d1423",
+          "entry_cd3ab2e5f18e30cbf6d921b1",
+          "entry_d61f91f63ea9d4e2f5815ad3",
+          "entry_ebc100ee0e93374774d26af4",
+          "entry_fd13c1a9fed3bb1e0b5e668e",
+          "entry_ff55aa4d4605716a06ee1a5f",
+          "secondary_entry_1d97ab9cbcf7c2340f80a56e",
+          "secondary_entry_21874104f293ae8a65f8aab4",
+          "secondary_entry_30323bcd4e21a2a13eef20bf",
+          "secondary_entry_448cbfd607fb757ff47e3615",
+          "secondary_entry_6f84ee62c3a9a484852f0374",
+          "secondary_entry_7c33e462ef682fb0d094d4ea",
+          "secondary_entry_815125d6c9d2ffc0388f373a",
+          "secondary_entry_8e0254a8859d43501ff0ba98",
+          "secondary_entry_98070566f30b9156f73d495e",
+          "secondary_entry_a53fdd6c3e25366ba4509c63",
+          "secondary_entry_bba030de591134adb89d1423",
+          "secondary_entry_cd3ab2e5f18e30cbf6d921b1",
+          "secondary_entry_d61f91f63ea9d4e2f5815ad3",
+          "secondary_entry_ebc100ee0e93374774d26af4",
+          "secondary_entry_fd13c1a9fed3bb1e0b5e668e",
+          "secondary_entry_ff55aa4d4605716a06ee1a5f"
+        ],
+        "changed": [],
+        "comparable": false,
+        "hashes_reused": 0,
+        "no_longer_observed": [],
+        "previous_scan_id": null,
+        "uncertainties": [
+          "Unchanged metadata does not prove unchanged content.",
+          "Entry IDs track root-relative addresses, not rename history."
+        ],
+        "unchanged_metadata": [],
+        "unverified_absent": []
+      },
+      "scan": {
+        "coverage": {
+          "atomic_snapshot": false,
+          "complete_within_policy": false,
+          "entries_observed": 32,
+          "hash_attempts": 18,
+          "hash_status_counts": {
+            "stale": 9,
+            "verified": 9
+          },
+          "hashed_bytes": 1896,
+          "hashed_files": 9,
+          "status_counts": {
+            "observed": 15,
+            "stale": 15,
+            "unreadable": 2
+          },
+          "stop_reason": null
+        },
+        "errors": [
+          {
+            "entry_id": "entry_30323bcd4e21a2a13eef20bf",
+            "errno": 13,
+            "kind": "PermissionError"
+          },
+          {
+            "entry_id": "secondary_entry_30323bcd4e21a2a13eef20bf",
+            "errno": 13,
+            "kind": "PermissionError"
+          }
+        ],
+        "exclusions": [],
+        "hash_policy": "bounded_sha256",
+        "id": "scan_synthetic_aurora_observation_v1",
+        "limits": {
+          "cross_filesystems": false,
+          "exclude_names": [],
+          "hash_files": true,
+          "max_depth": 32,
+          "max_directory_entries": 5000,
+          "max_entries": 20000,
+          "max_hash_file_bytes": 16777216,
+          "max_hash_files": 1000,
+          "max_hash_total_bytes": 67108864,
+          "max_seconds": 30.0
+        },
+        "roots": [
+          {
+            "id": "root_d691e552fd740ba4b1c60cbd",
+            "identity": {
+              "ctime_ns": 1767225600000000000,
+              "device": 1,
+              "inode": 1,
+              "link_count": 1,
+              "mode": 16832,
+              "mtime_ns": 1767225600000000000,
+              "size": 0
+            },
+            "path": "/synthetic/disk-map-demo",
+            "status": "observed"
+          },
+          {
+            "id": "root_synthetic_aurora_secondary",
+            "identity": {
+              "ctime_ns": 1767225600000000000,
+              "device": 1,
+              "inode": 1,
+              "link_count": 1,
+              "mode": 16832,
+              "mtime_ns": 1767225600000000000,
+              "size": 0
+            },
+            "path": "/synthetic/aurora-secondary",
+            "status": "stale"
+          }
+        ],
+        "started_at": "2026-10-06T12:00:00+00:00",
+        "status": "partial",
+        "uncertainties": [
+          "This is a synthetic demonstration, not a scan of a real disk.",
+          "Two observed roots do not establish two physical drives or independent copies."
+        ]
+      },
+      "selected_entry_count": 3
+    },
+    "observed_roots": [
+      {
+        "id": "root_d691e552fd740ba4b1c60cbd",
+        "identity": {
+          "ctime_ns": 1767225600000000000,
+          "device": 1,
+          "inode": 1,
+          "link_count": 1,
+          "mode": 16832,
+          "mtime_ns": 1767225600000000000,
+          "size": 0
+        },
+        "path": "/synthetic/disk-map-demo",
+        "status": "observed"
+      },
+      {
+        "id": "root_synthetic_aurora_secondary",
+        "identity": {
+          "ctime_ns": 1767225600000000000,
+          "device": 1,
+          "inode": 1,
+          "link_count": 1,
+          "mode": 16832,
+          "mtime_ns": 1767225600000000000,
+          "size": 0
+        },
+        "path": "/synthetic/aurora-secondary",
+        "status": "stale"
+      }
+    ],
+    "project": {
+      "id": "aurora",
+      "label": "Aurora project"
+    },
+    "protection": {
+      "configured_target_ids": null,
+      "independent_copy_count": null,
+      "live_backup_verified": false,
+      "live_restore_verified": false,
+      "project_restore_satisfied": null
+    },
+    "read_only": true,
+    "recorded_scan_freshness": "within_requested_window",
+    "schema_version": "disk-administration-observation-draft/v1",
+    "source_safe_to_erase": false,
+    "status": "blocked_observation_draft",
+    "synthetic": true,
+    "undo_available": false
+  },
+  "executable": false,
+  "execution_authority": null,
+  "fixture_as_of": "2026-10-06T12:00:00+00:00",
+  "live_backup_verified": false,
+  "live_restore_verified": false,
+  "observation_digest": "bfb69cc9dfdc4c0a0714bfdfc3104757dbdf555e937e01176616575b8b2eadb0",
+  "read_only": true,
+  "recorded_paths": [
+    {
+      "entry_id": "entry_1d97ab9cbcf7c2340f80a56e",
+      "relative_path": ".",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_21874104f293ae8a65f8aab4",
+      "relative_path": "Archive",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_cd3ab2e5f18e30cbf6d921b1",
+      "relative_path": "Archive/reference-alias.txt",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_bba030de591134adb89d1423",
+      "relative_path": "Archive/reference.txt",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_d61f91f63ea9d4e2f5815ad3",
+      "relative_path": "Cache",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_448cbfd607fb757ff47e3615",
+      "relative_path": "Cache/preview.bin",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_98070566f30b9156f73d495e",
+      "relative_path": "Inbox",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_8e0254a8859d43501ff0ba98",
+      "relative_path": "Inbox/receipt.pdf",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_ff55aa4d4605716a06ee1a5f",
+      "relative_path": "Inbox/reference-copy.txt",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_7c33e462ef682fb0d094d4ea",
+      "relative_path": "Project Aurora",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_ebc100ee0e93374774d26af4",
+      "relative_path": "Project Aurora/design_v1.blend",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_815125d6c9d2ffc0388f373a",
+      "relative_path": "Project Aurora/design_v2.blend",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_a53fdd6c3e25366ba4509c63",
+      "relative_path": "Project Aurora/pyproject.toml",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_6f84ee62c3a9a484852f0374",
+      "relative_path": "unclassified",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_30323bcd4e21a2a13eef20bf",
+      "relative_path": "unclassified/not-readable.data",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "entry_fd13c1a9fed3bb1e0b5e668e",
+      "relative_path": "unclassified/unknown.data",
+      "root_id": "root_d691e552fd740ba4b1c60cbd"
+    },
+    {
+      "entry_id": "secondary_entry_1d97ab9cbcf7c2340f80a56e",
+      "relative_path": ".",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_21874104f293ae8a65f8aab4",
+      "relative_path": "Archive",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_cd3ab2e5f18e30cbf6d921b1",
+      "relative_path": "Archive/reference-alias.txt",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_bba030de591134adb89d1423",
+      "relative_path": "Archive/reference.txt",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_d61f91f63ea9d4e2f5815ad3",
+      "relative_path": "Cache",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_448cbfd607fb757ff47e3615",
+      "relative_path": "Cache/preview.bin",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_98070566f30b9156f73d495e",
+      "relative_path": "Inbox",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_8e0254a8859d43501ff0ba98",
+      "relative_path": "Inbox/receipt.pdf",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_ff55aa4d4605716a06ee1a5f",
+      "relative_path": "Inbox/reference-copy.txt",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_7c33e462ef682fb0d094d4ea",
+      "relative_path": "Project Aurora",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_ebc100ee0e93374774d26af4",
+      "relative_path": "Project Aurora/design_v1.blend",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_815125d6c9d2ffc0388f373a",
+      "relative_path": "Project Aurora/design_v2.blend",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_a53fdd6c3e25366ba4509c63",
+      "relative_path": "Project Aurora/pyproject.toml",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_6f84ee62c3a9a484852f0374",
+      "relative_path": "unclassified",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_30323bcd4e21a2a13eef20bf",
+      "relative_path": "unclassified/not-readable.data",
+      "root_id": "root_synthetic_aurora_secondary"
+    },
+    {
+      "entry_id": "secondary_entry_fd13c1a9fed3bb1e0b5e668e",
+      "relative_path": "unclassified/unknown.data",
+      "root_id": "root_synthetic_aurora_secondary"
+    }
+  ],
+  "reference_decision_digest": "74f52670a8649e918fae80bb32dca819b2d5e647233fb34f9e8202cab96ec25d",
+  "roots": [
+    {
+      "id": "root_d691e552fd740ba4b1c60cbd",
+      "identity": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 1,
+        "link_count": 1,
+        "mode": 16832,
+        "mtime_ns": 1767225600000000000,
+        "size": 0
+      },
+      "path": "/synthetic/disk-map-demo",
+      "status": "observed"
+    },
+    {
+      "id": "root_synthetic_aurora_secondary",
+      "identity": {
+        "ctime_ns": 1767225600000000000,
+        "device": 1,
+        "inode": 1,
+        "link_count": 1,
+        "mode": 16832,
+        "mtime_ns": 1767225600000000000,
+        "size": 0
+      },
+      "path": "/synthetic/aurora-secondary",
+      "status": "stale"
+    }
+  ],
+  "scenario_id": "aurora-observation",
+  "source_entry_count": 32,
+  "source_revision": 1,
+  "source_safe_to_erase": false,
+  "synthetic": true,
+  "undo_available": false
+}

@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-07 04:58
+Last updated: 2026-10-07 06:01
 
 ## Project purpose
 
@@ -77,12 +77,21 @@ The main product direction is drive/project administration, organisation and bac
 - Exact repaired-source results: planner `37573413212` passed 140 tests on each OS; aggregate `37573413173` passed Linux 230 backend, Windows 181 passed/49 skipped, 123 Jest, 22 existing Chromium flows, OpenAPI/audits/formatting; isolated UI `37573413176` passed 22 HTTP on each OS, 23 focused Jest and seven existing Chromium flows. No new rendering or native-hardware acceptance is claimed; the existing UI blobs are unchanged. The documentation-only closeout preserves every runtime/test blob from this tested source.
 - Interface, evidence limits and next boundary: [observation draft adapter](docs/drive-administration/OBSERVATION-DRAFT-ADAPTER.md).
 
+## Aurora observation-backed interaction checkpoint
+
+- The isolated `/observation-draft` view connects the unchanged observation adapter to one fixed canonical-derived scenario: two recorded roots, 32 records and eight selectable examples. Explicit membership, intended project-relative paths and destination are reviewed against a revision/digest-bound source; nothing is inferred from hashes or folder roles. Harbour is unchanged apart from a link.
+- All physical identity, current-version, dependency, capacity and protection gaps stay Unknown. Same-address intent never establishes a no-op; recorded aliases/stale sizes are not independent protection or required copy space. Conflicts name actual root/path participants, including unselectable occupants.
+- Four allowlisted routes extend the separate demo to nine paths and five startup-loaded frontend assets. Existing exact loopback/host/origin/token/CSP controls remain. No arbitrary import, request-time files/network, native scan, provider, real observation conversion, default-app change, execution/recovery, autosave or deployment is introduced. Manual-only documentation publishing is unchanged.
+- Local checks: 140 pure-data tests in both cwd modes, 37 HTTP contracts and 175 Jest tests pass, along with formatting, compilation and parsing all 18 browser specifications. The original exact allowlist assertion expands intentionally; 15 new HTTP and 52 new Jest cases preserve adversarial scope and safety coverage. Independent pre-freeze inspection exposed duplicate/altered response rows a count-based collision-scope label and duplicate reference choices; explicit failing-before-fix regressions now pass with all three repaired.
+- A fresh local browser attempt reaches the isolated server but cannot find the locked Chromium executable. No local browser/pixel success is claimed. Independent frozen source/API review, exact-head hosted tests and actual desktop/mobile/320px/200% CSS-zoom/keyboard/stale-response acceptance remain pending. Historical accepted UI runs do not cover this new view.
+- Contract and precise verification boundary: [Aurora observation view](docs/drive-administration/OBSERVATION-VIEW.md). Save review is the next bounded follow-on, after this view is accepted; it is not implemented in this slice. Real-drive/native/provider, recovery and commercial-readiness gates remain held.
+
 ## Synthetic project interaction checkpoint
 
 - Standalone `frontend/project-review-demo.html`, `.js`, `.css` and `prototypes/drive_administration/demo_server.py` implement the simulated “Organise and protect Harbour” decision loop. The permanent banner identifies the simulation and disconnected drives/providers.
 - Membership suggestions/corrections and declared dependencies, a proposed volume/relative folder, side-by-side exact current/proposed paths, readable blockers, logical capacity/reserve, per-target/version backup evidence, scoped restore results and unresolved alerts are exposed. Dates, methods, fixture clock and uncertainty remain visible.
 - Review calls the accepted Python evaluator; there is no JavaScript rule clone. Dismiss returns the immutable reference decision and focus. The original interaction checkpoint kept the same-home occupied-path blocker. The later declared keep-current extension below explicitly addresses that separate gap.
-- Exactly two packaged scenarios and five allowlisted HTTP paths. Loopback address/exact host, same-origin checks, ephemeral process token, bounded strict decision JSON and restrictive CSP protect the isolated server. There are no arbitrary imports, uploads, filesystem/provider operations or editable backup evidence. Only three fixed frontend assets are read at app creation.
+- The original Harbour checkpoint had exactly two packaged scenarios and five allowlisted HTTP paths. The later Aurora extension above adds a separate fixed observation scenario and four paths. Loopback address/exact host, same-origin checks, ephemeral process token, bounded strict decision JSON and restrictive CSP protect the isolated server. There are no arbitrary imports, uploads, filesystem/provider operations or editable backup evidence. The original checkpoint read three fixed frontend assets at app creation; Aurora adds two fixed assets.
 - Drafts remain in tab memory. Every review uses the immutable fixture revision/digest; successive projected reviews do not advance a hidden server state. Edits, scenario changes, reload and dismissal invalidate pending success/error responses and previous results.
 - All results remain non-executable, with null authority, unavailable undo, no source-erasure permission and false live backup/restore verification. No existing default app, navigation, execution, recovery, observation or provider code changes.
 - Local verification: 68 unchanged evaluator tests, 20 new HTTP contract tests, 119 copied-frontend Jest tests (19 new UI tests), full copied-frontend Prettier check and Python compilation passed. Seven isolated browser specifications parse and list successfully. No aggregate backend or native hardware claim is made for this local partial checkout.
@@ -96,11 +105,11 @@ The backend scans allowed roots, builds file contexts, uses provider-backed or h
 
 ### Isolated synthetic interaction architecture
 
-The standalone demo has no connection to the default or legacy execution paths below. A tab-local decision revises a packaged fixture; all results return as non-executable evidence.
+The standalone demo has no connection to the default or legacy execution paths below. A tab-local decision reviews a packaged Harbour fixture or the fixed Aurora observation source; all results return as non-executable evidence. The planner and observation adapter remain distinct, and neither connects to an executor.
 
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="180" viewBox="0 0 1000 180" role="img" aria-labelledby="demo-arch-title demo-arch-desc">
   <title id="demo-arch-title">Isolated synthetic review</title>
-  <desc id="demo-arch-desc">The tab-local draft calls the loopback demo server, which reviews one of two packaged fixtures using the pure-data evaluator. No executor is connected.</desc>
+  <desc id="demo-arch-desc">The tab-local draft calls the loopback demo server, which calls the Harbour evaluator or Aurora observation adapter using fixed synthetic sources. No executor is connected.</desc>
   <defs><marker id="demo-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" /></marker></defs>
   <rect x="20" y="40" width="260" height="90" rx="8" fill="none" stroke="black" />
   <text x="150" y="72" text-anchor="middle" font-size="15">Tab-local membership / home</text>
@@ -111,9 +120,9 @@ The standalone demo has no connection to the default or legacy execution paths b
   <text x="480" y="97" text-anchor="middle" font-size="13">Origin / token / bounded edits</text>
   <line x1="610" y1="85" x2="680" y2="85" stroke="black" marker-end="url(#demo-arrow)" />
   <rect x="680" y="40" width="300" height="90" rx="8" fill="none" stroke="black" />
-  <text x="830" y="72" text-anchor="middle" font-size="15">Two fixtures + pure-data evaluator</text>
+  <text x="830" y="72" text-anchor="middle" font-size="15">Fixed sources + evaluator / adapter</text>
   <text x="830" y="97" text-anchor="middle" font-size="13">No files, providers or executor</text>
-  <text x="500" y="161" text-anchor="middle" font-size="13">Returned review: exact proposal, blockers and fabricated protection evidence only</text>
+  <text x="500" y="161" text-anchor="middle" font-size="13">Returned draft: exact intent, scoped blockers and explicitly limited synthetic evidence</text>
 </svg>
 
 ### Architecture diagram
@@ -382,4 +391,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-07 04:58
+Last updated: 2026-10-07 06:01
