@@ -469,3 +469,10 @@ for (const kind of ["root label", "fixture clock"])
     expect(id("status").textContent).toContain("Reference unavailable");
     expect(id("review-content").children).toHaveLength(0);
   });
+
+test("Aurora member cards use an intrinsic minimum instead of fixed narrow zoom columns", () => {
+  const css = fs.readFileSync(path.join(__dirname, "../project-review-demo.css"), "utf8");
+  const rule = css.match(/#observation-members\s*\{([^}]+)\}/);
+  expect(rule).not.toBeNull();
+  expect(rule[1]).toContain("repeat(auto-fit, minmax(min(100%, 26rem), 1fr))");
+});

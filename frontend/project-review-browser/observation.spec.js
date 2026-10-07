@@ -119,6 +119,11 @@ test("Aurora desktop bridges from Harbour, reviews explicit intent, and retains 
     "8 fixed selectable examples from 32 observation records across 2 recorded roots"
   );
   await assertUnknown(page);
+  expect(
+    await byId(page, "members").evaluate(
+      (node) => getComputedStyle(node).gridTemplateColumns.split(" ").length
+    )
+  ).toBe(2);
   await byId(page, "path-0").fill("Design/final.blend");
   await byId(page, "folder").fill("Projects/Aurora review");
   const result = await review(page);
@@ -209,6 +214,20 @@ test("200 percent CSS zoom permits a hit-tested pointer review with visible Unkn
     document.documentElement.style.zoom = "2";
   });
   await clickZoomedReview(page, testInfo);
+  const memberLayout = await byId(page, "members").evaluate((node) => ({
+    columns: getComputedStyle(node).gridTemplateColumns.split(" ").length,
+    labels: [...node.querySelectorAll(".member-row label")].map((label) =>
+      Number.parseFloat(getComputedStyle(label).width)
+    ),
+  }));
+  expect(memberLayout.columns).toBe(1);
+  expect(Math.min(...memberLayout.labels)).toBeGreaterThanOrEqual(200);
+  const layoutFile = testInfo.outputPath("aurora-zoom-member-layout.json");
+  fs.writeFileSync(layoutFile, JSON.stringify(memberLayout, null, 2) + "\n");
+  await testInfo.attach("aurora-zoom-member-layout.json", {
+    path: layoutFile,
+    contentType: "application/json",
+  });
   await assertUnknown(page);
   await noOverflow(page);
   await screenshot(page, testInfo, "aurora-zoom-200.png");

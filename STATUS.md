@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-07 06:01
+Last updated: 2026-10-07 06:16
 
 ## Project purpose
 
@@ -82,8 +82,8 @@ The main product direction is drive/project administration, organisation and bac
 - The isolated `/observation-draft` view connects the unchanged observation adapter to one fixed canonical-derived scenario: two recorded roots, 32 records and eight selectable examples. Explicit membership, intended project-relative paths and destination are reviewed against a revision/digest-bound source; nothing is inferred from hashes or folder roles. Harbour is unchanged apart from a link.
 - All physical identity, current-version, dependency, capacity and protection gaps stay Unknown. Same-address intent never establishes a no-op; recorded aliases/stale sizes are not independent protection or required copy space. Conflicts name actual root/path participants, including unselectable occupants.
 - Four allowlisted routes extend the separate demo to nine paths and five startup-loaded frontend assets. Existing exact loopback/host/origin/token/CSP controls remain. No arbitrary import, request-time files/network, native scan, provider, real observation conversion, default-app change, execution/recovery, autosave or deployment is introduced. Manual-only documentation publishing is unchanged.
-- Local checks: 140 pure-data tests in both cwd modes, 37 HTTP contracts and 175 Jest tests pass, along with formatting, compilation and parsing all 18 browser specifications. The original exact allowlist assertion expands intentionally; 15 new HTTP and 52 new Jest cases preserve adversarial scope and safety coverage. Independent pre-freeze inspection exposed duplicate/altered response rows a count-based collision-scope label and duplicate reference choices; explicit failing-before-fix regressions now pass with all three repaired.
-- A fresh local browser attempt reaches the isolated server but cannot find the locked Chromium executable. No local browser/pixel success is claimed. Independent frozen source/API review, exact-head hosted tests and actual desktop/mobile/320px/200% CSS-zoom/keyboard/stale-response acceptance remain pending. Historical accepted UI runs do not cover this new view.
+- Local checks: 140 pure-data tests in both cwd modes, 37 HTTP contracts and 176 Jest tests pass, along with formatting, compilation and parsing all 18 browser specifications. The original exact allowlist assertion expands intentionally; 15 new HTTP and 53 new Jest cases preserve adversarial scope and safety coverage. Independent pre-freeze inspection exposed duplicate/altered response rows a count-based collision-scope label and duplicate reference choices; explicit failing-before-fix regressions now pass with all three repaired.
+- A fresh local browser attempt reaches the isolated server but cannot find the locked Chromium executable. No local browser/pixel success is claimed. Independent source/API review accepts the 15-file source freeze after 587 additional HTTP and 36 JSDOM cases. Saved source `e6961bc74bff10633a162d182ca06308365f88d9` passed aggregate `37579859328`, planner `37579859269` and isolated UI `37579859355`, including 18 Chromium flows. Actual pixels exposed narrow member-label columns at 200% CSS zoom despite passing overflow checks. A scoped Aurora-only intrinsic grid rule, pre-fix Jest regression and explicit browser column/label-width checks repair that readability issue without changing Harbour styling. Fresh repaired-head CI and replacement pixels remain pending; earlier runs are not extended to this repair.
 - Contract and precise verification boundary: [Aurora observation view](docs/drive-administration/OBSERVATION-VIEW.md). Save review is the next bounded follow-on, after this view is accepted; it is not implemented in this slice. Real-drive/native/provider, recovery and commercial-readiness gates remain held.
 
 ## Synthetic project interaction checkpoint
@@ -391,4 +391,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-07 06:01
+Last updated: 2026-10-07 06:16

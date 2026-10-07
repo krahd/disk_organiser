@@ -289,6 +289,10 @@ fieldset {
   grid-template-columns: 1fr 1fr;
   gap: 1.2rem;
 }
+/* Aurora's evidence-rich member cards need usable text width at CSS zoom too. */
+#observation-members {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+}
 .destination-grid > *,
 .comparison > *,
 .targets > * {
