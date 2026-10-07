@@ -1,6 +1,6 @@
 # Save the current Aurora display report
 
-7 October 2026 · Synthetic local-download candidate
+7 October 2026 · Accepted synthetic local-download checkpoint
 
 ## Existing gap and outcome
 
@@ -58,4 +58,22 @@ Local checks pass: 140 unchanged pure tests, 37 unchanged HTTP tests, 204 Jest t
 
 The seven new browser flows check actual downloaded JSON/filename/MIME and URL cleanup, exact server-response/display projection, Unknown/alias/unreadable states, same-address uncertainty, unselected occupants, token/fingerprint exclusion, pending/error/dismissal/reload states, keyboard activation, repeated downloads, cancellation request, 390/320-pixel reflow and 200% CSS zoom. The existing workflow automatically discovers them; no CI infrastructure is added. New screenshots are written once to its existing artifact directory rather than duplicated as attachments.
 
-A fresh local attempt starts only the synthetic server, then cannot find the existing locked Chromium executable. No download or alternate browser was attempted. Local download/pixel success is not claimed. Independent frozen source review, exact-head hosted download/interaction tests and actual screenshots remain required before acceptance/main integration. Native browser-UI zoom, screen readers, real-drive/provider actions, replay/import and production readiness remain outside this slice.
+A fresh local attempt starts only the synthetic server, then cannot find the existing locked Chromium executable. No download or alternate browser was attempted. Local download/pixel success is not claimed. Independent frozen source and hosted download/pixel review accept the exact source below. Main integration and post-main checks remain separately guarded. Native browser-UI zoom, screen readers, real-drive/provider actions, replay/import and production readiness remain outside this slice.
+
+## Accepted exact source, downloaded bytes and pixels
+
+Accepted runtime/test source: [`c6ffb62ebddee564af597b6732027cbf028e3e87`](https://github.com/krahd/disk_organiser/commit/c6ffb62ebddee564af597b6732027cbf028e3e87), tree `df169dd99604c116cc742bb5020501608f672929`. Independent review verified all seven intended changes and 76 unchanged supplied files, then passed 57 additional cases including 27 actual Python-response exports, metadata injected into 173 admitted objects, silent intent changes and interruption/cleanup/failure/retry controls. The silent pending-intent finding is closed.
+
+All three exact-head workflows passed:
+
+- [Planner 37584999433](https://github.com/krahd/disk_organiser/actions/runs/37584999433): 140 pure-data tests on Linux and Windows.
+- [Aggregate CI 37584999415](https://github.com/krahd/disk_organiser/actions/runs/37584999415): Linux 230 backend tests; Windows 181 passed/49 skipped; 204 Jest; 22 existing Chromium flows; 44-route OpenAPI checks, dependency audits, compatibility and formatting.
+- [Isolated UI 37584999457](https://github.com/krahd/disk_organiser/actions/runs/37584999457): 37 HTTP contracts on each OS, 23 existing focused Harbour Jest tests and all 25 Chromium flows. The full aggregate Jest command covers the Aurora Save tests; no workflow was added or expanded.
+
+[Artifact 11465879693](https://github.com/krahd/disk_organiser/actions/runs/37584999457/artifacts/11465879693) has ZIP SHA-256 `7f086b8787e53bbf0a2b20955a57c1e3aa47e1df2b501e4d66bc7904c3202d3d`. All 38 file hashes were verified. The actual downloaded `aurora-reviewed-display-report.json` is 12,899 bytes with SHA-256 `835af08ae9b21096f828f5ca941b3f319816f2bc07c9ccb306e77ba4a6f8f165`. Independent reproduction from the accepted Python review and explicit JavaScript projection matches these bytes exactly. Filename, JSON MIME, excluded data, stale-intent admission and object-URL cleanup checks pass.
+
+Seventeen distinct screenshots cover the retained review and Save interaction. Independent inspection finds readable Save controls, keyboard focus, requested-download status and synthetic/non-replayable disclosures at desktop, 390-pixel mobile, 320-pixel reflow and 200% CSS zoom. No clipping, overlap or evidence-label regression is found. All seven Harbour PNGs remain byte-identical; the six prior Aurora views change only at appended Save content.
+
+The cancellation receipt is exactly `requested: true`, `failure: null`: this small download completed before cancellation. Subsequent review availability and repeated exact download pass. Early cancellation before completion remains unverified; neither the UI nor this report claims otherwise. Native browser-UI zoom, assistive technology and real storage/provider operations remain outside acceptance.
+
+This documentation-only closeout preserves every runtime/test/style blob from the accepted source. It does not attribute those runs to a later commit or trigger public documentation publication. No import, replay, live identity/protection proof, execution or recovery authority is introduced.

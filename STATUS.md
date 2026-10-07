@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-07 06:57
+Last updated: 2026-10-07 07:17
 
 ## Project purpose
 
@@ -92,7 +92,8 @@ The main product direction is drive/project administration, organisation and bac
 - Aurora adds one user-initiated JSON download for the exact current successful explicit review. Reference-only, edited, pending, errored, dismissed, reloaded and navigated-away states cannot export. Generation and exact-current-intent checks prevent stale responses or unannounced control changes from reviving an old report.
 - The versioned synthetic display-report allowlist preserves source/decision digests as strings, exact decisions, shown addresses/statuses, unresolved identity, Unknown capacity/protection, blockers and limitations. It explicitly says canonical observation export false and replayable false. Tokens, headers, unrelated state and undisplayed large fingerprint integers are excluded; no rounded identity is manufactured.
 - Blob/object URLs are local and user-initiated, with fixed safe ASCII filenames, temporary-anchor removal, deferred/idempotent URL revocation, repeated-click and interruption checks. Status reports a download request, never confirmed local saving. Browser cancellation may arrive after a small file completes and must be recorded honestly.
-- Local checks: 140 pure, 37 HTTP and 204 Jest tests pass, with formatting/syntax and all 25 browser specifications parsed. One pre-feature failing assertion, two activation/cleanup pre-fix failures and one silent-control-change regression are retained; the export snapshot binds directly to the echoed accepted decision. Seven new actual-download/browser flows are prepared; local Chromium is still absent, so independent source review and hosted download/pixel acceptance remain pending. Prior accepted runs do not cover this new download action.
+- Local checks: 140 pure, 37 HTTP and 204 Jest tests pass, with formatting/syntax and all 25 browser specifications parsed. One pre-feature failing assertion, two activation/cleanup pre-fix failures and one silent-control-change regression are retained; the export snapshot binds directly to the echoed accepted decision. Local Chromium is still absent; hosted acceptance is separate. Independent source review passes 57 additional cases including 27 actual-response exports and nested metadata exclusion. Accepted source `c6ffb62ebddee564af597b6732027cbf028e3e87` has exact tree verification and all three hosted workflows green. The silent pending-intent finding is closed; prior Aurora-only runs are not extended to this download action.
+- Exact source results: planner `37584999433` passes 140 on each OS; aggregate `37584999415` passes Linux 230 backend, Windows 181/49 skipped, 204 Jest, 22 existing Chromium, OpenAPI44/audits/formatting; isolated UI `37584999457` passes 37 HTTP on each OS, 23 existing focused Jest and 25 Chromium flows. Artifact `11465879693` ZIP SHA-256 is `7f086b8787e53bbf0a2b20955a57c1e3aa47e1df2b501e4d66bc7904c3202d3d`; all 38 files are verified. The 12,899-byte actual JSON matches fresh Python-review/accepted-JavaScript projection bytes, SHA-256 `835af08ae9b21096f828f5ca941b3f319816f2bc07c9ccb306e77ba4a6f8f165`. Independent inspection accepts desktop/mobile/320px/CSS-zoom download controls and disclosures. Seven Harbour PNGs are byte-identical; prior Aurora differences are confined to appended Save content. Cancellation was requested after this small download had completed (`failure: null`); early cancellation remains unverified. The docs-only closeout preserves accepted runtime/test/style blobs without relabelling CI as testing a later commit.
 - Harbour, CSS, server/adapter, fixtures, HTTP routes and workflows are unchanged. No import/replay, upload, autosave, provider, native scanning, execution/recovery, default-app change or public deployment is added. Manual-only documentation publication and all real-drive holds remain intact. Contract: [Save review](docs/drive-administration/SAVE-REVIEW.md).
 
 ## Synthetic project interaction checkpoint
@@ -116,13 +117,13 @@ The backend scans allowed roots, builds file contexts, uses provider-backed or h
 
 The standalone demo has no connection to the default or legacy execution paths below. A tab-local decision reviews a packaged Harbour fixture or the fixed Aurora observation source; all results return as non-executable evidence. The planner and observation adapter remain distinct, and neither connects to an executor.
 
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="180" viewBox="0 0 1000 180" role="img" aria-labelledby="demo-arch-title demo-arch-desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="260" viewBox="0 0 1000 260" role="img" aria-labelledby="demo-arch-title demo-arch-desc">
   <title id="demo-arch-title">Isolated synthetic review</title>
-  <desc id="demo-arch-desc">The tab-local draft calls the loopback demo server, which calls the Harbour evaluator or Aurora observation adapter using fixed synthetic sources. No executor is connected.</desc>
+  <desc id="demo-arch-desc">The tab-local draft calls the loopback demo server, which calls the Harbour evaluator or Aurora observation adapter using fixed synthetic sources. A current Aurora review can be downloaded locally as synthetic display JSON. No executor is connected.</desc>
   <defs><marker id="demo-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" /></marker></defs>
   <rect x="20" y="40" width="260" height="90" rx="8" fill="none" stroke="black" />
   <text x="150" y="72" text-anchor="middle" font-size="15">Tab-local membership / home</text>
-  <text x="150" y="97" text-anchor="middle" font-size="13">Review or dismiss a proposal</text>
+  <text x="150" y="97" text-anchor="middle" font-size="13">Review / dismiss / save report</text>
   <line x1="280" y1="85" x2="350" y2="85" stroke="black" marker-end="url(#demo-arrow)" />
   <rect x="350" y="40" width="260" height="90" rx="8" fill="none" stroke="black" />
   <text x="480" y="72" text-anchor="middle" font-size="15">Isolated loopback Flask app</text>
@@ -130,9 +131,15 @@ The standalone demo has no connection to the default or legacy execution paths b
   <line x1="610" y1="85" x2="680" y2="85" stroke="black" marker-end="url(#demo-arrow)" />
   <rect x="680" y="40" width="300" height="90" rx="8" fill="none" stroke="black" />
   <text x="830" y="72" text-anchor="middle" font-size="15">Fixed sources + evaluator / adapter</text>
-  <text x="830" y="97" text-anchor="middle" font-size="13">No files, providers or executor</text>
+  <text x="830" y="97" text-anchor="middle" font-size="13">No drives, providers or executor</text>
   <text x="500" y="161" text-anchor="middle" font-size="13">Returned draft: exact intent, scoped blockers and explicitly limited synthetic evidence</text>
+  <line x1="150" y1="130" x2="150" y2="182" stroke="black" marker-end="url(#demo-arrow)" />
+  <rect x="20" y="185" width="260" height="55" rx="8" fill="none" stroke="black" />
+  <text x="150" y="208" text-anchor="middle" font-size="13">User-initiated local JSON</text>
+  <text x="150" y="229" text-anchor="middle" font-size="12">Synthetic display report only</text>
 </svg>
+
+Only the current successful explicit Aurora review can follow the local-download branch. It is not an import/replay path and grants no filesystem authority.
 
 ### Architecture diagram
 
@@ -400,4 +407,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-07 06:57
+Last updated: 2026-10-07 07:17
