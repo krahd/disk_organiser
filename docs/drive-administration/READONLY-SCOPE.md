@@ -1,7 +1,7 @@
 # One-shot scoped read-only observation
 
 Source inspected: main `351e6a9c5a3067efd7cf7570c083859b931c9cfd`.
-Status: independently accepted design; bounded local implementation/source-review candidate. Only owned temporary fixture directories have been observed.
+Status: independently accepted bounded source and exact-head hosted checks. Only owned temporary fixture directories have been observed; user-folder integration remains held.
 
 ## Customer-journey gap and bounded outcome
 
@@ -129,4 +129,18 @@ The root-guard interface specification first failed on the accepted scanner. Two
 
 The fixture suite covers exact UTF-8/path bounds, unsupported platforms, no content reads, fixed directory/depth/entry/time budgets, symlinks/placeholders/filesystem boundaries, unreadable/disappeared descendants, root replacement before guard re-walk and after scanner completion, cancellation from final progress, latched cancellation, revocation priority, callback re-entry and lock separation, already-admitted callback completion, concurrent attempts, late-result discard, admission-before-revoke, descriptor cleanup, wrong-PID rejection before inherited locks and copy/serialization rejection. Provider/network/mutation calls and executor imports are prohibited during observation.
 
-Independent frozen source review and exact-head hosted checks remain pending. This is a cooperative in-process foundation for the roadmap's permissioned read-only customer workflow, not a connected real-folder product surface. User-folder access, native UI/HTTP permission handling, authenticated volume/content/protection evidence, execution/recovery and production/native-hardware acceptance remain held.
+## Accepted source and hosted verification
+
+Independent frozen source review accepts all six changed files and all 88 supplied files, with 111 additional reviewer-owned fixture cases covering input admission, descriptor cleanup, callback/state races, literal native spellings and changed-PID rejection. Fresh resumed local checks again pass 142 scanner/session cases, all 111 independent cases, 140 planner/adapter tests in each working directory, 37 HTTP contracts, 204 Jest tests and formatting. The accepted source manifest has SHA-256 `abb972c79bd2720285877033afd31346638cd0a5c65a472dc8d4a95f3c73c51b`.
+
+Saved source [`4f1cfee67527cdc68fce3c19997e934aca9edda7`](https://github.com/krahd/disk_organiser/commit/4f1cfee67527cdc68fce3c19997e934aca9edda7) has tree `4ae717b245ade8d9c0b98e4a7240322424bf933d`, with all 203 non-tree entries independently verified against the accepted source and unchanged baseline. Three exact-head workflows pass:
+
+- Aggregate [CI `37685415783`](https://github.com/krahd/disk_organiser/actions/runs/37685415783): Linux 313 backend tests; Windows 218 passed/95 skipped; 204 Jest; 22 existing Chromium flows; 44 OpenAPI routes on each OS; Python/Node dependency audits, formatting and scoped YAML compatibility.
+- [Project administration `37685415780`](https://github.com/krahd/disk_organiser/actions/runs/37685415780): 140 planner/adapter tests on each OS.
+- [Synthetic review UI `37685415788`](https://github.com/krahd/disk_organiser/actions/runs/37685415788): 37 HTTP contracts on each OS, 23 focused Jest and 25 isolated Chromium flows.
+
+Independent publication review accepts the bounded source, exact remote identity and these hosted results. Descriptor-relative traversal cases skip on unsupported Windows; the Windows result qualifies fail-closed and portable behaviour, not native Windows traversal. The existing hosted `pipx` resolver conflicts remain installation warnings rather than passing evidence about those unrelated packages. No dependency was changed.
+
+This documentation-only closeout preserves every runtime/test/workflow blob from the tested source. Its source-run evidence is not attributed to a later documentation commit; final-main readback and exact-head workflow attribution remain separate integration gates. The feature branch and commit retain the undoable tested source checkpoint. No public docs deployment, release or tag is included.
+
+This is a cooperative in-process foundation for the roadmap's permissioned read-only customer workflow, not a connected real-folder product surface. User-folder access, native UI/HTTP permission handling, authenticated volume/content/protection evidence, execution/recovery and production/native-hardware acceptance remain held.

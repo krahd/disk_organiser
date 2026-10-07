@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-07 08:49
+Last updated: 2026-10-07 20:57
 
 ## Project purpose
 
@@ -102,7 +102,10 @@ The main product direction is drive/project administration, organisation and bac
 - The optional scanner root guard runs before descendant enumeration/metadata/content access. The session re-walks the selected address without following links at the guard and before final admission; it forces metadata-only, no-cross-filesystem and fixed entry/directory/depth/cooperative-time limits. Scanner defaults and canonical output remain unchanged when no guard is supplied.
 - State/result admission is lock-protected; caller callbacks run outside locks. Cancellation is latched, final progress cancellation is polled, revocation invalidates late candidates, and held descriptors cannot be closed/recycled during active comparison. Copy/pickle and changed-PID misuse reject without touching inherited locks. This is a cooperative lifecycle API, not an OS grant or protection against hostile Python already in the process.
 - Descriptor/device/inode comparisons enforce only the short-lived selected scope. They never become durable volume/file identity, planner no-op evidence or independent protection. All operation/undo/erasure/live-verification flags remain false/null; missing identity, versions, dependencies, capacity and protection remain Unknown. Invalidated attempts return no admitted inventory rather than a false empty drive. In-flight syscalls and already-admitted callbacks are not claimed to stop instantly; post-check concurrent-writer/mount races and native hardware remain unqualified.
-- Local checks: 142 scanner/session tests (59 original, ten guard and 73 session), 140 unchanged planner/adapter tests in both cwd modes, 37 HTTP, 204 Jest, formatting and compilation pass. Root-guard absence, stale guard admission after re-entrant revocation, and malformed canonical-result admission have failing-before-fix regressions. Native allowed spellings stay literal data. Independent design is accepted; frozen source review and hosted checks are still pending. No new UI or pixel acceptance is claimed.
+- Local checks: 142 scanner/session tests (59 original, ten guard and 73 session), 140 unchanged planner/adapter tests in both cwd modes, 37 HTTP, 204 Jest, formatting and compilation pass. Root-guard absence, stale guard admission after re-entrant revocation, and malformed canonical-result admission have failing-before-fix regressions. Native allowed spellings stay literal data. Independent source review accepts the frozen six-file implementation, including 111 additional owned-fixture cases and exact verification of all 88 supplied files. Fresh local reruns repeat these results. No new UI or pixel acceptance is claimed.
+- Saved source [`4f1cfee67527cdc68fce3c19997e934aca9edda7`](https://github.com/krahd/disk_organiser/commit/4f1cfee67527cdc68fce3c19997e934aca9edda7) has exact tree/blob readback and three successful exact-head workflows: aggregate [`37685415783`](https://github.com/krahd/disk_organiser/actions/runs/37685415783), planner [`37685415780`](https://github.com/krahd/disk_organiser/actions/runs/37685415780) and isolated UI [`37685415788`](https://github.com/krahd/disk_organiser/actions/runs/37685415788). Independent publication review accepts the bounded source and hosted results.
+- Hosted source checks: Linux 313 backend tests; Windows 218 passed/95 skipped; 204 Jest; 22 existing Chromium flows; 44 OpenAPI routes on each OS; both dependency audits, formatting and scoped YAML compatibility. Planner contracts pass 140 on each OS; isolated HTTP contracts pass 37 on each OS, with 23 focused Jest and 25 isolated Chromium flows. Descriptor-relative cases skip on unsupported Windows; this is fail-closed/unsupported-platform coverage, not native Windows traversal acceptance. The runner reports existing `pipx` resolver conflicts without failing dependency installation or tests.
+- This documentation-only closeout preserves every runtime/test/workflow blob from the tested source. The three source runs above are not attributed to a later documentation commit; final-main readback and exact-head check attribution remain separate integration gates. Manual-only docs publication, user-folder access and all execution/provider/recovery holds are unchanged.
 - Contract, exact limits and remaining user-folder gate: [read-only scope](docs/drive-administration/READONLY-SCOPE.md). Frontend, demo routes, synthetic adapter/planner, schema, provider, execution/recovery code, dependencies and workflows are unchanged; manual-only publication remains intact.
 
 ## Synthetic project interaction checkpoint
@@ -442,4 +445,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-07 08:49
+Last updated: 2026-10-07 20:57
