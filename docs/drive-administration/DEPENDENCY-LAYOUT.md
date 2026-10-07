@@ -33,4 +33,24 @@ The same-home occupied-path blocker remains unchanged. A genuine keep-current/no
 
 The new tests cover renamed/reparented dependencies and declaring members, parent-relative traversal as data, source-root flattening, preserved common prefixes, cross-volume and unknown-semantics uncertainty, case/Unicode spelling, missing and unselected dependencies, cycles, historical restore separation, deterministic non-mutating output and null authority.
 
-This partial checkout does not establish fresh aggregate backend, native-platform or browser acceptance. The existing UI files and baseline tests remain byte-identical to the accepted interaction checkpoint. Independent review and publication evidence for this repair must be recorded separately; prior green CI does not certify new source.
+The local partial checkout alone does not establish aggregate backend, native-platform or browser acceptance. The existing UI files and baseline tests remain byte-identical to the accepted interaction checkpoint. Fresh remote verification is scoped below; no real-drive, native-hardware or sale-readiness acceptance is implied.
+
+## Independent review and exact-source CI
+
+Independent review accepts the bounded five-file repair. It reran all 82 tests, checked the full code/tests/documentation, compared 10,000 lexical relative-path cases against a separate standard-library oracle, and confirmed non-mutating/null-authority behaviour.
+
+Published source: [`27bce28350d7e83a443f1f0788748cbf5259a480`](https://github.com/krahd/disk_organiser/commit/27bce28350d7e83a443f1f0788748cbf5259a480), tree `6b2094c2c413c94b442dfb09dabc3648dbd6d6dd`, directly above accepted interaction/documentation head `2970140dca2b916489996dc3fc8d3d3cb90084fb`. Remote blob readback matches the frozen five-file candidate, and the commit comparison contains exactly those five files.
+
+All three exact-source workflows completed successfully:
+
+- [Aggregate CI 37556460692](https://github.com/krahd/disk_organiser/actions/runs/37556460692): Linux 230 backend tests; Windows 181 passed and 49 skipped; 119 Jest tests; 22 existing Chromium flows; OpenAPI coverage for 44 routes; Python/Node audits and frontend formatting.
+- [Pure planner 37556461031](https://github.com/krahd/disk_organiser/actions/runs/37556461031): 82 tests on both Linux and Windows.
+- [Isolated interaction 37556460867](https://github.com/krahd/disk_organiser/actions/runs/37556460867): 20 HTTP contracts on both OSes, 19 focused Jest tests and seven actual Chromium flows. The new [synthetic screenshot artifact](https://github.com/krahd/disk_organiser/actions/runs/37556460867/artifacts/11454807264) is tied to this source. Its pixels were not reinspected for this planner-only change; existing UI blobs remain unchanged.
+
+The hosted Windows dependency install reports conflicts with preinstalled `pipx` requirements for `filelock` and `packaging`, but exits successfully and all required tests pass. No dependency change is part of this repair.
+
+## Integration lineage and preserved holds
+
+The accepted interaction base descends from guided core head `a5048e950d2d9dcda8fa148b56fb0c68a338b7ab` ([PR #11](https://github.com/krahd/disk_organiser/pull/11)) and guided UI head `27b3c6760832f32d2b80a5e4ae95cf1362f17a52` ([PR #12](https://github.com/krahd/disk_organiser/pull/12)). Disk Model [PR #13](https://github.com/krahd/disk_organiser/pull/13), head `96c58ba41a0bc0a61196c490e60cdc551164f7a7`, has separate commit ancestry, but all nine added model runtime/test/fixture/specification/documentation files have identical Git blobs in the accepted interaction base. Its status text was reconciled into the later report. Integrate the latest reviewed stack once rather than replaying identical model code or older status text.
+
+This repair changes no execution/recovery flags, provider access, release or deployment workflow. Real-drive mutation and automatic recovery deletion remain held. Main integration must separately account for the repository's existing main-triggered documentation publication; source review and green tests do not authorise deployment.

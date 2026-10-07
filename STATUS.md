@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-07 01:12
+Last updated: 2026-10-07 01:23
 
 ## Project purpose
 
@@ -44,7 +44,9 @@ The main product direction is drive/project administration, organisation and bac
 - The pure-data planner now blocks changed declared parent-relative dependency addresses. Cross-volume dependencies and unknown source/destination naming semantics receive an explicit unknown-layout blocker. Dependency IDs, unchanged content versions and historical restore labels cannot clear either blocker.
 - The check compares declared strings only. It does not parse application references, approve relocation, authenticate restored layout or establish real application usability. Genuine keep-current/no-op planning and authenticated layout/restore evidence remain open.
 - Local verification: all 68 original evaluator/cost tests remain unchanged and pass; 14 added layout regressions bring the suite to 82. The new regressions fail against the original planner (15 failing assertions, no errors). All 20 original isolated HTTP tests and 119 original frontend Jest tests pass; exact packaged-reference equality, frontend formatting and Python compilation pass. Existing local test dependencies supply Flask; no dependency was installed or changed.
-- The accepted UI, HTTP code, packaged scenarios, original tests and safety boundaries are unchanged. No aggregate backend, native hardware or new browser acceptance is claimed. Independent review and publication are pending for this new source; earlier green CI remains scoped to its recorded checkpoint.
+- Independent review accepts the five-file bounded repair, including a 10,000-case lexical-path oracle and a fresh 82-test run. Published source `27bce28350d7e83a443f1f0788748cbf5259a480` has exact blob/diff readback and all three workflows green: aggregate `37556460692`, planner `37556461031` and isolated interaction `37556460867`.
+- Fresh remote results: Linux 230 backend tests; Windows 181 passed/49 skipped; 119 Jest; 22 existing Chromium flows; 44 OpenAPI routes; both dependency audits; 82 planner tests and 20 HTTP contracts on each OS; 19 focused Jest and seven isolated Chromium flows. Hosted Windows preinstalled `pipx` dependency conflicts are reported during installation, without failing the install or tests. No dependency changed.
+- The accepted UI, HTTP code, packaged scenarios, original tests and safety boundaries are unchanged. No native hardware, real-drive, restore or sale-readiness acceptance is claimed. The documentation closeout preserves every runtime/test blob from the tested source. Integration lineage, PR #13 blob parity and the separate main-triggered docs-publication gate are recorded in the checkpoint below.
 - Behaviour, evidence limits and reproducible checks: [dependency-layout checkpoint](docs/drive-administration/DEPENDENCY-LAYOUT.md).
 
 ## Synthetic project interaction checkpoint
@@ -352,4 +354,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-07 01:12
+Last updated: 2026-10-07 01:23
