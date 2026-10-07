@@ -37,7 +37,7 @@ Keeping a member does not clear unreviewed membership, missing dependencies, unk
 
 ## UI and regression boundary
 
-The isolated UI now labels kept and unresolved entries explicitly and explains their capacity scope. Its HTML, CSS, controls, revision/race handling and routes are unchanged. Ordinary copy-only display text and both packaged reference outputs remain unchanged.
+The isolated UI now labels kept and unresolved entries explicitly and explains their capacity scope. Its CSS, controls, revision/race handling and routes are unchanged. One static HTML help paragraph now explains conditional keep-current instead of asserting it is unimplemented. Ordinary copy-result text and both packaged reference outputs remain unchanged.
 
 The prior HTTP/browser assertion that the exact current home must self-collide intentionally changes: the reference fixture now has three `keep_current` entries, no self-collision and zero additional required space. This is the behaviour being fixed, not a test weakened to pass. New negative HTTP/browser assertions target a different folder below the existing `edit.project` file and still require an occupied-path blocker. Planner tests additionally cover unselected occupied targets, kept/copied overlap, source ancestry, case/Unicode aliases, unsupported kinds, stale/future observations, missing version/link/name evidence, mixed/unknown/zero-byte capacity and unchanged protection/authority boundaries.
 
@@ -47,11 +47,11 @@ Local candidate checks:
 
 - 100 pure-data tests pass: all 82 original tests unchanged plus 18 keep-current tests.
 - 22 isolated HTTP tests pass: the intentional same-home replacement plus two additional negative/uncertain cases; exact packaged-reference equality remains green.
-- 122 frontend Jest tests pass: all 119 original tests unchanged plus three conditional-rendering tests.
+- 123 frontend Jest tests pass: all 119 original tests unchanged plus three conditional-rendering tests and one static-help regression.
 - Full frontend formatting and Python compilation pass. All seven isolated Chromium scenarios parse/list successfully.
 - A fresh local Chromium attempt reached the browser-launch step, but the locked Chromium executable is absent. No browser installation/download, alternate browser or security bypass was attempted. No local browser pass or pixel acceptance is claimed.
 
-Independent review accepts the bounded pure-data source and tested HTTP/Jest behaviour: all 12 changed files and 49 unchanged supplied files match the accepted base/candidate manifest; fresh 100 planner, 22 HTTP and 122 Jest tests pass; a separate 3,356-case adversarial matrix passes; and both packaged outputs exactly match the baseline. It independently reproduces the 28 baseline assertion failures with no errors. Exact-source remote CI and inspection of the new keep-current screenshot remain required before rendered interaction acceptance. Older dependency-layout and interaction runs do not test this candidate. No real drive, provider, account, credential, application reference, backup/restore operation or historical mutation reproducer was used.
+Independent review accepts the bounded pure-data source and tested HTTP/Jest behaviour: all 12 changed files and 49 unchanged supplied files match the accepted base/candidate manifest; fresh 100 planner, 22 HTTP and 122 Jest tests pass; a separate 3,356-case adversarial matrix passes; and both packaged outputs exactly match the baseline. It independently reproduces the 28 baseline assertion failures with no errors. The initial saved source `f509dd7e20ea6676d17ac821aecb640b6e809ca4` passed all three exact-head workflows: aggregate `37567434040`, planner `37567434093` and isolated UI `37567434092`. Actual screenshot inspection then found an unchanged static HTML helper incorrectly saying current-layout preservation was unimplemented. Rendered acceptance was held despite green tests. A narrow follow-up changes that paragraph, adds a failing-before-fix Jest assertion and checks the wording in the actual same-home browser flow. The planner and runtime JavaScript are unchanged. Replacement exact-head CI and pixels remain required; the initial green runs do not test this helper repair. Older dependency-layout and interaction runs do not test this candidate. No real drive, provider, account, credential, application reference, backup/restore operation or historical mutation reproducer was used.
 
 ## Remaining limits
 

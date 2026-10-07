@@ -368,3 +368,11 @@ test("uncertain current locations remain unresolved with unknown required capaci
   expect(metric.textContent).toContain("Unknown");
   expect(content.textContent).not.toContain("Keep current: no copies are proposed");
 });
+
+test("current-home help describes conditional keep-current rather than the superseded collision", () => {
+  const text = document.body.textContent.replace(/\s+/g, " ");
+  expect(text).toContain("Choosing the exact current home can keep members in place.");
+  expect(text).toContain("Uncertain identities stay unresolved");
+  expect(text).not.toContain("Keeping the layout unchanged is not implemented");
+  expect(text).not.toContain("Choosing the current source folder is checked as a collision");
+});

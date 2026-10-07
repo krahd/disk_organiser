@@ -194,6 +194,15 @@ test("repeated reviews distinguish declared keep-current from an occupied differ
   await page.locator("#destination-volume").selectOption("working");
   await page.locator("#destination-folder").fill("Projects/Harbour");
   await review(page);
+  await expect(page.locator("#decision-fields")).toContainText(
+    "Choosing the exact current home can keep members in place."
+  );
+  await expect(page.locator("#decision-fields")).toContainText(
+    "Uncertain identities stay unresolved; other occupied paths remain blocked."
+  );
+  await expect(page.locator("#decision-fields")).not.toContainText(
+    "Keeping the layout unchanged is not implemented"
+  );
   await expect(page.locator("#review-content")).toContainText(
     "Keep current: no copies are proposed"
   );
