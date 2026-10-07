@@ -13,6 +13,8 @@ python demo.py
 
 The example's “verified” records are fictional test inputs. Every output keeps live backup/restore verification false, execution authority null, and undo/source-erasure permission false. No existing Disk Organiser execution module is imported.
 
+Selected dependency IDs alone do not establish layout fidelity. Changed declared parent-relative dependency addresses require review; cross-volume or unknown naming semantics remain unknown. See [the bounded dependency-layout check](../../docs/drive-administration/DEPENDENCY-LAYOUT.md). This check does not validate application references or approve relocation.
+
 The cost module is an explicitly incomplete illustration with dated public prices, clear unit assumptions and omitted costs. It is not a quote.
 
 See [the slice contract](../../docs/drive-administration/NEXT-SLICE.md), [product roadmap](../../docs/DRIVE-ADMINISTRATION-ROADMAP.md), [provider research](../../docs/drive-administration/PROVIDER-ECONOMICS.md) and [verification limits](../../docs/drive-administration/VERIFICATION.md).

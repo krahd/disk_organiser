@@ -267,6 +267,18 @@ def _overlap(first, second):
     return first == second or first.startswith(second + "/") or second.startswith(first + "/")
 
 
+def _relative_dependency_path(member_path, dependency_path):
+    """Compare declared spelling only; never resolve a filesystem/app reference."""
+    parent = member_path.split("/")[:-1]
+    target = dependency_path.split("/")
+    common = 0
+    for first, second in zip(parent, target):
+        if first != second:
+            break
+        common += 1
+    return ("..",) * (len(parent) - common) + tuple(target[common:])
+
+
 def review(document):
     """Return immutable-by-convention, exact-scope, explicitly non-executable data."""
     validate(document)
@@ -323,6 +335,18 @@ def review(document):
         missing = set(entry["dependencies"]) - set(selected)
         if missing:
             block("project_dependency_not_selected", [identifier, *missing])
+        for dependency_id in sorted(set(entry["dependencies"]) & set(selected)):
+            dependency = entries[dependency_id]
+            if (dependency["volume_id"] != entry["volume_id"] or
+                    volume["case_sensitive"] is None or volume["unicode_normalization"] == "unknown" or
+                    destination["case_sensitive"] is None or destination["unicode_normalization"] == "unknown"):
+                block("project_dependency_layout_unknown", [identifier, dependency_id])
+            elif (_relative_dependency_path(entry["path"], dependency["path"]) !=
+                  _relative_dependency_path(entry["project_path"], dependency["project_path"])):
+                # IDs/versions alone do not establish that a changed relative
+                # layout preserves an application's references. Do not infer a
+                # relocation policy or let historical restores approve it.
+                block("project_dependency_layout_requires_review", [identifier, dependency_id])
         if entry["bytes"] is None:
             unknown_sizes.append(identifier)
         else:

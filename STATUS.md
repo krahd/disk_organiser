@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-06 23:27
+Last updated: 2026-10-07 01:12
 
 ## Project purpose
 
@@ -38,6 +38,14 @@ The main product direction is drive/project administration, organisation and bac
 - Verification for the exact prototype and independent-review boundary is recorded in [the slice verification](docs/drive-administration/VERIFICATION.md). A separate two-OS standard-library workflow tests the isolated source; publication does not imply that its remote run has passed.
 - Independent review accepts the bounded v3 synthetic contract after source-identity, Unicode and restore-history repairs. Local and independent verification are detailed in the slice verification document.
 - A separate synthetic review UI now implements editable membership/destination and the three-step Harbour decision loop. Its source and validation boundary are described below. Native observation, authenticated backup evidence, execution/recovery design, representative hardware and commercial-readiness gates remain distinct.
+
+## Declared dependency-layout correctness checkpoint
+
+- The pure-data planner now blocks changed declared parent-relative dependency addresses. Cross-volume dependencies and unknown source/destination naming semantics receive an explicit unknown-layout blocker. Dependency IDs, unchanged content versions and historical restore labels cannot clear either blocker.
+- The check compares declared strings only. It does not parse application references, approve relocation, authenticate restored layout or establish real application usability. Genuine keep-current/no-op planning and authenticated layout/restore evidence remain open.
+- Local verification: all 68 original evaluator/cost tests remain unchanged and pass; 14 added layout regressions bring the suite to 82. The new regressions fail against the original planner (15 failing assertions, no errors). All 20 original isolated HTTP tests and 119 original frontend Jest tests pass; exact packaged-reference equality, frontend formatting and Python compilation pass. Existing local test dependencies supply Flask; no dependency was installed or changed.
+- The accepted UI, HTTP code, packaged scenarios, original tests and safety boundaries are unchanged. No aggregate backend, native hardware or new browser acceptance is claimed. Independent review and publication are pending for this new source; earlier green CI remains scoped to its recorded checkpoint.
+- Behaviour, evidence limits and reproducible checks: [dependency-layout checkpoint](docs/drive-administration/DEPENDENCY-LAYOUT.md).
 
 ## Synthetic project interaction checkpoint
 
@@ -344,4 +352,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-06 23:27
+Last updated: 2026-10-07 01:12
