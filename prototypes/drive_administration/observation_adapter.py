@@ -32,6 +32,7 @@ class AdapterError(ValueError):
 def _bounded_json(value):
     pending = [(value, 0)]
     count = 0
+    encoded_size = 0
     while pending:
         item, depth = pending.pop()
         count += 1
@@ -42,18 +43,37 @@ def _bounded_json(value):
         if type(item) is dict:
             if any(type(key) is not str or len(key) > 256 for key in item):
                 raise AdapterError("Expected bounded JSON object keys")
+            encoded_size += 2 + max(0, len(item) - 1) + len(item)
+            for key in item:
+                encoded_size += len(json.dumps(key, ensure_ascii=True))
+                if encoded_size > MAX_JSON_BYTES:
+                    raise AdapterError("Input exceeds the adapter byte limit")
             pending.extend((child, depth + 1) for child in item.values())
         elif type(item) is list:
+            encoded_size += 2 + max(0, len(item) - 1)
             pending.extend((child, depth + 1) for child in item)
         elif type(item) is str:
             if len(item) > 4096:
                 raise AdapterError("Text exceeds the adapter limit")
-        elif item is not None and type(item) not in (bool, int, float):
+            encoded_size += len(json.dumps(item, ensure_ascii=True))
+        elif item is None:
+            encoded_size += 4
+        elif type(item) is bool:
+            encoded_size += 4 if item else 5
+        elif type(item) is int:
+            if abs(item) > 2**63 - 1:
+                raise AdapterError("Integer exceeds the adapter limit")
+            encoded_size += len(str(item))
+        elif type(item) is float:
+            if not math.isfinite(item):
+                raise AdapterError("Non-finite values are unsupported")
+            encoded_size += len(json.dumps(item, allow_nan=False))
+        else:
             raise AdapterError("Expected JSON data only")
-        elif type(item) is float and not math.isfinite(item):
-            raise AdapterError("Non-finite values are unsupported")
-        elif type(item) is int and abs(item) > 2**63 - 1:
-            raise AdapterError("Integer exceeds the adapter limit")
+        if encoded_size > MAX_JSON_BYTES:
+            raise AdapterError("Input exceeds the adapter byte limit")
+    # Count the exact ASCII JSON representation before allocating it. Per-key
+    # and per-scalar encodings above are bounded by the individual text limits.
     encoded = json.dumps(value, sort_keys=True, separators=(",", ":"),
                          ensure_ascii=True, allow_nan=False).encode("utf-8")
     if len(encoded) > MAX_JSON_BYTES:

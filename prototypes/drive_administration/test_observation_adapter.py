@@ -498,6 +498,48 @@ class ObservationAdapterTests(unittest.TestCase):
         with self.assertRaises(AdapterError):
             draft(model, decision)
 
+    def test_oversized_repeated_text_rejects_before_whole_document_serialisation(self):
+        for text, count in [('x' * 4096, 1100), ('\U0001f9ed' * 4096, 100)]:
+            model = copy.deepcopy(CANONICAL)
+            model['oversized_test_data'] = [text] * count
+            original_dumps = json.dumps
+
+            def guarded_dumps(value, *args, **kwargs):
+                if value is model:
+                    raise AssertionError('Oversized document reached whole-document serialisation')
+                return original_dumps(value, *args, **kwargs)
+
+            with self.subTest(escaped=text.startswith('\U0001f9ed')):
+                with patch('observation_adapter.json.dumps', side_effect=guarded_dumps):
+                    with self.assertRaises(AdapterError):
+                        observation_digest(model)
+
+    def test_exact_canonical_byte_boundary_includes_json_escapes(self):
+        model = copy.deepcopy(CANONICAL)
+        model['scan']['uncertainties'].append('Escaped \n \t " \\ \U0001f9ed')
+        encoded = json.dumps(model, sort_keys=True, separators=(',', ':'), ensure_ascii=True, allow_nan=False).encode('utf-8')
+        with patch('observation_adapter.MAX_JSON_BYTES', len(encoded)):
+            self.assertEqual(len(observation_digest(model)), 64)
+        with patch('observation_adapter.MAX_JSON_BYTES', len(encoded) - 1):
+            with self.assertRaises(AdapterError):
+                observation_digest(model)
+
+    def test_decision_byte_budget_rejects_before_whole_document_serialisation(self):
+        model = copy.deepcopy(CANONICAL)
+        decision = decision_for(model)
+        decision['oversized_test_data'] = ['x' * 4096] * 1100
+        expected = observation_digest(model)
+        original_dumps = json.dumps
+
+        def guarded_dumps(value, *args, **kwargs):
+            if value is decision:
+                raise AssertionError('Oversized decision reached whole-document serialisation')
+            return original_dumps(value, *args, **kwargs)
+
+        with patch('observation_adapter.json.dumps', side_effect=guarded_dumps):
+            with self.assertRaises(AdapterError):
+                build_observation_draft(model, decision, expected_observation_digest=expected, now=NOW)
+
     def test_renderable_text_stays_text_data(self):
         model = copy.deepcopy(CANONICAL)
         decision = decision_for(model)
