@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-07 03:21
+Last updated: 2026-10-07 03:22
 
 ## Project purpose
 
@@ -49,18 +49,27 @@ The main product direction is drive/project administration, organisation and bac
 ## Declared dependency-layout correctness checkpoint
 
 - The pure-data planner now blocks changed declared parent-relative dependency addresses. Cross-volume dependencies and unknown source/destination naming semantics receive an explicit unknown-layout blocker. Dependency IDs, unchanged content versions and historical restore labels cannot clear either blocker.
-- The check compares declared strings only. It does not parse application references, approve relocation, authenticate restored layout or establish real application usability. Genuine keep-current/no-op planning and authenticated layout/restore evidence remain open.
+- The check compares declared strings only. It does not parse application references, approve relocation, authenticate restored layout or establish real application usability. Authenticated layout/restore evidence remains open. The later declared keep-current extension is recorded below.
 - Local verification: all 68 original evaluator/cost tests remain unchanged and pass; 14 added layout regressions bring the suite to 82. The new regressions fail against the original planner (15 failing assertions, no errors). All 20 original isolated HTTP tests and 119 original frontend Jest tests pass; exact packaged-reference equality, frontend formatting and Python compilation pass. Existing local test dependencies supply Flask; no dependency was installed or changed.
 - Independent review accepts the five-file bounded repair, including a 10,000-case lexical-path oracle and a fresh 82-test run. Published source `27bce28350d7e83a443f1f0788748cbf5259a480` has exact blob/diff readback and all three workflows green: aggregate `37556460692`, planner `37556461031` and isolated interaction `37556460867`.
 - Fresh remote results: Linux 230 backend tests; Windows 181 passed/49 skipped; 119 Jest; 22 existing Chromium flows; 44 OpenAPI routes; both dependency audits; 82 planner tests and 20 HTTP contracts on each OS; 19 focused Jest and seven isolated Chromium flows. Hosted Windows preinstalled `pipx` dependency conflicts are reported during installation, without failing the install or tests. No dependency changed.
 - The accepted UI, HTTP code, packaged scenarios, original tests and safety boundaries are unchanged. No native hardware, real-drive, restore or sale-readiness acceptance is claimed. The documentation closeout preserves every runtime/test blob from the tested source. Integration lineage, PR #13 blob parity and the separate main-triggered docs-publication gate are recorded in the checkpoint below.
 - Behaviour, evidence limits and reproducible checks: [dependency-layout checkpoint](docs/drive-administration/DEPENDENCY-LAYOUT.md).
 
+## Declared keep-current correctness candidate
+
+- Exact same-volume, same-spelling current addresses now receive `keep_current` only with fresh, complete, online, known-semantics plain-file/version/single-link identity and no declared source ancestry conflict. Only the member's own occupied check is exempted. Same-address uncertainty is `unresolved_current_location`, retains its blockers and leaves required capacity null.
+- Entirely kept scope needs zero logical copy bytes, zero applied reserve and zero additional required space. Mixed plans count only proposed copies plus one policy reserve; zero-byte copies still need reserve. Unknown physical allocation, dependency/backup/restore uncertainty and every safety flag remain unchanged.
+- The isolated UI conditionally labels kept/unresolved paths and explains capacity. HTML, CSS, routes, reference fixtures and ordinary copy-only output are unchanged. The old same-home self-collision assertion intentionally becomes an explicit no-op assertion; negative different-target collision coverage remains.
+- Local checks: 100 pure-data tests (82 original unchanged plus 18 new), 22 HTTP contracts, 122 Jest tests, frontend formatting and Python compilation pass. Eighteen new specifications reproduce 28 failing assertions on the accepted original planner, with no errors. Seven browser specifications parse/list; a fresh local launch cannot find the locked Chromium executable. No download or alternate browser was attempted and no local browser/pixel pass is claimed.
+- Independent review accepts the bounded source and tested HTTP/Jest behaviour: all 12 changed and 49 unchanged supplied files verified; a fresh full test run and 3,356 additional adversarial cases pass; ordinary packaged outputs exactly match the baseline. Exact-source CI and new keep-current screenshot inspection remain pending for rendered interaction acceptance. Main integration and the documentation-publication trigger are coordinated separately; this candidate changes neither the publication workflow nor deployment authority. No real-drive action, provider access, credential use, historical dangerous reproducer, mutation/recovery change or deployment is included.
+- Contract, intentional behaviour change and verification limits: [keep-current checkpoint](docs/drive-administration/KEEP-CURRENT.md).
+
 ## Synthetic project interaction checkpoint
 
 - Standalone `frontend/project-review-demo.html`, `.js`, `.css` and `prototypes/drive_administration/demo_server.py` implement the simulated “Organise and protect Harbour” decision loop. The permanent banner identifies the simulation and disconnected drives/providers.
 - Membership suggestions/corrections and declared dependencies, a proposed volume/relative folder, side-by-side exact current/proposed paths, readable blockers, logical capacity/reserve, per-target/version backup evidence, scoped restore results and unresolved alerts are exposed. Dates, methods, fixture clock and uncertainty remain visible.
-- Review calls the accepted Python evaluator; there is no JavaScript rule clone. Dismiss returns the immutable reference decision and focus. Same-home selection retains the honest occupied-path blocker; no successful keep-current/no-op contract is invented.
+- Review calls the accepted Python evaluator; there is no JavaScript rule clone. Dismiss returns the immutable reference decision and focus. The original interaction checkpoint kept the same-home occupied-path blocker. The later declared keep-current extension below explicitly addresses that separate gap.
 - Exactly two packaged scenarios and five allowlisted HTTP paths. Loopback address/exact host, same-origin checks, ephemeral process token, bounded strict decision JSON and restrictive CSP protect the isolated server. There are no arbitrary imports, uploads, filesystem/provider operations or editable backup evidence. Only three fixed frontend assets are read at app creation.
 - Drafts remain in tab memory. Every review uses the immutable fixture revision/digest; successive projected reviews do not advance a hidden server state. Edits, scenario changes, reload and dismissal invalidate pending success/error responses and previous results.
 - All results remain non-executable, with null authority, unavailable undo, no source-erasure permission and false live backup/restore verification. No existing default app, navigation, execution, recovery, observation or provider code changes.
@@ -361,4 +370,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-07 03:21
+Last updated: 2026-10-07 03:22

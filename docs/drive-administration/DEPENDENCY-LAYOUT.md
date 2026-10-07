@@ -21,7 +21,7 @@ The helper splits and compares strings only. It does not open, resolve or normal
 
 Historical backup/restore results keep their existing exact-version scope. A fixture restore can remain satisfied while the overall proposal is blocked for changed or unknown dependency layout. No restore record can clear either new layout blocker. No live verification, execution authority, undo, reclamation or source-erasure permission is introduced.
 
-The same-home occupied-path blocker remains unchanged. A genuine keep-current/no-op contract is still open. The two packaged scenarios, their returned reference JSON, the accepted UI, HTTP surface and all original tests are unchanged. No real drive, provider, account, credential, download, filesystem mutation or recovery deletion is involved.
+At this dependency-layout checkpoint, the same-home occupied-path blocker remained unchanged. The subsequent [declared keep-current contract](KEEP-CURRENT.md) addresses that separate gap. The two packaged scenarios, their returned reference JSON, the accepted UI, HTTP surface and all original tests are unchanged. No real drive, provider, account, credential, download, filesystem mutation or recovery deletion is involved.
 
 ## Local verification
 

@@ -140,7 +140,7 @@ Proposed later API naming, not implemented: a review endpoint and a revision end
 
 ## Explicit prototype gaps
 
-The current evaluator proposes copies only. Choosing the same source home is blocked as an occupied self-collision; there is no implemented keep-current/no-op mode. The future UI must implement that mode explicitly before promising the comparison described above. Project-relative paths and dependency completeness are supplied fixture declarations, not discovered identity or parsed application references. Restore records do not authenticate an actual restored layout, metadata fidelity or application state. All of these limits must remain visible when this contract becomes a real-data adapter.
+The later [declared keep-current contract](KEEP-CURRENT.md) adds exact current-location no-ops and explicitly unresolved current locations. Only proven synthetic same-volume, same-address identities avoid their own occupied-path check and copy-capacity charge; all other collisions and uncertainty remain. This extends the original copy-only evaluator and UI without adding execution authority. Project-relative paths and dependency completeness are supplied fixture declarations, not discovered identity or parsed application references. Restore records do not authenticate an actual restored layout, metadata fidelity or application state. All of these limits must remain visible when this contract becomes a real-data adapter.
 
 ## Work still required before execution
 

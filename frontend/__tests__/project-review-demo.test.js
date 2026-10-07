@@ -301,3 +301,70 @@ test("dismissal also invalidates a late error", async () => {
   expect(document.getElementById("status").textContent).toContain("dismissed");
   expect(document.getElementById("review-caption").textContent).toContain("Reference proposal");
 });
+
+test("renders declared keep-current without calling unchanged members copies", async () => {
+  const value = reviewed();
+  for (const change of value.review.proposed_changes) {
+    change.proposal = "keep_current";
+    change.destination = {
+      volume_id: change.source.volume_id,
+      relative_path: change.source.relative_path,
+    };
+  }
+  Object.assign(value.review.capacity, {
+    known_logical_copy_bytes: 0,
+    required_destination_bytes: 0,
+    reserve_bytes: 0,
+  });
+  fetchMock.mockResolvedValueOnce(response(value));
+  submit();
+  await settle();
+  const content = document.getElementById("review-content");
+  expect(content.textContent).toContain("Keep current: no copies are proposed");
+  expect(content.textContent).toContain("No additional copy space or reserve is required");
+  expect(content.querySelectorAll(".comparison strong").length).toBe(6);
+  expect(
+    [...content.querySelectorAll(".comparison strong")].filter((node) =>
+      node.textContent.startsWith("KEEP CURRENT")
+    )
+  ).toHaveLength(3);
+  expect(content.textContent).not.toContain("PROPOSED ·");
+  expect(content.textContent).toContain("Execution: false. Authority: null");
+});
+
+test("renders mixed kept and copied paths with scoped capacity wording", async () => {
+  const value = reviewed();
+  const change = value.review.proposed_changes[0];
+  change.proposal = "keep_current";
+  change.destination = {
+    volume_id: change.source.volume_id,
+    relative_path: change.source.relative_path,
+  };
+  fetchMock.mockResolvedValueOnce(response(value));
+  submit();
+  await settle();
+  const text = document.getElementById("review-content").textContent;
+  expect(text).toContain("KEEP CURRENT ·");
+  expect(text).toContain("PROPOSED ·");
+  expect(text).toContain("Logical data counts only proposed copies");
+  expect(text).not.toContain("Keep current: no copies are proposed");
+});
+
+test("uncertain current locations remain unresolved with unknown required capacity", async () => {
+  const value = reviewed();
+  value.review.proposed_changes[0].proposal = "unresolved_current_location";
+  value.review.capacity.required_destination_bytes = null;
+  value.review.blockers.push({ code: "current_location_identity_unproven", member_ids: ["edit"] });
+  fetchMock.mockResolvedValueOnce(response(value));
+  submit();
+  await settle();
+  const content = document.getElementById("review-content");
+  expect(content.textContent).toContain("UNRESOLVED ·");
+  expect(content.textContent).toContain("declared identity is incomplete or uncertain");
+  expect(content.textContent).toContain("no copy or no-op established");
+  const metric = [...content.querySelectorAll(".metric")].find((node) =>
+    node.textContent.includes("Required including reserve")
+  );
+  expect(metric.textContent).toContain("Unknown");
+  expect(content.textContent).not.toContain("Keep current: no copies are proposed");
+});

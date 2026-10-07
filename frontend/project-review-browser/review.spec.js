@@ -182,9 +182,9 @@ test("200 percent rendered zoom and narrow reflow have no horizontal overflow", 
   await screenshot(page, testInfo, "narrow-320-reflow.png");
 });
 
-test("repeated actual reviews use the immutable reference and current-home collision stays honest", async ({
+test("repeated reviews distinguish declared keep-current from an occupied different target", async ({
   page,
-}) => {
+}, testInfo) => {
   await open(page);
   for (const folder of ["First home", "Second home", "Third home"]) {
     await page.locator("#destination-folder").fill(folder);
@@ -194,7 +194,21 @@ test("repeated actual reviews use the immutable reference and current-home colli
   await page.locator("#destination-volume").selectOption("working");
   await page.locator("#destination-folder").fill("Projects/Harbour");
   await review(page);
+  await expect(page.locator("#review-content")).toContainText(
+    "Keep current: no copies are proposed"
+  );
+  await expect(page.locator("#review-content")).not.toContainText("already occupied");
+  await expect(
+    page.locator("#review-content .comparison strong").filter({ hasText: "KEEP CURRENT" })
+  ).toHaveCount(3);
+  await expect(
+    page.locator(".metric").filter({ hasText: "Required including reserve" })
+  ).toContainText("0 bytes");
+  await screenshot(page, testInfo, "desktop-keep-current.png");
+  await page.locator("#destination-folder").fill("Projects/Harbour/edit.project");
+  await review(page);
   await expect(page.locator("#review-content")).toContainText("already occupied");
+  await expect(page.locator("#review-content")).not.toContainText("KEEP CURRENT");
   await page.reload();
   await expect(page.locator("#destination-folder")).toHaveValue("Client projects/Harbour");
 });

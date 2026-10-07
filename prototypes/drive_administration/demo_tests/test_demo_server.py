@@ -109,9 +109,35 @@ class DemoServerTests(unittest.TestCase):
         self.assertIn("project_dependency_not_selected", [item["code"] for item in expected["blockers"]])
         self.assert_safe(response)
 
-    def test_same_home_is_collision_not_fake_no_op(self):
+    def test_same_home_is_explicit_declared_keep_current(self):
         response = self.post({**self.body, "destination_volume_id": "working", "destination_folder": "Projects/Harbour"})
-        self.assertIn("occupied_name_or_ancestor_collision", [item["code"] for item in response.json["review"]["blockers"]])
+        result = response.json["review"]
+        self.assertEqual(result["blockers"], [])
+        self.assertEqual({item["proposal"] for item in result["proposed_changes"]}, {"keep_current"})
+        self.assertEqual(result["capacity"]["known_logical_copy_bytes"], 0)
+        self.assertEqual(result["capacity"]["required_destination_bytes"], 0)
+        self.assert_safe(response)
+
+    def test_different_target_below_existing_file_remains_occupied(self):
+        response = self.post({**self.body, "destination_volume_id": "working", "destination_folder": "Projects/Harbour/edit.project"})
+        result = response.json["review"]
+        self.assertIn("occupied_name_or_ancestor_collision", [item["code"] for item in result["blockers"]])
+        self.assertEqual({item["proposal"] for item in result["proposed_changes"]}, {"copy_with_project_structure"})
+        self.assertGreater(result["capacity"]["required_destination_bytes"], 0)
+        self.assert_safe(response)
+
+    def test_uncertain_same_home_retains_identity_and_protection_gaps(self):
+        reference = _reference("harbour-uncertain")
+        response = self.post({**self.body, "scenario_id": reference["scenario_id"],
+                              "expected_digest": reference["reference_digest"],
+                              "destination_volume_id": "working", "destination_folder": "Projects/Harbour"})
+        result = response.json["review"]
+        proposals = {item["member_id"]: item["proposal"] for item in result["proposed_changes"]}
+        self.assertEqual(proposals, {"edit": "keep_current", "media": "unresolved_current_location", "notes": "keep_current"})
+        self.assertIsNone(result["capacity"]["required_destination_bytes"])
+        self.assertIn("current_location_identity_unproven", [item["code"] for item in result["blockers"]])
+        self.assertFalse(result["protection"]["project_restore_satisfied_in_fixture"])
+        self.assert_safe(response)
 
     def test_offline_destination_and_capacity_unknown_remain_blocked(self):
         response = self.post({**self.body, "destination_volume_id": "shelf"})

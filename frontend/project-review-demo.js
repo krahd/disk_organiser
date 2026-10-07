@@ -18,6 +18,8 @@
     unsupported_placeholder: "A member is a placeholder; its actual content is unavailable.",
     hardlink_or_link_identity_unknown: "A member has a hard link or uncertain link identity.",
     source_version_unknown: "A member’s content version is unknown.",
+    current_location_identity_unproven:
+      "Keeping this location is unresolved because its declared identity is incomplete or uncertain.",
     project_dependencies_unknown: "A member’s application dependencies are not fully known.",
     project_dependency_not_selected: "A selected member depends on a member you removed.",
     source_ancestor_not_a_directory: "A declared source path overlaps another file-like member.",
@@ -275,10 +277,18 @@
         }. Removed: ${corrections.removed.map(entryName).join(", ") || "none"}.`,
         "provenance"
       );
+      const allKept = result.proposed_changes.every((change) => change.proposal === "keep_current");
+      const hasCurrent = result.proposed_changes.some(
+        (change) => change.proposal !== "copy_with_project_structure"
+      );
       const layout = section(
         content,
         "Current layout → proposed paths",
-        "Proposed copies retain the sources. Zero bytes reclaimed. No move or deletion is proposed."
+        allKept
+          ? "Keep current: no copies are proposed. Exact declared locations stay unchanged. Zero bytes reclaimed."
+          : hasCurrent
+          ? "Kept entries stay at their declared locations. Unresolved locations need review. Proposed copies retain their sources. Zero bytes reclaimed."
+          : "Proposed copies retain the sources. Zero bytes reclaimed. No move or deletion is proposed."
       );
       for (const change of result.proposed_changes) {
         const row = append(layout, "div", undefined, "comparison");
@@ -287,14 +297,30 @@
         append(source, "div", change.source.relative_path, "path");
         append(source, "p", `Version: ${change.source.version || "unknown"}`, "evidence-line");
         const target = append(row, "div");
-        append(target, "strong", `PROPOSED · ${volumeName(change.destination.volume_id)}`);
+        const kept = change.proposal === "keep_current";
+        const unresolved = change.proposal === "unresolved_current_location";
+        const label = kept ? "KEEP CURRENT" : unresolved ? "UNRESOLVED" : "PROPOSED";
+        append(target, "strong", `${label} · ${volumeName(change.destination.volume_id)}`);
         append(target, "div", change.destination.relative_path, "path");
-        append(target, "p", "Source retained · proposal only", "evidence-line");
+        append(
+          target,
+          "p",
+          kept
+            ? "Same declared member, version and exact address · no copy proposed"
+            : unresolved
+            ? "Current-location identity unproven · no copy or no-op established"
+            : "Source retained · proposal only",
+          "evidence-line"
+        );
       }
       const capacity = section(
         content,
         "Capacity before committing to a home",
-        "Logical copy data plus a fixed reserve. Physical allocation, compression and actual free space are not verified."
+        allKept
+          ? "No additional copy space or reserve is required by this declared keep-current plan. Actual free space and physical allocation are not verified."
+          : hasCurrent
+          ? "Logical data counts only proposed copies. Unresolved current locations leave required capacity unknown. A fixed reserve applies unless every member is kept. Physical allocation and actual free space are not verified."
+          : "Logical copy data plus a fixed reserve. Physical allocation, compression and actual free space are not verified."
       );
       const metrics = append(capacity, "dl", undefined, "metrics");
       for (const [label, value] of [

@@ -311,6 +311,7 @@ def review(document):
     changes = []
     total = 0
     unknown_sizes = []
+    unresolved_current = []
     for identifier in selected:
         entry = entries[identifier]
         volume = volumes[entry["volume_id"]]
@@ -347,11 +348,8 @@ def review(document):
                 # layout preserves an application's references. Do not infer a
                 # relocation policy or let historical restores approve it.
                 block("project_dependency_layout_requires_review", [identifier, dependency_id])
-        if entry["bytes"] is None:
-            unknown_sizes.append(identifier)
-        else:
-            total += entry["bytes"]
         source_path = _normalise(entry["path"], volume)
+        source_overlap = False
         for other_id, other_entry in entries.items():
             if other_id == identifier or other_entry["volume_id"] != entry["volume_id"]:
                 continue
@@ -360,8 +358,27 @@ def review(document):
             # cannot be silently treated as a traversable source directory.
             if _overlap(source_path, ancestor):
                 block("source_ancestor_not_a_directory", [identifier, other_id])
+                source_overlap = True
         target_path = decision["destination_folder"] + "/" + entry["project_path"]
-        changes.append({"member_id": identifier, "proposal": "copy_with_project_structure",
+        proposal = "copy_with_project_structure"
+        if entry["volume_id"] == destination["id"] and entry["path"] == target_path:
+            # Exact declared identity only. Normalised aliases, labels and
+            # matching content elsewhere do not establish keep-current scope.
+            proven_current = (volume["state"] == "online" and volume["coverage"] == "complete" and
+                              volume["case_sensitive"] is not None and volume["unicode_normalization"] != "unknown" and
+                              _fresh(volume["observed_at"], now, policy["max_inventory_age_hours"]) and
+                              _fresh(entry["observed_at"], now, policy["max_inventory_age_hours"]) and
+                              entry["kind"] == "file" and entry["link_count"] == 1 and
+                              entry["version"] is not None and not source_overlap)
+            proposal = "keep_current" if proven_current else "unresolved_current_location"
+            if not proven_current:
+                unresolved_current.append(identifier)
+                block("current_location_identity_unproven", [identifier])
+        if proposal != "keep_current" and entry["bytes"] is None:
+            unknown_sizes.append(identifier)
+        if proposal == "copy_with_project_structure" and entry["bytes"] is not None:
+            total += entry["bytes"]
+        changes.append({"member_id": identifier, "proposal": proposal,
                         "source": {"volume_id": entry["volume_id"], "relative_path": entry["path"], "version": entry["version"]},
                         "destination": {"volume_id": destination["id"], "relative_path": target_path},
                         "source_retained": True})
@@ -376,6 +393,8 @@ def review(document):
                 block("planned_name_or_ancestor_collision", [change["member_id"], other_member])
         proposed[target_path] = change["member_id"]
         for other_member, existing_path in occupied:
+            if change["proposal"] == "keep_current" and other_member == change["member_id"]:
+                continue
             if _overlap(target_path, existing_path):
                 block("occupied_name_or_ancestor_collision", [change["member_id"], other_member])
         # Conservative portable destination screen; platform adapter must do more.
@@ -385,10 +404,14 @@ def review(document):
                 block("nonportable_destination_name", [change["member_id"]])
     if unknown_sizes:
         block("required_capacity_unknown", unknown_sizes)
-    required = None if unknown_sizes else total + policy["reserve_bytes"]
-    if destination["free_bytes"] is None:
+    # A zero-byte copy still needs the reserve. Only an entirely proven
+    # keep-current scope requires no additional storage; uncertainty is not zero.
+    all_kept = all(change["proposal"] == "keep_current" for change in changes)
+    reserve = 0 if all_kept else policy["reserve_bytes"]
+    required = None if unknown_sizes or unresolved_current else total + reserve
+    if not all_kept and destination["free_bytes"] is None:
         block("destination_capacity_unknown")
-    elif required is not None and required > destination["free_bytes"]:
+    elif required is not None and destination["free_bytes"] is not None and required > destination["free_bytes"]:
         block("insufficient_observed_capacity")
 
     # Later contradictory evidence for one target/snapshot supersedes an older
@@ -517,7 +540,7 @@ def review(document):
             "membership_corrections": {"added": sorted(set(selected) - candidates), "removed": sorted(candidates - set(selected))},
             "proposed_changes": changes, "blockers": blockers,
             "capacity": {"known_logical_copy_bytes": total, "unknown_size_member_ids": unknown_sizes,
-                         "reserve_bytes": policy["reserve_bytes"], "required_destination_bytes": required,
+                         "reserve_bytes": reserve, "required_destination_bytes": required,
                          "observed_free_bytes": destination["free_bytes"], "reclaimed_bytes": 0,
                          "physical_allocation_prediction": None},
             "protection": {"configured_target_ids": sorted(policy["target_ids"]), "members": protection,
