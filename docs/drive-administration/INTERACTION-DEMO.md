@@ -91,7 +91,7 @@ The browser specifications cover rendered desktop, mobile, 320-pixel reflow, key
 
 ## Keep-current correctness extension
 
-The later [keep-current checkpoint](KEEP-CURRENT.md) adds exact declared no-op and unresolved-current-location outcomes without changing the reference fixtures, routes, CSS or execution boundary. One static HTML helper is corrected to explain conditional keep-current; screenshot inspection identified its superseded copy-only wording. The historical accepted runs above do not establish acceptance of that later source.
+The later [keep-current checkpoint](KEEP-CURRENT.md) adds exact declared no-op and unresolved-current-location outcomes without changing the reference fixtures, routes, CSS or execution boundary. One static HTML helper is corrected to explain conditional keep-current; screenshot inspection identified its superseded copy-only wording. The historical accepted runs above do not establish acceptance of that later source. Its independently accepted runtime/test head is `9d3502751b4d725f960757878b163b34eb8ea056`; [the keep-current verification](KEEP-CURRENT.md#accepted-exact-source-and-rendered-evidence) records the separate exact-head runs and inspected replacement screenshots.
 
 ## Remaining gates
 

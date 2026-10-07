@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-07 03:41
+Last updated: 2026-10-07 03:51
 
 ## Project purpose
 
@@ -56,13 +56,15 @@ The main product direction is drive/project administration, organisation and bac
 - The accepted UI, HTTP code, packaged scenarios, original tests and safety boundaries are unchanged. No native hardware, real-drive, restore or sale-readiness acceptance is claimed. The documentation closeout preserves every runtime/test blob from the tested source. Integration lineage, PR #13 blob parity and the separate main-triggered docs-publication gate are recorded in the checkpoint below.
 - Behaviour, evidence limits and reproducible checks: [dependency-layout checkpoint](docs/drive-administration/DEPENDENCY-LAYOUT.md).
 
-## Declared keep-current correctness candidate
+## Declared keep-current correctness checkpoint
 
 - Exact same-volume, same-spelling current addresses now receive `keep_current` only with fresh, complete, online, known-semantics plain-file/version/single-link identity and no declared source ancestry conflict. Only the member's own occupied check is exempted. Same-address uncertainty is `unresolved_current_location`, retains its blockers and leaves required capacity null.
 - Entirely kept scope needs zero logical copy bytes, zero applied reserve and zero additional required space. Mixed plans count only proposed copies plus one policy reserve; zero-byte copies still need reserve. Unknown physical allocation, dependency/backup/restore uncertainty and every safety flag remain unchanged.
 - The isolated UI conditionally labels kept/unresolved paths and explains capacity. CSS, routes, reference fixtures and ordinary copy-result output are unchanged. One static HTML help paragraph now explains conditional keep-current. The old same-home self-collision assertion intentionally becomes an explicit no-op assertion; negative different-target collision coverage remains.
 - Local checks: 100 pure-data tests (82 original unchanged plus 18 new), 22 HTTP contracts, 123 Jest tests, frontend formatting and Python compilation pass. Eighteen new specifications reproduce 28 failing assertions on the accepted original planner, with no errors. Seven browser specifications parse/list; a fresh local launch cannot find the locked Chromium executable. No download or alternate browser was attempted and no local browser/pixel pass is claimed.
-- Independent review accepts the bounded source and tested HTTP/Jest behaviour: all 12 changed and 49 unchanged supplied files verified; a fresh full test run and 3,356 additional adversarial cases pass; ordinary packaged outputs exactly match the baseline. Initial saved source `f509dd7e` passed aggregate `37567434040`, planner `37567434093` and isolated UI `37567434092`. Actual pixels then exposed a stale static HTML helper saying current-layout preservation was unimplemented. A narrow paragraph repair adds a failing-before-fix Jest regression and explicit browser wording assertions; planner/runtime JavaScript are unchanged. Replacement exact-head CI and screenshots remain pending for rendered acceptance; the initial green runs do not test this repair. Main integration and the documentation-publication trigger are coordinated separately; this candidate changes neither the publication workflow nor deployment authority. No real-drive action, provider access, credential use, historical dangerous reproducer, mutation/recovery change or deployment is included.
+- Independent review accepts the bounded source and tested HTTP/Jest behaviour: all 12 changed and 49 unchanged supplied files verified; a fresh full test run and 3,356 additional adversarial cases pass; ordinary packaged outputs exactly match the baseline. Initial saved source `f509dd7e` passed aggregate `37567434040`, planner `37567434093` and isolated UI `37567434092`. Actual pixels then exposed a stale static HTML helper saying current-layout preservation was unimplemented. A narrow paragraph repair adds a failing-before-fix Jest regression and explicit browser wording assertions; planner/runtime JavaScript are unchanged. The repaired source `9d3502751b4d725f960757878b163b34eb8ea056` is independently accepted after exact tree verification and inspection of all seven replacement screenshots, including 320-pixel reflow and 200% CSS zoom. The static-help finding is closed. The initial green runs are not attributed to this repair. Main integration and the documentation-publication trigger are coordinated separately; this candidate changes neither the publication workflow nor deployment authority. No real-drive action, provider access, credential use, historical dangerous reproducer, mutation/recovery change or deployment is included.
+- Exact repaired-source CI: aggregate `37568117611` passed Linux 230 backend, Windows 181 passed/49 skipped, 123 Jest, 22 existing Chromium flows, 44-route OpenAPI, audits and formatting; planner `37568117563` passed 100 on each OS; isolated UI `37568117598` passed 22 HTTP on each OS, 23 focused Jest and seven Chromium flows. The documentation-only closeout preserves every runtime/test blob from the tested source rather than relabelling those runs.
+- Artifact `11458909865` has ZIP SHA-256 `fadb1e3fd20440b51c3cb3fa51275c6640ca2f58f365c1d4c45a6ba16020efc8`; all 16 screenshot/geometry file hashes were verified. Corrected guidance, three kept paths and zero additional copy/reserve/required bytes are readable and consistent. No clipping or overlap was found. This is synthetic interaction acceptance, not native browser-UI zoom, screen-reader, real-drive or backup/restore acceptance.
 - Contract, intentional behaviour change and verification limits: [keep-current checkpoint](docs/drive-administration/KEEP-CURRENT.md).
 
 ## Synthetic project interaction checkpoint
@@ -370,4 +372,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-07 03:41
+Last updated: 2026-10-07 03:51
