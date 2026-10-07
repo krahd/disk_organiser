@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-07 07:17
+Last updated: 2026-10-07 08:49
 
 ## Project purpose
 
@@ -96,6 +96,15 @@ The main product direction is drive/project administration, organisation and bac
 - Exact source results: planner `37584999433` passes 140 on each OS; aggregate `37584999415` passes Linux 230 backend, Windows 181/49 skipped, 204 Jest, 22 existing Chromium, OpenAPI44/audits/formatting; isolated UI `37584999457` passes 37 HTTP on each OS, 23 existing focused Jest and 25 Chromium flows. Artifact `11465879693` ZIP SHA-256 is `7f086b8787e53bbf0a2b20955a57c1e3aa47e1df2b501e4d66bc7904c3202d3d`; all 38 files are verified. The 12,899-byte actual JSON matches fresh Python-review/accepted-JavaScript projection bytes, SHA-256 `835af08ae9b21096f828f5ca941b3f319816f2bc07c9ccb306e77ba4a6f8f165`. Independent inspection accepts desktop/mobile/320px/CSS-zoom download controls and disclosures. Seven Harbour PNGs are byte-identical; prior Aurora differences are confined to appended Save content. Cancellation was requested after this small download had completed (`failure: null`); early cancellation remains unverified. The docs-only closeout preserves accepted runtime/test/style blobs without relabelling CI as testing a later commit.
 - Harbour, CSS, server/adapter, fixtures, HTTP routes and workflows are unchanged. No import/replay, upload, autosave, provider, native scanning, execution/recovery, default-app change or public deployment is added. Manual-only documentation publication and all real-drive holds remain intact. Contract: [Save review](docs/drive-administration/SAVE-REVIEW.md).
 
+## One-shot scoped observation checkpoint
+
+- New `backend/observation_session.py` wraps the existing read-only scanner with one explicit process-local selected directory, a held non-inheritable descriptor and a one-shot revocable lifecycle. Only owned temporary fixtures are exercised. No route, CLI, arbitrary import, persistent grant, token usable outside the process, native user-folder surface or GuidedStore is added.
+- The optional scanner root guard runs before descendant enumeration/metadata/content access. The session re-walks the selected address without following links at the guard and before final admission; it forces metadata-only, no-cross-filesystem and fixed entry/directory/depth/cooperative-time limits. Scanner defaults and canonical output remain unchanged when no guard is supplied.
+- State/result admission is lock-protected; caller callbacks run outside locks. Cancellation is latched, final progress cancellation is polled, revocation invalidates late candidates, and held descriptors cannot be closed/recycled during active comparison. Copy/pickle and changed-PID misuse reject without touching inherited locks. This is a cooperative lifecycle API, not an OS grant or protection against hostile Python already in the process.
+- Descriptor/device/inode comparisons enforce only the short-lived selected scope. They never become durable volume/file identity, planner no-op evidence or independent protection. All operation/undo/erasure/live-verification flags remain false/null; missing identity, versions, dependencies, capacity and protection remain Unknown. Invalidated attempts return no admitted inventory rather than a false empty drive. In-flight syscalls and already-admitted callbacks are not claimed to stop instantly; post-check concurrent-writer/mount races and native hardware remain unqualified.
+- Local checks: 142 scanner/session tests (59 original, ten guard and 73 session), 140 unchanged planner/adapter tests in both cwd modes, 37 HTTP, 204 Jest, formatting and compilation pass. Root-guard absence, stale guard admission after re-entrant revocation, and malformed canonical-result admission have failing-before-fix regressions. Native allowed spellings stay literal data. Independent design is accepted; frozen source review and hosted checks are still pending. No new UI or pixel acceptance is claimed.
+- Contract, exact limits and remaining user-folder gate: [read-only scope](docs/drive-administration/READONLY-SCOPE.md). Frontend, demo routes, synthetic adapter/planner, schema, provider, execution/recovery code, dependencies and workflows are unchanged; manual-only publication remains intact.
+
 ## Synthetic project interaction checkpoint
 
 - Standalone `frontend/project-review-demo.html`, `.js`, `.css` and `prototypes/drive_administration/demo_server.py` implement the simulated “Organise and protect Harbour” decision loop. The permanent banner identifies the simulation and disconnected drives/providers.
@@ -140,6 +149,32 @@ The standalone demo has no connection to the default or legacy execution paths b
 </svg>
 
 Only the current successful explicit Aurora review can follow the local-download branch. It is not an import/replay path and grants no filesystem authority.
+
+### Owned-fixture scoped observation boundary
+
+This separate in-process path is exercised only by owned temporary fixture tests. It does not connect the default app or the synthetic demo to real user folders. A returned inventory is observation data with missing-evidence limits, never operation authority.
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="190" viewBox="0 0 1000 190" role="img" aria-labelledby="scope-arch-title scope-arch-desc">
+  <title id="scope-arch-title">One-shot read-only observation scope</title>
+  <desc id="scope-arch-desc">An owned fixture selection supplies a revocable descriptor-bound session to the guarded metadata scanner. Final admission returns limited observations or no inventory. No user-folder route or executor is connected.</desc>
+  <defs><marker id="scope-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" /></marker></defs>
+  <rect x="20" y="45" width="210" height="80" rx="8" fill="none" stroke="black" />
+  <text x="125" y="76" text-anchor="middle" font-size="14">Owned fixture selection</text>
+  <text x="125" y="100" text-anchor="middle" font-size="12">Explicit single directory</text>
+  <line x1="230" y1="85" x2="270" y2="85" stroke="black" marker-end="url(#scope-arrow)" />
+  <rect x="270" y="45" width="210" height="80" rx="8" fill="none" stroke="black" />
+  <text x="375" y="76" text-anchor="middle" font-size="14">Revocable one-shot session</text>
+  <text x="375" y="100" text-anchor="middle" font-size="12">Process-local descriptor</text>
+  <line x1="480" y1="85" x2="520" y2="85" stroke="black" marker-end="url(#scope-arrow)" />
+  <rect x="520" y="45" width="210" height="80" rx="8" fill="none" stroke="black" />
+  <text x="625" y="76" text-anchor="middle" font-size="14">Guarded metadata scanner</text>
+  <text x="625" y="100" text-anchor="middle" font-size="12">No-follow / bounded / read-only</text>
+  <line x1="730" y1="85" x2="770" y2="85" stroke="black" marker-end="url(#scope-arrow)" />
+  <rect x="770" y="45" width="210" height="80" rx="8" fill="none" stroke="black" />
+  <text x="875" y="76" text-anchor="middle" font-size="14">Final state admission</text>
+  <text x="875" y="100" text-anchor="middle" font-size="12">Observation or no inventory</text>
+  <text x="500" y="158" text-anchor="middle" font-size="13">Identity / capacity / protection remain Unknown; no operation or recovery authority</text>
+</svg>
 
 ### Architecture diagram
 
@@ -407,4 +442,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-07 07:17
+Last updated: 2026-10-07 08:49

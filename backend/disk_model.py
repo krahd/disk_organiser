@@ -138,12 +138,15 @@ def _entry(root_id: str, relative: str, st=None, status="observed") -> dict:
 def scan_storage(roots: list[str], *, limits: ScanLimits | None = None,
                  previous: dict | None = None, cancel: Callable[[], bool] | None = None,
                  progress: Callable[[dict], None] | None = None,
-                 started_at: str | None = None) -> dict:
+                 started_at: str | None = None,
+                 root_guard: Callable[[str, int], bool] | None = None) -> dict:
     """Observe explicitly supplied roots; return partial results on bounded interruption.
 
     No content reads by default. No cache/database writes or remote services.
     ``previous`` only computes deltas; hashes are never trusted/reused from it.
     """
+    if root_guard is not None and not callable(root_guard):
+        raise ValueError("root_guard must be callable")
     limits = limits or ScanLimits()
     if not roots or len(roots) > 16 or any(not isinstance(p, str) or not p or "\0" in p for p in roots):
         raise ValueError("Provide 1–16 non-empty root paths")
@@ -345,6 +348,9 @@ def scan_storage(roots: list[str], *, limits: ScanLimits | None = None,
         root_fd = None
         try:
             root_fd = _open_root(path)
+            # Scope guard borrows this descriptor; no descendants were read yet.
+            if root_guard is not None and root_guard(path, root_fd) is not True:
+                raise PermissionError("Selected root was not admitted")
             observed = os.fstat(root_fd)
             entry = _entry(root_id, ".", observed)
             entries.append(entry)

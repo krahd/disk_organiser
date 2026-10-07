@@ -624,3 +624,57 @@ def test_runtime_schema_validates_complete_partial_and_cancelled_scans(tmp_path)
               scan(tmp_path, limits=dm.ScanLimits(max_entries=1)), scan(tmp_path, cancel=lambda: True)]
     for model in models:
         dm.validate_inventory(model)
+
+
+def test_optional_scope_guard_interface_is_available():
+    import inspect
+    assert "root_guard" in inspect.signature(dm.scan_storage).parameters
+
+
+@POSIX
+@pytest.mark.parametrize("answer", [False, None, 1, "yes", {}, []])
+def test_root_guard_rejects_before_any_child_access(tmp_path, monkeypatch, answer):
+    (tmp_path / "private.txt").write_text("owned fixture only")
+    seen = []
+    def guard(path, fd):
+        seen.append((path, os.fstat(fd).st_ino))
+        return answer
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError("guard rejection must precede child access")
+    monkeypatch.setattr(dm.os, "scandir", forbidden)
+    # Replacing a supported callable otherwise changes feature introspection.
+    monkeypatch.setattr(dm, "traversal_supported", lambda: True)
+    result = scan(tmp_path, root_guard=guard)
+    assert len(seen) == 1
+    assert result["scan"]["status"] == "partial"
+    assert result["scan"]["roots"][0]["status"] == "unreadable"
+    assert [entry["relative_path"] for entry in result["entries"]] == ["."]
+
+
+@POSIX
+def test_root_guard_success_preserves_exact_default_output(tmp_path):
+    (tmp_path / "one.txt").write_text("owned")
+    expected = scan(tmp_path)
+    assert scan(tmp_path, root_guard=lambda _path, _fd: True) == expected
+    assert scan(tmp_path, root_guard=None) == expected
+
+
+@POSIX
+def test_root_guard_exception_closes_borrowed_scanner_descriptor(tmp_path, monkeypatch):
+    borrowed = []
+    def guard(_path, fd):
+        borrowed.append(fd)
+        raise RuntimeError("owned test guard interruption")
+    with pytest.raises(RuntimeError, match="guard interruption"):
+        scan(tmp_path, root_guard=guard)
+    with pytest.raises(OSError):
+        os.fstat(borrowed[0])
+
+
+def test_invalid_root_guard_rejects_before_filesystem(monkeypatch):
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError("invalid guard must not open anything")
+    monkeypatch.setattr(dm, "_open_root", forbidden)
+    for value in (False, 1, "guard", {}):
+        with pytest.raises(ValueError, match="root_guard"):
+            dm.scan_storage(["/owned-fixture-placeholder"], root_guard=value)
