@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-07 06:16
+Last updated: 2026-10-07 06:28
 
 ## Project purpose
 
@@ -83,7 +83,8 @@ The main product direction is drive/project administration, organisation and bac
 - All physical identity, current-version, dependency, capacity and protection gaps stay Unknown. Same-address intent never establishes a no-op; recorded aliases/stale sizes are not independent protection or required copy space. Conflicts name actual root/path participants, including unselectable occupants.
 - Four allowlisted routes extend the separate demo to nine paths and five startup-loaded frontend assets. Existing exact loopback/host/origin/token/CSP controls remain. No arbitrary import, request-time files/network, native scan, provider, real observation conversion, default-app change, execution/recovery, autosave or deployment is introduced. Manual-only documentation publishing is unchanged.
 - Local checks: 140 pure-data tests in both cwd modes, 37 HTTP contracts and 176 Jest tests pass, along with formatting, compilation and parsing all 18 browser specifications. The original exact allowlist assertion expands intentionally; 15 new HTTP and 53 new Jest cases preserve adversarial scope and safety coverage. Independent pre-freeze inspection exposed duplicate/altered response rows a count-based collision-scope label and duplicate reference choices; explicit failing-before-fix regressions now pass with all three repaired.
-- A fresh local browser attempt reaches the isolated server but cannot find the locked Chromium executable. No local browser/pixel success is claimed. Independent source/API review accepts the 15-file source freeze after 587 additional HTTP and 36 JSDOM cases. Saved source `e6961bc74bff10633a162d182ca06308365f88d9` passed aggregate `37579859328`, planner `37579859269` and isolated UI `37579859355`, including 18 Chromium flows. Actual pixels exposed narrow member-label columns at 200% CSS zoom despite passing overflow checks. A scoped Aurora-only intrinsic grid rule, pre-fix Jest regression and explicit browser column/label-width checks repair that readability issue without changing Harbour styling. Fresh repaired-head CI and replacement pixels remain pending; earlier runs are not extended to this repair.
+- A fresh local browser attempt reaches the isolated server but cannot find the locked Chromium executable. No local browser/pixel success is claimed. Independent source/API review accepts the 15-file source freeze after 587 additional HTTP and 36 JSDOM cases. Saved source `e6961bc74bff10633a162d182ca06308365f88d9` passed aggregate `37579859328`, planner `37579859269` and isolated UI `37579859355`, including 18 Chromium flows. Actual pixels exposed narrow member-label columns at 200% CSS zoom despite passing overflow checks. A scoped Aurora-only intrinsic grid rule, pre-fix Jest regression and explicit browser column/label-width checks repair that readability issue without changing Harbour styling. Repaired source `57e06d1460ee689ffc8a0fda4ef85d394f6d88b5` is independently accepted after exact tree verification, fresh CI and replacement pixel inspection; earlier runs are not extended to this repair.
+- Exact repaired-head results: planner `37580973081` passes 140 on each OS; aggregate `37580973068` passes Linux 230 backend, Windows 181/49 skipped, 176 Jest, 22 existing Chromium, OpenAPI44/audits/formatting; isolated UI `37580973070` passes 37 HTTP on each OS, 23 existing focused Jest and all 18 Chromium flows. Artifact `11464836743` ZIP SHA-256 is `b9e3cd6a77580157165354d595ac4600983c28604fa6bd2214197e4b7cd43e33`; all 32 file hashes and 13 distinct screenshots are verified. The zoom repair provides one-column member cards with 332.672–358.281 CSS-pixel label widths. All other twelve screenshots, including every Harbour image, are byte-identical. Independent review closes all four findings with no clipping, overlap or evidence-label regression. This documentation-only closeout preserves the tested runtime/test blobs; no later-commit, native-browser-zoom, screen-reader or real-hardware acceptance is inferred.
 - Contract and precise verification boundary: [Aurora observation view](docs/drive-administration/OBSERVATION-VIEW.md). Save review is the next bounded follow-on, after this view is accepted; it is not implemented in this slice. Real-drive/native/provider, recovery and commercial-readiness gates remain held.
 
 ## Synthetic project interaction checkpoint
@@ -391,4 +392,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-07 06:16
+Last updated: 2026-10-07 06:28
