@@ -1,10 +1,17 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-07 01:23
+Last updated: 2026-10-07 03:21
 
 ## Project purpose
 
 Disk Organiser is intended to help people understand and administer their drives, organise projects without breaking their dependencies, maintain storage policies, and control backup targets, coverage and recovery. Optional provider integrations and resale are part of the longer-term commercial direction. The current prototypes implement only bounded parts of this vision; real-drive mutation, automatic recovery deletion and sale readiness remain held.
+
+## Source integration and publication boundary
+
+- This integration preserves accepted source `8ecab6e04e3d1efb52771611b1e43b8cf9e03f06` and joins the separate PR #13 history at `96c58ba41a0bc0a61196c490e60cdc551164f7a7`. All nine model, test, fixture, specification and documentation blobs match; the older PR #13 status report is not replayed. PR #11 and PR #12 are already ancestors of the accepted source.
+- The only additional changes are this status note and the removal of the automatic `main` push trigger from `.github/workflows/publish-docs.yml`. Documentation publication remains available through explicit `workflow_dispatch`; its job and permissions are unchanged. Main integration does not authorise a public-site update, release, tag or store submission.
+- The accepted source has three successful exact-head workflows: aggregate CI `37557058025`, project administration `37557058069` and synthetic review UI `37557058028`. The integration candidate is checked independently before main advances; these historical runs are not attributed to a later commit.
+- Runtime, tests, dependencies and safety gates are unchanged. Real-drive mutation, automatic recovery deletion, live providers and sale readiness remain held. Separate in-progress keep-current/no-op work is excluded from this integration.
 
 ## Current implementation state
 
@@ -354,4 +361,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-07 01:23
+Last updated: 2026-10-07 03:21
