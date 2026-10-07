@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-07 04:45
+Last updated: 2026-10-07 04:58
 
 ## Project purpose
 
@@ -67,13 +67,14 @@ The main product direction is drive/project administration, organisation and bac
 - Artifact `11458909865` has ZIP SHA-256 `fadb1e3fd20440b51c3cb3fa51275c6640ca2f58f365c1d4c45a6ba16020efc8`; all 16 screenshot/geometry file hashes were verified. Corrected guidance, three kept paths and zero additional copy/reserve/required bytes are readable and consistent. No clipping or overlap was found. This is synthetic interaction acceptance, not native browser-UI zoom, screen-reader, real-drive or backup/restore acceptance.
 - Contract, intentional behaviour change and verification limits: [keep-current checkpoint](docs/drive-administration/KEEP-CURRENT.md).
 
-## Synthetic observation-draft adapter candidate
+## Synthetic observation-draft adapter checkpoint
 
 - `prototypes/drive_administration/observation_adapter.py` bridges canonical synthetic Disk Model exports and explicit member/path intent into a separate incomplete observation draft. Observed roots, fingerprints, hashes and aliases never become physical volumes, authenticated versions, independent backups or a successful copy/no-op.
 - Current/intended root-relative addresses, recorded observations, coverage, source changes and uncertainty are preserved. Missing identity, name semantics, live availability, capacity, dependencies and protection evidence remain blocking; copy/required space and protection counts remain null. Every authority, recovery and live-verification flag remains false/null.
 - Admission reuses the pure canonical validator and adds bounded used-observation consistency checks. Real or missing synthetic flags reject without conversion. Untrusted paths stay strings. Evaluation makes no file, scanner, network, provider or existing-planner call.
 - Local checks: 140 standard-library tests (100 accepted tests unchanged plus 40 adapter tests), the exact existing workflow cwd command, 22 unchanged HTTP contracts, 123 unchanged Jest tests, formatting and compilation pass. The oversized external-clock and dense-collision resource bounds found during independent pre-freeze inspection are repaired and covered. Collision comparisons and issue output have explicit fail-closed budgets; no detail is silently truncated.
-- Independent frozen-source review reran the checks and passed 11 additional methods covering 86 synthetic cases, with no remaining runtime blocker. The two bounds findings are closed, and documentation now distinguishes sorted member rows from deterministic evaluation-order blockers. Initial source `bd812633` passed CI `37572443984`, planner `37572443945` and isolated UI `37572443997`. A further pre-integration resource check found that the byte limit followed full serialisation; upfront exact JSON-byte accounting and three regressions now prevent oversized whole-document allocation. Independent repair review and replacement exact-source CI are pending; the earlier runs are not attributed to this repair. UI, routes, canonical producer/schema/fixture, execution/recovery code, dependencies and workflows are unchanged. This source-only bridge introduces no arbitrary import, native scan, account/provider access, real-file operation or public deployment.
+- Independent frozen-source review reran the checks and passed 11 additional methods covering 86 synthetic cases, with no remaining runtime blocker. The two bounds findings are closed, and documentation now distinguishes sorted member rows from deterministic evaluation-order blockers. Initial source `bd812633` passed CI `37572443984`, planner `37572443945` and isolated UI `37572443997`. A further pre-integration resource check found that the byte limit followed full serialisation; upfront exact JSON-byte accounting and three regressions now prevent oversized whole-document allocation. Independent repair review passes 2,342 exact JSON-byte/bounds cases with unchanged valid canonical bytes/digests. Repaired source `f7e33aaf41efe92976bcede9106108daa6ebc678` has exact tree verification and all three hosted workflows green. The earlier runs are not attributed to this repair. UI, routes, canonical producer/schema/fixture, execution/recovery code, dependencies and workflows are unchanged. This source-only bridge introduces no arbitrary import, native scan, account/provider access, real-file operation or public deployment.
+- Exact repaired-source results: planner `37573413212` passed 140 tests on each OS; aggregate `37573413173` passed Linux 230 backend, Windows 181 passed/49 skipped, 123 Jest, 22 existing Chromium flows, OpenAPI/audits/formatting; isolated UI `37573413176` passed 22 HTTP on each OS, 23 focused Jest and seven existing Chromium flows. No new rendering or native-hardware acceptance is claimed; the existing UI blobs are unchanged. The documentation-only closeout preserves every runtime/test blob from this tested source.
 - Interface, evidence limits and next boundary: [observation draft adapter](docs/drive-administration/OBSERVATION-DRAFT-ADAPTER.md).
 
 ## Synthetic project interaction checkpoint
@@ -381,4 +382,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-07 04:45
+Last updated: 2026-10-07 04:58
