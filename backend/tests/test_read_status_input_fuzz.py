@@ -123,7 +123,7 @@ def test_query_corpus_never_changes_read_scope(read_client, endpoint, query):
 @pytest.mark.parametrize("body", [b"", b"null", b"false", b"123", b'"text"', b"[]", b"{}",
                                   b'{"path":"../synthetic","cancel":true}',
                                   b"{", b"\xff\xfe", b"[" * 2048,
-                                  b'{"path":"' + b"a" * 65536 + b'"}'])
+                                  b'{"path":"' + b"a" * 65536 + b'"}'], ids=lambda body: f"body-{len(body)}")
 def test_get_bodies_are_not_parsed_or_applied(read_client, endpoint, body):
     _assert_read(read_client[0].get(endpoint, data=body, content_type="application/json"),
                  endpoint, read_client)
@@ -214,10 +214,18 @@ def test_missing_maintenance_stays_unknown(read_client):
     assert not read_client[1].exists()
 
 
-@pytest.mark.parametrize("raw", [b"{", b"\xff\xfe", b'{"status": "idle"}\x00', b"[" * 2048])
+@pytest.mark.parametrize("raw", [b"{", b"\xff\xfe", b'{"status": "idle"}\x00', b"[" * 2048],
+                         ids=lambda raw: f"raw-{len(raw)}")
 def test_malformed_maintenance_is_reported_without_rewrite(read_client, raw):
     read_client[1].write_bytes(raw)
     response = read_client[0].get("/api/maintenance/status")
     assert response.status_code == 500
     assert isinstance(response.get_json()["error"], str)
     assert read_client[1].read_bytes() == raw
+
+
+def test_request_case_names_stay_bounded_for_windows(request):
+    # Pytest exports each node ID as PYTEST_CURRENT_TEST. Do not expand the
+    # large request corpus into Windows' size-limited environment variables.
+    cases = [item for item in request.session.items if item.path == request.node.path]
+    assert all(len(item.name) < 256 for item in cases)

@@ -1,13 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 01:37
+Last updated: 2026-10-09 01:45
 
 ## Read/status malformed-input checkpoint
 
 - The explicit backlog for `/api/ops`, `/api/recycle/list` and `/api/maintenance/status` now has 276 deterministic request cases in a separate test file. Inert operation/recycle mocks and owned temporary maintenance data cover malformed/large/encoded/duplicate query values, JSON type/encoding/body cases, interrupted input, repeated response closure, unsupported methods, local-origin boundaries and preserved failure responses.
 - All new cases pass against unchanged runtime source from accepted main `33e74a23`. No production bug or failing-before-fix claim is made. These endpoints have no query/body parameters; unsupported pagination, path, action and cancellation arguments remain inert. Malformed maintenance fixtures remain byte-identical.
 - Runtime/UI/dependencies/workflows, execution/recovery flags and manual-only documentation publishing are unchanged. The slice does not establish bounded legacy stored-result sizes, safe legacy backup traversal, read-only SQLite access, live transport cancellation or real-drive acceptance. See [the request-contract checkpoint](docs/READ-STATUS-INPUT-FUZZ.md).
-- Local verification passes: 276 focused request cases, 589 full backend tests, 44-route OpenAPI, 204 Jest tests, frontend formatting, YAML consumer compatibility, 140 pure planner tests and 37 isolated HTTP contracts. Focused flake8, diff whitespace checks and both dependency audits pass. No new local browser/pixel result is claimed. Independent review accepts the bounded tranche after repairing two test-oracle weaknesses (shared mutable expected data and permissive provider-method mocks), six adversarial in-memory checks, and an explicit fresh app-state-directory prerequisite. Exact-source hosted CI remains pending; historical passes below are not attributed to this new test source.
+- Local verification passes: 277 focused tests (276 request cases plus a collection-name bound), 590 full backend tests, 44-route OpenAPI, 204 Jest tests, frontend formatting, YAML consumer compatibility, 140 pure planner tests and 37 isolated HTTP contracts. Focused flake8, diff whitespace checks and both dependency audits pass. No new local browser/pixel result is claimed. Independent review accepts the bounded tranche after repairing two test-oracle weaknesses (shared mutable expected data and permissive provider-method mocks), six adversarial in-memory checks, and an explicit fresh app-state-directory prerequisite. Initial published source `5b1409ca` passes Linux and both planner/demo workflows, but Windows reports six setup/teardown errors because default expanded large-body parameter IDs exceed its environment-variable limit. Short body/file-case labels and a failing-before-fix collection-name regression repair the harness without changing request bytes or assertions. Independent repair review and repaired-source hosted CI remain pending; earlier passes are not extended to this repair.
 
 ## Project purpose
 
@@ -452,4 +452,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 01:37
+Last updated: 2026-10-09 01:45

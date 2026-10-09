@@ -6,9 +6,10 @@ Updated: 2026-10-09. Tests and documentation only; runtime behaviour is unchange
 
 The explicit malformed-input backlog for `GET /api/ops`,
 `GET /api/recycle/list` and `GET /api/maintenance/status` is covered by
-`backend/tests/test_read_status_input_fuzz.py`. All 276 new cases pass against
+`backend/tests/test_read_status_input_fuzz.py`. All 276 request cases pass against
 unchanged runtime source from main `33e74a23eaeb192c11cf0be19dbf09d38da12932`.
-No source bug was reproduced and no validation repair is claimed.
+No source bug was reproduced and no validation repair is claimed. A separate
+collection-name bound regression brings the focused suite to 277 tests.
 
 These endpoints do not accept query parameters or request bodies. Arbitrary
 query values, apparent pagination, paths, action/cancellation flags and GET
@@ -54,6 +55,19 @@ result sizes, add pagination, validate all persisted legacy schemas, establish
 real-drive safety or resolve the release/commercial holds. Those would need
 separate scoped fixtures and review. It does not reproduce the historical
 unsafe persisted-journal path operation.
+
+## Hosted Windows harness repair
+
+Initial published source `5b1409ca` passed the full Linux backend/browser job and
+both planner/demo workflows, but Windows could not set `PYTEST_CURRENT_TEST`
+for three large-body cases: the default expanded parameter IDs exceeded the
+32,767-character environment-variable limit (three setup plus three teardown
+errors). This was a test-collection defect, not an API response failure.
+
+Body and malformed-file IDs now use short length-based labels. A collection-name bound regression
+fails before that repair (one failure, 276 passes on Linux) and passes after it
+(277 passes). Request bytes and every original request assertion are unchanged.
+The initial Linux pass does not establish Windows or repaired-source acceptance.
 
 ## Verification
 
