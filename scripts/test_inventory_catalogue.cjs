@@ -191,11 +191,11 @@ async function launch() {
   await file(saved);
   click("catalogue-cancel");
   assert.equal(cards().length, 2);
-  assert.match(d.getElementById("selection-count").textContent, /1 selected scope/);
+  assert.match(d.getElementById("selection-count").textContent, /1 folder selected/);
   await file(saved);
   submit();
   assert.equal(cards().length, 2);
-  assert.match(d.getElementById("selection-count").textContent, /0 selected scopes/);
+  assert.match(d.getElementById("selection-count").textContent, /0 files or folders selected/);
   assert.match(text(), /reopened/);
   checks.push(
     "catalogue cancellation preserves selection; confirmed reopen roundtrips sources and clears temporary choices"
@@ -346,6 +346,76 @@ async function launch() {
   assert.equal(a.revoked.length, a.downloads.length);
   checks.push("all export object URLs are released after download requests");
   dom.window.close();
+  const readable = await launch(),
+    rd = readable.d;
+  const dated = JSON.parse(example),
+    raw = "2026-12-31T23:59:59.123456-03:30";
+  dated.source.observed_at = raw;
+  await readable.file(JSON.stringify(dated));
+  assert.match(
+    rd.getElementById("catalogue-dialog-body").textContent,
+    /31 Dec 2026, 23:59 UTC-03:30/
+  );
+  readable.submit();
+  const dateNode = rd.querySelector(".source-date time");
+  assert.equal(dateNode.textContent, "31 Dec 2026, 23:59 UTC-03:30");
+  assert.equal(dateNode.dateTime, raw);
+  assert.equal(rd.querySelector(".catalogue-entry time").textContent, dateNode.textContent);
+  readable.click("catalogue-details");
+  assert.match(
+    rd.getElementById("source-details").textContent,
+    /Original claimed date \(ISO\): 2026-12-31T23:59:59.123456-03:30/
+  );
+  checks.push("readable source dates retain the unconverted original ISO under details");
+  const choose = (path) =>
+    [...rd.querySelectorAll(".catalogue-entry")]
+      .find((e) => e.querySelector("strong").textContent === path)
+      .querySelector("input")
+      .click();
+  const words = () => rd.getElementById("selection-count").textContent;
+  assert.equal(words(), "0 files or folders selected");
+  choose("Readme.txt");
+  assert.equal(words(), "1 file selected");
+  choose("Drafts/Notes.txt");
+  assert.equal(words(), "2 files selected");
+  choose("Photos");
+  assert.equal(words(), "2 files and 1 folder selected");
+  choose("Drafts/Notes.txt");
+  choose("Drafts");
+  assert.equal(words(), "1 file and 2 folders selected");
+  assert.match(readable.cards()[0].textContent, /1 file and 2 folders in your project selection/);
+  readable.click("prepare-plan");
+  assert.match(
+    rd.getElementById("catalogue-dialog-body").textContent,
+    /1 file and 2 folders across 1 labelled location/
+  );
+  readable.click("catalogue-cancel");
+  readable.click("clear-selection");
+  choose("Photos");
+  assert.equal(words(), "1 folder selected");
+  assert.match(
+    rd.querySelector(".project-selection").textContent,
+    /Folder contents are not counted separately/
+  );
+  checks.push("plain selection counts distinguish zero, singular, plural and mixed files/folders");
+  const beforeBad = rd.getElementById("source-cards").textContent;
+  for (const invalid of ["2026-10-09", "2026-10-09T07:00:00", "2026-02-30T07:00:00Z"]) {
+    dated.source.observed_at = invalid;
+    await readable.file(JSON.stringify(dated));
+    assert.equal(rd.getElementById("catalogue-dialog").open, false);
+    assert.equal(rd.getElementById("source-cards").textContent, beforeBad);
+    assert.equal(words(), "1 folder selected");
+  }
+  checks.push("incomplete or invalid source dates cannot replace retained records or selection");
+  dated.source.observed_at = "2026-10-09T07:00:00-00:00";
+  await readable.add(JSON.stringify(dated));
+  assert.equal(
+    rd.querySelectorAll(".source-date time")[1].textContent,
+    "9 Oct 2026, 07:00 UTC (local offset unknown)"
+  );
+  assert.deepEqual(readable.errors, []);
+  checks.push("unknown local offset is explicit rather than converted to the host timezone");
+  readable.dom.window.close();
   console.log(
     `PASS: ${checks.length} catalogue DOM checks\n` + checks.map((x) => "  " + x).join("\n")
   );

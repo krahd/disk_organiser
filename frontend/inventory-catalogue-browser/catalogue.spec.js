@@ -104,7 +104,7 @@ test("multi-location overview, offline search, source-preserving plan and catalo
     })
   ).toBeDisabled();
   await page.getByLabel("Search recorded names and paths", { exact: true }).fill("");
-  await expect(page.locator("#selection-count")).toContainText("2 selected scopes");
+  await expect(page.locator("#selection-count")).toContainText("1 file and 1 folder selected");
   await page.locator(".project-selection").scrollIntoViewIfNeeded();
   await expect(page.locator("#selected-scopes")).toContainText("Photos");
   await expect(page.locator("#selected-scopes")).toContainText("Exports/Film.mov");
@@ -138,7 +138,7 @@ test("multi-location overview, offline search, source-preserving plan and catalo
   await page.locator("#inventory-file").setInputFiles(cp);
   await page.getByRole("button", { name: "Replace catalogue and open", exact: true }).click();
   await expect(page.locator(".source-card")).toHaveCount(2);
-  await expect(page.locator("#selection-count")).toContainText("0 selected scopes");
+  await expect(page.locator("#selection-count")).toContainText("0 files or folders selected");
   await expect(page.locator("#catalogue-status")).toContainText("reopened");
   await geometry(page);
   expect(external).toEqual([]);
@@ -366,4 +366,76 @@ test("maximum decimal sizes and duplicate labels stay bounded and separately foc
   await expect(
     page.getByRole("checkbox", { name: "Select Photos from Same label", exact: true }).nth(1)
   ).toBeFocused();
+});
+
+test.describe("readable claimed dates", () => {
+  test.use({ timezoneId: "America/Los_Angeles" });
+  test("recorded offsets, unknown local time and exact history survive readable presentation", async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width: 320, height: 900 });
+    await open(page);
+    const source = JSON.parse(fs.readFileSync(first, "utf8")),
+      raw = "2026-12-31T23:59:59.123456-03:30",
+      unknown = "2026-10-09T07:00:00-00:00";
+    source.source.observed_at = raw;
+    const input = () => ({
+      name: "owned-date-claim.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify(source)),
+    });
+    await page.locator("#inventory-file").setInputFiles(input());
+    await expect(page.getByRole("dialog")).toContainText("31 Dec 2026, 23:59 UTC-03:30");
+    await page.getByRole("button", { name: "Add separate snapshot record", exact: true }).click();
+    source.source.observed_at = unknown;
+    await add(page, input(), "Unknown local offset example");
+    await expect(page.locator(".source-date time").first()).toHaveText(
+      "31 Dec 2026, 23:59 UTC-03:30"
+    );
+    await expect(page.locator(".source-date time").first()).toHaveAttribute("datetime", raw);
+    await expect(page.locator(".source-date time").last()).toHaveText(
+      "9 Oct 2026, 07:00 UTC (local offset unknown)"
+    );
+    await page
+      .getByRole("checkbox", {
+        name: "Select Photos from Owned example · creative folder",
+        exact: true,
+      })
+      .check();
+    await page
+      .getByRole("checkbox", {
+        name: "Select Readme.txt from Unknown local offset example",
+        exact: true,
+      })
+      .check();
+    await expect(page.locator("#selection-count")).toHaveText("1 file and 1 folder selected");
+    await geometry(page);
+    await shot(page, info, "33-catalogue-readable-dates-mobile.png");
+    await page.getByRole("button", { name: "Show details", exact: true }).click();
+    await expect(page.locator("#source-details")).toContainText(
+      `Original claimed date (ISO): ${raw}`
+    );
+    await expect(page.locator("#source-details")).toContainText(
+      `Original claimed date (ISO): ${unknown}`
+    );
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.locator("#catalogue-precision").scrollIntoViewIfNeeded();
+    await geometry(page);
+    await shot(page, info, "34-catalogue-exact-source-dates.png", { fullPage: false });
+    await page.getByRole("button", { name: "Save catalogue", exact: true }).click();
+    const pending = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Download catalogue", exact: true }).click();
+    const download = await pending,
+      target = info.outputPath("owned-date-catalogue.json");
+    await download.saveAs(target);
+    expect(
+      JSON.parse(fs.readFileSync(target, "utf8")).records.map((r) => r.snapshot.source.observed_at)
+    ).toEqual([raw, unknown]);
+    await page.locator("#inventory-file").setInputFiles(target);
+    await expect(page.getByRole("dialog")).toContainText("31 Dec 2026, 23:59 UTC-03:30");
+    await expect(page.getByRole("dialog")).toContainText("UTC (local offset unknown)");
+    await page.getByRole("button", { name: "Replace catalogue and open", exact: true }).click();
+    await expect(page.locator(".source-date time").first()).toHaveAttribute("datetime", raw);
+    await expect(page.locator(".source-date time").last()).toHaveAttribute("datetime", unknown);
+  });
 });

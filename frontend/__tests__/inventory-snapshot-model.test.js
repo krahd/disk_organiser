@@ -12,6 +12,60 @@ const parse = (x) => C.parse(JSON.stringify(x));
 const now = "2026-10-09T07:00:00Z";
 const selection = (path, n = 1) => ({ source_id: id(n), path });
 
+test.each([
+  ["2026-10-09T07:00:59.123456Z", "9 Oct 2026, 07:00 UTC"],
+  ["2026-10-09T07:00:00+00:00", "9 Oct 2026, 07:00 UTC"],
+  ["2026-10-09T00:05:00+05:30", "9 Oct 2026, 00:05 UTC+05:30"],
+  ["2026-12-31T23:59:59-03:30", "31 Dec 2026, 23:59 UTC-03:30"],
+  ["2026-10-09T07:00:00-00:00", "9 Oct 2026, 07:00 UTC (local offset unknown)"],
+  ["2000-02-29T00:00:00Z", "29 Feb 2000, 00:00 UTC"],
+  ["0001-01-01T00:00:00Z", "1 Jan 0001, 00:00 UTC"],
+  ["9999-12-31T23:59:59+23:59", "31 Dec 9999, 23:59 UTC+23:59"],
+])("claimed date %s has a readable, unconverted minute display", (raw, shown) => {
+  expect(C.formatObservationDate(raw)).toBe(shown);
+  const snapshot = clone(fixture);
+  snapshot.source.observed_at = raw;
+  const catalogue = C.add(C.empty(), parse(snapshot), "Date fixture", id(1));
+  expect(C.parse(C.exportCatalogue(catalogue)).records[0].snapshot.source.observed_at).toBe(raw);
+  const plan = C.buildPlan(catalogue, [selection("Photos")], "Date project", now);
+  expect(plan.items[0].notes).toContain(raw);
+});
+test.each([
+  undefined,
+  null,
+  0,
+  {},
+  "",
+  "2026",
+  "2026-10-09",
+  "2026-10-09T07:00",
+  "2026-10-09T07:00:00",
+  "2026-10-09T07:00:00+05",
+  "2026-10-09T07:00:00.1234567Z",
+  "1900-02-29T07:00:00Z",
+  "2026-10-09T24:00:00Z",
+  "2026-10-09T07:00:00+24:00",
+])("invalid or incomplete date %p stays unavailable and cannot import", (raw) => {
+  expect(C.formatObservationDate(raw)).toBe("Date unavailable");
+  const snapshot = clone(fixture);
+  snapshot.source.observed_at = raw;
+  expect(() => parse(snapshot)).toThrow();
+});
+test("date display is independent of the host timezone", () => {
+  const { execFileSync } = require("node:child_process"),
+    modulePath = require.resolve("../inventory-snapshot-model.js"),
+    script = `process.stdout.write(require(${JSON.stringify(
+      modulePath
+    )}).formatObservationDate("2026-12-31T23:59:59-03:30"))`;
+  for (const TZ of ["UTC", "Pacific/Kiritimati", "America/Los_Angeles"])
+    expect(
+      execFileSync(process.execPath, ["-e", script], {
+        env: { ...process.env, TZ },
+        encoding: "utf8",
+      })
+    ).toBe("31 Dec 2026, 23:59 UTC-03:30");
+});
+
 test("owned complete and partial projections preserve exact decimal strings", () => {
   expect(parse(fixture)).toEqual(fixture);
   expect(parse(partial)).toEqual(partial);

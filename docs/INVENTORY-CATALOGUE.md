@@ -27,6 +27,18 @@ The illustrative snapshots in `prototypes/inventory_catalogue/` were generated b
 - Four named content groups are shown on a card; any remaining groups are explicitly aggregated. All recorded entry matches remain accessible through 50-row pagination with total and page counts. Nothing is silently cut out of search.
 - Show details exposes original source labels, dates, source references, record keys, coverage, stop reasons, errors and exclusion counts. It changes presentation only.
 
+## Readable dates and selection counts
+
+Cards, search results and import previews show dates such as `9 Oct 2026, 07:00 UTC` or `31 Dec 2026, 23:59 UTC-03:30`. These are minute-level presentations of the recorded claim, not rounded or converted times. Day, month, year, hour and minute stay in the supplied offset regardless of the computer's timezone. This does not infer a geographic timezone, daylight-saving rule, current connection or scan freshness.
+
+Show details retains the exact original ISO date, including seconds, any fractional seconds and its original offset spelling. The same string remains in semantic `time` elements, saved catalogues and exported manual-plan source notes. A `-00:00` offset is displayed as `UTC (local offset unknown)`, retaining its unknown-local-offset distinction ([RFC 3339 section 4.3](https://www.rfc-editor.org/rfc/rfc3339#section-4.3)).
+
+`InventoryCatalogue.formatObservationDate(value)` uses the existing strict stamp validator and returns a stable English display string. It does not use JavaScript Date parsing, host locale or timezone conversion. Invalid or incomplete values return `Date unavailable` from this display helper; import validation continues to reject them rather than admitting missing dates or altering existing records. Existing format restrictions, including no leap seconds and four-digit nonzero years, are unchanged.
+
+Selection summaries count explicitly chosen file and directory records as files and folders: for example, `1 file and 2 folders selected`. Folder contents are not counted separately. Counts do not establish physical uniqueness across saved records or expand selection into unrecorded contents. Empty selections say `0 files or folders selected`; source identity and ancestor/descendant overlap rules remain unchanged.
+
+This follow-on passes 638 local Jest tests (88 catalogue model cases), 32 catalogue DOM checks, 43 unchanged manual-workspace DOM checks and frontend formatting. Eight browser specifications are discovered locally without executing Chromium. Independent source/model/DOM review passes, including 11,859 calendar/offset/precision oracle cases and 53 DOM checkpoints. Its own hosted Chromium/pixel acceptance remains pending. Prior exact-source evidence below remains historical rather than being silently attributed to the follow-on.
+
 ## Producer and trust boundary
 
 `backend/inventory_snapshot.py` exposes `observe_snapshot(selection, source_label, *, cancel=None, progress=None)`. It accepts the existing live process-local `ReadOnlySelection`, consumes it through `observe_once`, and projects display metadata. It does not accept an inventory dictionary, open a path itself, add an OS permission grant or register a public route/CLI. The return value is a `{state, snapshot}` wrapper. Only its non-null `snapshot` member is the browser artifact; do not serialise the wrapper for import. A terminal result without admitted observations has `snapshot: null`.

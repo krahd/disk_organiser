@@ -30,6 +30,28 @@
     $("catalogue-status").textContent = text;
   };
   const count = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+  function selectionWords(chosen) {
+    let files = 0,
+      folders = 0;
+    chosen.forEach((s) => {
+      const record = catalogue.records.find((r) => r.id === s.source_id),
+        entry = record.snapshot.entries.find((e) => e.path === s.path);
+      if (entry.kind === "file") files++;
+      else if (entry.kind === "directory") folders++;
+    });
+    return (
+      [files ? count(files, "file") : "", folders ? count(folders, "folder") : ""]
+        .filter(Boolean)
+        .join(" and ") || "0 files or folders"
+    );
+  }
+  const observationDate = (tag, label, value, cls) => {
+    const line = el(tag, label, cls),
+      time = el("time", C.formatObservationDate(value));
+    time.dateTime = value;
+    line.append(time);
+    return line;
+  };
   function bytes(value) {
     const n = BigInt(value);
     const units = [
@@ -144,7 +166,7 @@
       card.append(
         icon,
         el("h3", record.label),
-        el("p", `Snapshot date (claimed): ${s.source.observed_at}`, "source-date"),
+        observationDate("p", "Snapshot date (claimed): ", s.source.observed_at, "source-date"),
         el("p", bytes(sum.bytes), "source-stat"),
         el("p", `Listed observed file sizes · ${count(sum.files, "file path")}`, "small muted"),
         el(
@@ -200,8 +222,8 @@
             "small muted"
           )
         );
-      const chosen = selections.filter((x) => x.source_id === record.id).length;
-      card.append(el("p", `${count(chosen, "scope")} in your project selection`, "small"));
+      const chosen = selections.filter((x) => x.source_id === record.id);
+      card.append(el("p", `${selectionWords(chosen)} in your project selection`, "small"));
       const actions = el("div", undefined, "source-actions");
       actions.append(
         button("Browse record", () => {
@@ -233,7 +255,7 @@
       box.append(
         el("h3", r.label),
         el("p", `Original folder label: ${s.source.label}`),
-        el("p", `Observation claimed: ${s.source.observed_at}`),
+        el("p", `Original claimed date (ISO): ${s.source.observed_at}`),
         el("p", `Source reference: ${s.source.scan_id}`),
         el("p", `Saved record key: ${r.id}`),
         el(
@@ -293,7 +315,12 @@
           }`,
           "entry-kind"
         ),
-        el("small", `Historical source date: ${record.snapshot.source.observed_at}`, "muted")
+        observationDate(
+          "small",
+          "Historical source date: ",
+          record.snapshot.source.observed_at,
+          "muted"
+        )
       );
       if (!C.selectable(entry))
         content.append(
@@ -316,7 +343,7 @@
         if (input.checked) {
           if (selections.length >= 2000) {
             input.checked = false;
-            status("Selection limit is 2,000 scopes; existing choices are unchanged.");
+            status("Selection limit is 2,000 files or folders; existing choices are unchanged.");
             return;
           }
           selections = [...selections, { source_id: record.id, path: entry.path }];
@@ -351,7 +378,7 @@
     $("result-page").textContent = `Page ${page + 1} of ${pages} · up to ${PAGE_SIZE} per page`;
   }
   function renderSelection() {
-    $("selection-count").textContent = `${count(selections.length, "selected scope")}`;
+    $("selection-count").textContent = `${selectionWords(selections)} selected`;
     $("prepare-plan").disabled = !selections.length;
     $("clear-selection").disabled = !selections.length;
     $("selected-scopes").replaceChildren();
@@ -413,7 +440,7 @@
           (body) => {
             body.append(
               el("p", `Source label: ${parsed.source.label}`),
-              el("p", `Observation claimed: ${parsed.source.observed_at}`),
+              observationDate("p", "Snapshot date (claimed): ", parsed.source.observed_at),
               el(
                 "p",
                 `${parsed.entries.length} entry records · ${parsed.source.coverage} within the selected folder`
@@ -453,7 +480,9 @@
               body.append(
                 el(
                   "p",
-                  `${r.label} · ${r.snapshot.source.observed_at} · ${r.snapshot.source.coverage}`
+                  `${r.label} · ${C.formatObservationDate(r.snapshot.source.observed_at)} · ${
+                    r.snapshot.source.coverage
+                  }`
                 )
               )
             );
@@ -517,7 +546,7 @@
         body.append(
           el(
             "p",
-            `${count(chosen.length, "selected scope")} across ${count(
+            `${selectionWords(chosen)} across ${count(
               new Set(chosen.map((s) => s.source_id)).size,
               "labelled location"
             )}. No file action will occur.`

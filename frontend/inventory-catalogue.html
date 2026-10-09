@@ -106,7 +106,8 @@
               Choose files or folders across recorded locations. Choose a folder or its contents,
               not both.
             </p>
-            <p id="selection-count" class="selection-number">0 selected scopes</p>
+            <p id="selection-count" class="selection-number">0 files or folders selected</p>
+            <p class="small muted">Folder contents are not counted separately.</p>
             <div id="selected-scopes"></div>
             <button id="clear-selection" class="text-button" type="button" disabled>
               Clear selection</button
@@ -129,11 +130,12 @@
         </section>
       </section>
       <section id="catalogue-precision" class="precision-panel" hidden>
-        <h2>Source and scope details</h2>
+        <h2>Source and coverage details</h2>
         <p>
           Imported fields are unauthenticated claims. Source labels and dates remain unchanged when
           you rename a catalogue card. Scan references identify claims, not devices or content
-          versions.
+          versions. Displayed dates use the recorded timezone offset and show minutes; the exact
+          original dates below retain seconds and any fractional seconds.
         </p>
         <div id="source-details"></div>
       </section>
