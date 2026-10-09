@@ -1,0 +1,58 @@
+{
+  "schema_version": "disk-organiser/inventory-snapshot/v1",
+  "source": {
+    "label": "Owned example · creative folder",
+    "observed_at": "2026-10-09T07:14:51.390589+00:00",
+    "scan_id": "scan_2d4073d29c73643febc5eac4",
+    "coverage": "complete"
+  },
+  "entries": [
+    {
+      "path": ".",
+      "kind": "directory",
+      "status": "observed",
+      "logical_bytes": null
+    },
+    {
+      "path": "Drafts",
+      "kind": "directory",
+      "status": "observed",
+      "logical_bytes": null
+    },
+    {
+      "path": "Drafts/Notes.txt",
+      "kind": "file",
+      "status": "observed",
+      "logical_bytes": "12000"
+    },
+    {
+      "path": "Photos",
+      "kind": "directory",
+      "status": "observed",
+      "logical_bytes": null
+    },
+    {
+      "path": "Photos/Portrait.jpg",
+      "kind": "file",
+      "status": "observed",
+      "logical_bytes": "2097152"
+    },
+    {
+      "path": "Photos/Trip.jpg",
+      "kind": "file",
+      "status": "observed",
+      "logical_bytes": "4194304"
+    },
+    {
+      "path": "Readme.txt",
+      "kind": "file",
+      "status": "observed",
+      "logical_bytes": "1000"
+    }
+  ],
+  "gaps": {
+    "exclusions": [],
+    "error_count": "0",
+    "stop_reason": null
+  }
+}

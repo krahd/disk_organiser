@@ -1,0 +1,90 @@
+name: Inventory catalogue
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  catalogue-contract:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+      - run: npm ci
+      - name: Test strict inventory catalogue model
+        run: npx jest --config jest.config.js --runInBand frontend/__tests__/inventory-snapshot-model.test.js
+      - name: Test offline catalogue without a browser or backend
+        run: node scripts/test_inventory_catalogue.cjs
+
+  catalogue-browser:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+      - run: npm ci
+      - name: Install the existing locked Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Test owned inventory records in Chromium
+        run: npx playwright test --config playwright.inventory-catalogue.config.js
+      - name: Collect original screenshots with hashes and a bounded transfer size
+        id: collect_screens
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PYSCREEN'
+          import hashlib, json, pathlib, zipfile
+          source = pathlib.Path("test-results/inventory-catalogue")
+          files = sorted(p for p in source.rglob("[0-9][0-9]-*.png") if "attachments" not in p.parts)
+          if not files:
+              raise SystemExit("No original screenshots were produced; visual verification did not complete.")
+          total = sum(p.stat().st_size for p in files)
+          if total > 30 * 1024 * 1024:
+              raise SystemExit("Original screenshot packet exceeds 30 MiB; inspect individual failure artifacts.")
+          destination = pathlib.Path("test-results/inventory-catalogue-originals.zip")
+          candidate = destination.with_suffix(".zip.pending")
+          names = [image.name for image in files]
+          if len(names) != len(set(names)):
+              raise SystemExit("Duplicate original screenshot names; packet was not created.")
+          if destination.exists() or candidate.exists():
+              raise SystemExit("Screenshot packet path already exists; refusing to reuse earlier output.")
+          manifest = [{"file": image.name, "bytes": image.stat().st_size, "sha256": hashlib.sha256(image.read_bytes()).hexdigest()} for image in files]
+          metadata = json.dumps({"total_image_bytes": total, "screenshots": manifest}, indent=2).encode("utf-8")
+          with zipfile.ZipFile(candidate, "x", compression=zipfile.ZIP_STORED) as packet:
+              for image in files:
+                  packet.write(image, arcname=image.name)
+              packet.writestr("manifest.json", metadata)
+          if candidate.stat().st_size > 30 * 1024 * 1024:
+              raise SystemExit("Complete screenshot ZIP, including its manifest and ZIP headers, exceeds 30 MiB; inspect separate failure artifacts.")
+          candidate.rename(destination)
+          PYSCREEN
+      - name: Save bounded original screenshot packet
+        if: always() && steps.collect_screens.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: inventory-catalogue-screens
+          path: test-results/inventory-catalogue-originals.zip
+          if-no-files-found: error
+          retention-days: 14
+      - name: Save separate browser failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: inventory-catalogue-failures
+          path: test-results/inventory-catalogue/
+          if-no-files-found: ignore
+          retention-days: 14
