@@ -302,7 +302,26 @@ test("partial, hostile text and no-match states never imply live evidence", asyn
     "live storage has not been checked"
   );
   // Capture actual painted viewports rather than accepting offscreen full-page pixels.
-  await page.locator(".catalogue-work").scrollIntoViewIfNeeded();
+  await page.locator(".catalogue-work").evaluate((node) => {
+    node.scrollIntoView({ block: "start" });
+    window.scrollBy(0, -24);
+  });
+  const viewportEvidence = await page.locator(".project-selection").evaluate((node) => {
+    const r = node.getBoundingClientRect();
+    return {
+      top: r.top,
+      bottom: r.bottom,
+      left: r.left,
+      right: r.right,
+      height: innerHeight,
+      width: innerWidth,
+    };
+  });
+  console.log("NO_MATCH_VIEWPORT", JSON.stringify(viewportEvidence));
+  expect(viewportEvidence.top).toBeGreaterThanOrEqual(0);
+  expect(viewportEvidence.bottom).toBeLessThanOrEqual(viewportEvidence.height);
+  expect(viewportEvidence.left).toBeGreaterThanOrEqual(0);
+  expect(viewportEvidence.right).toBeLessThanOrEqual(viewportEvidence.width);
   await expect(page.locator("#catalogue-results")).toBeInViewport({ ratio: 1 });
   await expect(page.locator(".project-selection")).toBeInViewport({ ratio: 1 });
   await shot(page, info, "28-catalogue-no-match.png", { fullPage: false });
