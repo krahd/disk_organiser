@@ -1,6 +1,14 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 01:50
+Last updated: 2026-10-09 02:22
+
+## Operation history text-rendering checkpoint
+
+- Legacy operation/recycle titles and operation detail responses now render stored strings through text nodes and `textContent`. The existing `strong`, `em` and `pre` structure, classes, labels, action ordering, accessibility state and fetch/JSON contracts are preserved.
+- Added 34 isolated Jest regressions and five synthetic Chromium scenarios. Fixtures contain inert markup, quotes, entities and Unicode only; fetch is mocked and no backend, provider, saved operation or user directory is used by the new tests. The Jest corpus gives nine assertion failures against the unchanged renderer and passes after the repair.
+- Local verification passes: 238 Jest tests, 590 existing backend tests in fresh owned app state, 44 OpenAPI routes, 140 pure planner tests, 37 isolated HTTP contracts, frontend formatting and YAML dependency compatibility. Independent review accepts the bounded repair after a separate 34-test run and 47 owned-DOM probes, including exact normal-page equality. Local Chromium cannot start because process sockets are unavailable; no local browser/pixel pass is claimed.
+- Published source `c9c388288f1014b826e432050da10e88328b12f2` passes all exact-head push and PR workflows: [aggregate CI](https://github.com/krahd/disk_organiser/actions/runs/37873935082), [planner CI](https://github.com/krahd/disk_organiser/actions/runs/37873935117) and [isolated UI CI](https://github.com/krahd/disk_organiser/actions/runs/37873935085). Hosted aggregate logs establish Linux 590; Windows 495 passed/95 skipped; 44 OpenAPI routes on both OS; 238 Jest; 27 Chromium flows including all five new history scenarios; audits, formatting and YAML compatibility. Matching hosted normal-history screenshots were inspected. This documentation-only closeout preserves those runtime/test blobs; the cited runs are not attributed to a later commit.
+- This is a display-only repair. Backend storage/path handling, permissions, dependencies, execution/recovery flags, default navigation and manual-only documentation publishing are unchanged. Other stored-result and backup-traversal safety work, representative hardware and release acceptance remain separate.
 
 ## Read/status malformed-input checkpoint
 
@@ -452,4 +460,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 01:50
+Last updated: 2026-10-09 02:22
