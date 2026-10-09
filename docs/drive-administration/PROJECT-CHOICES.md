@@ -108,7 +108,7 @@ deliberate saves and same-file reopen are supported.
 
 ## Verification
 
-Source-only local checks are recorded in `STATUS.md`. The original admission
+Local and exact-source hosted checks are recorded in `STATUS.md`. The original admission
 test failed before implementation. Independent review additionally reproduced
 fractional numeric tokens rounding to the accepted revision and two re-entrant
 download lifecycle faults. Canonical integer-token admission and generation-
@@ -124,7 +124,7 @@ Browser specifications exercise actual downloaded bytes, reload/open/replace/
 explicit-review flow, keyboard focus, optional disclosures and desktop, 320/390
 pixel and 200% CSS-zoom layouts. Local Chromium launch is blocked by sandbox process-socket restrictions, so no
 local browser or pixel pass is claimed. Exact-source hosted evidence and independent
-rendered review remain required before acceptance. Initial hosted runs expose intermittent keyboard file-picker waits. The locked
+rendered review are recorded below. Initial hosted runs expose intermittent keyboard file-picker waits. The locked
 Playwright client toggles picker interception asynchronously when its first/last
 listener changes; a persistent observer installed before navigation is intended
 to prevent this suspected harness race while retaining real keyboard activation, chooser selection and all
@@ -132,9 +132,32 @@ assertions. No delays, retries or runtime changes are added. Repaired source `7d
 passes all 36 browser flows in both push and PR runs. The full evidence ZIP is
 larger than the available local-transfer limit, so an additive always-run upload
 also preserves the project-choices PNGs as a smaller artefact. The original full
-evidence upload and all tests remain unchanged. Final rendered review is pending. Native browser zoom,
+evidence upload and all tests remain unchanged. Final rendered review passes for source `855e89e`, as recorded below. Native browser zoom,
 assistive technology, representative hardware and real data are not qualified
 by these tests.
+
+### Accepted source and rendered evidence
+
+Source `855e89e83e4ff6fd2cc18e1e5bdb1269df545b87` passes all six push/PR
+workflows. [Aggregate CI](https://github.com/krahd/disk_organiser/actions/runs/37888897915)
+passes Linux 691 backend tests, Windows 596 with 95 skipped, OpenAPI44 on both,
+351 Jest tests, 27 existing Chromium flows, audits, formatting and YAML
+compatibility. [Planner CI](https://github.com/krahd/disk_organiser/actions/runs/37888897910)
+passes 140 tests per OS; [isolated UI CI](https://github.com/krahd/disk_organiser/actions/runs/37888897923)
+passes 39 HTTP contracts per OS, 23 existing focused Jest tests and all 36
+Chromium flows. Independent source checks pass 113 focused Jest tests and
+1,700 additional assertions with no blocker.
+
+The [focused screenshot artefact](https://github.com/krahd/disk_organiser/actions/runs/37888897923/artifacts/11597411945)
+ZIP SHA-256 is `b7a3a0b2d00e64df9d0526595f7fb6a69e74550f77aeb03963479568054be6fa`.
+All six original PNG hashes are verified and inspected independently: desktop,
+320-pixel collapsed/expanded, 390-pixel and 200% CSS-zoom collapsed/expanded.
+Destination cards, warnings, focus, long paths and Replace/Cancel controls are
+readable without overlap or clipping. The three narrow views exactly match
+previously accepted pixels; desktop changes only in the singular-label region.
+The original complete evidence artefact remains available. This documentation
+closeout changes no runtime, test or workflow bytes; later commits need their
+own hosted checks, and these results do not qualify real-data or hardware use.
 
 ## Next useful boundary: the person's own inventory
 
