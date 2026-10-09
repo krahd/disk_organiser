@@ -1,6 +1,45 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 05:34
+Last updated: 2026-10-09 05:53
+
+## Guided manual planning workspace checkpoint
+
+- Added a separate static `frontend/manual-workspace.html` interface for real manually entered projects, named drives/scopes, recorded locations, intended homes, planned backup targets, desired policies, exclusions and restore checklists. It starts empty and does not replace default navigation or Aurora. Project cards, labelled location lanes, a recorded/intended comparison and planned-target cards support the four-step guided journey; Show details reveals exact paths, keys, JSON and history without changing saved state.
+- The same independent model handles every edit and import. Archived references remain present; changes to current names/locations/targets cannot relabel historical results. Report rendering uses frozen context and shows drift, mixed outcomes, explicit sample descriptions and dates. Everything remains manual intent with unknown backup coverage; no scanner, provider, account, model service or file-operation authority is present.
+- Explicit local artifact export/import preserves all decisions and history. The UI checks size before reading, decodes UTF-8 fatally with BOM preservation, previews before replacement and rejects obsolete asynchronous reads. Cancelling, editing during a pending read, malformed/unreadable input and save failure preserve the draft. Download feedback distinguishes a requested download from confirmed saving; unsaved-state acknowledgement is revision-specific. All untrusted text is text-rendered and CSP denies connections/forms; no browser autosave or telemetry was introduced.
+- Local combined verification passes 41 DOM integration checks, all 550 frontend Jest tests after preserving the accepted Aurora integration and seven Chromium spec discovery cases. The DOM checks cover the real guided authoring journey, generated Blob export/reopen, details parity, immutable history/drift, hostile text, nonblank/whole-drive requirements, reference-preserving archival, malformed UTF-8/BOM/JSON, stale picker/import races and repeated report submit. DOM simulation is not native browser/pixel or hardware acceptance.
+- The dedicated read-only workflow uses existing locked dependencies for model/DOM checks on Linux and Windows, plus Chromium journeys, mobile/zoom, keyboard, save/reopen, cancellation and direct-file launch. Original numbered screenshots and their manifest enter a measured ZIP of at most 30 MiB, including metadata and ZIP headers; full failure artifacts remain separate. Local Chromium execution is blocked by process-socket restrictions, so hosted exact-source execution and original screenshot inspection are required before visual acceptance. Empty intercepted filechooser selection does not establish OS-native dialog-button automation; screen-reader/nontechnical-participant acceptance also remains open.
+- [Workspace usage and verification](docs/MANUAL-WORKSPACE.md). Independent source/DOM review accepts the frozen runtime after separate guided-only, delayed-import, history and failure-path probes. Hosted visual acceptance and maintainer integration review remain open; no deployment or real backup/restore action is included.
+
+## Independent manual planning model checkpoint
+
+- Added a standalone browser/CommonJS model for user-authored named drives, file/folder/whole-drive scopes, projects, intended backup targets, desired policies and restore checklists. It is separate from Aurora/synthetic evaluation and the Flask app. Paths remain inert text; coverage, authenticated versions, capacity and physical independence remain unknown. No app/provider/filesystem/network/storage operations or runtime dependencies were introduced.
+- Strict JSON admission rejects duplicate keys, unknown fields, future versions, unsafe/non-integer numeric representations, unsupported Unicode/control characters, dangling/wrong-type references and malformed lifecycle claims. Explicit bounds are 1 MiB UTF-8, 24 nested containers, 100,000 JSON nodes/keys and schema-sized collections. Canonical export size is checked before serialisation; a failed edit/import keeps the existing document.
+- Immutable revision-checked edits support atomic batches, full record replacement, explicit archive/reference handling and one-use staged import confirmation. No hidden cascading deletion, import merge or migration occurs. Unknown optional facts remain absent; no-op edits preserve revision.
+- Report history is append-only. First reporting freezes a bounded context containing the historical target/item/project/destination names, locations, provider and user-described versions. Current records remain editable; drift is shown without rewriting old context. Earlier failures and same-time contradictory reports stay separate. Imported snapshots are untrusted claims, not verified recovery. This pre-publication schema extension deliberately updates the illustrative reported example; older result artifacts without historical context reject instead of fabricating it.
+- Local verification passes 199 new model tests plus all 351 existing frontend tests (550 total after additive rebase), full frontend formatting, JavaScript syntax, 44-route OpenAPI and all three examples against the extended schema. The earlier independent design harness passes 39 cases but does not establish the new snapshot contract. No Flask/application/database runtime was started for this model work.
+- Independent adversarial review accepts model SHA-256 `45d714de3a18f902e9e7329bd62d19ac12786be4ed70356688a1380f52dc6154` after fixes for prototype-name action dispatch, C1/Unicode line separators and historical context rebinding. It includes parser/UTF-8 accounting oracles, exact resource edges, malformed actions, frozen context mutation attempts, subsequent edits plus append/export/reopen, 5,000 retained reports and atomic snapshot-overflow rejection. Browser rendering/keyboard/mobile/accessibility acceptance remains a separate UI integration gate; no physical backup/restore or hardware acceptance is claimed.
+- Contract, representation policies, public API and boundaries: [manual planning model](docs/manual-planning/MODEL.md). The additive candidate preserves accepted main `17fdaf203de5e5a5062f9d864f1eaa7bb922eafe` and all 214 non-status upstream blobs exactly. The latest upstream `STATUS.md` content is retained with this checkpoint and refreshed timestamps. Hosted exact-source verification and original screenshot review remain required before integration; no deployment is included.
+
+The independent model validates manual metadata and returns private JSON text. The UI owns deliberate file selection, import confirmation and save-request feedback; none of these connections represents a file operation on a named drive.
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 190" role="img" aria-labelledby="manual-model-title manual-model-desc">
+  <title id="manual-model-title">Independent manual planning data flow</title>
+  <desc id="manual-model-desc">User-authored edit actions and chosen JSON text pass through bounded validation and an immutable model. The model returns private JSON text, warnings and planning summaries without accessing named drives.</desc>
+  <defs><marker id="manual-model-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#52657a"/></marker></defs>
+  <rect x="20" y="55" width="220" height="80" rx="10" fill="#eef4fb" stroke="#52657a"/>
+  <text x="130" y="84" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#172b40">Manual edit actions</text>
+  <text x="130" y="110" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">or chosen JSON text</text>
+  <line x1="240" y1="95" x2="320" y2="95" stroke="#52657a" stroke-width="2" marker-end="url(#manual-model-arrow)"/>
+  <rect x="320" y="40" width="280" height="110" rx="10" fill="#f3f1fb" stroke="#52657a"/>
+  <text x="460" y="70" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#172b40">Bounded immutable model</text>
+  <text x="460" y="98" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">References and retained history</text>
+  <text x="460" y="124" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">Manual claims; coverage unknown</text>
+  <line x1="600" y1="95" x2="680" y2="95" stroke="#52657a" stroke-width="2" marker-end="url(#manual-model-arrow)"/>
+  <rect x="680" y="55" width="220" height="80" rx="10" fill="#eef4fb" stroke="#52657a"/>
+  <text x="790" y="84" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#172b40">JSON text and summaries</text>
+  <text x="790" y="110" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">No drive/provider access</text>
+</svg>
 
 ## Aurora project choices checkpoint
 
@@ -482,4 +521,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 05:34
+Last updated: 2026-10-09 05:53

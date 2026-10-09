@@ -1,0 +1,163 @@
+{
+  "schema_version": "disk-organiser/manual-storage-plan/v1",
+  "document_id": "plan_00000000-0000-0000-0000-000000000002",
+  "title": "Illustrative manual plan: family photos",
+  "revision": 4,
+  "created_at": "2026-10-09T04:40:00Z",
+  "updated_at": "2026-10-09T04:40:00Z",
+  "drives": [
+    {
+      "id": "drive_00000000-0000-0000-0000-000000000001",
+      "label": "Laptop",
+      "kind": "internal_drive",
+      "purposes": [
+        "working"
+      ]
+    },
+    {
+      "id": "drive_00000000-0000-0000-0000-000000000002",
+      "label": "Photo archive",
+      "kind": "external_drive",
+      "purposes": [
+        "archive"
+      ],
+      "availability_report": {
+        "status": "unavailable",
+        "recorded_at": "2026-10-09T04:40:00Z",
+        "note": "Example user reports that this drive is on a shelf."
+      }
+    },
+    {
+      "id": "drive_00000000-0000-0000-0000-000000000003",
+      "label": "Backup drive",
+      "kind": "external_drive",
+      "purposes": [
+        "backup"
+      ],
+      "notes": "Capacity and current contents have not been checked."
+    }
+  ],
+  "items": [
+    {
+      "id": "item_00000000-0000-0000-0000-000000000001",
+      "label": "Recent photos",
+      "kind": "folder",
+      "location": {
+        "drive_id": "drive_00000000-0000-0000-0000-000000000001",
+        "path_text": "Pictures/Recent"
+      }
+    },
+    {
+      "id": "item_00000000-0000-0000-0000-000000000002",
+      "label": "Older photos",
+      "kind": "folder",
+      "location": {
+        "drive_id": "drive_00000000-0000-0000-0000-000000000002",
+        "path_text": "Photos"
+      }
+    },
+    {
+      "id": "item_00000000-0000-0000-0000-000000000003",
+      "label": "Exported previews",
+      "kind": "folder",
+      "location": {
+        "drive_id": "drive_00000000-0000-0000-0000-000000000001",
+        "path_text": "Pictures/Previews"
+      },
+      "notes": "Illustrative user considers these recreatable. No deletion is requested."
+    }
+  ],
+  "projects": [
+    {
+      "id": "project_00000000-0000-0000-0000-000000000001",
+      "label": "Family photos",
+      "member_item_ids": [
+        "item_00000000-0000-0000-0000-000000000001",
+        "item_00000000-0000-0000-0000-000000000002",
+        "item_00000000-0000-0000-0000-000000000003"
+      ],
+      "notes": "Illustrative entries only. No drive, file or provider has been inspected."
+    }
+  ],
+  "backup_targets": [
+    {
+      "id": "target_00000000-0000-0000-0000-000000000001",
+      "label": "Local photo backup",
+      "kind": "local_storage",
+      "storage_drive_id": "drive_00000000-0000-0000-0000-000000000003",
+      "independence_note": "Example user intends to keep this on a separate drive; physical independence is unverified."
+    },
+    {
+      "id": "target_00000000-0000-0000-0000-000000000002",
+      "label": "Cloud backup to choose",
+      "kind": "object_storage",
+      "notes": "No provider or account selected."
+    }
+  ],
+  "protection_plans": [
+    {
+      "id": "protect_00000000-0000-0000-0000-000000000001",
+      "label": "Protect family photos",
+      "project_id": "project_00000000-0000-0000-0000-000000000001",
+      "target_ids": [
+        "target_00000000-0000-0000-0000-000000000001",
+        "target_00000000-0000-0000-0000-000000000002"
+      ],
+      "excluded_item_ids": [
+        "item_00000000-0000-0000-0000-000000000003"
+      ],
+      "policy": {
+        "desired_independent_copies": 2,
+        "desired_frequency": "weekly",
+        "desired_retention": "Keep previous versions for at least one year, subject to a future provider choice.",
+        "desired_restore_checks": [
+          "file_readability",
+          "metadata"
+        ],
+        "next_review_on": "2026-10-16"
+      }
+    }
+  ],
+  "restore_plans": [
+    {
+      "id": "restore_00000000-0000-0000-0000-000000000001",
+      "label": "Check a sample from the local backup",
+      "protection_plan_id": "protect_00000000-0000-0000-0000-000000000001",
+      "target_id": "target_00000000-0000-0000-0000-000000000001",
+      "intended_scope": "sample",
+      "item_ids": [
+        "item_00000000-0000-0000-0000-000000000001"
+      ],
+      "snapshot_reference_text": "Snapshot still to be located",
+      "destination": {
+        "drive_id": "drive_00000000-0000-0000-0000-000000000001",
+        "path_text": "Restore checks/Photo sample"
+      },
+      "capacity_note": "Required size and free capacity are unknown.",
+      "access_note": "Record where to obtain access; never enter a password or recovery key.",
+      "lifecycle": "draft",
+      "checks": [
+        {
+          "id": "check_00000000-0000-0000-0000-000000000001",
+          "label": "Locate the intended snapshot and check whether the chosen folder is listed.",
+          "kind": "locate_snapshot"
+        },
+        {
+          "id": "check_00000000-0000-0000-0000-000000000002",
+          "label": "Check that the chosen restore destination is separate and empty.",
+          "kind": "confirm_destination"
+        },
+        {
+          "id": "check_00000000-0000-0000-0000-000000000003",
+          "label": "After using the backup tool yourself, open the selected sample files.",
+          "kind": "file_readability"
+        },
+        {
+          "id": "check_00000000-0000-0000-0000-000000000004",
+          "label": "Check photo dates and other required metadata on the same sample.",
+          "kind": "metadata"
+        }
+      ]
+    }
+  ]
+}
