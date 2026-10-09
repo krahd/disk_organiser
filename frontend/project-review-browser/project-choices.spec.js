@@ -40,6 +40,10 @@ function filePayload(value, name = "aurora-choices.json") {
   };
 }
 async function open(page) {
+  // Keep interception subscribed before navigation. In locked Playwright 1.37,
+  // adding/removing the last waiter changes interception asynchronously and can
+  // race an immediate keyboard activation, including reopening after Cancel.
+  page.on("filechooser", () => {});
   const requests = [];
   page.on("request", (request) => {
     if (/^https?:/.test(request.url()))

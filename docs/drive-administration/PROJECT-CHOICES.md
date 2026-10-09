@@ -124,7 +124,12 @@ Browser specifications exercise actual downloaded bytes, reload/open/replace/
 explicit-review flow, keyboard focus, optional disclosures and desktop, 320/390
 pixel and 200% CSS-zoom layouts. Local Chromium launch is blocked by sandbox process-socket restrictions, so no
 local browser or pixel pass is claimed. Exact-source hosted evidence and independent
-rendered review remain required before acceptance. Native browser zoom,
+rendered review remain required before acceptance. Initial hosted runs expose intermittent keyboard file-picker waits. The locked
+Playwright client toggles picker interception asynchronously when its first/last
+listener changes; a persistent observer installed before navigation is intended
+to prevent this supported harness-race explanation while retaining real keyboard activation, chooser selection and all
+assertions. No delays, retries or runtime changes are added. Fresh hosted
+verification of the repair is pending. Native browser zoom,
 assistive technology, representative hardware and real data are not qualified
 by these tests.
 

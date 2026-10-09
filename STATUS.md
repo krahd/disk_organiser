@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 05:12
+Last updated: 2026-10-09 05:20
 
 ## Aurora project choices checkpoint
 
@@ -8,6 +8,7 @@ Last updated: 2026-10-09 05:12
 - The new `disk-administration-project-intent/v1` contract is separate from the unchanged non-replayable report. It holds all eight membership choices and edited paths, including unchecked edits, plus the intended destination and exact packaged-source identity. Admission caps bytes at 8 KiB, depth at eight, parsed nodes at 256 and the existing review-request projection at 4 KiB. Strict UTF-8, duplicate decoded keys, exact field allowlists, canonical safe integer revisions, relative paths, Unicode and exact source matching are enforced. Imported strings never grant native access or supply observation, backup, recovery or execution evidence.
 - A separate import epoch and full-control/source snapshots prevent delayed reads, edits, repeated opens, dismissal, reload, page exit or back/forward restoration from reviving obsolete choices. Saving rechecks source, generation and controls before download activation/status and releases temporary object URLs. No upload, autosave or browser persistence is added. The only server change is one fixed static asset: ten isolated routes and six assets; the default 44-route API is unchanged.
 - Fresh local checks pass 347 Jest tests (77 pure intent, 32 choices-flow and 238 existing tests), 691 backend tests in fresh owned app state, 140 pure planner tests, 39 isolated HTTP contracts, 44 OpenAPI routes, frontend formatting, YAML compatibility, Python compilation and whitespace checks. Both npm and pinned Python dependency audits report no known vulnerabilities. Broad flake8 retains pre-existing diagnostics in the three touched Python files; baseline comparison establishes zero new diagnostics. All 36 isolated browser specifications parse, including eleven new project-choices flows. The retained pre-implementation admission failure and earlier independent numeric/download lifecycle regressions are preserved as evidence; fresh independent source review finds no blocker after 109 focused Jest tests and 1,700 additional assertions covering all 510 nonempty membership/root combinations, independent request projections, strict admission and real asynchronous FileReader lifecycle flows.
+- Initial published source `9086a9a27162933172f710a1c63d7d13e13972e6` passes aggregate CI and planner workflows, but both isolated UI runs expose intermittent keyboard file-picker waits (35/36 push and 34/36 PR flows pass). Failure pixels keep Open visible, enabled and focused. Independent inspection of the locked Playwright 1.37 subscription code identifies asynchronous first/last-listener interception toggles as the supported cause. A persistent observer is now installed before navigation; all actual chooser waits, keyboard/pointer activations, file selections, assertions and zero retries remain. This harness-only repair changes no application bytes and requires fresh hosted verification; the failed runs are not acceptance evidence.
 - Local Chromium launch is blocked by sandbox process-socket restrictions, so no local browser/pixel pass is claimed. Exact-source hosted tests, independent rendered review and manual merge approval remain pending. Dependency and workflow files, real-drive/provider access, mutation/recovery gates and manual-only documentation publication are unchanged. Representative hardware, native browser zoom, assistive technology, real-data and release acceptance remain separate.
 - The next useful product boundary is a person's bounded declared or imported inventory, with source-bound intent and explicit reconciliation. This is documented as a proposal only; the current slice remains the packaged synthetic Aurora example.
 
@@ -477,4 +478,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 05:12
+Last updated: 2026-10-09 05:20
