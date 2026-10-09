@@ -1,0 +1,59 @@
+name: Owned native inventory core
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  owned-darwin-core:
+    runs-on: macos-15
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+      - name: Require the reviewed native toolchain and record runner identity
+        env:
+          DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d "$DEVELOPER_DIR"
+          test "$(xcodebuild -version)" = $'Xcode 16.4\nBuild version 16F6'
+          test "$(xcrun --sdk macosx --show-sdk-version)" = "15.5"
+          xcodebuild -version
+          xcrun --sdk macosx --show-sdk-version
+          xcrun --find swift
+          xcrun swift --version
+          sw_vers
+          printf 'Runner image: %s %s\n' "${ImageOS:-unknown}" "${ImageVersion:-unknown}"
+          test ! -e "$DISK_INVENTORY_GOLDEN_OUTPUT"
+      - name: Test only fresh owned Darwin fixtures and internal lifecycle
+        env:
+          DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
+        run: xcrun swift test --package-path native/DiskInventoryCore
+      - name: Compare native snapshots with an independently created Python fixture oracle
+        env:
+          DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
+        run: python native/DiskInventoryCore/Validation/compare_fixture_snapshots.py
+      - name: Admit native output through the unchanged browser parser
+        env:
+          DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
+        run: node native/DiskInventoryCore/Validation/check_snapshot_parser.cjs
+      - name: Preserve generated fixture-only snapshots
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-native-inventory-goldens
+          path: ${{ runner.temp }}/disk-inventory-goldens/*.json
+          if-no-files-found: error
+          retention-days: 14

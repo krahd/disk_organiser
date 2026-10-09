@@ -1,6 +1,49 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 08:32
+Last updated: 2026-10-09 23:24
+
+## Isolated owned native core checkpoint
+
+- Native source `07b93c5e2f0f09746d024884681259aaf513903d` now passes all twelve push/PR workflow runs. The [native push run](https://github.com/krahd/disk_organiser/actions/runs/38003620756) checked out that exact source. The [native PR run](https://github.com/krahd/disk_organiser/actions/runs/38003624967) checked out GitHub merge ref `eebe7971a9bc0c21cde4c6a1231d32c3752a94aa`; its tree is exactly the same `a0c13a1737790f8bf2e7971da76195d16ab1f5ca`. Both compiled and passed all 59 XCTest cases with zero failures, six native/Python differential cases and six unchanged-JavaScript parser/catalogue cases. The later documentation head is not relabelled as the source of this evidence.
+- Actual native toolchain: Xcode 16.4 build 16F6, macOS SDK 15.5, Apple Swift 6.1.2 (`swiftlang-6.1.2.1.2`), macOS 15.7.9 build 24G830, arm64 runner image `macos-15-arm64` / `20260907.0337.1`. The filesystem refused the deliberately invalid UTF-8 name with errno 92; synthetic invalid-UTF-8 rejection passed unconditionally. That refusal is an explicit native-case limitation, not successful invalid-name-path coverage. No native XCTest was silently skipped or substituted with a Linux walker.
+- Independent source review and subsequent log/artifact evidence review found no remaining blocking Phase A defect. Evidence review is not an additional hardware test. The [six original generated fixture outputs and hash manifest](native/DiskInventoryCore/Validation/accepted-fixtures/README.md) preserve the push result in source control; they are evidence only and are never reused as oracle expectations. Original artifact `11650306815` is 2,518 bytes, SHA-256 `6314bbb58f899672cfe70976b37b75a2e58113c5d33332600bb7a614680001db`.
+- Existing [aggregate CI](https://github.com/krahd/disk_organiser/actions/runs/38003624975) passes Linux 709 backend, Windows 607 passed/102 skipped, 638 Jest, OpenAPI44, dependency audits, formatting and 27 Chromium journeys. [Catalogue CI](https://github.com/krahd/disk_organiser/actions/runs/38003624976) passes its unchanged model/DOM and eight browser journeys. The existing Windows skips are not native coverage. All 244 non-STATUS baseline blobs and all native source/test/workflow blobs from the accepted source remain unchanged in this documentation/evidence closeout.
+- First hosted validation at `4487071bdd40bf71ffa630c46c8009889d4058da` failed before scheduling a native job ([run 38003436006](https://github.com/krahd/disk_organiser/actions/runs/38003436006)). The workflow referenced `runner.temp` in job-level `env`, where [GitHub context rules](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability) do not allow `runner`. The fixed fixture-output value is now declared only in the four consuming steps. Native source, fixed path validation, toolchain pins and all test assertions remained unchanged. No native job ran at that initial checkpoint.
+- Recovery checkpoint: all 20 originally reviewed candidate files were restored and verified against their retained per-file SHA-256 and Git blob hashes before this documentation update. The six owned Python-oracle cases and unchanged-JavaScript parser/catalogue self-checks pass again. Native compilation and all 59 XCTest methods were unexecuted at that recovery checkpoint; recovery and source review alone did not establish native runtime acceptance. The subsequent hosted results are recorded above.
+- The next bridge towards native selected-folder onboarding is an isolated Swift/Darwin core and one-shot controller under `native/DiskInventoryCore/`. It has no package product, public scanner API, executable, production selection factory, AppKit/WebKit wiring, entitlement or application entry point. Only a test-target constructor creates leases from fresh owned temporary directories. Existing Python/frontend runtimes, synthetic-only adapter and all v1 formats remain unchanged.
+- The bounded descriptor reader records metadata without file-content reads, hashes, writes to source or filesystem crossing. It preserves exact UTF-8 spelling, explicit partial/error evidence, root/ancestor checks, hard-link conflict invalidation and cooperative cancellation. Immutable v1 bytes are available only after source-descriptor release. No physical-drive identity, current presence, atomic snapshot, backup protection or real hardware acceptance is inferred.
+- The [native onboarding contract](docs/drive-administration/NATIVE-ONBOARDING.md) records source admission, transient scope ownership, volume ambiguity, source/intent provenance and the later native catalogue handoff. Signed picker/WebKit/container save and real user-drive stages remain separate unimplemented gates. The core's injected owned-fixture class is not a production local/cloud/provider classifier.
+- The dedicated read-only macOS workflow pins Xcode 16.4 build 16F6 and SDK 15.5, records actual compiler/OS/runner identity and fails if the reviewed toolchain is absent. Six independently created native/Python fixtures and the unchanged browser parser check v1 compatibility; generated fixture metadata is the only workflow artifact. No production dependency is added.
+- The candidate contains 59 native XCTest methods covering owned filesystem observations, limits, syscall-result failures, exact projection, hard-link conflicts and lifecycle races. Pre-publication review found and repaired a post-guard callback race, late deadline classification, shared-lease ownership and exact errno/pointer-lifetime handling. The subsequent hosted runs above provide actual native execution evidence; source/static review alone was not counted as a compiler pass.
+- Local validation currently passes six Python-oracle self-checks, the parser-harness self-check using Python-owned output, 160 unchanged disk-model/scoped-observer/snapshot tests, 88 unchanged catalogue model tests and 32 catalogue DOM checks. The assigned Linux workspace has no Swift compiler; the native compilation/test evidence comes from the separate hosted runs above. Final documentation-head checks and guarded main verification remain merge gates. [Native scope and test instructions](native/DiskInventoryCore/README.md).
+
+The native prototype is reachable only from the owned test target. The app still opens empty historical/manual workspaces; this slice creates no live user-storage connection.
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 180" role="img" aria-labelledby="native-core-title native-core-desc">
+  <title id="native-core-title">Isolated owned native verification flow</title>
+  <desc id="native-core-desc">A test creates a temporary source and a process-local lease. The internal Swift controller observes bounded metadata, releases descriptors and returns historical JSON to independent Python and browser parser checks. No production picker is connected.</desc>
+  <defs><marker id="native-core-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#52657a"/></marker></defs>
+  <rect x="15" y="40" width="200" height="95" rx="10" fill="#eef4fb" stroke="#52657a"/>
+  <text x="115" y="68" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#172b40">Owned test fixture</text>
+  <text x="115" y="94" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">Temporary source</text>
+  <text x="115" y="116" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">Test-only lease factory</text>
+  <line x1="215" y1="87" x2="250" y2="87" stroke="#52657a" stroke-width="2" marker-end="url(#native-core-arrow)"/>
+  <rect x="250" y="25" width="240" height="125" rx="10" fill="#f3f1fb" stroke="#52657a"/>
+  <text x="370" y="56" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#172b40">Internal Swift controller</text>
+  <text x="370" y="83" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">Bounded metadata reader</text>
+  <text x="370" y="107" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">One attempt; explicit gaps</text>
+  <text x="370" y="131" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">Release before returning</text>
+  <line x1="490" y1="87" x2="525" y2="87" stroke="#52657a" stroke-width="2" marker-end="url(#native-core-arrow)"/>
+  <rect x="525" y="40" width="180" height="95" rx="10" fill="#eef4fb" stroke="#52657a"/>
+  <text x="615" y="68" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#172b40">Snapshot v1 JSON</text>
+  <text x="615" y="94" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">Historical metadata</text>
+  <text x="615" y="116" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">No access authority</text>
+  <line x1="705" y1="87" x2="740" y2="87" stroke="#52657a" stroke-width="2" marker-end="url(#native-core-arrow)"/>
+  <rect x="740" y="40" width="205" height="95" rx="10" fill="#f1f8f2" stroke="#52657a"/>
+  <text x="842" y="68" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#172b40">Independent checks</text>
+  <text x="842" y="94" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">Python fixture oracle</text>
+  <text x="842" y="116" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#172b40">Unchanged JS parser</text>
+</svg>
 
 ## Catalogue readability checkpoint
 
@@ -566,4 +609,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 08:32
+Last updated: 2026-10-09 23:24
