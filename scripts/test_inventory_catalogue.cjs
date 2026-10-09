@@ -334,6 +334,12 @@ async function launch() {
     1
   );
   checks.push("duplicate labels retain unique source selection and keyboard focus");
+  assert.equal(
+    dom.window.getComputedStyle(d.getElementById("previous-results")).whiteSpace,
+    "nowrap"
+  );
+  assert.equal(dom.window.getComputedStyle(d.getElementById("next-results")).flexShrink, "0");
+  checks.push("pagination controls retain no-wrap nonshrinking display safeguards");
   assert.deepEqual(a.errors, []);
   checks.push("owned-only resource loader observed no script or external request error");
   await new Promise((r) => setTimeout(r, 1100));

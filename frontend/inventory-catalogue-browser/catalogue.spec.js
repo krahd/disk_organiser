@@ -26,6 +26,20 @@ async function add(page, file = first, label) {
   await page.getByRole("button", { name: "Add separate snapshot record", exact: true }).click();
   await expect(page.getByRole("dialog")).not.toBeVisible();
 }
+async function singleLineControl(control) {
+  const lines = await control.evaluate((node) => {
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    return [
+      ...new Set(
+        [...range.getClientRects()]
+          .filter((r) => r.width > 0 && r.height > 0)
+          .map((r) => Math.round(r.top))
+      ),
+    ].length;
+  });
+  expect(lines).toBe(1);
+}
 async function geometry(page) {
   expect(
     await page.evaluate(
@@ -128,6 +142,8 @@ test("320-pixel catalogue and long-label rename stay usable", async ({ page }, i
   await add(page, first, "External archive · " + "long folder description ".repeat(7));
   await add(page, second, "Second recorded location");
   await geometry(page);
+  await singleLineControl(page.locator("#previous-results"));
+  await singleLineControl(page.locator("#next-results"));
   await shot(page, info, "24-catalogue-mobile.png");
   await page.getByRole("button", { name: "Rename label", exact: true }).first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -140,6 +156,11 @@ test("320-pixel catalogue and long-label rename stay usable", async ({ page }, i
         n.querySelector("button").getBoundingClientRect().left + 1
     );
   expect(fits).toBe(true);
+  const focusClearance = await page.locator("#catalogue-name").evaluate((input) => {
+    const note = input.nextElementSibling;
+    return note.getBoundingClientRect().top - input.getBoundingClientRect().bottom;
+  });
+  expect(focusClearance).toBeGreaterThanOrEqual(8);
   await shot(page, info, "25-catalogue-mobile-dialog.png");
   await page.getByRole("button", { name: "Cancel", exact: true }).click();
   await expect(page.getByRole("dialog")).not.toBeVisible();
@@ -154,7 +175,64 @@ test("200 percent CSS zoom keeps overview, search and source details readable", 
   await page.evaluate(() => {
     document.documentElement.style.zoom = "2";
   });
-  await page.getByRole("button", { name: "Show details", exact: true }).click();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const pointerEvidence = await page.locator("#catalogue-details").evaluate((control) => {
+    const r = control.getBoundingClientRect();
+    const zoom = Number(getComputedStyle(document.documentElement).zoom);
+    const centre = { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2 };
+    const points = [1, zoom, 1 / zoom].map((factor) => {
+      const x = centre.x * factor,
+        y = centre.y * factor;
+      const hit = document.elementFromPoint(x, y);
+      return {
+        factor,
+        x,
+        y,
+        hit: hit?.id || hit?.tagName || null,
+        matches: hit === control || control.contains(hit),
+      };
+    });
+    return { zoom, rect: { left: r.left, top: r.top, right: r.right, bottom: r.bottom }, points };
+  });
+  const cdp = await page.context().newCDPSession(page);
+  const { root } = await cdp.send("DOM.getDocument");
+  const { nodeId } = await cdp.send("DOM.querySelector", {
+    nodeId: root.nodeId,
+    selector: "#catalogue-details",
+  });
+  const { quads } = await cdp.send("DOM.getContentQuads", { nodeId });
+  const quad = quads[0];
+  const quadPoint = {
+    x: (quad[0] + quad[2] + quad[4] + quad[6]) / 4,
+    y: (quad[1] + quad[3] + quad[5] + quad[7]) / 4,
+  };
+  const quadHit = await page.evaluate(({ x, y }) => {
+    const hit = document.elementFromPoint(x, y),
+      control = document.getElementById("catalogue-details");
+    return {
+      hit: hit?.id || hit?.tagName || null,
+      matches: hit === control || control.contains(hit),
+    };
+  }, quadPoint);
+  await cdp.detach();
+  console.log(
+    "ZOOM_NATIVE_HIT_TEST " +
+      JSON.stringify({ ...pointerEvidence, cdpQuad: quad, cdpCentre: quadPoint, cdpHit: quadHit })
+  );
+  const visiblePoint = pointerEvidence.points.find((point) => point.matches);
+  expect(
+    visiblePoint,
+    "The zoomed control must have an unobstructed native hit-test point"
+  ).toBeTruthy();
+  // This is an actual pointer event at a native hit-tested point, never a forced
+  // locator click or DOM .click(). Record the chosen coordinates for diagnosis.
+  await page.mouse.click(visiblePoint.x, visiblePoint.y);
+  await expect(page.locator("#catalogue-details")).toHaveAttribute("aria-pressed", "true");
+  await page.locator("#catalogue-details").focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#catalogue-details")).toHaveAttribute("aria-pressed", "false");
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#catalogue-details")).toHaveAttribute("aria-pressed", "true");
   await geometry(page);
   await shot(page, info, "26-catalogue-css-zoom.png");
 });
