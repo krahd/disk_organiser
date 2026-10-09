@@ -29,7 +29,15 @@ This command takes no source-path argument. Darwin tests do not substitute a wea
 
 In hosted CI, a golden-output test exclusively creates the fixed `RUNNER_TEMP/disk-inventory-goldens` output directory. Six fixtures cover empty/nested folders, links, a known placeholder marker, depth and per-directory bounds. The independent Python harness creates its own fresh sources and compares every v1 field except generated observation time and scan ID. The unchanged JavaScript parser then validates the native artifacts, rejects injected authority/duplicate keys and roundtrips the combined historical catalogue. These scripts are test harnesses, not export/import entry points for the app.
 
-The assigned Linux workspace has no Swift compiler. Local Python-oracle and parser-harness self-checks do not constitute native acceptance. Exact hosted native results are recorded in root `STATUS.md` only after execution.
+The assigned Linux workspace has no Swift compiler. Local Python-oracle and parser-harness self-checks do not constitute native acceptance. The hosted execution below is separate evidence.
+
+## Executed Phase A evidence
+
+Source `07b93c5e2f0f09746d024884681259aaf513903d` passed [native push CI](https://github.com/krahd/disk_organiser/actions/runs/38003620756): 59 XCTest cases, six independently created native/Python comparisons and six unchanged-JavaScript parser/catalogue cases. [PR CI](https://github.com/krahd/disk_organiser/actions/runs/38003624967) repeated that result on merge checkout `eebe7971a9bc0c21cde4c6a1231d32c3752a94aa`, whose tree exactly matched the source tree. All twelve existing/new workflow runs passed.
+
+Both native runs used Xcode 16.4 (16F6), SDK 15.5 and Apple Swift 6.1.2 on macOS 15.7.9 (24G830), arm64 image `20260907.0337.1`. The filesystem refused invalid UTF-8 filename creation (errno 92); unconditional synthetic rejection passed, but native invalid-name-path coverage is not claimed. No XCTest was silently skipped. All source trees were freshly created and owned by tests; no user-drive or signed-sandbox acceptance follows.
+
+[Original owned outputs and their hash manifest](Validation/accepted-fixtures/README.md) preserve fixture-only evidence. Tests continue to create independent fresh sources rather than using these saved outputs as expectations. Independent source and evidence reviews accepted this bounded Phase A result, not a new hardware test or production integration. Root `STATUS.md` records exact source/run identities and the initial repaired workflow-validation failure.
 
 ## Not established by Phase A
 

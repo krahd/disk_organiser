@@ -1,0 +1,42 @@
+{
+  "source_commit": "07b93c5e2f0f09746d024884681259aaf513903d",
+  "source_tree": "a0c13a1737790f8bf2e7971da76195d16ab1f5ca",
+  "event": "push",
+  "run_id": 38003620756,
+  "job_id": 114067250009,
+  "artifact_id": 11650306815,
+  "artifact_bytes": 2518,
+  "artifact_sha256": "6314bbb58f899672cfe70976b37b75a2e58113c5d33332600bb7a614680001db",
+  "files": [
+    {
+      "path": "directory-limit.json",
+      "bytes": 405,
+      "sha256": "80320fd702de6c71635818c55ebd54173c76467faba36827bc150ebbd865a022"
+    },
+    {
+      "path": "depth-limit.json",
+      "bytes": 1067,
+      "sha256": "73487530117729a055887149aff5ea4755191dc90ae4aadac90a353bd457ef59"
+    },
+    {
+      "path": "empty.json",
+      "bytes": 350,
+      "sha256": "da37fbcf530b0a4dd840e216dbebc165dcf5518293e604538dfb8963fca9a1a5"
+    },
+    {
+      "path": "links.json",
+      "bytes": 622,
+      "sha256": "a60454b4763061ec549817c01162f93f02a99e030442c8f5b2cdef20dd1a5d16"
+    },
+    {
+      "path": "nested.json",
+      "bytes": 673,
+      "sha256": "341e9c5e37285a9ef32a289ae75d52683a0b79917722364773c79465e637d53e"
+    },
+    {
+      "path": "placeholder.json",
+      "bytes": 560,
+      "sha256": "4194cce45027140ec7b3945d7a941a3f153f42d2e54c7102eb2bd4ef823445f7"
+    }
+  ]
+}

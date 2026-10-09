@@ -1,0 +1,1 @@
+{"schema_version":"disk-organiser/inventory-snapshot/v1","source":{"label":"Owned fixture empty","observed_at":"2026-10-09T23:19:29.859Z","scan_id":"scan_e1f62281b9444672834396e9","coverage":"complete"},"entries":[{"path":".","kind":"directory","status":"observed","logical_bytes":null}],"gaps":{"exclusions":[],"error_count":"0","stop_reason":null}}
