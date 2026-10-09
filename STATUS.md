@@ -1,6 +1,36 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 06:13
+Last updated: 2026-10-09 07:23
+
+## Historical inventory catalogue and scoped overview checkpoint
+
+- Added a separate empty-first `frontend/inventory-catalogue.html` page for historical selected-folder snapshots. Up to 32 independently labelled records share a 10,000-entry/4 MiB aggregate budget. Cards show source dates, scoped top-level groups and listed observed logical-file sizes; search across saved records works without connected storage. Physical-drive identity, current presence, whole-drive capacity and protection stay unknown. Partial and missing-record states never imply empty or complete drives.
+- A display-only backend bridge consumes the existing one-shot process-local selection and projects minimal metadata. Only newly created owned temporary fixtures are observed in this work. Absolute roots, device/inode identity, hashes, allocation and all operation authority are omitted. There is no route, native user-folder selector, arbitrary inventory conversion, provider, persistent access or mutation/recovery connection; the synthetic-only adapter is unchanged.
+- Every imported snapshot remains an unauthenticated historical claim. Renaming a catalogue card preserves embedded source labels/dates/paths; duplicate visible labels never merge records. Exact bounded parsing, fatal UTF-8, duplicate-key rejection, hierarchy/gap consistency, upfront canonical byte budgets, staged imports and generation checks preserve existing state on rejection, interruption or navigation. All text is inert; no browser storage or network is added.
+- Users explicitly select observed plain files/folders across records, without ancestor/descendant overlap inside a record, and download a manual project plan for the unchanged planning workspace. Full historical origin stays in per-item notes; current named locations and membership are manual decisions. Intended homes remain unset and targets empty. Catalogue export/reopen retains source history; temporary project selections require separate plan export. Download feedback and revision-specific save acknowledgement remain distinct.
+- Local verification currently passes 91 focused backend/scoped tests, 65 new model tests (615 aggregate Jest) and 27 catalogue DOM checks; all 43 existing manual-workspace DOM checks, 44-route OpenAPI and frontend formatting also pass. Seven Chromium specifications parse/list, but the local browser launch failed before executing any journey because the locked Chromium executable is absent. Independent source/model/DOM review accepts the repaired candidate after additional bounds, owned-producer and interruption probes; hosted exact-source execution and original-pixel inspection remain pending. No browser/hardware, physical backup or sale-readiness acceptance is claimed.
+- [Catalogue contract, usage, limits and verification](docs/INVENTORY-CATALOGUE.md). The dedicated read-only workflow tests the model/DOM on Linux and Windows and retains a bounded originals-only Chromium screenshot packet. Existing application/model/schema/default navigation, dependencies and prior workflows remain unchanged.
+
+The new read-only bridge separates process-local observation, imported display claims and explicit manual intent. No arrow grants physical identity, protection or execution authority.
+
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="210" viewBox="0 0 920 210" font-family="DejaVu Sans, sans-serif" role="img" aria-labelledby="catalogue-flow-title catalogue-flow-desc">
+<title id="catalogue-flow-title">Historical catalogue to manual plan boundary</title>
+<desc id="catalogue-flow-desc">Owned selected-folder observation produces a display snapshot. Explicit import creates untrusted historical catalogue records. User selection creates a manual plan with source notes. No execution is available.</desc>
+<defs><marker id="catalogue-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#53685b"/></marker></defs>
+<rect x="15" y="35" width="190" height="100" rx="8" fill="#eef3e9" stroke="#53685b"/>
+<text x="110" y="65" text-anchor="middle" font-size="15">Owned selected folder</text><text x="110" y="92" text-anchor="middle" font-size="13">Metadata-only one-shot</text><text x="110" y="114" text-anchor="middle" font-size="13">No user-drive surface</text>
+<line x1="205" y1="85" x2="245" y2="85" stroke="#53685b" marker-end="url(#catalogue-arrow)"/>
+<rect x="250" y="35" width="185" height="100" rx="8" fill="#fff5df" stroke="#53685b"/>
+<text x="342" y="65" text-anchor="middle" font-size="15">Snapshot JSON</text><text x="342" y="92" text-anchor="middle" font-size="13">Historical display claim</text><text x="342" y="114" text-anchor="middle" font-size="13">Not authenticated</text>
+<line x1="435" y1="85" x2="475" y2="85" stroke="#53685b" marker-end="url(#catalogue-arrow)"/>
+<rect x="480" y="35" width="190" height="100" rx="8" fill="#fff5df" stroke="#53685b"/>
+<text x="575" y="65" text-anchor="middle" font-size="15">Saved catalogue</text><text x="575" y="92" text-anchor="middle" font-size="13">Label, overview, search</text><text x="575" y="114" text-anchor="middle" font-size="13">Presence unknown</text>
+<line x1="670" y1="85" x2="710" y2="85" stroke="#53685b" marker-end="url(#catalogue-arrow)"/>
+<rect x="715" y="35" width="190" height="100" rx="8" fill="#eef3e9" stroke="#53685b"/>
+<text x="810" y="65" text-anchor="middle" font-size="15">Manual project plan</text><text x="810" y="92" text-anchor="middle" font-size="13">Explicit chosen scopes</text><text x="810" y="114" text-anchor="middle" font-size="13">Source notes retained</text>
+<text x="460" y="166" text-anchor="middle" font-size="14">Paths stay text. Physical identity and protection remain unknown.</text>
+<text x="460" y="191" text-anchor="middle" font-size="14">No file operations.</text>
+</svg>
 
 ## Guided manual planning workspace checkpoint
 
@@ -523,4 +553,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 06:13
+Last updated: 2026-10-09 07:23

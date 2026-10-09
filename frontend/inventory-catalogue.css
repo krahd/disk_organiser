@@ -1,0 +1,328 @@
+.catalogue-shell {
+  max-width: 1240px;
+  margin: auto;
+  padding: 2.5rem 2rem;
+}
+.catalogue-intro {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 3rem;
+  align-items: end;
+  margin-bottom: 2rem;
+}
+.catalogue-intro h1 {
+  margin-bottom: 1rem;
+}
+.boundary-card,
+.unknown-protection {
+  padding: 1.15rem;
+  border: 1px solid #d1b879;
+  border-radius: 8px;
+  background: #fcf3df;
+  font-size: 0.86rem;
+}
+.empty-catalogue {
+  text-align: center;
+  padding: 4rem 2rem;
+  border: 1px dashed #9aac9c;
+  border-radius: 12px;
+  background: #fffefa;
+}
+.empty-catalogue p {
+  max-width: 650px;
+  margin: 1rem auto 0;
+}
+.empty-disks {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+.empty-disks i {
+  width: 52px;
+  height: 76px;
+  border: 2px solid #849a89;
+  border-radius: 9px;
+  background: linear-gradient(#e6eddf 75%, #cad8c3 75%);
+  transform: rotate(-8deg);
+}
+.empty-disks i:nth-child(2) {
+  transform: translateY(-8px);
+}
+.empty-disks i:nth-child(3) {
+  transform: rotate(8deg);
+}
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 1rem;
+  margin: 1.2rem 0 2.5rem;
+}
+.source-card {
+  padding: 1.3rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fffefa;
+  min-width: 0;
+}
+.source-card h3 {
+  font-size: 1.2rem;
+  overflow-wrap: anywhere;
+}
+.source-card .source-icon {
+  width: 34px;
+  height: 42px;
+  border: 2px solid #647d6c;
+  border-radius: 6px;
+  display: block;
+  background: #e7eedf;
+  margin-bottom: 0.8rem;
+}
+.source-card .source-date {
+  overflow-wrap: anywhere;
+  color: #54645b;
+  font-size: 0.78rem;
+  margin: 0.5rem 0;
+}
+.source-card .source-stat {
+  overflow-wrap: anywhere;
+  font-size: 1.6rem;
+  font-weight: 670;
+  letter-spacing: -0.04em;
+}
+.source-card .source-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.source-card .group-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+.source-card .group-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  margin: 0.4rem 0;
+}
+.source-card .group-list li span:first-child {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.source-card .group-list li span:last-child {
+  flex: 0 1 45%;
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.composition {
+  display: flex;
+  min-height: 12px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #e4e8df;
+  margin-top: 0.8rem;
+}
+.composition span {
+  flex-basis: 0;
+  background: #39755c;
+  min-width: 0;
+}
+.composition span:nth-child(4n + 2) {
+  background: #728e48;
+}
+.composition span:nth-child(4n + 3) {
+  background: #baaa73;
+}
+.composition span:nth-child(4n) {
+  background: #8ca6a4;
+}
+.coverage-label {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.18rem 0.55rem;
+  background: #ecefe7;
+  border-radius: 5px;
+  font-size: 0.75rem;
+}
+.coverage-label.partial {
+  background: #faebd0;
+  color: #704409;
+}
+.catalogue-work {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 2rem;
+  align-items: start;
+}
+.catalogue-browser {
+  min-width: 0;
+}
+.search-controls {
+  display: grid;
+  grid-template-columns: 1fr 210px;
+  gap: 1rem;
+  margin: 1.3rem 0 0.6rem;
+}
+.catalogue-results {
+  margin: 0.7rem 0;
+}
+.catalogue-entry {
+  display: flex;
+  align-items: start;
+  gap: 0.7rem;
+  padding: 0.85rem;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  background: #fffefa;
+  font-weight: 400;
+  min-height: 64px;
+}
+.catalogue-entry:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.catalogue-entry .entry-text {
+  min-width: 0;
+  flex: 1;
+}
+.catalogue-entry strong,
+.catalogue-entry small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.catalogue-entry input {
+  margin-top: 0.35rem;
+}
+.catalogue-entry:has(input:checked) {
+  background: #e6eedf;
+  border-left: 4px solid #39755c;
+  padding-left: calc(0.85rem - 3px);
+}
+.catalogue-entry .entry-kind {
+  font-size: 0.75rem;
+  color: #54645b;
+}
+.result-pages {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.result-pages span {
+  text-align: center;
+  font-size: 0.8rem;
+}
+.project-selection {
+  background: #e8eee0;
+  padding: 1.3rem;
+  border-radius: 10px;
+  min-width: 0;
+}
+.project-selection h2 {
+  margin-bottom: 0.8rem;
+}
+.project-selection > button {
+  width: 100%;
+  margin-top: 0.6rem;
+}
+.project-selection .selection-number {
+  font-size: 1.45rem;
+  font-weight: 650;
+  margin: 1rem 0;
+}
+.project-selection .small {
+  margin-top: 1rem;
+}
+#selected-scopes {
+  max-height: 250px;
+  overflow: auto;
+}
+.selected-scope {
+  overflow-wrap: anywhere;
+  font-size: 0.8rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid #c6d1bc;
+}
+.unknown-protection {
+  margin-top: 1.2rem;
+}
+#catalogue-precision {
+  margin-top: 2rem;
+}
+.source-detail {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+#catalogue-dialog {
+  max-width: 620px;
+}
+#catalogue-dialog-body {
+  margin-top: 1rem;
+}
+#catalogue-dialog-body label {
+  margin-top: 0.8rem;
+}
+#catalogue-dialog-body p {
+  overflow-wrap: anywhere;
+}
+#catalogue-close {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  min-width: 64px;
+}
+#catalogue-dialog .dialog-heading {
+  align-items: start;
+}
+#catalogue-dialog-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+#catalogue-dialog button,
+.source-actions button {
+  white-space: normal;
+}
+@media (max-width: 800px) {
+  .catalogue-intro,
+  .catalogue-work {
+    grid-template-columns: 1fr;
+    gap: 1.3rem;
+  }
+  .project-selection {
+    order: -1;
+  }
+  .catalogue-shell {
+    padding: 1.5rem 1rem;
+  }
+}
+@media (max-width: 440px) {
+  .search-controls {
+    grid-template-columns: 1fr;
+  }
+  .catalogue-shell {
+    padding: 1rem 0.8rem;
+  }
+  .empty-catalogue {
+    padding: 2rem 1rem;
+  }
+  .app-header {
+    padding: 1rem 0.8rem;
+  }
+  .source-card {
+    padding: 1rem;
+  }
+}
+@media (forced-colors: active) {
+  .composition span {
+    border: 1px solid CanvasText;
+  }
+  .source-card,
+  .project-selection {
+    border: 1px solid CanvasText;
+  }
+}

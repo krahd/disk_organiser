@@ -1,0 +1,69 @@
+{
+  "schema_version": "disk-organiser/inventory-snapshot/v1",
+  "source": {
+    "label": "Owned example · archive folder",
+    "observed_at": "2026-10-09T07:14:51.394781+00:00",
+    "scan_id": "scan_80d1e6b72571d5817928ab95",
+    "coverage": "partial"
+  },
+  "entries": [
+    {
+      "path": ".",
+      "kind": "directory",
+      "status": "observed",
+      "logical_bytes": null
+    },
+    {
+      "path": "Exports",
+      "kind": "directory",
+      "status": "observed",
+      "logical_bytes": null
+    },
+    {
+      "path": "Exports/Film.mov",
+      "kind": "file",
+      "status": "observed",
+      "logical_bytes": "9437184"
+    },
+    {
+      "path": "External link",
+      "kind": "symlink",
+      "status": "unsupported",
+      "logical_bytes": null
+    },
+    {
+      "path": "Invoices",
+      "kind": "directory",
+      "status": "observed",
+      "logical_bytes": null
+    },
+    {
+      "path": "Invoices/Record.txt",
+      "kind": "file",
+      "status": "observed",
+      "logical_bytes": "2500"
+    },
+    {
+      "path": "Reference",
+      "kind": "directory",
+      "status": "observed",
+      "logical_bytes": null
+    },
+    {
+      "path": "Reference/Sketch.png",
+      "kind": "file",
+      "status": "observed",
+      "logical_bytes": "3145728"
+    }
+  ],
+  "gaps": {
+    "exclusions": [
+      {
+        "reason": "symlink_not_followed",
+        "count": "1"
+      }
+    ],
+    "error_count": "0",
+    "stop_reason": null
+  }
+}
