@@ -1,6 +1,15 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 23:24
+Last updated: 2026-10-09 23:55
+
+## Historical location comparison checkpoint
+
+- Added an explicit two-record comparison to the existing visual catalogue. Users choose the pair, see recorded overlap/differences and decide which labelled location to reconnect and check. The default view leads with plain descriptions and source context; raw source dates, gap reasons and exact decimal sizes remain available in details.
+- The pure bounded model groups all exact relative child paths into one-sided listings, matching listed details, differing recorded details or uncertain/unsupported records. Uncertain ancestors keep descendants uncertain. Same names or logical sizes never imply identical contents, physical-drive identity, verified copies, deletion, live presence or backup protection. Folder-kind agreement does not claim matching contents.
+- Inputs pass the unchanged v1 catalogue validator. The full union (at most 3,998 children) is counted before 50-row pagination. Record numbers disambiguate duplicate labels; left/right do not infer chronology. Cancelling/closing preserves records and project selection; confirmed catalogue replacement retires comparison state. No schema, source/provenance, native-runtime, provider, drive-read or operation authority changes.
+- Local checks pass 665 Jest cases (27 new comparison cases), 39 catalogue DOM checks and full frontend formatting. The first aggregate local attempt lacked unchanged manual-planning fixtures; fetching the pinned baseline fixtures restored all 665 passes. Initial local Chromium launch stopped because the locked browser was absent. After installing the existing locked version in the owned workspace, nine Chromium journeys pass, including both comparison flows; twenty original PNGs are preserved. The unchanged direct `file:` launch case is blocked by the browser administrator and remains unverified locally. No security workaround, test change or full local browser pass is claimed. Full hosted CI and independent source/pixel review remain pending. [Comparison contract](docs/INVENTORY-CATALOGUE.md#compare-two-saved-locations).
+
+The existing source/intent and native diagrams remain accurate: comparison is a second read-only presentation of admitted historical records. It adds no authority-bearing path or storage connection.
 
 ## Isolated owned native core checkpoint
 
@@ -609,4 +618,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 23:24
+Last updated: 2026-10-09 23:55

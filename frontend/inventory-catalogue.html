@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="inventory-catalogue.css" />
     <script src="manual-planning-model.js" defer></script>
     <script src="inventory-snapshot-model.js" defer></script>
+    <script src="inventory-comparison-model.js" defer></script>
     <script src="inventory-catalogue.js" defer></script>
   </head>
   <body>
@@ -71,6 +72,80 @@
           check it in your own tools; this page cannot detect a connection.
         </p>
         <div id="source-cards" class="source-grid"></div>
+        <section class="comparison-section" aria-labelledby="comparison-heading">
+          <div class="comparison-heading">
+            <div>
+              <p class="eyebrow">COMPARE SAVED LOCATIONS</p>
+              <h2 id="comparison-heading">Where is your project recorded?</h2>
+              <p>Compare two saved locations before deciding which one to reconnect and check.</p>
+            </div>
+            <button id="choose-comparison" class="secondary-button" type="button" disabled>
+              Compare two locations
+            </button>
+          </div>
+          <p id="comparison-hint" class="small muted">
+            Add a second saved record to compare locations.
+          </p>
+          <div id="comparison-view" hidden>
+            <div id="comparison-sources" class="comparison-sources"></div>
+            <p class="comparison-caution">
+              Matching names and sizes do not prove identical contents or a backup. “Not listed”
+              never means deleted or absent from a live drive.
+            </p>
+            <div
+              id="comparison-counts"
+              class="comparison-counts"
+              aria-label="Recorded path groups"
+            ></div>
+            <div class="comparison-controls">
+              <div>
+                <label for="comparison-filter">Show recorded paths</label
+                ><select id="comparison-filter">
+                  <option value="">All groups</option>
+                  <option value="left">Only listed in Left</option>
+                  <option value="right">Only listed in Right</option>
+                  <option value="different">Different recorded details</option>
+                  <option value="uncertain">Needs a closer look</option>
+                  <option value="matching">Matching listed details</option>
+                </select>
+              </div>
+              <button id="clear-comparison" class="text-button" type="button">
+                Close comparison
+              </button>
+            </div>
+            <p id="comparison-result-count" role="status" class="small muted"></p>
+            <div id="comparison-results"></div>
+            <nav class="result-pages" aria-label="Comparison result pages">
+              <button
+                id="comparison-previous"
+                class="secondary-button"
+                type="button"
+                aria-label="Previous comparison page"
+              >
+                Previous</button
+              ><span id="comparison-page"></span
+              ><button
+                id="comparison-next"
+                class="secondary-button"
+                type="button"
+                aria-label="Next comparison page"
+              >
+                Next
+              </button>
+            </nav>
+            <details class="comparison-details">
+              <summary>How to read this comparison</summary>
+              <p>
+                Paths are matched exactly, relative to each recorded folder. A completed listing
+                means complete within the recorded folder policy, not a whole-drive inventory.
+                Folder names do not prove matching contents. No identity, ordering in time, file
+                version, current presence or protection is verified. Gaps can hide entries, even
+                where other entries were observed.
+              </p>
+              <div id="comparison-source-details"></div>
+            </details>
+          </div>
+        </section>
         <section class="catalogue-work">
           <div class="catalogue-browser">
             <h2>Find files and build a project</h2>

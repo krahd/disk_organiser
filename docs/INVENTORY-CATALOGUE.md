@@ -49,6 +49,18 @@ Initial `ff84f331` passed eight journeys and all workflows, yet the full-page no
 
 Earlier catalogue evidence below remains attributed to its original source. Native browser-UI zoom, OS dialogues, assistive technology, participant usability and real-drive/backup/restore remain separate acceptance gates.
 
+## Compare two saved locations
+
+After opening at least two records, choose **Compare two locations**, explicitly choose Left and Right, and confirm. Record numbers distinguish repeated labels. Left and Right do not mean earlier/later or two distinct physical drives. Cancelling keeps the previous pair and filter; closing returns focus without changing the catalogue or manual project selection. Confirmed catalogue replacement clears temporary comparison state.
+
+The comparison groups every non-root relative path across the chosen pair: only listed on the left, only listed on the right, differing recorded details, uncertain/unsupported records, or matching listed details. Paths match by exact spelling, without case folding or Unicode normalisation. A folder matches only its recorded kind; descendants remain separate rows. An uncertain containing folder keeps its listed descendants uncertain. One-sided rows say “Not listed in this snapshot”, never deleted or absent from live storage. Matching file path/size means no more than those fields: contents, versions, copies and backup protection remain unverified.
+
+The full bounded union is counted before 50-row pagination: at most 3,998 child paths from two valid 2,000-entry snapshots. Filters and empty states never silently truncate the result. Both source labels, dates and coverage stay visible; raw ISO, source references and gap reasons remain in expert details. Approximate displayed file sizes have expandable exact decimal-byte counts. No combined capacity, physical identity or protection estimate is produced.
+
+Comparison is temporary presentation, not a new saved format or source authority. All snapshot/catalogue/manual v1 schemas and producer/native boundaries are unchanged. The pure `inventory-comparison-model.js` validates the existing catalogue before comparing and returns an immutable copy without changing its caller. Browser code adds no filesystem, network, provider or storage access. The owned comparison fixture is synthetic saved-history test data only.
+
+Local validation covers 27 new model cases, including the full maximum pair, Unicode/case distinction, ancestor uncertainty and exact large decimals. The catalogue DOM harness adds explicit pair cancellation/error/reversal, state preservation, all filters, complete pagination and replacement retirement. Nine local Chromium journeys now pass, including both comparison flows, with original desktop/mobile/zoom screenshots preserved. The unchanged direct `file:` launch journey is blocked by the cloud browser administrator and remains unverified locally; no workaround or weakened assertion was used. Full hosted browser validation and independent source/pixel review remain required.
+
 ## Producer and trust boundary
 
 `backend/inventory_snapshot.py` exposes `observe_snapshot(selection, source_label, *, cancel=None, progress=None)`. It accepts the existing live process-local `ReadOnlySelection`, consumes it through `observe_once`, and projects display metadata. It does not accept an inventory dictionary, open a path itself, add an OS permission grant or register a public route/CLI. The return value is a `{state, snapshot}` wrapper. Only its non-null `snapshot` member is the browser artifact; do not serialise the wrapper for import. A terminal result without admitted observations has `snapshot: null`.
