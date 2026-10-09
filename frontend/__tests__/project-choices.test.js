@@ -151,6 +151,33 @@ test("opening stages without replacing; Cancel preserves accepted review and edi
   expect(fetchMock).toHaveBeenCalledTimes(2);
 });
 
+test.each([0, 1, 2])("staged summary uses correct nouns for %i added members", (added) => {
+  const intent = editor();
+  intent.members
+    .filter((member) => !member.included)
+    .slice(0, added)
+    .forEach((member) => {
+      member.included = true;
+    });
+  intent.members[0].project_path = "Design/one-edited-path.blend";
+  read(model.serialise(intent, fixture));
+  expect(id("choices-summary").textContent).toContain(
+    `${added} ${added === 1 ? "member" : "members"} added · 0 removed · 1 edited path`
+  );
+  expect(id("choices-summary").textContent).not.toContain("1 edited paths");
+});
+
+test("a destination card with one included member uses the singular noun", () => {
+  const intent = editor();
+  intent.members.forEach((member, index) => {
+    member.included = index === 0;
+  });
+  read(model.serialise(intent, fixture));
+  const cards = id("choices-summary").querySelectorAll(".destination-grid .current-layout");
+  expect(cards[1].textContent).toContain("1 included member");
+  expect(cards[1].textContent).not.toContain("1 included members");
+});
+
 test("Replace restores every choice but no accepted review or report export", async () => {
   await accepted();
   const input = fileText();

@@ -261,7 +261,7 @@ test("download reload cancel reselect replace and explicit Review preserve exact
   await expect(byId(page, "choices-summary")).toContainText("Exclude:");
   await expect(byId(page, "choices-summary")).toContainText("Saved excluded path/é-🛰.data");
   await expect(byId(page, "choices-summary")).toContainText(
-    "1 members added · 1 removed · 2 edited paths"
+    "1 member added · 1 removed · 2 edited paths"
   );
   await evidence(page, testInfo, "aurora-project-choices-staged-desktop");
   await byId(page, "cancel-choices").click();

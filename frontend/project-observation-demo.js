@@ -252,7 +252,11 @@
           append(
             summary,
             "p",
-            `${added} members added · ${removed} removed · ${changedPaths} edited paths`
+            `${added} ${
+              added === 1 ? "member" : "members"
+            } added · ${removed} removed · ${changedPaths} edited ${
+              changedPaths === 1 ? "path" : "paths"
+            }`
           );
           const comparison = append(summary, "div", undefined, "destination-grid");
           for (const [label, choices] of [
@@ -260,12 +264,9 @@
             ["Saved choices", intent],
           ]) {
             const card = append(comparison, "div", undefined, "current-layout");
+            const included = choices.members.filter((member) => member.included).length;
             append(card, "h4", label);
-            append(
-              card,
-              "p",
-              `${choices.members.filter((member) => member.included).length} included members`
-            );
+            append(card, "p", `${included} included ${included === 1 ? "member" : "members"}`);
             append(card, "p", "Intended location", "muted");
             append(card, "p", rootName(choices.destination_root_id), "path");
             append(card, "p", choices.destination_folder, "path");
