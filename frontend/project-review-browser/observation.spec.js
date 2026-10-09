@@ -246,6 +246,12 @@ test("keyboard-only editing, review and dismissal preserve focus and reference",
   await page.keyboard.press("Tab");
   await expect(byId(page, "reload")).toBeFocused();
   for (let count = 0; count < 4; count++) await page.keyboard.press("Tab");
+  await expect(byId(page, "save-choices")).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(byId(page, "open-choices")).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(byId(page, "choices-details")).toBeFocused();
+  await page.keyboard.press("Tab");
   await expect(byId(page, "member-0")).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(byId(page, "path-0")).toBeFocused();

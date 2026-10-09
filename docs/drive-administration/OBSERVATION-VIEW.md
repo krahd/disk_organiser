@@ -14,7 +14,7 @@ python prototypes/drive_administration/demo_server.py --port 8765
 
 The permanent banner identifies synthetic observations and disconnected drives/providers. Harbour's two fixtures, evaluator outputs, styles and controls are preserved. A scoped Aurora-only intrinsic grid rule keeps member labels readable at enlarged scale. The default application and its 44-route OpenAPI contract are unchanged; the separate demo routes are documented here and in [the interaction contract](INTERACTION-DEMO.md).
 
-The observation-view checkpoint added no arbitrary import, file picker, upload, native scanning, provider call, filesystem mutation, execution/recovery, autosave, export, deployment or real-observation flag conversion. This observation-view checkpoint itself has no export. The later [Save review slice](SAVE-REVIEW.md) adds only a current, successful explicit display-report download; its verification is separate.
+The observation-view checkpoint added no arbitrary import, file picker, upload, native scanning, provider call, filesystem mutation, execution/recovery, autosave, export, deployment or real-observation flag conversion. This observation-view checkpoint itself has no export. The later [Save review slice](SAVE-REVIEW.md) adds only a current, successful explicit display-report download; its verification is separate. The subsequent [project-choices slice](PROJECT-CHOICES.md) adds a distinct browser-local intent file and explicit reopen/replace flow. The report itself remains non-replayable.
 
 ## Fixed source and explicit intent
 

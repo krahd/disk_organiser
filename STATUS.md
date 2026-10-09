@@ -1,6 +1,15 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 02:49
+Last updated: 2026-10-09 05:12
+
+## Aurora project choices checkpoint
+
+- The isolated Aurora example now saves editable project choices before Review and stages a deliberately selected choices file for explicit replacement. Current/saved destination cards, membership and edited-path counts give a concise comparison; exact member paths and file limits are optional detail. Cancel preserves current edits and review. Successful replacement clears the prior review/report export and requires a fresh explicit Review. [Contract and boundaries](docs/drive-administration/PROJECT-CHOICES.md).
+- The new `disk-administration-project-intent/v1` contract is separate from the unchanged non-replayable report. It holds all eight membership choices and edited paths, including unchecked edits, plus the intended destination and exact packaged-source identity. Admission caps bytes at 8 KiB, depth at eight, parsed nodes at 256 and the existing review-request projection at 4 KiB. Strict UTF-8, duplicate decoded keys, exact field allowlists, canonical safe integer revisions, relative paths, Unicode and exact source matching are enforced. Imported strings never grant native access or supply observation, backup, recovery or execution evidence.
+- A separate import epoch and full-control/source snapshots prevent delayed reads, edits, repeated opens, dismissal, reload, page exit or back/forward restoration from reviving obsolete choices. Saving rechecks source, generation and controls before download activation/status and releases temporary object URLs. No upload, autosave or browser persistence is added. The only server change is one fixed static asset: ten isolated routes and six assets; the default 44-route API is unchanged.
+- Fresh local checks pass 347 Jest tests (77 pure intent, 32 choices-flow and 238 existing tests), 691 backend tests in fresh owned app state, 140 pure planner tests, 39 isolated HTTP contracts, 44 OpenAPI routes, frontend formatting, YAML compatibility, Python compilation and whitespace checks. Both npm and pinned Python dependency audits report no known vulnerabilities. Broad flake8 retains pre-existing diagnostics in the three touched Python files; baseline comparison establishes zero new diagnostics. All 36 isolated browser specifications parse, including eleven new project-choices flows. The retained pre-implementation admission failure and earlier independent numeric/download lifecycle regressions are preserved as evidence; fresh independent source review finds no blocker after 109 focused Jest tests and 1,700 additional assertions covering all 510 nonempty membership/root combinations, independent request projections, strict admission and real asynchronous FileReader lifecycle flows.
+- Local Chromium launch is blocked by sandbox process-socket restrictions, so no local browser/pixel pass is claimed. Exact-source hosted tests, independent rendered review and manual merge approval remain pending. Dependency and workflow files, real-drive/provider access, mutation/recovery gates and manual-only documentation publication are unchanged. Representative hardware, native browser zoom, assistive technology, real-data and release acceptance remain separate.
+- The next useful product boundary is a person's bounded declared or imported inventory, with source-bound intent and explicit reconciliation. This is documented as a proposal only; the current slice remains the packaged synthetic Aurora example.
 
 ## Maintenance status payload-bound checkpoint
 
@@ -468,4 +477,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 02:49
+Last updated: 2026-10-09 05:12

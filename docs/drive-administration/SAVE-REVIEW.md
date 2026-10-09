@@ -8,6 +8,8 @@ The accepted [Aurora observation view](OBSERVATION-VIEW.md) supports explicit pr
 
 This is a synthetic display report, not a canonical observation export and not replayable. It cannot authorise copy, restore, erasure or any other operation. It does not supply missing evidence or authenticate physical identity. Harbour, all HTTP routes, server/adapter code, source fixtures, styles and workflows are unchanged. No import, upload, autosave, native filesystem API, scanner, provider, executable plan or deployment is added.
 
+A later [project-choices slice](PROJECT-CHOICES.md) adds a separate intent-only save/reopen format. It does not change or replay this display report; successfully replacing choices clears report availability and requires fresh Review.
+
 ## Availability and exact binding
 
 Saving is enabled only after an explicit Review succeeds, the existing source/decision/authority checks pass, and the complete result renders. The displayed reference by itself cannot be saved through this action. Dismiss restores that reference and disables Save.

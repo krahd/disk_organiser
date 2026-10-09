@@ -35,6 +35,10 @@
   };
 
   function createObservationDemo(doc, requestFetch) {
+    const intentModel =
+      typeof module !== "undefined" && module.exports
+        ? require("./project-intent-model")
+        : doc.defaultView.ProjectIntentModel;
     const byId = (id) => doc.getElementById(id);
     const token = doc.querySelector('meta[name="demo-process-token"]').content;
     const fields = byId("observation-fields");
@@ -49,6 +53,10 @@
     let controller = null;
     let pending = false;
     const controls = new Map();
+    let importEpoch = 0;
+    let importReader = null;
+    let stagedIntent = null;
+    const choiceURLs = new Map();
 
     function append(parent, tag, text, className) {
       const node = doc.createElement(tag);
@@ -84,6 +92,7 @@
       for (const url of downloadURLs.keys()) releaseDownload(url);
     }
     function invalidate() {
+      clearImport();
       clearExport();
       generation += 1;
       if (controller) controller.abort();
@@ -91,6 +100,278 @@
       pending = false;
       reviewButton.disabled = !reference;
       return generation;
+    }
+    function choicesStatus(message) {
+      byId("observation-choices-status").textContent = message;
+    }
+    function captureChoices() {
+      return {
+        members: Array.from(controls, ([entry_id, control]) => ({
+          entry_id,
+          included: control.check.checked,
+          project_path: control.path.value,
+        })),
+        destination_root_id: byId("observation-root").value,
+        destination_folder: byId("observation-folder").value,
+      };
+    }
+    function clearImport() {
+      const discarded = stagedIntent || importReader;
+      importEpoch += 1;
+      stagedIntent = null;
+      const reader = importReader;
+      importReader = null;
+      if (reader && reader.readyState === 1) reader.abort();
+      byId("observation-choices-preview").hidden = true;
+      byId("observation-choices-summary").replaceChildren();
+      if (discarded)
+        choicesStatus("Opened choices discarded. Open the saved file again when you are ready.");
+    }
+    function releaseChoiceURL(url) {
+      if (!choiceURLs.has(url)) return true;
+      const timer = choiceURLs.get(url);
+      if (timer !== undefined) win.clearTimeout(timer);
+      try {
+        win.URL.revokeObjectURL(url);
+        choiceURLs.delete(url);
+        return true;
+      } catch (_failure) {
+        choicesStatus("Temporary choices-download cleanup failed. Reload this page.");
+        return false;
+      }
+    }
+    function saveChoices() {
+      if (!reference) return;
+      const source = reference;
+      const savedGeneration = generation;
+      let url = null;
+      let anchor = null;
+      try {
+        const snapshot = JSON.stringify(captureChoices());
+        const json = intentModel.serialise(captureChoices(), source);
+        const blob = new win.Blob([json], { type: "application/json" });
+        url = win.URL.createObjectURL(blob);
+        choiceURLs.set(url, undefined);
+        if (
+          reference !== source ||
+          generation !== savedGeneration ||
+          snapshot !== JSON.stringify(captureChoices())
+        ) {
+          const released = releaseChoiceURL(url);
+          if (released && reference === source && generation === savedGeneration)
+            choicesStatus("Choices changed before download. Save the current choices again.");
+          return;
+        }
+        anchor = doc.createElement("a");
+        anchor.href = url;
+        anchor.download = "disk-organiser-aurora-project-choices.json";
+        anchor.hidden = true;
+        doc.body.append(anchor);
+        anchor.click();
+        if (
+          reference === source &&
+          generation === savedGeneration &&
+          snapshot === JSON.stringify(captureChoices())
+        )
+          choicesStatus(
+            "Choices download requested. Reopening restores editable intent and requires a fresh Review."
+          );
+        if (choiceURLs.has(url))
+          choiceURLs.set(
+            url,
+            win.setTimeout(() => releaseChoiceURL(url), 0)
+          );
+      } catch (failure) {
+        const released = !url || releaseChoiceURL(url);
+        if (released && reference === source && generation === savedGeneration)
+          choicesStatus(
+            `Choices could not be saved: ${
+              failure.message || "download unavailable"
+            }. Current edits are unchanged.`
+          );
+      } finally {
+        if (anchor) anchor.remove();
+      }
+    }
+    function openChoices() {
+      if (!reference) return;
+      clearImport();
+      const input = byId("observation-choices-file");
+      input.value = "";
+      input.click();
+    }
+    function readChoices() {
+      const file = byId("observation-choices-file").files[0];
+      if (!file || !reference) return;
+      clearImport();
+      const epoch = importEpoch;
+      const source = reference;
+      const before = JSON.stringify(captureChoices());
+      const current = () => epoch === importEpoch && reference === source;
+      const unchanged = () => before === JSON.stringify(captureChoices());
+      if (file.size > intentModel.MAX_BYTES) {
+        choicesStatus(
+          "Project-choices files must be no larger than 8 KiB. Current choices and review are unchanged."
+        );
+        return;
+      }
+      const reader = new win.FileReader();
+      importReader = reader;
+      choicesStatus("Reading project choices locally. Current edits and review are unchanged.");
+      reader.onload = () => {
+        if (!current()) return;
+        importReader = null;
+        try {
+          if (!unchanged())
+            throw new Error("Choices changed while the file was opening. Open it again");
+          if (
+            !(reader.result instanceof win.ArrayBuffer) ||
+            reader.result.byteLength > intentModel.MAX_BYTES
+          )
+            throw new Error("Project-choices files must be no larger than 8 KiB");
+          const input = new win.TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(
+            reader.result
+          );
+          const intent = intentModel.parse(input, source);
+          if (!current() || !unchanged()) return;
+          stagedIntent = { epoch, source, before, intent };
+          const summary = byId("observation-choices-summary");
+          const currentChoices = captureChoices();
+          const currentMembers = new Map(
+            currentChoices.members.map((member) => [member.entry_id, member])
+          );
+          const added = intent.members.filter(
+            (member) => member.included && !currentMembers.get(member.entry_id).included
+          ).length;
+          const removed = intent.members.filter(
+            (member) => !member.included && currentMembers.get(member.entry_id).included
+          ).length;
+          const changedPaths = intent.members.filter(
+            (member) => member.project_path !== currentMembers.get(member.entry_id).project_path
+          ).length;
+          append(
+            summary,
+            "p",
+            `${added} members added · ${removed} removed · ${changedPaths} edited paths`
+          );
+          const comparison = append(summary, "div", undefined, "destination-grid");
+          for (const [label, choices] of [
+            ["Current choices", currentChoices],
+            ["Saved choices", intent],
+          ]) {
+            const card = append(comparison, "div", undefined, "current-layout");
+            append(card, "h4", label);
+            append(
+              card,
+              "p",
+              `${choices.members.filter((member) => member.included).length} included members`
+            );
+            append(card, "p", "Intended location", "muted");
+            append(card, "p", rootName(choices.destination_root_id), "path");
+            append(card, "p", choices.destination_folder, "path");
+          }
+          const details = append(summary, "details");
+          append(details, "summary", "Show all member choices and paths");
+          const list = append(details, "ul");
+          for (const member of intent.members)
+            append(
+              list,
+              "li",
+              `${member.included ? "Include" : "Exclude"}: ${memberName(member.entry_id)} → ${
+                member.project_path || "(empty saved path)"
+              }`,
+              "path"
+            );
+          byId("observation-choices-preview").hidden = false;
+          choicesStatus(
+            "Project choices opened. Confirm Replace choices to use them, or Cancel to keep your edits and review."
+          );
+          byId("observation-choices-preview-heading").focus();
+        } catch (failure) {
+          choicesStatus(
+            `Choices could not be opened: ${
+              failure.message || "invalid UTF-8 or JSON"
+            }. Current choices and review are unchanged.`
+          );
+        }
+      };
+      reader.onerror = () => {
+        if (!current()) return;
+        importReader = null;
+        choicesStatus(
+          "The choices file could not be read. Current choices and review are unchanged. Open it again to retry."
+        );
+      };
+      reader.onabort = () => {
+        if (!current()) return;
+        importReader = null;
+        choicesStatus("Opening cancelled. Current choices and review are unchanged.");
+      };
+      try {
+        reader.readAsArrayBuffer(file);
+      } catch (_failure) {
+        reader.onerror();
+      }
+    }
+    function restoreChoices(intent) {
+      for (const member of intent.members) {
+        const control = controls.get(member.entry_id);
+        control.check.checked = member.included;
+        control.path.value = member.project_path;
+      }
+      byId("observation-root").value = intent.destination_root_id;
+      byId("observation-folder").value = intent.destination_folder;
+      markMembers();
+      rootFacts();
+    }
+    function replaceChoices() {
+      const candidate = stagedIntent;
+      if (!candidate) return;
+      if (
+        candidate.epoch !== importEpoch ||
+        candidate.source !== reference ||
+        candidate.before !== JSON.stringify(captureChoices())
+      ) {
+        clearImport();
+        choicesStatus(
+          "Current choices changed after opening the file. Open it again; your edits and review are unchanged."
+        );
+        return;
+      }
+      const before = captureChoices();
+      try {
+        const intent = intentModel.validateIntent(candidate.intent, reference);
+        // Check text-input admission before replacing any live control.
+        for (const value of [
+          ...intent.members.map((member) => member.project_path),
+          intent.destination_folder,
+        ]) {
+          const input = doc.createElement("input");
+          input.type = "text";
+          input.value = value;
+          if (input.value !== value) throw new Error("A saved path cannot be restored exactly");
+        }
+        restoreChoices(intent);
+        if (!sameJSON(captureChoices(), intent))
+          throw new Error("The choices could not be restored exactly");
+      } catch (failure) {
+        restoreChoices(before);
+        clearImport();
+        choicesStatus(
+          `Choices were not replaced: ${failure.message}. Current choices and review are unchanged.`
+        );
+        return;
+      }
+      changed();
+      choicesStatus(
+        "Saved choices restored as editable intent. Review again; no saved review or permission was restored."
+      );
+      reviewButton.focus();
+    }
+    function cancelChoices() {
+      clearImport();
+      choicesStatus("Opening cancelled. Current choices and review are unchanged.");
+      byId("observation-open-choices").focus();
     }
     function safe(value) {
       return (
@@ -732,6 +1013,8 @@
       fields.disabled = false;
       reviewButton.disabled = false;
       dismissButton.disabled = false;
+      byId("observation-save-choices").disabled = false;
+      byId("observation-open-choices").disabled = false;
     }
     function changed() {
       if (!reference) return;
@@ -751,6 +1034,9 @@
       fields.disabled = true;
       reviewButton.disabled = true;
       dismissButton.disabled = true;
+      byId("observation-save-choices").disabled = true;
+      byId("observation-open-choices").disabled = true;
+      choicesStatus("Load the Aurora reference first.");
       for (const id of [
         "observation-members",
         "observation-roots",
@@ -808,6 +1094,9 @@
         assertProjection(value, value);
         reference = value;
         renderReference();
+        choicesStatus(
+          "Save project choices to resume them later against this same synthetic source."
+        );
         status(
           "Aurora reference loaded. Review explicit intent; identity and protection remain Unknown."
         );
@@ -919,7 +1208,16 @@
     byId("observation-reload").addEventListener("click", loadReference);
     dismissButton.addEventListener("click", dismiss);
     saveButton.addEventListener("click", saveReview);
-    if (win) win.addEventListener("pagehide", invalidate);
+    byId("observation-save-choices").addEventListener("click", saveChoices);
+    byId("observation-open-choices").addEventListener("click", openChoices);
+    byId("observation-choices-file").addEventListener("change", readChoices);
+    byId("observation-replace-choices").addEventListener("click", replaceChoices);
+    byId("observation-cancel-choices").addEventListener("click", cancelChoices);
+    if (win)
+      win.addEventListener("pagehide", () => {
+        invalidate();
+        for (const url of choiceURLs.keys()) releaseChoiceURL(url);
+      });
     if (doc.defaultView)
       doc.defaultView.addEventListener("pageshow", (event) => {
         if (event.persisted) loadReference();

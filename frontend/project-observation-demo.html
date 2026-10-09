@@ -6,6 +6,7 @@
     <meta name="demo-process-token" content="__DEMO_PROCESS_TOKEN__" />
     <title>Review Aurora observations · Disk Organiser</title>
     <link rel="stylesheet" href="/project-review-demo.css" />
+    <script src="/project-intent-model.js" defer></script>
     <script src="/project-observation-demo.js" defer></script>
   </head>
   <body>
@@ -42,6 +43,56 @@
         Loading Aurora observations…
       </p>
       <p id="observation-error" class="error" role="alert" hidden></p>
+      <section class="panel" aria-labelledby="observation-choices-heading">
+        <h2 id="observation-choices-heading">Keep your project choices</h2>
+        <p>
+          Save your decisions and pick up where you left off. Reopening restores your choices for
+          this Aurora example; you will review them again before saving a new report.
+        </p>
+        <div class="decision-actions">
+          <button id="observation-save-choices" type="button" class="secondary" disabled>
+            Save project choices
+          </button>
+          <button id="observation-open-choices" type="button" class="secondary" disabled>
+            Open project choices
+          </button>
+          <input id="observation-choices-file" type="file" accept=".json,application/json" hidden />
+        </div>
+        <p id="observation-choices-status" role="status" aria-live="polite">
+          Load the Aurora reference first.
+        </p>
+        <p class="muted">
+          Nothing is uploaded or saved automatically. This example never changes your files.
+        </p>
+        <details>
+          <summary id="observation-choices-details">File details and limits</summary>
+          <p>
+            Local JSON files up to 8 KiB, tied to the same synthetic Aurora source. Choices contain
+            included members, all edited paths and the intended location. They contain no
+            observations, reviewed result or permission to change files. Saved review reports cannot
+            be reopened as choices.
+          </p>
+        </details>
+        <section
+          id="observation-choices-preview"
+          class="note"
+          hidden
+          aria-labelledby="observation-choices-preview-heading"
+        >
+          <h3 id="observation-choices-preview-heading" tabindex="-1">
+            Replace the current choices?
+          </h3>
+          <p>
+            Review these saved choices before replacing your edits. Replacement clears the previous
+            review; Review must be pressed again.
+          </p>
+          <div id="observation-choices-summary"></div>
+          <div class="decision-actions">
+            <button id="observation-replace-choices" type="button">Replace choices</button>
+            <button id="observation-cancel-choices" type="button" class="secondary">Cancel</button>
+          </div>
+        </section>
+      </section>
       <form id="observation-form">
         <fieldset id="observation-fields" disabled>
           <section class="panel" aria-labelledby="observation-members-heading">
