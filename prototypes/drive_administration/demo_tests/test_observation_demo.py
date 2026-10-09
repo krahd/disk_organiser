@@ -73,6 +73,46 @@ class ObservationDemoTests(unittest.TestCase):
         for query in ('?path=/tmp', '?scenario_id=anything', '?synthetic=false', '?file=../../../etc/passwd'):
             self.assertEqual(self.get('/api/observation/reference' + query).status_code, 400)
 
+    def test_project_choices_model_is_an_exact_fixed_static_asset(self):
+        model_path = Path(__file__).resolve().parents[3] / 'frontend/project-intent-model.js'
+        expected = model_path.read_text(encoding='utf-8')
+        response = self.get('/project-intent-model.js')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, expected)
+        self.assertEqual(response.mimetype, 'text/javascript')
+        self.assertNotIn(self.token, response.text)
+        self.assertEqual(response.headers['Cache-Control'], 'no-store')
+        self.assertEqual(response.headers['X-Content-Type-Options'], 'nosniff')
+        self.assertNotIn('unsafe-inline', response.headers['Content-Security-Policy'])
+        self.assertNotIn('Access-Control-Allow-Origin', response.headers)
+        page = self.get('/observation-draft').text
+        self.assertEqual(page.count('src="/project-intent-model.js"'), 1)
+        self.assertLess(page.index('src="/project-intent-model.js"'),
+                        page.index('src="/project-observation-demo.js"'))
+        self.assertEqual({rule.rule for rule in self.app.url_map.iter_rules()}, {
+            '/', '/project-review-demo.js', '/project-review-demo.css',
+            '/observation-draft', '/project-observation-demo.js', '/project-intent-model.js',
+            '/api/reference', '/api/review', '/api/observation/reference', '/api/observation/review',
+        })
+
+    def test_project_choices_asset_keeps_origin_method_and_fixed_path_bounds(self):
+        path = '/project-intent-model.js'
+        for suffix in ('?file=../../../etc/passwd', '?source=live', '?v=1'):
+            self.assertEqual(self.get(path + suffix).status_code, 400)
+        for method in ('POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'):
+            with self.subTest(method=method):
+                response = self.client.open(path, method=method, base_url=self.origin,
+                                            headers=self.headers, data=b'local choices must not upload')
+                self.assertEqual(response.status_code, 400)
+        for headers in ({'Origin': 'https://evil.example'}, {'Sec-Fetch-Site': 'cross-site'},
+                        {'Sec-Fetch-Site': 'same-site'}):
+            self.assertEqual(self.get(path, headers=headers).status_code, 403)
+        self.assertEqual(self.get(path, environ_overrides={'REMOTE_ADDR': '203.0.113.9'}).status_code, 403)
+        for unknown in ('/api/observation/choices', '/api/observation/import', '/api/observation/save',
+                        '/api/upload', '/project-intent-model.js/../STATUS.md'):
+            self.assertEqual(self.get(unknown).status_code, 404)
+        self.assertEqual(self.get().json, self.reference)
+
     def test_exact_python_adapter_is_used_for_explicit_decisions(self):
         body = {**self.body, 'destination_folder': 'Reviewed Aurora',
                 'member_paths': [self.body['member_paths'][0], {'entry_id': self.reference['choices'][3]['entry']['id'], 'project_path': 'Unresolved/asset.data'}]}
@@ -202,6 +242,7 @@ class ObservationDemoTests(unittest.TestCase):
              patch('demo_server.review', side_effect=AssertionError('unexpected bound planner')), \
              patch('demo_server.revise', side_effect=AssertionError('unexpected bound revision')):
             self.assertEqual(self.get('/observation-draft').status_code, 200)
+            self.assertEqual(self.get('/project-intent-model.js').status_code, 200)
             self.assert_incomplete(self.get())
             self.assert_incomplete(self.post())
         self.assertFalse(any(name in sys.modules for name in ('backend.app', 'backend.guided', 'backend.op_store')))

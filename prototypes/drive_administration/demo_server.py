@@ -2,7 +2,7 @@
 
 No application, executor, operation store or provider client is imported.
 Decisions are stateless and reference only fixed synthetic snapshots. Pure model
-validation/fixture functions are used; no scanner is called. Five fixed frontend
+validation/fixture functions are used; no scanner is called. Six fixed frontend
 assets are read once at app creation, never in response to a supplied path.
 """
 
@@ -177,6 +177,8 @@ def create_demo_app(port=8765):
         "/observation-draft": ((frontend / "project-observation-demo.html").read_text(encoding="utf-8").replace(
             "__DEMO_PROCESS_TOKEN__", process_token), "text/html"),
         "/project-observation-demo.js": ((frontend / "project-observation-demo.js").read_text(encoding="utf-8"), "text/javascript"),
+        "/project-intent-model.js": (
+            (frontend / "project-intent-model.js").read_text(encoding="utf-8"), "text/javascript"),
     }
 
     def error(message, status):

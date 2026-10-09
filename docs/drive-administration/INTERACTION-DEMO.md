@@ -4,7 +4,7 @@
 
 This standalone interaction demonstrates a small part of the drive-administration product: decide which files belong to Harbour, choose a proposed home, then read the layout, dependency, capacity and protection consequences. A map supports that decision; it is not the product endpoint.
 
-The permanent page banner says **Simulated project; no drives or providers connected**. The Harbour form loads only its two existing packaged synthetic fixtures. The separate [Aurora observation view](OBSERVATION-VIEW.md) adds one fixed canonical-derived synthetic scenario; it does not add import. No scanning, file picker, arbitrary document import, upload, provider credential, telemetry, external request, execution, restore, undo or recovery-deletion route is present. The existing default app, navigation, backend and execution/recovery gates are unchanged.
+The permanent page banner says **Simulated project; no drives or providers connected**. The Harbour form loads only its two existing packaged synthetic fixtures. The separate [Aurora observation view](OBSERVATION-VIEW.md) adds one fixed canonical-derived synthetic scenario; it does not add import. No scanning, observation/inventory import, upload, provider credential, telemetry, external request, execution, restore, undo or recovery-deletion route is present. The later [project-choices slice](PROJECT-CHOICES.md) adds only a browser-local file picker for its strict synthetic intent format. The existing default app, navigation, backend and execution/recovery gates are unchanged.
 
 The example contains fabricated dated backup and restore records. A fixture claim never becomes live verification. Every result, including errors, has `executable: false`, `execution_authority: null`, `undo_available: false`, `source_safe_to_erase: false`, `live_backup_verified: false` and `live_restore_verified: false`.
 
@@ -19,7 +19,7 @@ python prototypes/drive_administration/demo_server.py --port 8765
 
 Open `http://127.0.0.1:8765/` in the same computer's browser. `localhost`, a different Host header, proxy publication and non-loopback clients are deliberately rejected. Stop the process to end the demo. This is a development-only server, not a production deployment.
 
-`create_demo_app()` is separate from `backend.app`, `guided` and `op_store`. It loads exactly five named frontend assets once during creation (the original three plus Aurora HTML/script). It makes no request-time filesystem or network calls. No draft is stored on disk or in the Flask process; drafts live only in the current page's memory. Reload, scenario switch and back/forward cache restoration discard the draft. The ephemeral process token is regenerated on restart and is never stored in browser storage or logs.
+`create_demo_app()` is separate from `backend.app`, `guided` and `op_store`. It loads exactly six named frontend assets once during creation (the original three, Aurora HTML/script and the project-intent contract). It makes no request-time filesystem or network calls. No draft is stored on disk or in the Flask process; drafts live only in the current page's memory. Reload, scenario switch and back/forward cache restoration discard the draft. The ephemeral process token is regenerated on restart and is never stored in browser storage or logs.
 
 ## Three-step decision loop
 
@@ -41,7 +41,7 @@ The original Harbour contract has these five paths:
 | GET | `/api/reference?scenario_id=harbour-reference` | Immutable reference, with `harbour-uncertain` as the only other accepted ID |
 | POST | `/api/review` | Evaluate bounded membership/destination edits |
 
-The [Aurora contract](OBSERVATION-VIEW.md#http-contract) adds four explicitly allowlisted paths, for nine in total, under the same guards. It accepts only the fixed observation scenario and explicit member/path intent.
+The [Aurora contract](OBSERVATION-VIEW.md#http-contract) adds four explicitly allowlisted paths; the project-choices contract adds one fixed script asset, for ten in total, under the same guards. It accepts only the fixed observation scenario and explicit member/path intent.
 
 All access requires a loopback remote address and the exact configured `http://127.0.0.1:PORT` host. Cross-site Origin and Fetch Metadata are rejected. APIs require `X-Demo-Token`; POST also requires an exact same-origin Origin header. No CORS permission is granted. Responses use a restrictive CSP, no-store, nosniff, no-referrer, frame denial and disabled camera/microphone/geolocation permissions. Assets cannot be selected by a client-supplied path, and errors do not reflect route paths or filesystem details.
 
