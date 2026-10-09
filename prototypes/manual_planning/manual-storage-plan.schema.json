@@ -1,0 +1,850 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:disk-organiser:manual-storage-plan:v1",
+  "title": "Disk Organiser manual storage plan v1",
+  "description": "User-authored planning metadata. Imported claims are untrusted. No observation, authenticated version, backup verification, execution or recovery authority is represented.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "disk-organiser/manual-storage-plan/v1"
+    },
+    "document_id": {
+      "$ref": "#/$defs/id"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "\\S"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "created_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "updated_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "drives": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/drive"
+      },
+      "maxItems": 100
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/item"
+      },
+      "maxItems": 2000
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/project"
+      },
+      "maxItems": 200
+    },
+    "backup_targets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/target"
+      },
+      "maxItems": 100
+    },
+    "protection_plans": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/protectionPlan"
+      },
+      "maxItems": 500
+    },
+    "restore_plans": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/restorePlan"
+      },
+      "maxItems": 500
+    }
+  },
+  "required": [
+    "schema_version",
+    "document_id",
+    "title",
+    "revision",
+    "created_at",
+    "updated_at",
+    "drives",
+    "items",
+    "projects",
+    "backup_targets",
+    "protection_plans",
+    "restore_plans"
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]{0,11}_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "maxLength": 49,
+      "description": "An application record key, never evidence of a physical drive, file or account identity."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,6})?(Z|[+-][0-9]{2}:[0-9]{2})$",
+      "maxLength": 40
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "maxLength": 10
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "drive_id": {
+          "$ref": "#/$defs/id"
+        },
+        "path_text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "drive_id"
+      ]
+    },
+    "availabilityReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "available",
+            "unavailable",
+            "unsure"
+          ]
+        },
+        "recorded_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "status",
+        "recorded_at"
+      ]
+    },
+    "drive": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "internal_drive",
+            "external_drive",
+            "network_storage",
+            "cloud_location",
+            "other",
+            "unspecified"
+          ]
+        },
+        "purposes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "working",
+              "archive",
+              "backup",
+              "other"
+            ]
+          },
+          "maxItems": 4,
+          "uniqueItems": true
+        },
+        "availability_report": {
+          "$ref": "#/$defs/availabilityReport"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        },
+        "archived": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "label"
+      ]
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "file",
+            "folder",
+            "whole_drive",
+            "unspecified"
+          ]
+        },
+        "location": {
+          "$ref": "#/$defs/location"
+        },
+        "described_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        },
+        "archived": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "kind"
+      ]
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "member_item_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 2000,
+          "uniqueItems": true
+        },
+        "intended_home": {
+          "$ref": "#/$defs/location"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        },
+        "archived": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "member_item_ids"
+      ]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "local_storage",
+            "network_storage",
+            "object_storage",
+            "managed_backup",
+            "sync_service",
+            "other",
+            "unspecified"
+          ]
+        },
+        "storage_drive_id": {
+          "$ref": "#/$defs/id"
+        },
+        "provider_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "\\S"
+        },
+        "account_nickname": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "\\S"
+        },
+        "region_note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "independence_note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "pattern": "\\S"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        },
+        "archived": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "kind"
+      ]
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "desired_independent_copies": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "desired_frequency": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly",
+            "after_changes",
+            "before_drive_retirement",
+            "custom"
+          ]
+        },
+        "frequency_note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "desired_retention": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "max_acceptable_backup_age_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3650
+        },
+        "desired_restore_checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "file_readability",
+              "byte_comparison",
+              "metadata",
+              "application_opening",
+              "other"
+            ]
+          },
+          "maxItems": 5,
+          "uniqueItems": true
+        },
+        "restore_check_note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "next_review_on": {
+          "$ref": "#/$defs/date"
+        }
+      },
+      "required": []
+    },
+    "protectionPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "project_id": {
+          "$ref": "#/$defs/id"
+        },
+        "target_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 100,
+          "uniqueItems": true
+        },
+        "excluded_item_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 2000,
+          "uniqueItems": true
+        },
+        "policy": {
+          "$ref": "#/$defs/policy"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        },
+        "archived": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "project_id",
+        "target_ids",
+        "excluded_item_ids",
+        "policy"
+      ]
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "locate_snapshot",
+            "confirm_scope",
+            "confirm_destination",
+            "confirm_capacity",
+            "confirm_access",
+            "file_readability",
+            "byte_comparison",
+            "metadata",
+            "application_opening",
+            "other"
+          ]
+        },
+        "user_reports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "result": {
+                "type": "string",
+                "enum": [
+                  "reports_pass",
+                  "reports_fail",
+                  "inconclusive",
+                  "not_applicable"
+                ]
+              },
+              "recorded_at": {
+                "$ref": "#/$defs/timestamp"
+              },
+              "performed_at": {
+                "$ref": "#/$defs/timestamp"
+              },
+              "notes": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "id",
+              "result",
+              "recorded_at"
+            ]
+          },
+          "maxItems": 50
+        },
+        "archived": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "kind"
+      ]
+    },
+    "restorePlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "protection_plan_id": {
+          "$ref": "#/$defs/id"
+        },
+        "target_id": {
+          "$ref": "#/$defs/id"
+        },
+        "intended_scope": {
+          "type": "string",
+          "enum": [
+            "sample",
+            "whole_planned_scope",
+            "undecided"
+          ]
+        },
+        "item_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 2000,
+          "uniqueItems": true
+        },
+        "exercise_scope_note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "pattern": "\\S"
+        },
+        "snapshot_reference_text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "destination": {
+          "$ref": "#/$defs/location"
+        },
+        "capacity_note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "pattern": "\\S"
+        },
+        "access_note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "pattern": "\\S"
+        },
+        "lifecycle": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "prepared",
+            "user_recorded_results"
+          ]
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          },
+          "maxItems": 100
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "reported_context": {
+          "$ref": "#/$defs/reportedContext"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "protection_plan_id",
+        "intended_scope",
+        "item_ids",
+        "lifecycle",
+        "checks"
+      ]
+    },
+    "snapshotLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "drive_id": {
+          "$ref": "#/$defs/id"
+        },
+        "path_text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "\\S"
+        },
+        "drive_label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "drive_id",
+        "drive_label"
+      ]
+    },
+    "snapshotItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "file",
+            "folder",
+            "whole_drive",
+            "unspecified"
+          ]
+        },
+        "location": {
+          "$ref": "#/$defs/snapshotLocation"
+        },
+        "described_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "kind"
+      ]
+    },
+    "snapshotTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "local_storage",
+            "network_storage",
+            "object_storage",
+            "managed_backup",
+            "sync_service",
+            "other",
+            "unspecified"
+          ]
+        },
+        "storage_drive_id": {
+          "$ref": "#/$defs/id"
+        },
+        "provider_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "\\S"
+        },
+        "account_nickname": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "\\S"
+        },
+        "region_note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "independence_note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "pattern": "\\S"
+        },
+        "storage_drive_label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "kind"
+      ]
+    },
+    "reportedContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "captured_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "first_report_id": {
+          "$ref": "#/$defs/id"
+        },
+        "protection_plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240,
+              "pattern": "\\S"
+            },
+            "project_id": {
+              "$ref": "#/$defs/id"
+            },
+            "project_label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240,
+              "pattern": "\\S"
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "project_id",
+            "project_label"
+          ]
+        },
+        "target": {
+          "$ref": "#/$defs/snapshotTarget"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/snapshotItem"
+          },
+          "maxItems": 2000
+        },
+        "destination": {
+          "$ref": "#/$defs/snapshotLocation"
+        }
+      },
+      "required": [
+        "captured_at",
+        "first_report_id",
+        "protection_plan",
+        "target",
+        "items"
+      ]
+    }
+  }
+}

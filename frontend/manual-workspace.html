@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Disk Organiser · Manual planning workspace</title>
+    <link rel="stylesheet" href="manual-workspace.css" />
+    <script src="manual-planning-model.js" defer></script>
+    <script src="manual-workspace.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">Skip to project workspace</a>
+    <header class="app-header">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Disk Organiser</div>
+      <span class="header-context">Manual planning workspace</span>
+      <div class="header-actions">
+        <button id="open-plan" class="text-button" type="button">Open plan</button>
+        <button id="save-plan" class="secondary-button" type="button">Save plan</button>
+        <button id="detail-toggle" class="quiet-button" type="button" aria-pressed="false">
+          Show details
+        </button>
+      </div>
+    </header>
+    <main id="workspace" tabindex="-1"></main>
+    <div class="status-dock">
+      <p id="status" role="status" aria-live="polite">
+        New plan · kept in this tab until you save it
+      </p>
+      <button id="acknowledge-save" class="text-button" type="button" hidden>
+        I saved the file
+      </button>
+    </div>
+    <footer class="app-footer">
+      <p>Planning only. No files are copied, moved, backed up, restored or deleted.</p>
+      <p>
+        Names and paths are your manual records. Never enter passwords, recovery keys or tokens.
+      </p>
+    </footer>
+    <input id="open-file" type="file" accept=".json,application/json" hidden />
+    <dialog id="editor-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-intro">
+      <form id="editor-form">
+        <div class="dialog-heading">
+          <h2 id="dialog-title"></h2>
+          <button id="close-dialog" type="button" class="text-button" aria-label="Close dialogue">
+            Close
+          </button>
+        </div>
+        <p id="dialog-intro" class="muted"></p>
+        <div id="dialog-body"></div>
+        <p id="dialog-error" class="inline-warning" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button id="cancel-dialog" type="button" class="secondary-button">Cancel</button
+          ><button id="submit-dialog" type="submit" class="primary-button">Save change</button>
+        </div>
+      </form>
+    </dialog>
+    <noscript
+      >This local workspace needs JavaScript. It does not connect to drives or services.</noscript
+    >
+  </body>
+</html>
