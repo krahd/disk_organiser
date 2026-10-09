@@ -83,6 +83,18 @@ For another shell, set the same environment variable to a newly created empty
 owned temporary directory before starting Python. Ordinary CI starts from a
 fresh checkout without saved application state.
 
-The final acceptance gate remains independent review plus ordinary CI on the
-exact published source. Documentation publication stays manual-only; no
-workflow, deployment, dependency, UI, route or execution/recovery code changes.
+Independent review accepts the repaired request-boundary coverage at source
+`0ae3d6b54cd47f674f087bb41105fef6847b6e3b`. Exact-source hosted results:
+
+- [Aggregate CI](https://github.com/krahd/disk_organiser/actions/runs/37871477246):
+  Linux 590; Windows 495 passed/95 skipped; both 44-route OpenAPI checks;
+  Jest 204; existing Chromium 22; audits, formatting and YAML compatibility.
+- [Planner CI](https://github.com/krahd/disk_organiser/actions/runs/37871477241):
+  140 tests on each OS.
+- [Isolated UI CI](https://github.com/krahd/disk_organiser/actions/runs/37871477132):
+  37 HTTP tests on each OS, 23 focused Jest and 25 Chromium flows.
+
+The documentation-only closeout retains those runtime/test bytes. It does not
+attribute these runs to a later commit or claim new pixel/hardware acceptance.
+Documentation publication stays manual-only; no workflow, deployment,
+dependency, UI, route or execution/recovery code changes.

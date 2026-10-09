@@ -1,13 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 01:45
+Last updated: 2026-10-09 01:50
 
 ## Read/status malformed-input checkpoint
 
 - The explicit backlog for `/api/ops`, `/api/recycle/list` and `/api/maintenance/status` now has 276 deterministic request cases in a separate test file. Inert operation/recycle mocks and owned temporary maintenance data cover malformed/large/encoded/duplicate query values, JSON type/encoding/body cases, interrupted input, repeated response closure, unsupported methods, local-origin boundaries and preserved failure responses.
 - All new cases pass against unchanged runtime source from accepted main `33e74a23`. No production bug or failing-before-fix claim is made. These endpoints have no query/body parameters; unsupported pagination, path, action and cancellation arguments remain inert. Malformed maintenance fixtures remain byte-identical.
 - Runtime/UI/dependencies/workflows, execution/recovery flags and manual-only documentation publishing are unchanged. The slice does not establish bounded legacy stored-result sizes, safe legacy backup traversal, read-only SQLite access, live transport cancellation or real-drive acceptance. See [the request-contract checkpoint](docs/READ-STATUS-INPUT-FUZZ.md).
-- Local verification passes: 277 focused tests (276 request cases plus a collection-name bound), 590 full backend tests, 44-route OpenAPI, 204 Jest tests, frontend formatting, YAML consumer compatibility, 140 pure planner tests and 37 isolated HTTP contracts. Focused flake8, diff whitespace checks and both dependency audits pass. No new local browser/pixel result is claimed. Independent review accepts the bounded tranche after repairing two test-oracle weaknesses (shared mutable expected data and permissive provider-method mocks), six adversarial in-memory checks, and an explicit fresh app-state-directory prerequisite. Initial published source `5b1409ca` passes Linux and both planner/demo workflows, but Windows reports six setup/teardown errors because default expanded large-body parameter IDs exceed its environment-variable limit. Short body/file-case labels and a failing-before-fix collection-name regression repair the harness without changing request bytes or assertions. Independent repair review and repaired-source hosted CI remain pending; earlier passes are not extended to this repair.
+- Local verification passes: 277 focused tests (276 request cases plus a collection-name bound), 590 full backend tests, 44-route OpenAPI, 204 Jest tests, frontend formatting, YAML consumer compatibility, 140 pure planner tests and 37 isolated HTTP contracts. Focused flake8, diff whitespace checks and both dependency audits pass. No new local browser/pixel result is claimed. Independent review accepts the bounded tranche after repairing two test-oracle weaknesses (shared mutable expected data and permissive provider-method mocks), six adversarial in-memory checks, and an explicit fresh app-state-directory prerequisite. Initial published source `5b1409ca` passes Linux and both planner/demo workflows, but Windows reports six setup/teardown errors because default expanded large-body parameter IDs exceed its environment-variable limit. Short body/file-case labels and a failing-before-fix collection-name regression repair the harness without changing request bytes or assertions. Independent repair review accepts the unchanged corpus and name-bound fix after a fresh 277-test run. Repaired source `0ae3d6b54cd47f674f087bb41105fef6847b6e3b` passes [aggregate CI](https://github.com/krahd/disk_organiser/actions/runs/37871477246), [planner CI](https://github.com/krahd/disk_organiser/actions/runs/37871477241) and [isolated UI CI](https://github.com/krahd/disk_organiser/actions/runs/37871477132). Exact logs establish Linux 590; Windows 495 passed/95 skipped; 44 OpenAPI routes on both; 204 Jest; 22 existing Chromium flows; 140 planner tests and 37 HTTP contracts on each OS; 23 focused Jest and 25 isolated Chromium flows; both audits and formatting. Earlier failed-source results are not extended to the repair. This documentation-only closeout preserves the tested runtime/test blobs; no new pixel, hardware or release acceptance is inferred.
 
 ## Project purpose
 
@@ -430,11 +430,11 @@ Current session verification:
 
 ## Pending tasks
 
-- Verify the independently reviewed read/status request corpus on ordinary CI. Legacy stored-result bounds and backup traversal require a separately scoped audit; this request-contract coverage does not accept them.
+- Scope legacy stored-result bounds and backup traversal as a separate data-only audit; the accepted read/status request-contract coverage does not establish these storage-layer safety properties.
 
 ## Next steps
 
-1. Finish exact-source CI for the independently reviewed read/status request corpus, then scope legacy stored-result bounds and backup-traversal evidence separately.
+1. Define a bounded data-only legacy stored-result and backup-traversal audit with explicit zero selected-folder I/O and no migration or execution authority.
 2. Keep visual tests deterministic as new UI/API paths are introduced.
 3. Keep OpenAPI documentation in sync with route changes.
 
@@ -452,4 +452,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 01:45
+Last updated: 2026-10-09 01:50
