@@ -153,17 +153,18 @@
   color: #704409;
 }
 .catalogue-work {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 290px;
+  display: flex;
+  flex-wrap: wrap;
   gap: 2rem;
   align-items: start;
 }
 .catalogue-browser {
   min-width: 0;
+  flex: 999 1 480px;
 }
 .search-controls {
   display: grid;
-  grid-template-columns: 1fr 210px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 1rem;
   margin: 1.3rem 0 0.6rem;
 }
@@ -217,6 +218,7 @@
   font-size: 0.8rem;
 }
 .project-selection {
+  flex: 1 1 290px;
   background: #e8eee0;
   padding: 1.3rem;
   border-radius: 10px;

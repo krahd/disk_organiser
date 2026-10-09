@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 07:36
+Last updated: 2026-10-09 07:44
 
 
 ## Historical inventory catalogue and scoped overview checkpoint
@@ -12,6 +12,9 @@ Last updated: 2026-10-09 07:36
 - Local verification currently passes 91 focused backend/scoped tests, 65 new model tests (615 aggregate Jest) and 28 catalogue DOM checks; all 43 existing manual-workspace DOM checks, 44-route OpenAPI and frontend formatting also pass. Seven Chromium specifications parse/list, but the local browser launch failed before executing any journey because the locked Chromium executable is absent. Independent source/model/DOM review accepts the repaired candidate after additional bounds, owned-producer and interruption probes; hosted exact-source execution and original-pixel inspection remain pending. No browser/hardware, physical backup or sale-readiness acceptance is claimed.
 
 Initial published source `8ec49a851b02634cc1b0eda39e9866cefef0cf59` passes model/DOM checks on Linux and Windows and six of seven hosted Chromium journeys. The CSS-zoom locator click stalls while the original screenshot shows a visible Show details control. A diagnostic repair records native hit-test geometry and requires an actual pointer event at an unobstructed point plus keyboard toggling; it does not force or call a DOM click. Exact repaired-source execution and pixels are pending. The initial failed run and its original failure image remain evidence of the open issue. An additional local attempt using installed system Chromium also stops before any journey because its process socket is prohibited; it is not a browser pass.
+
+
+Repaired source `a34d9d8d44a23a5cb16d9d654df8180144a11ab2` passes all seven hosted Chromium journeys. Native diagnostic evidence establishes the locked browser's CSS-zoom coordinate mismatch: the protocol/rectangle centre hits the header, while the correctly scaled point hits the details button; actual mouse activation and keyboard toggling both pass. Original pixels close the pagination/focus-note defects. One selected-project full-page PNG has incomplete offscreen painting and is not accepted as visual evidence. Its follow-on capture uses real viewport images of the selected scopes after settled paint; an intrinsic work/search layout also removes the unnecessarily narrow zoomed search column, with a 240-pixel input-width regression. Fresh exact-source screenshots remain required.
 
 - [Catalogue contract, usage, limits and verification](docs/INVENTORY-CATALOGUE.md). The dedicated read-only workflow tests the model/DOM on Linux and Windows and retains a bounded originals-only Chromium screenshot packet. Existing application/model/schema/default navigation, dependencies and prior workflows remain unchanged.
 
@@ -560,4 +563,4 @@ Current session verification:
 
 Initial original-pixel review found two 320-pixel display defects: pagination labels wrapped inside their buttons, and the rename field's focus ring crossed its following source note. The scoped repair keeps pagination controls nonshrinking/no-wrap and adds source-note clearance, with rendered-line and eight-pixel-clearance browser regressions. Model, source provenance and authority boundaries are unchanged. Regenerated exact-source pixels are required to close these findings.
 
-Last updated: 2026-10-09 07:36
+Last updated: 2026-10-09 07:44

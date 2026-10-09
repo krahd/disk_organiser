@@ -10,9 +10,13 @@ const second = path.resolve(
   __dirname,
   "../../prototypes/inventory_catalogue/owned-archive.example.json"
 );
-async function shot(page, info, name) {
+async function shot(page, info, name, options = {}) {
   const p = info.outputPath(name);
-  await page.screenshot({ path: p, fullPage: true });
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
+  await page.screenshot({ path: p, fullPage: true, ...options });
   await info.attach(name, { path: p, contentType: "image/png" });
 }
 async function open(page) {
@@ -101,7 +105,17 @@ test("multi-location overview, offline search, source-preserving plan and catalo
   ).toBeDisabled();
   await page.getByLabel("Search recorded names and paths", { exact: true }).fill("");
   await expect(page.locator("#selection-count")).toContainText("2 selected scopes");
-  await shot(page, info, "23-catalogue-project-selection.png");
+  await page.locator(".project-selection").scrollIntoViewIfNeeded();
+  await expect(page.locator("#selected-scopes")).toContainText("Photos");
+  await expect(page.locator("#selected-scopes")).toContainText("Exports/Film.mov");
+  await shot(page, info, "23-catalogue-project-selection.png", { fullPage: false });
+  const selectedFilm = page.getByRole("checkbox", {
+    name: "Select Exports/Film.mov from Archive drive · saved projects",
+    exact: true,
+  });
+  await selectedFilm.scrollIntoViewIfNeeded();
+  await expect(selectedFilm).toBeChecked();
+  await shot(page, info, "32-catalogue-selected-file-viewport.png", { fullPage: false });
   await page.getByRole("button", { name: "Create a manual plan", exact: true }).click();
   await page.getByLabel("Project name", { exact: true }).fill("Scattered creative project");
   const pe = page.waitForEvent("download");
@@ -234,6 +248,15 @@ test("200 percent CSS zoom keeps overview, search and source details readable", 
   await page.keyboard.press("Enter");
   await expect(page.locator("#catalogue-details")).toHaveAttribute("aria-pressed", "true");
   await geometry(page);
+  const searchWidth = await page
+    .locator("#catalogue-search")
+    .evaluate((input) => input.getBoundingClientRect().width);
+  expect(searchWidth).toBeGreaterThanOrEqual(240);
+  const searchLayout = await page.locator(".search-controls").evaluate((group) => {
+    const children = [...group.children].map((n) => n.getBoundingClientRect());
+    return children[0].right <= children[1].left + 1 || children[0].bottom <= children[1].top + 1;
+  });
+  expect(searchLayout).toBe(true);
   await shot(page, info, "26-catalogue-css-zoom.png");
 });
 test("keyboard cancellation restores focus and repeated confirmation is single-use", async ({
