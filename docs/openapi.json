@@ -189,7 +189,8 @@
     },
     "/api/maintenance/status": {
       "get": {
-        "summary": "Get maintenance status"
+        "summary": "Get maintenance status",
+        "description": "Reads at most 65537 bytes once from the existing status file. New payload limits: 65536 UTF-8 bytes, 32 nested object/array containers and 4096 retained parsed nodes (root, containers, scalar values and object keys each count once). Successful JSON values and missing-file status are preserved. Failed reads, invalid JSON/encoding and exceeded limits return HTTP 500 with {error: 'Unable to read maintenance status.'}. Query/body arguments remain ignored. No path-provenance, no-follow, blocking-open or schema guarantee is introduced."
       }
     },
     "/api/maintenance/run": {

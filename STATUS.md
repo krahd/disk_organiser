@@ -1,6 +1,14 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 02:22
+Last updated: 2026-10-09 02:49
+
+## Maintenance status payload-bound checkpoint
+
+- The existing maintenance status reader now requests 65,537 binary bytes once and admits at most 65,536 UTF-8 bytes, 32 nested JSON containers and 4,096 retained parsed nodes. These are new documented product limits. Root/containers/scalar values/retained object keys each count once; duplicate keys retain last-value semantics. A string/escape-aware preflight runs before JSON parsing, followed by iterative node counting.
+- The separately importable standard-library helper has no app, database, provider, thread or filesystem side effects on import. Success and missing-file response structures remain; failure stays HTTP 500 with a fixed bounded error string. Files are never truncated, rewritten, repaired or retried. Request arguments remain inert. [API contract](docs/API.md).
+- Both hosted backend-test steps now create a fresh owned directory under `RUNNER_TEMP` and set `DISK_ORGANISER_DATA_DIR` before app import. This strengthens test isolation only; production storage semantics, existing test selectors/assertions, jobs, dependencies, permissions and publication remain unchanged.
+- Local focused verification currently passes 378 cases: 72 pure payload tests, 29 owned-file route tests and the original 277 request-contract cases. PR #14's request corpus/assertions are retained except for its two legitimate binary-open expectations. Boundary coverage includes byte cap minus one/exact/plus one, UTF-8 edges/errors, nested containers at 31/32/33, strings/escapes, node limits, malformed/truncated JSON, unchanged bytes and no rewrite. Full local verification passes 691 backend tests in fresh owned app state, 238 Jest tests, 44 OpenAPI routes, 140 planner tests, 37 isolated HTTP contracts, formatting, YAML compatibility, focused flake8 and Python compilation. Independent review accepts the bounded source/harness after a fresh 378-case run, 5,029 inert-stream oracle probes and four additional owned-route failure probes. Published source `1b548cd7df03d2c1a29619a41292e394159a2922` passes all exact-head push and PR workflows: [aggregate CI](https://github.com/krahd/disk_organiser/actions/runs/37876105864), [planner CI](https://github.com/krahd/disk_organiser/actions/runs/37876105831) and [isolated UI CI](https://github.com/krahd/disk_organiser/actions/runs/37876105802). Hosted logs establish Linux 691; Windows 596 passed/95 skipped; 44 OpenAPI routes on both; 238 Jest; 27 existing Chromium flows; both audits, formatting and YAML compatibility; 140 planner and 37 HTTP contracts on each OS; 23 focused Jest and 25 isolated Chromium flows. Both fresh-state shell forms executed successfully. This documentation-only closeout preserves all tested runtime/test/workflow blobs; the cited runs are not attributed to a later commit. No new pixel or hardware acceptance is claimed.
+- This is payload resource hardening only. Path provenance, no-follow and blocking-open guarantees, schema validation, app-import writes and legacy backup/storage safety remain separate gates. Embedded paths gain no interpretation or authority. Dependencies, mutation/recovery flags, PR #15's display repair and manual publication stay unchanged; no real-folder, provider, hardware or release acceptance is claimed.
 
 ## Operation history text-rendering checkpoint
 
@@ -460,4 +468,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 02:22
+Last updated: 2026-10-09 02:49

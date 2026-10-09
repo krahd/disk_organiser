@@ -39,8 +39,10 @@ except ImportError:
 
 try:
     from backend.runtime_paths import data_path
+    from backend.maintenance_payload import read_maintenance_payload
 except ImportError:  # direct-script compatibility
     from runtime_paths import data_path
+    from maintenance_payload import read_maintenance_payload
 
 
 def _import_local_module(module_name: str, filename: str):
@@ -1511,12 +1513,12 @@ def api_maintenance_status():
     """Return last maintenance run status persisted by the maintenance loop."""
     try:
         if os.path.exists(MAINT_FILE):
-            with open(MAINT_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
+            with open(MAINT_FILE, "rb") as f:
+                data = read_maintenance_payload(f)
             return jsonify({"status": "ok", "maintenance": data})
         return jsonify({"status": "unknown", "maintenance": None})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "Unable to read maintenance status."}), 500
 
 
 @app.route("/api/maintenance/run", methods=["POST"])

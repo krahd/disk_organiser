@@ -61,7 +61,7 @@ def read_client(tmp_path, monkeypatch):
 
     def owned_read(path, mode="r", **kwargs):
         assert path == str(maintenance)
-        assert mode == "r"
+        assert mode == "rb"
         return builtins.open(path, mode, **kwargs)
 
     opened = Mock(side_effect=owned_read)
@@ -86,7 +86,7 @@ def _assert_read(response, endpoint, state):
     else:
         recycle.assert_not_called()
     if endpoint == "/api/maintenance/status":
-        opened.assert_called_once_with(str(maintenance), "r", encoding="utf-8")
+        opened.assert_called_once_with(str(maintenance), "rb")
     else:
         opened.assert_not_called()
     assert maintenance.read_text(encoding="utf-8") == json.dumps(MAINTENANCE)
