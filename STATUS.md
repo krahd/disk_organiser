@@ -1,9 +1,10 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 20:22
+Last updated: 2026-10-09 23:15
 
 ## Isolated owned native core checkpoint
 
+- First hosted validation at `4487071bdd40bf71ffa630c46c8009889d4058da` failed before scheduling a native job ([run 38003436006](https://github.com/krahd/disk_organiser/actions/runs/38003436006)). The workflow referenced `runner.temp` in job-level `env`, where [GitHub context rules](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability) do not allow `runner`. The fixed fixture-output value is now declared only in the four consuming steps. Native source, fixed path validation, toolchain pins and all test assertions are unchanged; actual native execution remains pending.
 - Recovery checkpoint: all 20 originally reviewed candidate files were restored and verified against their retained per-file SHA-256 and Git blob hashes before this documentation update. The six owned Python-oracle cases and unchanged-JavaScript parser/catalogue self-checks pass again. Native compilation and all 59 XCTest methods remain unexecuted pending the dedicated macOS workflow; recovery and source review do not establish native runtime acceptance.
 - The next bridge towards native selected-folder onboarding is an isolated Swift/Darwin core and one-shot controller under `native/DiskInventoryCore/`. It has no package product, public scanner API, executable, production selection factory, AppKit/WebKit wiring, entitlement or application entry point. Only a test-target constructor creates leases from fresh owned temporary directories. Existing Python/frontend runtimes, synthetic-only adapter and all v1 formats remain unchanged.
 - The bounded descriptor reader records metadata without file-content reads, hashes, writes to source or filesystem crossing. It preserves exact UTF-8 spelling, explicit partial/error evidence, root/ancestor checks, hard-link conflict invalidation and cooperative cancellation. Immutable v1 bytes are available only after source-descriptor release. No physical-drive identity, current presence, atomic snapshot, backup protection or real hardware acceptance is inferred.
@@ -604,4 +605,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 20:22
+Last updated: 2026-10-09 23:15

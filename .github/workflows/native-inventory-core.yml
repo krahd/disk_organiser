@@ -13,7 +13,6 @@ jobs:
     timeout-minutes: 15
     env:
       DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
-      DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,6 +22,8 @@ jobs:
         with:
           node-version: "20.x"
       - name: Require the reviewed native toolchain and record runner identity
+        env:
+          DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
         shell: bash
         run: |
           set -euo pipefail
@@ -37,10 +38,16 @@ jobs:
           printf 'Runner image: %s %s\n' "${ImageOS:-unknown}" "${ImageVersion:-unknown}"
           test ! -e "$DISK_INVENTORY_GOLDEN_OUTPUT"
       - name: Test only fresh owned Darwin fixtures and internal lifecycle
+        env:
+          DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
         run: xcrun swift test --package-path native/DiskInventoryCore
       - name: Compare native snapshots with an independently created Python fixture oracle
+        env:
+          DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
         run: python native/DiskInventoryCore/Validation/compare_fixture_snapshots.py
       - name: Admit native output through the unchanged browser parser
+        env:
+          DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
         run: node native/DiskInventoryCore/Validation/check_snapshot_parser.cjs
       - name: Preserve generated fixture-only snapshots
         if: success()
