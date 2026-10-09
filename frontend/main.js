@@ -56,6 +56,22 @@ document.addEventListener("DOMContentLoaded", () => {
       container.classList.remove("visible");
     }, 5000);
   }
+  function createOperationTitle(opId, status) {
+    const title = document.createElement("div");
+    const label = document.createElement("strong");
+    label.textContent = "Op:";
+    const state = document.createElement("em");
+    state.textContent = String(status);
+    title.append(label, document.createTextNode(` ${opId} — `), state);
+    return title;
+  }
+
+  function showOperationDetails(payload) {
+    const pre = document.createElement("pre");
+    pre.textContent = JSON.stringify(payload, null, 2);
+    document.getElementById("ops-detail").replaceChildren(pre);
+  }
+
   function loadContent(section) {
     switch (section) {
       case "duplicates":
@@ -1064,9 +1080,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const op = ops[opId];
             const card = document.createElement("div");
             card.className = "card";
-            const title = document.createElement("div");
-            title.innerHTML = `<strong>Op:</strong> ${opId} — <em>${op.status}</em>`;
-            card.appendChild(title);
+            card.appendChild(createOperationTitle(opId, op.status));
             const meta = document.createElement("div");
             meta.textContent = JSON.stringify(op.metadata || {});
             card.appendChild(meta);
@@ -1076,8 +1090,7 @@ document.addEventListener("DOMContentLoaded", () => {
             view.onclick = async () => {
               const dres = await fetch(`${API_BASE}/api/ops/${opId}/preview`);
               const dj = await dres.json();
-              const det = document.getElementById("ops-detail");
-              det.innerHTML = `<pre>${JSON.stringify(dj, null, 2)}</pre>`;
+              showOperationDetails(dj);
             };
             card.appendChild(view);
             const undo = document.createElement("button");
@@ -1103,8 +1116,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ op_id: opId, dry_run: true }),
               });
               const jr = await r.json();
-              const det = document.getElementById("ops-detail");
-              det.innerHTML = `<pre>${JSON.stringify(jr, null, 2)}</pre>`;
+              showOperationDetails(jr);
             };
             card.appendChild(undo);
             card.appendChild(previewUndo);
@@ -1131,8 +1143,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ op_id: opId, dry_run: true }),
               });
               const jd = await r.json();
-              const det = document.getElementById("ops-detail");
-              det.innerHTML = `<pre>${JSON.stringify(jd, null, 2)}</pre>`;
+              showOperationDetails(jd);
             };
             card.appendChild(previewDelete);
             card.appendChild(del);
@@ -1171,9 +1182,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const op = data[opId];
             const card = document.createElement("div");
             card.className = "card";
-            const title = document.createElement("div");
-            title.innerHTML = `<strong>Op:</strong> ${opId} — <em>${op.status}</em>`;
-            card.appendChild(title);
+            card.appendChild(createOperationTitle(opId, op.status));
             const meta = document.createElement("div");
             meta.textContent = JSON.stringify(op.metadata || {});
             card.appendChild(meta);

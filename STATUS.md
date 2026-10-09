@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 01:50
+Last updated: 2026-10-09 02:16
+
+## Operation history text-rendering checkpoint
+
+- Legacy operation/recycle titles and operation detail responses now render stored strings through text nodes and `textContent`. The existing `strong`, `em` and `pre` structure, classes, labels, action ordering, accessibility state and fetch/JSON contracts are preserved.
+- Added 34 isolated Jest regressions and five synthetic Chromium scenarios. Fixtures contain inert markup, quotes, entities and Unicode only; fetch is mocked and no backend, provider, saved operation or user directory is used by the new tests. The Jest corpus gives nine assertion failures against the unchanged renderer and passes after the repair.
+- Local verification passes: 238 Jest tests, 590 existing backend tests in fresh owned app state, 44 OpenAPI routes, 140 pure planner tests, 37 isolated HTTP contracts, frontend formatting and YAML dependency compatibility. Independent review accepts the bounded repair after a separate 34-test run and 47 owned-DOM probes, including exact normal-page equality. Exact-head hosted checks are required before merge. Local Chromium cannot start because process sockets are unavailable; no local browser/pixel pass is claimed.
+- This is a display-only repair. Backend storage/path handling, permissions, dependencies, execution/recovery flags, default navigation and manual-only documentation publishing are unchanged. Other stored-result and backup-traversal safety work, representative hardware and release acceptance remain separate.
 
 ## Read/status malformed-input checkpoint
 
@@ -452,4 +459,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 01:50
+Last updated: 2026-10-09 02:16
