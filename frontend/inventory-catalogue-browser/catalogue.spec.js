@@ -281,6 +281,7 @@ test("keyboard cancellation restores focus and repeated confirmation is single-u
 test("partial, hostile text and no-match states never imply live evidence", async ({
   page,
 }, info) => {
+  await page.setViewportSize({ width: 1280, height: 1000 });
   await open(page);
   const s = JSON.parse(fs.readFileSync(second, "utf8"));
   s.source.label = "<img src=x onerror=alert(1)> owned fixture";
@@ -300,7 +301,14 @@ test("partial, hostile text and no-match states never imply live evidence", asyn
   await expect(page.locator("#catalogue-results")).toContainText(
     "live storage has not been checked"
   );
-  await shot(page, info, "28-catalogue-no-match.png");
+  // Capture actual painted viewports rather than accepting offscreen full-page pixels.
+  await page.locator(".catalogue-work").scrollIntoViewIfNeeded();
+  await expect(page.locator("#catalogue-results")).toBeInViewport({ ratio: 1 });
+  await expect(page.locator(".project-selection")).toBeInViewport({ ratio: 1 });
+  await shot(page, info, "28-catalogue-no-match.png", { fullPage: false });
+  await page.locator("#catalogue-precision").scrollIntoViewIfNeeded();
+  await expect(page.locator("#source-details")).toBeInViewport({ ratio: 1 });
+  await shot(page, info, "35-catalogue-hostile-source-details.png", { fullPage: false });
 });
 test("navigation dismisses staged changes and direct file launch works", async ({ page }, info) => {
   await page.goto(pathToFileURL(path.resolve(__dirname, "../inventory-catalogue.html")).href);
