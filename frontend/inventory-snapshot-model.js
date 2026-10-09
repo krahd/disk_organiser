@@ -103,6 +103,41 @@
       (m[7] !== "Z" && (+m[9] > 23 || +m[10] > 59))
     )
       fail("Invalid observation date.");
+    return m;
+  }
+  function formatObservationDate(value) {
+    let parts;
+    try {
+      parts = stamp(value);
+    } catch {
+      return "Date unavailable";
+    }
+    // Display the recorded wall time, never the browser's timezone. The full
+    // original stamp stays in source details and exported history.
+    const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ],
+      offset = parts[7],
+      zone =
+        offset === "-00:00"
+          ? "UTC (local offset unknown)"
+          : offset === "Z" || offset === "+00:00"
+          ? "UTC"
+          : `UTC${offset}`;
+    return `${Number(
+      parts[3]
+    )} ${months[Number(parts[2]) - 1]} ${parts[1]}, ${parts[4]}:${parts[5]} ${zone}`;
   }
   function budget(value, max) {
     let size = 0;
@@ -363,7 +398,7 @@
     validate(c);
     text(title);
     if (!Array.isArray(selections) || !selections.length || selections.length > 2000)
-      fail("Choose 1–2,000 project scopes.");
+      fail("Choose 1–2,000 files or folders for the project.");
     const chosen = new Map(),
       rows = [];
     selections.forEach((s) => {
@@ -371,7 +406,7 @@
       const record = c.records.find((r) => r.id === s.source_id),
         entry = record?.snapshot.entries.find((e) => e.path === s.path);
       if (!entry || !selectable(entry))
-        fail("Only listed observed files or folders can become manual scopes.");
+        fail("Only listed observed files or folders can be selected for a manual plan.");
       const prior = chosen.get(record.id) || [];
       if (
         prior.some((p) => p === s.path || p.startsWith(s.path + "/") || s.path.startsWith(p + "/"))
@@ -436,5 +471,6 @@
     summary,
     selectable,
     buildPlan,
+    formatObservationDate,
   });
 });

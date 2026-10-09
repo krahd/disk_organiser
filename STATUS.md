@@ -1,6 +1,16 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 07:55
+Last updated: 2026-10-09 08:32
+
+## Catalogue readability checkpoint
+
+- A focused display-only follow-on to merged catalogue PR19 (`e08692fe05858debef3a10e3d0d40eb875ebb3ee`, all five main workflows green) replaces dense timestamps with a readable day/month/year and minute-level time. It retains the recorded offset without browser-timezone conversion; `-00:00` explicitly reports an unknown local offset. Original ISO strings, seconds, fractional seconds and offsets remain unchanged in source details, semantic time attributes, catalogue files and manual-plan notes. The same strict date validator still rejects incomplete or invalid imports; the standalone formatter returns “Date unavailable” for unsupported input.
+- Project selection counts now distinguish actual files and folders in empty, singular, plural and mixed selections. Selecting a folder counts that chosen folder once, not its descendants. Internal source keys, imported claims, selection limits and overlap rules are unchanged.
+- Local checks pass all 638 frontend Jest tests (88 catalogue model cases), 32 catalogue DOM checks, 43 unchanged manual-workspace DOM checks and full frontend formatting. Independent source/model/DOM review adds 11,859 calendar/offset/precision oracle cases with unchanged admission parity and 53 DOM checkpoints, without a blocking defect. No local browser execution is claimed; the existing locked-browser/process-socket limits remain.
+- Accepted source `6dedfe051c6055bc481e9b0fa4158d8ada1e09db` has all ten push/PR workflow runs green. The [catalogue run](https://github.com/krahd/disk_organiser/actions/runs/37905173948) passes 88 model and 32 DOM checks on each OS plus eight Chromium journeys, including recorded offsets under a different host timezone and exact-date save/reopen. [Aggregate CI](https://github.com/krahd/disk_organiser/actions/runs/37905173983) passes Linux 709 backend, Windows 607 passed/102 skipped, 638 Jest, OpenAPI44, audits, formatting and 27 existing Chromium journeys. Existing planner, manual workspace and synthetic UI workflows pass. All 237 unaffected baseline blobs remain identical.
+- Original artifact `11604460803` is 5,931,301 bytes, SHA-256 `4ebd6cf2bcd8d5615e02dd9ad6fb2e711a880ba3350ef28980b570e5ed9eef15`. All fifteen original PNG lengths and hashes verify. Independent exact-source pixel review accepts readable dates, unknown/recorded offsets, file/folder counts, raw ISO details, selected states, mobile/zoom/focus, no-match and hostile-text views. Eleven originals are byte-identical to earlier inspected passes; the remaining four were freshly inspected.
+- Initial `ff84f331` passed all workflows/eight browser journeys but its full-page no-match PNG had missing offscreen text. Intermediate `faeb4c94` then failed the new full-sidebar viewport assertion because nearest scrolling clipped roughly one pixel at the image edge. Both failed evidence stages remain preserved. A test-only framing repair uses explicit top-aligned scrolling and retains strict full-visibility assertions. The accepted log records sidebar top 24.40625/bottom 771.84375 in a 1000-pixel viewport; separate real viewports fully paint both no-match/sidebar and source details. No production/CSS change or weakened assertion was used for this repair.
+- Producer, snapshot/catalogue/manual schemas, fixtures, dependencies, permissions, save/export authority and all native-drive/provider/mutation/recovery gates are unchanged. [Catalogue date presentation and selection wording](docs/INVENTORY-CATALOGUE.md#readable-dates-and-selection-counts) describes the display contract. Existing diagrams remain structurally accurate and unchanged. This closeout changes documentation only and preserves every tested runtime/test/workflow blob; cited evidence is not relabelled as a later documentation head. Native browser-UI zoom, OS dialogues, assistive technology, participant usability and real-drive/backup/restore remain separate gates.
 
 ## Historical inventory catalogue and scoped overview checkpoint
 
@@ -556,4 +566,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 07:55
+Last updated: 2026-10-09 08:32
