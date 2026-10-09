@@ -29,6 +29,8 @@ jobs:
       - name: Run backend tests (Windows)
         shell: pwsh
         run: |
+          $env:DISK_ORGANISER_DATA_DIR = Join-Path $env:RUNNER_TEMP ("disk-organiser-tests-" + [guid]::NewGuid().ToString("N"))
+          New-Item -ItemType Directory -Path $env:DISK_ORGANISER_DATA_DIR -ErrorAction Stop | Out-Null
           python -m pytest -q backend/tests
 
       - name: Validate OpenAPI route coverage (Windows)
@@ -63,6 +65,8 @@ jobs:
 
       - name: Run backend tests
         run: |
+          DISK_ORGANISER_DATA_DIR="$(mktemp -d "$RUNNER_TEMP/disk-organiser-tests.XXXXXX")"
+          export DISK_ORGANISER_DATA_DIR
           python -m pytest -q backend/tests
 
       - name: Validate OpenAPI route coverage

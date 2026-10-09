@@ -104,6 +104,24 @@ Maintenance endpoints
 - `POST /api/maintenance/run` — run maintenance workflow
 - `GET /api/safety/backup-status` — get macOS Time Machine / backup status
 
+Maintenance status payload limits
+
+`GET /api/maintenance/status` reads the existing status file once in binary mode,
+requesting at most 65,537 bytes. New product limits admit up to 65,536 bytes of
+UTF-8 JSON, 32 nested object/array containers and 4,096 retained parsed nodes.
+The root, every container, scalar value and retained object key each count as
+one node. Duplicate keys keep the standard JSON decoder's last-value behaviour.
+Strings containing braces or escapes do not add nesting. Payload overflow is
+rejected, never silently truncated, repaired, rewritten or retried.
+
+Successful values retain the `{"status":"ok","maintenance":value}` response;
+a missing file retains `{"status":"unknown","maintenance":null}`. Failed reads,
+invalid encoding/JSON and exceeded limits return HTTP 500 with the fixed bounded
+response `{"error":"Unable to read maintenance status."}`. Query/body arguments
+remain ignored. These are payload resource bounds only: path provenance,
+no-follow/open behaviour, schema validation, app-import writes and other legacy
+storage safety remain separate gates. Embedded paths are still just JSON values.
+
 Validation notes
 
 - Integer fields like `min_size` and `depth` must be `>= 0`; invalid values
