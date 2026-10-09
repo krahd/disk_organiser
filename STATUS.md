@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 05:23
+Last updated: 2026-10-09 05:29
 
 ## Aurora project choices checkpoint
 
@@ -10,7 +10,8 @@ Last updated: 2026-10-09 05:23
 - Fresh local checks pass 351 Jest tests (77 pure intent, 36 choices-flow and 238 existing tests), 691 backend tests in fresh owned app state, 140 pure planner tests, 39 isolated HTTP contracts, 44 OpenAPI routes, frontend formatting, YAML compatibility, Python compilation and whitespace checks. Both npm and pinned Python dependency audits report no known vulnerabilities. Broad flake8 retains pre-existing diagnostics in the three touched Python files; baseline comparison establishes zero new diagnostics. All 36 isolated browser specifications parse, including eleven new project-choices flows. The retained pre-implementation admission failure and earlier independent numeric/download lifecycle regressions are preserved as evidence; fresh independent source review finds no blocker after 109 focused Jest tests and 1,700 additional assertions covering all 510 nonempty membership/root combinations, independent request projections, strict admission and real asynchronous FileReader lifecycle flows.
 - Initial published source `9086a9a27162933172f710a1c63d7d13e13972e6` passes aggregate CI and planner workflows, but both isolated UI runs expose intermittent keyboard file-picker waits (35/36 push and 34/36 PR flows pass). Failure pixels keep Open visible, enabled and focused. Independent inspection of the locked Playwright 1.37 subscription code identifies asynchronous first/last-listener interception toggles as the supported cause. A persistent observer is now installed before navigation; all actual chooser waits, keyboard/pointer activations, file selections, assertions and zero retries remain. This harness-only repair changes no application bytes and requires fresh hosted verification; the failed runs are not acceptance evidence.
 - Independent initial pixels pass the desktop, 320-pixel collapsed/expanded and 390-pixel staged comparisons with readable controls, focus and wrapped paths; all 48 artefact files match their manifest. Zoom staging remains unverified until the keyboard harness repair passes. Root visual inspection requested a small copy repair: singular/plural summary and included-member labels now match their count, with four new failing-before-fix Jest cases and the desktop browser expectation corrected. No import, review or persistence behaviour changes. The complete 351-test Jest suite and 1,700-assertion independent probe pass after the copy repair.
-- Local Chromium launch is blocked by sandbox process-socket restrictions, so no local browser/pixel pass is claimed. Exact-source hosted tests, independent rendered review and manual merge approval remain pending. Dependency and workflow files, real-drive/provider access, mutation/recovery gates and manual-only documentation publication are unchanged. Representative hardware, native browser zoom, assistive technology, real-data and release acceptance remain separate.
+- Repaired source `7dc442b79b660abadd8adfa15f54741b8c79dfda` passes all 36 isolated Chromium flows in both push and PR runs, including repeated keyboard Open and 200% CSS zoom. The complete screenshot ZIP exceeds the available 32 MiB local-transfer limit. One additive `if: always()` upload step now preserves project-choices PNGs as a smaller focused artefact; the original complete evidence upload, every test, selectors, permissions and failure evidence remain unchanged. This packaging-only adjustment and final rendered acceptance require fresh hosted verification.
+- Local Chromium launch is blocked by sandbox process-socket restrictions, so no local browser/pixel pass is claimed. Exact-source hosted tests, independent rendered review and manual merge approval remain pending. Dependency files, real-drive/provider access, mutation/recovery gates and manual-only documentation publication are unchanged. Representative hardware, native browser zoom, assistive technology, real-data and release acceptance remain separate.
 - The next useful product boundary is a person's bounded declared or imported inventory, with source-bound intent and explicit reconciliation. This is documented as a proposal only; the current slice remains the packaged synthetic Aurora example.
 
 ## Maintenance status payload-bound checkpoint
@@ -479,4 +480,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 05:23
+Last updated: 2026-10-09 05:29

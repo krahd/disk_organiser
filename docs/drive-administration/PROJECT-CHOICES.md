@@ -128,8 +128,11 @@ rendered review remain required before acceptance. Initial hosted runs expose in
 Playwright client toggles picker interception asynchronously when its first/last
 listener changes; a persistent observer installed before navigation is intended
 to prevent this suspected harness race while retaining real keyboard activation, chooser selection and all
-assertions. No delays, retries or runtime changes are added. Fresh hosted
-verification of the repair is pending. Native browser zoom,
+assertions. No delays, retries or runtime changes are added. Repaired source `7dc442b`
+passes all 36 browser flows in both push and PR runs. The full evidence ZIP is
+larger than the available local-transfer limit, so an additive always-run upload
+also preserves the project-choices PNGs as a smaller artefact. The original full
+evidence upload and all tests remain unchanged. Final rendered review is pending. Native browser zoom,
 assistive technology, representative hardware and real data are not qualified
 by these tests.
 

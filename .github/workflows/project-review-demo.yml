@@ -52,3 +52,11 @@ jobs:
           path: test-results/project-review/
           if-no-files-found: ignore
           retention-days: 14
+      - name: Save focused project choices screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-choices-synthetic-screens
+          path: test-results/project-review/project-choices-*/*.png
+          if-no-files-found: ignore
+          retention-days: 14
