@@ -10,6 +10,8 @@
     return n;
   };
   const now = () => new Date().toISOString();
+  const countLabel = (count, singular, plural = `${singular}s`) =>
+    `${count} ${count === 1 ? singular : plural}`;
   const clone = (value) => JSON.parse(JSON.stringify(value));
   const labelOf = (collection, id) =>
     state[collection].find((r) => r.id === id)?.label || "Not recorded";
@@ -1114,7 +1116,7 @@
       pane.append(button("Choose project members", editMembership, "text-button"));
     pane.append(
       small(
-        "These are named scopes, not a scanned file list. Grouping them here leaves their recorded locations unchanged."
+        "These are items you named, not a scanned file list. Grouping them here leaves their recorded locations unchanged."
       )
     );
     renderDriveLibrary(pane);
@@ -1258,9 +1260,14 @@
     scope.append(
       titleRow(
         "What this protection plan includes",
-        button("Choose included scopes", chooseScope, "text-button")
+        button("Choose included items", chooseScope, "text-button")
       ),
-      small(`${included.length} listed scopes included · ${excluded.length} excluded by you`)
+      small(
+        `${countLabel(included.length, "item")} included · ${countLabel(
+          excluded.length,
+          "item"
+        )} excluded by you`
+      )
     );
     const list = el("ul", null, "plain-list");
     included.forEach((i) => list.append(el("li", i.label)));
@@ -1354,7 +1361,10 @@
       card = el("article", null, "check-card");
     card.append(
       el("h4", restore.label),
-      tag(reports.length ? `${reports.length} self-reports recorded` : "Checklist only", "neutral")
+      tag(
+        reports.length ? `${countLabel(reports.length, "self-report")} recorded` : "Checklist only",
+        "neutral"
+      )
     );
     if (restore.archived) card.append(tag("Archived record", "neutral"));
     card.append(
@@ -1419,7 +1429,9 @@
       );
     const checks = el("details");
     checks.open = details || reports.length > 0;
-    checks.append(el("summary", `Checklist and result history · ${restore.checks.length} checks`));
+    checks.append(
+      el("summary", `Checklist and result history · ${countLabel(restore.checks.length, "check")}`)
+    );
     if (details && context) {
       checks.append(
         small(
@@ -1510,11 +1522,15 @@
   function renderReview(pane) {
     const p = currentProtection(),
       data = M.derive(state),
+      checklistCount = state.restore_plans.filter((r) => r.protection_plan_id === p?.id).length,
       stats = el("div", null, "summary-stats");
     for (const [count, label] of [
-      [members().length, "listed scopes"],
-      [p?.target_ids.length || 0, "targets planned"],
-      [state.restore_plans.filter((r) => r.protection_plan_id === p?.id).length, "checklists"],
+      [members().length, members().length === 1 ? "item listed" : "items listed"],
+      [
+        p?.target_ids.length || 0,
+        p?.target_ids.length === 1 ? "target planned" : "targets planned",
+      ],
+      [checklistCount, checklistCount === 1 ? "checklist" : "checklists"],
     ]) {
       const s = el("div", null, "summary-stat");
       s.append(el("strong", String(count)), el("span", label));
@@ -1719,7 +1735,9 @@
         el("strong", project.label),
         el(
           "small",
-          `${project.member_item_ids.length} listed scopes${project.archived ? " · archived" : ""}`
+          `${countLabel(project.member_item_ids.length, "item")} listed${
+            project.archived ? " · archived" : ""
+          }`
         )
       );
       b.append(icon("folder-icon"), name);
@@ -1832,7 +1850,9 @@
         body.append(
           el(
             "p",
-            `“${state.title}” · ${state.projects.length} projects · revision ${state.revision}`,
+            `“${state.title}” · ${countLabel(state.projects.length, "project")} · revision ${
+              state.revision
+            }`,
             "modal-summary"
           ),
           small(
@@ -1884,7 +1904,13 @@
           el("strong", doc.title),
           el(
             "p",
-            `${doc.projects.length} projects · ${doc.drives.length} named locations · ${doc.items.length} listed scopes · ${doc.backup_targets.length} targets · ${doc.restore_plans.length} checklists`
+            `${countLabel(doc.projects.length, "project")} · ${countLabel(
+              doc.drives.length,
+              "named location"
+            )} · ${countLabel(doc.items.length, "item")} listed · ${countLabel(
+              doc.backup_targets.length,
+              "target"
+            )} · ${countLabel(doc.restore_plans.length, "checklist")}`
           )
         );
         body.append(summary);

@@ -979,14 +979,22 @@ main {
 }
 .overview-heading {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
   margin-bottom: 1rem;
 }
 .overview-heading h2 {
+  flex: 1 1 14rem;
+  min-width: 0;
   font-size: 1rem;
   letter-spacing: 0;
+}
+.overview-heading > .text-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
 .project-rail {
   display: flex;
@@ -1276,9 +1284,12 @@ dialog::backdrop {
   margin-bottom: 0.7rem;
 }
 .dialog-heading h2 {
+  flex: 1 1 0;
+  min-width: 0;
   font-size: 1.4rem;
   padding-top: 0.5rem;
 }
+
 #dialog-intro {
   font-size: 0.87rem;
 }
@@ -1446,6 +1457,13 @@ label {
 .target-row {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+#close-dialog {
+  flex: 0 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
 .draft-check {
   border-top: 1px solid var(--line);

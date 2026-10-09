@@ -22,6 +22,29 @@ async function noOverflow(page) {
   }));
   expect(geometry.scroll).toBeLessThanOrEqual(geometry.width + 1);
 }
+async function singleLineControl(locator) {
+  const geometry = await locator.evaluate((node) => {
+    const rect = node.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    const textLines = [...range.getClientRects()]
+      .filter((line) => line.width > 0 && line.height > 0)
+      .map((line) => Math.round(line.top));
+    return { width: rect.width, height: rect.height, lines: [...new Set(textLines)].length };
+  });
+  expect(geometry.width).toBeGreaterThanOrEqual(44);
+  expect(geometry.height).toBeGreaterThanOrEqual(44);
+  expect(geometry.lines).toBe(1);
+}
+async function closeControlFits(page) {
+  await singleLineControl(page.locator("#close-dialog"));
+  const fit = await page.locator(".dialog-heading").evaluate((header) => {
+    const title = header.querySelector("h2").getBoundingClientRect();
+    const close = header.querySelector("button").getBoundingClientRect();
+    return title.right <= close.left + 1;
+  });
+  expect(fit).toBe(true);
+}
 async function open(page) {
   await page.goto("/manual-workspace.html");
   await expect(page.getByRole("button", { name: "Name your first project" })).toBeVisible();
@@ -60,6 +83,7 @@ test("guided real manual journey saves and reopens a lossless private artifact",
   await open(page);
   await shot(page, info, "01-empty-desktop.png");
   await createSimplePlan(page);
+  await expect(page.locator(".project-card small")).toHaveText("1 item listed");
   await page.getByRole("button", { name: "Next: where it lives →", exact: true }).click();
   await page.getByRole("button", { name: "Set intended home", exact: true }).click();
   await page.getByLabel("Named location", { exact: true }).selectOption("__new__");
@@ -76,6 +100,9 @@ test("guided real manual journey saves and reopens a lossless private artifact",
   await page.getByLabel("Target name", { exact: true }).fill("Backup at home");
   await page.getByRole("button", { name: "Add planned target", exact: true }).click();
   await expect(page.locator(".evidence-strip")).toContainText("Backup coverage unknown");
+  await expect(page.locator(".check-card").first()).toContainText(
+    "1 item included · 0 items excluded by you"
+  );
   await shot(page, info, "03-planned-protection.png");
   const downloadEvent = page.waitForEvent("download");
   await page.getByRole("button", { name: "Save plan", exact: true }).first().click();
@@ -141,12 +168,19 @@ test("320 CSS pixel layout keeps every arrangement and dialog control reachable"
   await page.setViewportSize({ width: 320, height: 740 });
   await open(page);
   await importPlan(page);
+  await page.getByRole("button", { name: "Rename plan", exact: true }).click();
+  await page
+    .getByLabel("Plan title", { exact: true })
+    .fill("Photo archive planning notes across laptop and offline drives");
+  await page.getByRole("button", { name: "Save title", exact: true }).click();
+  await singleLineControl(page.getByRole("button", { name: "Rename plan", exact: true }));
   await page.getByRole("button", { name: /Where it lives/ }).click();
   await noOverflow(page);
   await shot(page, info, "05-mobile-320-arrangement.png");
   await page.getByRole("button", { name: "Set intended home", exact: true }).click();
   await noOverflow(page);
   await expect(page.getByLabel("Named location", { exact: true })).toBeVisible();
+  await closeControlFits(page);
   await shot(page, info, "06-mobile-320-dialog.png");
   await page.getByRole("button", { name: "Cancel", exact: true }).click();
   await page.getByRole("button", { name: /How to protect it/ }).click();
@@ -165,7 +199,13 @@ test("200 percent CSS zoom reflows with keyboard step navigation", async ({ page
   await page.keyboard.press("Enter");
   await expect(page.locator("#step-heading")).toBeFocused();
   await noOverflow(page);
+  await singleLineControl(page.getByRole("button", { name: "Rename plan", exact: true }));
   await shot(page, info, "08-css-zoom-200.png");
+  await page.getByRole("button", { name: "Set intended home", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  await noOverflow(page);
+  await closeControlFits(page);
+  await shot(page, info, "11-css-zoom-200-dialog.png");
 });
 test("keyboard-only entry, focus restoration and cancellation work without dragging", async ({
   page,

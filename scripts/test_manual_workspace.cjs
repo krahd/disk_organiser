@@ -441,6 +441,48 @@ async function launch() {
   );
   checks.push("draft checklist descriptions can be corrected before any report");
   race.dom.window.close();
+  const counts = await launch();
+  counts.click("Name your first project");
+  counts.fill("Project name", "Count examples");
+  counts.submit();
+  assert.equal(counts.d.querySelector(".project-card small").textContent, "0 items listed");
+  for (const [name, expected] of [
+    ["First folder", "1 item listed"],
+    ["Second folder", "2 items listed"],
+  ]) {
+    counts.click("+ Add folder or file");
+    counts.fill("Folder or file name", name);
+    counts.submit();
+    assert.equal(counts.d.querySelector(".project-card small").textContent, expected);
+  }
+  counts.d.querySelectorAll(".steps button")[2].click();
+  assert.match(counts.text(), /2 items included · 0 items excluded by you/);
+  counts.click("Choose included items");
+  counts.checkbox("First folder", false);
+  counts.submit();
+  assert.match(counts.text(), /1 item included · 1 item excluded by you/);
+  counts.d.querySelectorAll(".steps button")[3].click();
+  assert.equal(counts.d.querySelector(".summary-stat span").textContent, "items listed");
+  checks.push("listed and included counts use plain singular/plural item labels");
+  counts.click("Edit project");
+  const closeStyle = counts.dom.window.getComputedStyle(counts.d.getElementById("close-dialog"));
+  assert.equal(closeStyle.flexShrink, "0");
+  assert.equal(closeStyle.whiteSpace, "nowrap");
+  assert.equal(closeStyle.minHeight, "44px");
+  assert.equal(closeStyle.minWidth, "44px");
+  counts.click("Cancel");
+  const rename = [...counts.d.querySelectorAll(".overview-heading button")].find(
+    (b) => b.textContent === "Rename plan"
+  );
+  const renameStyle = counts.dom.window.getComputedStyle(rename);
+  assert.equal(renameStyle.flexShrink, "0");
+  assert.equal(renameStyle.whiteSpace, "nowrap");
+  assert.equal(
+    counts.dom.window.getComputedStyle(counts.d.querySelector(".overview-heading")).flexWrap,
+    "wrap"
+  );
+  checks.push("Close and Rename controls retain nonshrinking no-wrap CSS safeguards");
+  counts.dom.window.close();
   assert.deepEqual(a.errors, []);
   checks.push("no uncaught script errors or external resource requests");
   const csp = d.querySelector('meta[http-equiv="Content-Security-Policy"]').content;

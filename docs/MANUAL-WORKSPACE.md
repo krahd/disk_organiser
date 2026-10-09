@@ -6,7 +6,9 @@
 
 The prototype starts with an empty plan. It contains no sample records unless the user explicitly opens one of the clearly labelled illustrative JSON fixtures. No default navigation, execution/recovery flag, backend route, provider integration or deployment is changed.
 
-Independent source/DOM review accepted the frozen runtime with no remaining source/DOM blockers. All 41 integration checks and separate guided-only, import-race, history and failure-path probes passed. Local browser execution is blocked by process-socket restrictions; no local screenshot, real keyboard-focus trap, responsive geometry, browser-zoom or screen-reader acceptance is claimed. The dedicated hosted workflow must pass on the exact combined source, and a reviewer must inspect the original screenshots before visual acceptance or merge.
+Independent source/DOM review accepted the frozen runtime with no remaining source/DOM blockers. All 43 integration checks and separate guided-only, import-race, history and failure-path probes passed. Local browser execution is blocked by process-socket restrictions; no local screenshot, real keyboard-focus trap, responsive geometry, browser-zoom or screen-reader acceptance is claimed. The dedicated hosted workflow must pass on the exact combined source, and a reviewer must inspect the original screenshots before visual acceptance or merge.
+
+Published source `4b681288` passed seven hosted Chromium flows, but original pixels exposed narrow-screen Close/Rename wrapping and count wording that needed correction. The focused repair has new 320-pixel/200% CSS-zoom single-line, 44-pixel-control and title-separation assertions. Its regenerated exact-source screenshots and CI remain required; earlier passing runs do not establish the repair.
 
 ## A useful first journey
 

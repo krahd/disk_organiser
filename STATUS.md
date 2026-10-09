@@ -1,14 +1,15 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-09 05:53
+Last updated: 2026-10-09 06:06
 
 ## Guided manual planning workspace checkpoint
 
 - Added a separate static `frontend/manual-workspace.html` interface for real manually entered projects, named drives/scopes, recorded locations, intended homes, planned backup targets, desired policies, exclusions and restore checklists. It starts empty and does not replace default navigation or Aurora. Project cards, labelled location lanes, a recorded/intended comparison and planned-target cards support the four-step guided journey; Show details reveals exact paths, keys, JSON and history without changing saved state.
 - The same independent model handles every edit and import. Archived references remain present; changes to current names/locations/targets cannot relabel historical results. Report rendering uses frozen context and shows drift, mixed outcomes, explicit sample descriptions and dates. Everything remains manual intent with unknown backup coverage; no scanner, provider, account, model service or file-operation authority is present.
 - Explicit local artifact export/import preserves all decisions and history. The UI checks size before reading, decodes UTF-8 fatally with BOM preservation, previews before replacement and rejects obsolete asynchronous reads. Cancelling, editing during a pending read, malformed/unreadable input and save failure preserve the draft. Download feedback distinguishes a requested download from confirmed saving; unsaved-state acknowledgement is revision-specific. All untrusted text is text-rendered and CSP denies connections/forms; no browser autosave or telemetry was introduced.
-- Local combined verification passes 41 DOM integration checks, all 550 frontend Jest tests after preserving the accepted Aurora integration and seven Chromium spec discovery cases. The DOM checks cover the real guided authoring journey, generated Blob export/reopen, details parity, immutable history/drift, hostile text, nonblank/whole-drive requirements, reference-preserving archival, malformed UTF-8/BOM/JSON, stale picker/import races and repeated report submit. DOM simulation is not native browser/pixel or hardware acceptance.
+- Local combined verification passes 43 DOM integration checks, all 550 frontend Jest tests after preserving the accepted Aurora integration and seven Chromium spec discovery cases. The DOM checks cover the real guided authoring journey, generated Blob export/reopen, details parity, immutable history/drift, hostile text, nonblank/whole-drive requirements, reference-preserving archival, malformed UTF-8/BOM/JSON, stale picker/import races and repeated report submit. DOM simulation is not native browser/pixel or hardware acceptance.
 - The dedicated read-only workflow uses existing locked dependencies for model/DOM checks on Linux and Windows, plus Chromium journeys, mobile/zoom, keyboard, save/reopen, cancellation and direct-file launch. Original numbered screenshots and their manifest enter a measured ZIP of at most 30 MiB, including metadata and ZIP headers; full failure artifacts remain separate. Local Chromium execution is blocked by process-socket restrictions, so hosted exact-source execution and original screenshot inspection are required before visual acceptance. Empty intercepted filechooser selection does not establish OS-native dialog-button automation; screen-reader/nontechnical-participant acceptance also remains open.
+- Initial published source `4b681288bada73abf334fe815143818a3aca08b2` passes all eight push/PR workflows, including 199 model cases and 41 DOM checks on Linux/Windows and seven Chromium flows. Original screenshot review found a 320-pixel Close-label wrap defect, awkward Rename-plan wrapping and singular/plural count wording. A focused display-only repair adds nonshrinking 44-pixel/no-wrap Close, wrapping title rows, plain item counts and rendered-line/geometry regressions. Local checks now pass 43 DOM cases and 550 Jest tests; regenerated exact-source pixels and CI are required before accepting the repair. Model, schema, report history and provider/filesystem boundaries remain unchanged.
 - [Workspace usage and verification](docs/MANUAL-WORKSPACE.md). Independent source/DOM review accepts the frozen runtime after separate guided-only, delayed-import, history and failure-path probes. Hosted visual acceptance and maintainer integration review remain open; no deployment or real backup/restore action is included.
 
 ## Independent manual planning model checkpoint
@@ -521,4 +522,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-09 05:53
+Last updated: 2026-10-09 06:06
