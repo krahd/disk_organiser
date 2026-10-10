@@ -1,6 +1,12 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 12:03
+Last updated: 2026-10-10 12:36
+
+## Synchronous selection cancellation: source-only regression tranche
+
+- PR28 merged normally at `ecc64105fe05049ea23ccc2831b1078d5d3bb73f`; all six actual-main workflows passed, including 213 XCTest methods plus six differential/six parser cases. The ordinary product remains unlinked from selection and the real panel gate stays closed.
+- Four new memory-only methods assert stopping state from inside synchronous cancellation hooks: picker Cancel, picker Close returning a selected choice, reader Cancel returning success and reader Close returning failure. They check retirement, discarded completion, duplicate calls and closed-state refusal. Each drops the test doubles' and local request references, then requires a weak request to be nil while the session remains alive; a retained spent request cannot pass. All 213 previous identities remain, for 217 authored methods.
+- These four new methods are not compiled or executed yet. Source review and existing owned native gates remain required. No production, workflow, signing, entitlement, panel, grant, user-device or source-admission change is included.
 
 ## Isolated selected-folder adapter: owned native validation
 
@@ -792,4 +798,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 12:03
+Last updated: 2026-10-10 12:36
