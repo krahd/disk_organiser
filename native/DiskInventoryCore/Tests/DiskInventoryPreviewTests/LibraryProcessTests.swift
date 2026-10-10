@@ -22,20 +22,35 @@ final class LibraryProcessTests: XCTestCase {
     private func launch(arguments: [String] = []) throws -> (Process, Pipe, LockedBox<OwnedProcessOutput>, URL) {
         let binary = try executable()
         let process = Process(); process.executableURL = binary; process.arguments = arguments
-        let pipe = Pipe(); let output = LockedBox(OwnedProcessOutput())
+        let pipe = Pipe(); let output = try collect(pipe)
         process.standardOutput = pipe; process.standardError = FileHandle.nullDevice
-        pipe.fileHandleForReading.readabilityHandler = { handle in
-            do {
-                let bytes = try handle.read(upToCount: 1024) ?? Data()
-                if bytes.isEmpty { handle.readabilityHandler = nil; return }
-                output.update { value in
-                    guard value.bytes.count + bytes.count <= 4096 else { value.invalid = true; return }
-                    value.bytes.append(bytes)
-                }
-            } catch { output.update { $0.invalid = true } }
-        }
-        try process.run()
+        do { try process.run() }
+        catch { pipe.fileHandleForReading.readabilityHandler = nil; throw error }
         return (process, pipe, output, binary)
+    }
+    private func collect(_ pipe: Pipe) throws -> LockedBox<OwnedProcessOutput> {
+        let output = LockedBox(OwnedProcessOutput())
+        let descriptor = pipe.fileHandleForReading.fileDescriptor
+        let flags = fcntl(descriptor, F_GETFL)
+        guard flags >= 0, fcntl(descriptor, F_SETFL, flags | O_NONBLOCK) == 0 else { throw CataloguePreviewHost.Failure.unavailable }
+        pipe.fileHandleForReading.readabilityHandler = { handle in
+            // One bounded nonblocking syscall observes a short live write
+            // without waiting for 1 KiB or EOF. This is our own pipe only.
+            var buffer = [UInt8](repeating: 0, count: 1024)
+            let count = buffer.withUnsafeMutableBytes { Darwin.read(handle.fileDescriptor, $0.baseAddress!, $0.count) }
+            if count == 0 { handle.readabilityHandler = nil; return }
+            if count < 0 {
+                if errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK { return }
+                output.update { $0.invalid = true }; handle.readabilityHandler = nil; return
+            }
+            let bytes = Data(buffer.prefix(count))
+            output.update { value in
+                guard value.bytes.count + bytes.count <= 4096 else { value.invalid = true; return }
+                value.bytes.append(bytes)
+            }
+            if output.read().invalid { handle.readabilityHandler = nil }
+        }
+        return output
     }
     private func contains(_ receipt: String, in output: LockedBox<OwnedProcessOutput>) -> Bool {
         let current = output.read()
@@ -67,6 +82,26 @@ final class LibraryProcessTests: XCTestCase {
         if child.isRunning { _ = Darwin.kill(child.processIdentifier, SIGKILL) }
         let reaped = await waitForExit(child, seconds: 3)
         XCTAssertTrue(reaped, "Owned child cleanup did not complete; test remains failed")
+    }
+
+    func testOwnedReceiptPipeObservesShortWriteBeforeWriterCloses() async throws {
+        let pipe = Pipe(); let output = try collect(pipe)
+        defer { pipe.fileHandleForReading.readabilityHandler = nil; try? pipe.fileHandleForWriting.close() }
+        let receipt = Data("OWNED_SHORT\n".utf8)
+        try pipe.fileHandleForWriting.write(contentsOf: receipt)
+        let deadline = Date().addingTimeInterval(1)
+        while output.read().bytes.isEmpty && Date() < deadline { try await Task.sleep(for: .milliseconds(10)) }
+        // The writer is deliberately still open and fewer than 1 KiB exists.
+        XCTAssertEqual(output.read().bytes, receipt); XCTAssertFalse(output.read().invalid)
+    }
+
+    func testOwnedReceiptPipeRejectsAggregateOverflow() async throws {
+        let pipe = Pipe(); let output = try collect(pipe)
+        defer { pipe.fileHandleForReading.readabilityHandler = nil; try? pipe.fileHandleForWriting.close() }
+        try pipe.fileHandleForWriting.write(contentsOf: Data(repeating: 65, count: 4097))
+        let deadline = Date().addingTimeInterval(1)
+        while !output.read().invalid && Date() < deadline { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertTrue(output.read().invalid); XCTAssertLessThanOrEqual(output.read().bytes.count, 4096)
     }
 
     func testOwnedSampleExecutableLoadsEmptyWindowAndQuitsNormally() async throws {
