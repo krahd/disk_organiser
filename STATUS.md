@@ -1,8 +1,10 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 01:26
+Last updated: 2026-10-10 01:33
 
 ## Owned native visual handoff source checkpoint
+
+- Source `9d55bd54` also compiles and confirms the bootstrap executes, but the owned XCTest window remains inactive/non-key, so three pointer cases still stop before dispatch. A bounded, nonblocking own-application event-queue diagnostic is prepared; existing readiness and trusted pointer assertions remain required, and screenshots must now pass readiness before capture. No native visual acceptance is claimed.
 
 - Diagnostic source `447380fe` compiles; its PR native run retains 59 core and two WebKit passes, while all three pointer flows fail the new pre-dispatch guard with `active=false`, `key=false`, `visible=true`. No pointer success is claimed. A test-only one-time AppKit launch bootstrap is prepared with launch-file/default and delegate refusal guards; it preserves all native event assertions and remains unverified.
 
@@ -664,4 +666,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 01:26
+Last updated: 2026-10-10 01:33

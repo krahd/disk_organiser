@@ -135,14 +135,31 @@ final class OwnedPreviewHarness {
         XCTFail("Owned WebKit condition did not reach the expected state")
         throw OwnedPreviewHost.Failure.expired
     }
+    // XCTest services asynchronous work but does not run NSApplication.run().
+    // Drain only this process's AppKit queue, without a global event tap, blocking
+    // wait, unbounded loop or alternative click route.
+    @discardableResult
+    private func pumpApplicationEvents() -> Int {
+        var count = 0
+        for _ in 0..<32 {
+            guard let event = NSApp.nextEvent(matching: .any, until: .distantPast,
+                                             inMode: .default, dequeue: true) else { break }
+            NSApp.sendEvent(event)
+            count += 1
+        }
+        NSApp.updateWindows()
+        return count
+    }
     private func prepareInteraction() async throws {
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
         let deadline = Date().addingTimeInterval(3)
+        var serviced = pumpApplicationEvents()
         while (!NSApp.isActive || !window.isKeyWindow) && Date() < deadline {
             try await Task.sleep(for: .milliseconds(30))
+            serviced += pumpApplicationEvents()
         }
-        print("OWNED_EVENT_WINDOW active=\(NSApp.isActive) key=\(window.isKeyWindow) visible=\(window.isVisible) responder=\(String(describing: window.firstResponder)) bounds=\(host.webView.bounds)")
+        print("OWNED_EVENT_WINDOW queuedEvents=\(serviced) active=\(NSApp.isActive) key=\(window.isKeyWindow) visible=\(window.isVisible) responder=\(String(describing: window.firstResponder)) bounds=\(host.webView.bounds)")
         guard NSApp.isActive, window.isKeyWindow, window.isVisible, !host.webView.isHidden else {
             throw OwnedPreviewHost.Failure.unavailable
         }
@@ -198,6 +215,7 @@ final class OwnedPreviewHarness {
             // bypasses that route and is explicitly discouraged by AppKit.
             NSApp.sendEvent(event)
             try await Task.sleep(for: .milliseconds(40))
+            pumpApplicationEvents()
         }
         let trace = try await script("return JSON.stringify(window.__ownedEventTrace);")
         print("OWNED_EVENT_TRACE id=\(id) events=\(trace)")
@@ -222,6 +240,7 @@ final class OwnedPreviewHarness {
                 isARepeat: false, keyCode: code))
             NSApp.sendEvent(event)
             try await Task.sleep(for: .milliseconds(40))
+            pumpApplicationEvents()
         }
         let trace = try await script("return JSON.stringify(window.__ownedEventTrace);")
         print("OWNED_KEY_TRACE events=\(trace)")
@@ -229,6 +248,7 @@ final class OwnedPreviewHarness {
         XCTAssertTrue(rows.contains { $0["type"] as? String == "keydown" && $0["id"] as? String == "catalogue-name" && $0["trusted"] as? Bool == true })
     }
     func snapshot() async throws -> Data {
+        try await prepareInteraction()
         let configuration = WKSnapshotConfiguration()
         configuration.rect = host.webView.bounds
         configuration.snapshotWidth = NSNumber(value: Double(host.webView.bounds.width))
