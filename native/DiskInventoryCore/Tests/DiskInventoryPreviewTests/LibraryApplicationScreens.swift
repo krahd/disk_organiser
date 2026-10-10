@@ -40,12 +40,12 @@ final class LibraryApplicationScreens {
               !view.isHiddenOrHasHiddenAncestor else { throw CoreFailure.invalidProjection }
         view.layoutSubtreeIfNeeded(); view.displayIfNeeded()
         // A transparent child omits its real window background in cacheDisplay.
-        // Render this exact visible region from its actual opaque ancestor;
+        // Render this exact visible region from its actual returned ancestor;
         // never fill, composite, restyle or resize the evidence after capture.
         let ancestor = try XCTUnwrap(view.opaqueAncestor)
         guard names.contains(name) else { throw CoreFailure.invalidProjection }
         print("OWNED_APP_CAPTURE id=\(name) sameWindow=\(ancestor.window === window) opaque=\(ancestor.isOpaque) descendant=\(ancestor === view || view.isDescendant(of: ancestor)) visible=\(view.visibleRect) bounds=\(view.bounds) ancestorBounds=\(ancestor.bounds)")
-        guard ancestor.window === window, ancestor.isOpaque,
+        guard ancestor.window === window,
               (ancestor === view || view.isDescendant(of: ancestor)), view.visibleRect.contains(view.bounds) else { throw CoreFailure.invalidProjection }
         let region = ancestor.convert(view.bounds, from: view)
         guard ancestor.bounds.contains(region) else { throw CoreFailure.invalidProjection }
@@ -55,8 +55,33 @@ final class LibraryApplicationScreens {
         guard representation.pixelsWide == originalDimensions.pixelsWide,
               representation.pixelsHigh == originalDimensions.pixelsHigh else { throw CoreFailure.invalidProjection }
         ancestor.cacheDisplay(in: region, to: representation)
+        let alpha = try validateAlpha(representation, name: name)
         let bytes = try XCTUnwrap(representation.representation(using: .png, properties: [:]))
-        try admit(bytes, name: name, kind: "original AppKit named-view region from actual opaque ancestor")
+        try admit(bytes, name: name, kind: "original AppKit named-view region from actual ancestor; raw alpha checked")
+        rows[rows.count - 1].merge(alpha) { _, value in value }
+    }
+    private func validateAlpha(_ bitmap: NSBitmapImageRep, name: String) throws -> [String: String] {
+        let width = bitmap.pixelsWide; let height = bitmap.pixelsHigh
+        guard width > 32, height > 32, width <= 2048, height <= 2048,
+              width * height <= 1_000_000 else { throw CoreFailure.invalidProjection }
+        var opaque = 0; var transparentInterior = 0
+        // Inspect the original pixels without changing them. At most 1% may
+        // be non-opaque, all within the outer 16 backing pixels (native edges).
+        // This automated completeness check never replaces pixel review.
+        for y in 0..<height {
+            try autoreleasepool {
+                for x in 0..<width {
+                    guard let colour = bitmap.colorAt(x: x, y: y) else { throw CoreFailure.invalidProjection }
+                    if colour.alphaComponent == 1 { opaque += 1 }
+                    else if x >= 16 && x < width - 16 && y >= 16 && y < height - 16 { transparentInterior += 1 }
+                }
+            }
+        }
+        let total = width * height
+        print("OWNED_APP_CAPTURE_ALPHA id=\(name) opaque=\(opaque) total=\(total) nonOpaqueInterior=\(transparentInterior) edgeBandPixels=16")
+        guard opaque * 100 >= total * 99, transparentInterior == 0 else { throw CoreFailure.invalidProjection }
+        return ["opaquePixels": String(opaque), "totalPixels": String(total),
+            "nonOpaqueInteriorPixels": String(transparentInterior), "edgeBandPixels": "16"]
     }
     func web(_ name: String, harness: OwnedPreviewHarness) async throws {
         let bytes = try await harness.snapshot()
