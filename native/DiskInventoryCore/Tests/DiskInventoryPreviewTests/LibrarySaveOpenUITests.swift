@@ -112,7 +112,7 @@ extension LibraryApplicationTests {
 
 @MainActor
 extension LibraryApplicationTests {
-    private func assertFirstVersionAtTop(in window: NSWindow) throws {
+    func assertFirstVersionAtTop(in window: NSWindow) throws {
         window.contentView?.layoutSubtreeIfNeeded()
         let first = try button("library-version-1", in: window)
         let scroll = try XCTUnwrap(first.enclosingScrollView), document = try XCTUnwrap(scroll.documentView)

@@ -8,7 +8,7 @@ Only the test target constructs a source lease, from a fresh temporary directory
 
 The ordinary development executable now supplies a lazy, fixed Application Support provider for native Save/Open. Empty startup does not resolve or create library storage. This is unsandboxed application data, not a signed container. Real-folder controls remain explicitly unavailable. [The approved contract and source/test boundary](APP-PERSISTENCE.md) describe fixed names, descriptor identity, private metadata checks, lease lifetime and cancellation.
 
-This tranche is authored but **not yet compiled or executed on macOS**. Its new application-path UI is tested only through an internal fresh-owned-parent capability; the separate owned process probe has no ordinary-product root override. Historical executed evidence below belongs to its named sources, not this candidate. Default-path user-device save/relaunch and distribution remain unverified.
+At source `4a11d4f2`, the ordinary preview and separate owned-capability probe compile on macOS. **XCTest compilation fails** on a private helper used by a cross-file test extension; no tests, process interactions or new captures execute. The helper-visibility successor remains unverified. Its new application-path UI is tested only through an internal fresh-owned-parent capability; the separate owned process probe has no ordinary-product root override. Historical executed evidence below belongs to its named sources, not this candidate. Default-path user-device save/relaunch and distribution remain unverified.
 
 ## Purpose and limits
 
