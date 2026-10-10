@@ -1,15 +1,18 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 08:47
+Last updated: 2026-10-10 09:14
 
-## Native Save/Open interaction: local source work
+## Native Save/Open interaction: owned runtime verification
 
 - PR25 merged at `f22e8ec0f0b61c396b86fdef5852139ab203eabb`; all six actual-main workflows pass, including 123 XCTest + six differential/six parser and 22 admission/4,102 encoding cases on the exact merged checkout.
-- The approved next contract starts native Save/Open/Replace/Cancel and close-loss handling against injected fresh-owned storage only. The local source candidate includes the strict fixed-operation native client, single interaction owner, usable native version chooser and Close/Save loss decisions; no new native compilation, UI execution or pixel acceptance has occurred. Shared operation ownership, page mutation fences, storage-before-page acknowledgement and explicit temporary-selection/draft loss are required.
+- The approved next contract starts native Save/Open/Replace/Cancel and close-loss handling against injected fresh-owned storage only. The local source candidate includes the strict fixed-operation native client, single interaction owner, usable native version chooser and Close/Save loss decisions; the initial source now compiles and has the partial native results below, while complete native and original-pixel acceptance remain open. Shared operation ownership, page mutation fences, storage-before-page acknowledgement and explicit temporary-selection/draft loss are required.
 - The normal executable has no production storage factory or source grant. Saved v1 schemas, user-drive access, signing/entitlements, permanent archive and provider gates remain unchanged. See the [approved implementation contract](native/DiskInventoryCore/SAVE-OPEN-INTERACTION.md) for exact v2 envelopes, visible behaviour and pending test gates.
-- Fresh local checks pass 17 pure protocol, ten integrated persistence DOM, 39 catalogue DOM, 16 ingress DOM, 665 Jest, frontend formatting, eight-asset parity and 22 admission/4,102 encoding cases. The candidate authors 153 XCTest methods (123 preserved plus 30 new); no new Swift/native pass or pixel acceptance is claimed. The normal executable still has no storage capability; only a fresh test-owned injection can enable these controls.
+- Fresh local checks pass 17 pure protocol, ten integrated persistence DOM, 39 catalogue DOM, 16 ingress DOM, 665 Jest, frontend formatting, eight-asset parity and 22 admission/4,102 encoding cases. The candidate retains 153 XCTest methods (123 preserved plus 30 new); the first executed source and the still-unrun layout successor are distinguished below. The normal executable still has no storage capability; only a fresh test-owned injection can enable these controls.
 
-- Independent source review of the first 33-path freeze found duplicate actor ownership through distinct wrappers, no-op result controls after selected-read failure, and stale Close loss after saved-result recovery. The local successor repairs those states plus retained-file wording and explicit 128-preview exhaustion. Eight new authored regressions include actual native controls; independent recheck and all Swift/native/pixel gates remain pending. The reviewer independently reran the listed JavaScript/DOM/Jest/asset/codec checks successfully on the original freeze; that is not execution evidence for the new native repairs.
+- Independent source review of the first 33-path freeze found duplicate actor ownership through distinct wrappers, no-op result controls after selected-read failure, and stale Close loss after saved-result recovery. The local successor repairs those states plus retained-file wording and explicit 128-preview exhaustion. Eight new regressions include actual native controls. Independent recheck cleared this source before publication; the subsequent layout repair still requires review and a complete native/pixel pass. The reviewer independently reran the listed JavaScript/DOM/Jest/asset/codec checks successfully on the original freeze; that is not execution evidence for the new native repairs.
+
+- First actual interaction source `36d7226e32a9a4d55f6c6d6136b622b0424a29ec` compiles and executes all 153 XCTest methods. Native [push 38039642864](https://github.com/krahd/disk_organiser/actions/runs/38039642864) passes 151 methods and fails two (three assertions); [PR 38039668011](https://github.com/krahd/disk_organiser/actions/runs/38039668011) passes 152 methods and fails one (two assertions). Push checks out the source; PR checks out merge `74c937fc4811237c4ebc9c70590fdc2a83572f4a`. Ten non-native workflows pass. Downstream six differential/six parser gates are skipped after native failure and are not counted as passes.
+- Both native runs complete the main genuine Save/Open/Replace/Cancel/Close journey and generate all eight new originals. The two repeated Close assertions come from an assertion-bearing lookup used for expected absence. Push additionally refuses a native hit test in selected-version failure recovery; that flow passes in PR, so its precise layout/timing cause is not established. Original chooser pixels show short lists bottom-aligned below blank space. A bounded local successor uses a shared non-asserting absence/readiness lookup, top-origin document stacks, completed chooser layout and stronger positive-size/visible-centre/first-row geometry diagnostics while retaining native events and hit testing. Its actual outcome remains unverified; there is no acceptance from opacity alone.
 
 ## Saved-library preparation: executed owned-storage engine
 
@@ -740,4 +743,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 08:47
+Last updated: 2026-10-10 09:14

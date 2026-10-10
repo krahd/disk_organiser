@@ -1,6 +1,13 @@
 import AppKit
 import Foundation
 
+// Short document content starts at its upper edge, just like long previews.
+// This changes native coordinates/layout only, not scrolling or input authority.
+@MainActor
+private final class LibraryTopOriginStack: NSStackView {
+    override var isFlipped: Bool { true }
+}
+
 @MainActor
 final class LibrarySavedPanel {
     let window: NSWindow
@@ -48,8 +55,8 @@ final class LibrarySavedPanel {
         } else { summary = "Checking the complete bounded list…" }
         let counts = label(summary); stack.addArrangedSubview(counts)
         let columns = NSStackView(); columns.orientation = .horizontal; columns.alignment = .top; columns.spacing = 12
-        let rows = NSStackView(); rows.orientation = .vertical; rows.alignment = .leading; rows.spacing = 8
-        let detail = NSStackView(); detail.orientation = .vertical; detail.alignment = .leading; detail.spacing = 10
+        let rows = LibraryTopOriginStack(); rows.orientation = .vertical; rows.alignment = .leading; rows.spacing = 8
+        let detail = LibraryTopOriginStack(); detail.orientation = .vertical; detail.alignment = .leading; detail.spacing = 10
         let formatter = DateFormatter(); formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone(secondsFromGMT: 0); formatter.dateFormat = "dd MMM yyyy HH:mm:ss 'UTC'"
         if let listing = owner.listing {
@@ -114,6 +121,7 @@ final class LibrarySavedPanel {
         ])
         for child in rows.arrangedSubviews { child.widthAnchor.constraint(equalTo: rows.widthAnchor).isActive = true }
         for child in detail.arrangedSubviews { child.widthAnchor.constraint(equalTo: detail.widthAnchor).isActive = true }
+        content.layoutSubtreeIfNeeded()
         window.makeFirstResponder(cancel)
     }
 }

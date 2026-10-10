@@ -36,6 +36,7 @@ extension LibraryApplicationTests {
         try await clickNative("library-open", using: h); try await settle(owner)
         try await clickNative("library-version-1", using: h); try await settle(owner)
         XCTAssertEqual(owner.preview?.locations.count, 2)
+        try assertFirstVersionAtTop(in: try XCTUnwrap(h.window.attachedSheet))
         XCTAssertTrue(owner.preview?.locations.contains { $0.partial } == true)
         try await screens.native("81-native-open-two-locations.png", view: try XCTUnwrap(h.window.attachedSheet?.contentView))
         try await clickNative("library-open-cancel", using: h); try await settle(owner)
@@ -74,6 +75,7 @@ extension LibraryApplicationTests {
         h.window.setContentSize(NSSize(width: 680, height: 600))
         try await clickNative("library-open", using: h); try await settle(owner)
         try await clickNative("library-version-1", using: h); try await settle(owner)
+        try assertFirstVersionAtTop(in: try XCTUnwrap(h.window.attachedSheet))
         try await screens.native("86-native-open-narrow.png", view: try XCTUnwrap(h.window.attachedSheet?.contentView))
         try await clickNative("library-open-cancel", using: h); try await settle(owner)
         let listing = try await store.list(); XCTAssertEqual(listing.entries.count, 2)
@@ -110,6 +112,21 @@ extension LibraryApplicationTests {
 
 @MainActor
 extension LibraryApplicationTests {
+    private func assertFirstVersionAtTop(in window: NSWindow) throws {
+        window.contentView?.layoutSubtreeIfNeeded()
+        let first = try button("library-version-1", in: window)
+        let scroll = try XCTUnwrap(first.enclosingScrollView), document = try XCTUnwrap(scroll.documentView)
+        let actual = document.convert(first.bounds, from: first), visible = scroll.documentVisibleRect
+        print("OWNED_LIBRARY_FIRST_ROW frame=\(actual) visible=\(visible) flipped=\(document.isFlipped)")
+        XCTAssertGreaterThan(actual.width, 0)
+        XCTAssertGreaterThan(actual.height, 0)
+        XCTAssertGreaterThan(visible.width, 0)
+        XCTAssertGreaterThan(visible.height, 0)
+        XCTAssertTrue(document.isFlipped)
+        XCTAssertTrue(visible.contains(actual), "The first version must be fully visible without a pointer workaround")
+        XCTAssertGreaterThanOrEqual(actual.minY - visible.minY, 0)
+        XCTAssertLessThanOrEqual(actual.minY - visible.minY, 16, "Short lists start at the visible top, not below a blank area")
+    }
     func testNativeReadAndPreparationFailuresOfferUsableCancelWithoutFalseCheck() async throws {
         let fixture = try OwnedStorageFixture(), store = try fixture.store()
         try await seedEmpty(store)
@@ -127,6 +144,7 @@ extension LibraryApplicationTests {
         try await clickNative("library-version-\(bad)", using: h); try await settle(owner)
         XCTAssertEqual(owner.openPhase, .choosing)
         var sheet = try XCTUnwrap(h.window.attachedSheet)
+        try assertFirstVersionAtTop(in: sheet)
         XCTAssertTrue(try button("library-replacement-check", in: sheet).isHidden)
         XCTAssertTrue(window.checkButton.isHidden)
         XCTAssertTrue(try button("library-version-\(good)", in: sheet).isEnabled)
@@ -168,11 +186,11 @@ extension LibraryApplicationTests {
             let deadline = Date().addingTimeInterval(3)
             while Date() < deadline {
                 h.pumpApplicationEvents()
-                if let sheet = h.window.attachedSheet, (try? button("library-close-check", in: sheet)) != nil { break }
+                if let sheet = h.window.attachedSheet, optionalButton("library-close-check", in: sheet) != nil { break }
                 try await Task.sleep(for: .milliseconds(20))
             }
             let sheet = try XCTUnwrap(h.window.attachedSheet)
-            XCTAssertNil(try? button("library-close-save", in: sheet))
+            XCTAssertNil(optionalButton("library-close-save", in: sheet))
             XCTAssertTrue(try button("library-close-check", in: sheet).isEnabled)
             XCTAssertTrue(try button("library-keep", in: sheet).isEnabled)
             try await clickNative("library-close-check", using: h); try await settle(owner)
