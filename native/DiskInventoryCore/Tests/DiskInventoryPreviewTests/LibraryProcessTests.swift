@@ -41,6 +41,17 @@ final class LibraryProcessTests: XCTestCase {
         let current = output.read()
         return !current.invalid && String(data: current.bytes, encoding: .utf8)?.split(separator: "\n").contains(Substring(receipt)) == true
     }
+    private func diagnose(_ child: Process, output: LockedBox<OwnedProcessOutput>, binary: URL) {
+        // Report only fixed allowlisted phases and booleans, never child output,
+        // paths, error descriptions, source labels or an unbounded log stream.
+        let phases = ["ENTRY", "INPUT_REJECTED", "BOOTSTRAP_REJECTED", "RUN_LOOP", "DID_LAUNCH",
+            "RULES_READY", "HOST_CREATED", "VIEW_READY", "WINDOW_SHOWN", "EMPTY_CONFIRMED",
+            "ACTIVE", "KEY", "VISIBLE", "READY_EMPTY_WINDOW", "STARTUP_FAILED", "QUIT_REQUEST", "WILL_TERMINATE"]
+        let observed = phases.filter { contains("DISK_PREVIEW_" + $0, in: output) }.joined(separator: ",")
+        let application = child.isRunning ? NSRunningApplication(processIdentifier: child.processIdentifier) : nil
+        let matches = application?.executableURL?.resolvingSymlinksInPath() == binary
+        print("OWNED_APP_STARTUP phases=\(observed) bytes=\(output.read().bytes.count) invalid=\(output.read().invalid) running=\(child.isRunning) registered=\(application != nil) executableMatches=\(matches) finishedLaunching=\(application?.isFinishedLaunching ?? false) active=\(application?.isActive ?? false)")
+    }
     private func waitForExit(_ child: Process, seconds: TimeInterval) async -> Bool {
         let deadline = Date().addingTimeInterval(seconds)
         while child.isRunning && Date() < deadline { try? await Task.sleep(for: .milliseconds(30)) }
@@ -66,6 +77,7 @@ final class LibraryProcessTests: XCTestCase {
             while child.isRunning && !contains("DISK_PREVIEW_READY_EMPTY_WINDOW", in: output) && Date() < deadline {
                 try await Task.sleep(for: .milliseconds(30))
             }
+            diagnose(child, output: output, binary: binary)
             guard child.isRunning, contains("DISK_PREVIEW_READY_EMPTY_WINDOW", in: output),
                   let application = NSRunningApplication(processIdentifier: child.processIdentifier),
                   application.processIdentifier == child.processIdentifier,
