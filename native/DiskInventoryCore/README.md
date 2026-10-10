@@ -4,6 +4,14 @@ The Swift/Darwin observation core remains an isolated bounded metadata-only prot
 
 Only the test target constructs a source lease, from a fresh temporary directory it creates and owns. A private held descriptor and the test's address guard are process-local objects, never JSON, persisted permissions or physical-drive identity. No production source-class admission is implemented. The supplied classifier means only “owned test fixture”. The test adapter supplies the absolute-address ancestor re-walk; a production picker/admission adapter does not exist.
 
+## Ordinary Save/Open: owned native validation
+
+The ordinary development executable supplies a lazy, fixed Application Support provider for native Save/Open. Empty startup does not resolve or create library storage. This is unsandboxed application data, not a signed container. Real-folder controls remain unavailable. [The contract](APP-PERSISTENCE.md) describes fixed names, descriptor identity, private metadata checks, lease lifetime and cancellation.
+
+Exact source `86d3620b` compiles and passes **194 XCTest + six differential + six parser cases** in both macOS lanes. Storage execution uses fresh owned parent capabilities; the default Application Support resolver is unexecuted in CI. A separate test-only process probe verifies exact saved bytes after fresh-process reopening, contention and lease release. The ordinary executable separately proves empty startup and normal Quit. [Exact source, process and original-pixel evidence](APP-PERSISTENCE-ACCEPTANCE.md) preserves those distinct claims. Default-path user-device save/relaunch, signed distribution and real-folder use remain unverified.
+
+The following source-candidate section records the first hosted `4a11d4f2` checkpoint; current owned validation is recorded above.
+
 ## Ordinary Save/Open source candidate
 
 The ordinary development executable now supplies a lazy, fixed Application Support provider for native Save/Open. Empty startup does not resolve or create library storage. This is unsandboxed application data, not a signed container. Real-folder controls remain explicitly unavailable. [The approved contract and source/test boundary](APP-PERSISTENCE.md) describe fixed names, descriptor identity, private metadata checks, lease lifetime and cancellation.

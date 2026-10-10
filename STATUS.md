@@ -1,6 +1,20 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 10:55
+Last updated: 2026-10-10 11:16
+
+## Ordinary application persistence: owned native validation
+
+- Draft [PR27](https://github.com/krahd/disk_organiser/pull/27), source `86d3620bc34fb8b242a73af669a160863654e2e2`, tree `6b58ab2300ff953575bfaab30588c4731014595f`, passes all twelve push/PR workflows. The 32 changed paths and 309 unaffected baseline blobs/modes preserve main `26f6e67194af2ec10bac31b6594ac89a79bc8380`.
+- Both native [push 38046725515](https://github.com/krahd/disk_organiser/actions/runs/38046725515) and [PR 38046727680](https://github.com/krahd/disk_organiser/actions/runs/38046727680) compile the ordinary preview and separate owned-capability probe, then pass **194 XCTest + six differential + six parser cases**. All 153 previous method identities remain. The PR checkout is distinct merge `9bf5d05d4d1149ee1642849e81282564cf8549ad`, independently read back to the same source tree.
+- Native Save/Open now has a lazy fixed application-data provider, with separate namespace/lease admission and pre-save cancellation. Missing Open creates nothing; in-use refusal preserves work; an uncertain issued Save keeps same-attempt Check. This is unsandboxed app data, not a signed container. Real-folder selection remains unavailable.
+- Actual storage execution uses fresh owned parent capabilities. The ordinary default Application Support resolver is unexecuted in CI. A separate test-only process probe proves exact-byte fresh-process reopening, contention, normal close and owned-child crash lease release. Ordinary empty startup/normal Quit also passes, exit 0; this does not establish default-path user-device save/relaunch.
+- Actual absent-ACL descriptor tests and in-memory valid empty/nonempty ACL API tests pass without filesystem ACL changes. Partial/unrecognised setup is preserved/refused; no automatic cleanup or permission repair is added. The [contract](native/DiskInventoryCore/APP-PERSISTENCE.md) retains cancellation, descriptor and advisory-lock limits.
+- Five downloaded archives and all **26 original PNGs**, including seven new ordinary-persistence views, match their hashes. The author personally opened every original. Root evidence review opened four new views; independent exact-source/raw-log/all-original closeout accepts this bounded development slice. Native chrome/sheets and WebKit viewports are distinct original regions; view 96 shows the reopened count, not offscreen cards. [Exact execution/pixel scope](native/DiskInventoryCore/APP-PERSISTENCE-ACCEPTANCE.md) retains source attribution and the 14-day artifact limit. No permanent archive or commercial UX acceptance is claimed.
+- Aggregate push checks pass 709 Linux backend, 665 Jest, 27 browser journeys (the workflow excludes the `preview modal` group) and 44 routes. Windows reports **607 passed, 102 skipped**; skips are not coverage. Native gates include eight assets/two examples, 22 codec/4,102 UTF-8 cases and 18 protocol checks. Local 11 persistence DOM, 16 ingress and 39 catalogue DOM checks remain separate. APFS invalid-UTF-8 filename creation is refused with errno 92; synthetic rejection is not native filename acceptance.
+- Earlier `4a11d4f2` compiled the ordinary app and probe but failed XCTest compilation because a shared test geometry helper was private. No XCTest or new pixels ran there; downstream checks were skipped. The approved one-word test visibility repair preserves all assertions and runtime/assets/workflow/probe bytes. Its successor results above replace that open compile gate, without relabelling the earlier run.
+- Independent closeout is complete; final documentation-head CI, guarded integration and actual-main verification remain open. No user-device/default-path execution, picker, grant, bookmark, entitlement, signing, distribution, drive/content/backup verification or disk operation is included.
+
+The following first-compilation section is retained as the historical `4a11d4f2` checkpoint. Its then-pending execution statements are superseded by the exact successor evidence above.
 
 ## Ordinary application persistence: first hosted compilation
 
@@ -758,4 +772,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 10:55
+Last updated: 2026-10-10 11:16
