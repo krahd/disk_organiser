@@ -45,12 +45,15 @@ jobs:
         run: node scripts/test_native_library_protocol.cjs
       - name: Compile the development preview entry point without activating folder access
         run: xcrun swift build --package-path native/DiskInventoryCore --product DiskOrganiserPreview
+      - name: Compile the separate owned-capability process probe
+        run: python native/DiskInventoryCore/Validation/build_owned_application_probe.py
       - name: Test only fresh owned Darwin fixtures, lifecycle and WebKit preview
         env:
           DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
           DISK_INVENTORY_PREVIEW_OUTPUT: ${{ runner.temp }}/disk-inventory-preview-screens
           DISK_APPLICATION_PREVIEW_OUTPUT: ${{ runner.temp }}/disk-application-preview-screens
           DISK_LIBRARY_INTERACTION_OUTPUT: ${{ runner.temp }}/disk-library-interaction-screens
+          DISK_APPLICATION_LIBRARY_OUTPUT: ${{ runner.temp }}/disk-application-library-screens
         run: xcrun swift test --package-path native/DiskInventoryCore
       - name: Compare native snapshots with an independently created Python fixture oracle
         env:
@@ -90,5 +93,13 @@ jobs:
         with:
           name: owned-native-library-interaction-screens
           path: ${{ runner.temp }}/disk-library-interaction-screens/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Preserve original owned application-library captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-application-library-screens
+          path: ${{ runner.temp }}/disk-application-library-screens/
           if-no-files-found: warn
           retention-days: 14

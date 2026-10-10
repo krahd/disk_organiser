@@ -65,11 +65,11 @@ private final class PreviewApplicationDelegate: NSObject, NSApplicationDelegate 
                 let (cache, rule) = try await ApplicationRuleCache.create()
                 self.cache = cache
                 FileHandle.standardOutput.write(Data("DISK_PREVIEW_RULES_READY\n".utf8))
-                let host = try CataloguePreviewHost(rule: rule)
+                let host = try CataloguePreviewHost(rule: rule, storageMode: .applicationData)
                 FileHandle.standardOutput.write(Data("DISK_PREVIEW_HOST_CREATED\n".utf8))
                 try await host.load()
                 FileHandle.standardOutput.write(Data("DISK_PREVIEW_VIEW_READY\n".utf8))
-                let library = try LibraryWindowController(session: LibrarySession(host: host, source: BundledLibraryExamples()), startReady: false)
+                let library = try LibraryWindowController(session: LibrarySession(host: host, source: BundledLibraryExamples()), startReady: false, provider: ApplicationLibraryFactory())
                 opened = library
                 self.library = library
                 library.didClose = { [weak self] in

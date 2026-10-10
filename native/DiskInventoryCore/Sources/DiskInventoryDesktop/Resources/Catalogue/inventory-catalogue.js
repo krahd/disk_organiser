@@ -332,7 +332,7 @@
         changed(
           C.rename(catalogue, record.id, input.value),
           embedded
-            ? nativeMode === "owned-storage"
+            ? ["owned-storage", "application-data"].includes(nativeMode)
               ? "Location label updated · save a new library version in the native window"
               : "Location label updated in this temporary native preview · nothing saved"
             : "Location label updated · save the catalogue to keep it"
@@ -831,7 +831,7 @@
         changed(
           next,
           embedded
-            ? nativeMode === "owned-storage"
+            ? ["owned-storage", "application-data"].includes(nativeMode)
               ? "Snapshot record added · save a new library version in the native window"
               : "Snapshot record added to this temporary native preview · nothing saved"
             : "Snapshot record added · save the catalogue to keep it"
@@ -869,7 +869,7 @@
         initialise(version, session, mode) {
           if (
             arguments.length !== 3 ||
-            !["temporary", "owned-storage"].includes(mode) ||
+            !["temporary", "owned-storage", "application-data"].includes(mode) ||
             !window.NativeLibraryProtocol ||
             nativeSession !== null ||
             nativeInvalidated ||
@@ -882,7 +882,12 @@
           nativeSession = session;
           nativeMode = mode;
           nativeProtocol = makePersistenceProtocol();
-          if (mode === "owned-storage") {
+          if (mode === "application-data") {
+            $("native-preview-note").textContent =
+              "Development preview · Save library versions on this Mac using the native window. Built-in examples only; real folders and manual-plan export remain unavailable.";
+            $("empty-catalogue").querySelector("p").textContent =
+              "Explore sample folders, then Save a library version to keep it between launches. Open lets you choose a saved version; it never replaces your work without review.";
+          } else if (mode === "owned-storage") {
             $("native-preview-note").textContent =
               "Development preview · temporary test library storage. Native Save/Open keep catalogue versions here; real folders and manual-plan export remain unavailable.";
             $("empty-catalogue").querySelector("p").textContent =

@@ -129,7 +129,7 @@
       });
     }
     function requireStorage() {
-      if (port.mode() !== "owned-storage" || blocked) fail();
+      if (!["owned-storage", "application-data"].includes(port.mode()) || blocked) fail();
     }
     function requireIdle(s) {
       if (s.busy || s.dialog !== "none" || s.draft !== "none") fail();

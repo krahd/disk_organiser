@@ -47,9 +47,9 @@ private final class LibraryInteractionClaim: @unchecked Sendable {
     }
 }
 
-// Descriptor capability. Only a test-target factory creates/adopts an owned
-// root; native interaction requires its one-use injected lease. No production
-// path/container constructor or default executable storage capability exists.
+// Descriptor capability. Test-owned roots retain their explicit admission.
+// Ordinary app data arrives only through a validated, single-consumption fixed
+// namespace capability; this actor accepts no path or source-folder grant.
 actor LibraryStorage {
     static let maximumEntries = 256
     static let maximumListedBytes: Int64 = 64 * 1_024 * 1_024
@@ -65,6 +65,7 @@ actor LibraryStorage {
     private let owner = UUID()
     private let io: LibraryFileIO
     private let guardAddress: @Sendable (Int32) throws -> Void
+    private let applicationLease: ApplicationLibraryLease?
     private var active = false
     private var generation = UUID()
     private var usedAttempts = Set<UUID>()
@@ -83,10 +84,23 @@ actor LibraryStorage {
             guard identity.directoryPrivate else { throw LibraryStorageFailure.invalidScope }
             try guardAddress(descriptor)
             self.descriptor = descriptor; self.identity = identity
-            self.io = io; self.guardAddress = guardAddress
+            self.io = io; self.guardAddress = guardAddress; self.applicationLease = nil
         } catch { if descriptor >= 0 { io.close(descriptor) }; throw error }
     }
-    deinit { if descriptor >= 0 { io.close(descriptor) } }
+    // A distinct, single-consumption capability is created only by the fixed
+    // app-data factory. Owned-fixture enum admission is never relabelled.
+    init(applicationData root: ApplicationLibraryRoot) throws {
+        let (descriptor, lease) = try root.consume()
+        let io = ApplicationLibraryIO()
+        do {
+            let identity = try io.privateDirectory(descriptor)
+            try lease.validate(descriptor)
+            self.descriptor = descriptor; self.identity = identity
+            self.io = io; self.applicationLease = lease
+            self.guardAddress = { try lease.validate($0) }
+        } catch { io.close(descriptor); lease.retire(); throw error }
+    }
+    deinit { if descriptor >= 0 { io.close(descriptor) }; applicationLease?.retire() }
 
     nonisolated func claimInteractionOwner() throws { try interactionClaim.claim() }
 
@@ -95,6 +109,7 @@ actor LibraryStorage {
         generation = UUID()
         if descriptor >= 0 { io.close(descriptor); descriptor = -1 }
         pending = nil
+        applicationLease?.retire()
     }
 
     private static func completed(_ id: UUID) -> String { "catalogue-" + id.uuidString.lowercased() + ".json" }

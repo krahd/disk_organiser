@@ -11,17 +11,20 @@ import Darwin
 final class LibraryApplicationScreens {
     private var descriptor: Int32?
     private var rows = [[String: String]]()
-    enum SetKind { case application, saveOpen }
+    enum SetKind { case application, saveOpen, applicationData }
     private let names: Set<String>
     private static let applicationNames: Set<String> = ["70-native-library-controls.png", "71-native-sample-selector.png",
         "72-native-scope-review.png", "73-native-progress-controls.png", "74-native-library-record.png", "75-native-close-confirmation.png"]
     init(_ kind: SetKind = .application) throws {
-        names = kind == .application ? Self.applicationNames : [
+        names = kind == .applicationData ? [
+            "90-application-storage-controls.png", "91-application-missing-library.png", "92-application-library-in-use.png",
+            "93-application-preparation-cancelled.png", "94-application-library-saved.png", "95-application-reopen-preview.png",
+            "96-application-reopened-records.png"] : kind == .application ? Self.applicationNames : [
             "80-native-library-saved.png", "81-native-open-two-locations.png", "82-native-replace-result.png",
             "83-native-selection-close.png", "84-native-draft-close.png", "85-native-save-unconfirmed.png",
             "86-native-open-narrow.png", "87-native-reopened-records.png"]
-        let key = kind == .application ? "DISK_APPLICATION_PREVIEW_OUTPUT" : "DISK_LIBRARY_INTERACTION_OUTPUT"
-        let suffix = kind == .application ? "/disk-application-preview-screens" : "/disk-library-interaction-screens"
+        let key = kind == .applicationData ? "DISK_APPLICATION_LIBRARY_OUTPUT" : kind == .application ? "DISK_APPLICATION_PREVIEW_OUTPUT" : "DISK_LIBRARY_INTERACTION_OUTPUT"
+        let suffix = kind == .applicationData ? "/disk-application-library-screens" : kind == .application ? "/disk-application-preview-screens" : "/disk-library-interaction-screens"
         let environment = ProcessInfo.processInfo.environment
         if let output = environment[key] {
             let root = try XCTUnwrap(environment["RUNNER_TEMP"])

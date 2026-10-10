@@ -1,6 +1,15 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 09:41
+Last updated: 2026-10-10 10:41
+
+## Ordinary application persistence: approved local source work
+
+- PR26 merged normally at `26f6e67194af2ec10bac31b6594ac89a79bc8380`, tree `e0d51b283c86cc5b5644390bd91948601a00e1d0`. All six actual-main workflows pass. Native [38042766388](https://github.com/krahd/disk_organiser/actions/runs/38042766388) verifies the exact merge, all 153 individual XCTest passes, six differential/six parser cases and actual empty startup/normal Quit, exit 0. Its original visual attribution remains the independently reviewed `c530fc19` source.
+- The independently reviewed [ordinary-persistence contract](native/DiskInventoryCore/APP-PERSISTENCE.md) is approved for local source authoring. Work starts from that exact merged baseline: a fixed Application Support factory, distinct app-data capability, lazy native Save/Open bootstrap and a test-only owned process probe. This is unsandboxed app data, not a signed container.
+- The local candidate now wires the ordinary executable's discoverable Save/Open controls to a lazy fixed app-data provider, with separate namespace/lease admission and pre-save cancellation. Missing Open creates nothing; contention preserves work; retained uncertain Save still uses the same attempt. The dedicated inherited-capability process probe is outside ordinary products/argument handling. All 153 previous native identities remain; 41 additional methods are authored, for 194 total, but none of the new native work has run.
+- Local source checks pass 665 Jest, 18 pure persistence protocol, 11 persistence DOM, 16 ingress DOM, 39 catalogue DOM, eight-asset/two-example parity and 22 codec/4,102 UTF-8 cases. These are not Swift compilation, real process or new-pixel acceptance. Seven new original application-library captures are specified but have not been produced. No native method is counted from authoring alone.
+- The first independent source review required four bounded repairs: Darwin ACL presence bit handling, native Close-only lease-release proof, bounded truthful child cleanup, and a valid no-final-newline patch artifact. The local successor uses in-memory ACL fixtures plus owned descriptor absence/error checks; it does not change filesystem ACLs. Source recheck and all new native evidence remain required.
+- Only fresh owned temporary roots may be exercised in development/CI. The ordinary default path is not accessed by tests or startup. No user-device execution, picker, source grant, bookmark, entitlement, permission repair or automatic cleanup is authorised by this source tranche. Frozen-source review precedes publication, and actual owned process/native/original-pixel evidence is still required. New Swift files are uncompiled and unrun in this Linux workspace.
 
 ## Native Save/Open interaction: owned-fixture acceptance
 
@@ -747,4 +756,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 09:41
+Last updated: 2026-10-10 10:41

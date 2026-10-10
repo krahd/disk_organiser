@@ -47,7 +47,7 @@ final class LibrarySavedPanel {
         let content = NSView(); window.contentView = content
         let stack = NSStackView(); stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 10
         let title = label("Open a saved library version", bold: true); stack.addArrangedSubview(title)
-        let explanation = label("Temporary test library storage · Select a version to check its contents. Replace changes only this window. Saved files are never overwritten.")
+        let explanation = label((owner.applicationData ? "Saved library versions on this Mac" : "Temporary test library storage") + " · Select a version to check its contents. Replace changes only this window. Saved files are never overwritten.")
         stack.addArrangedSubview(explanation)
         let summary: String
         if let listing = owner.listing {

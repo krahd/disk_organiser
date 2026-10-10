@@ -7,8 +7,8 @@
     },
     {
       "file": "inventory-catalogue.js",
-      "bytes": 44544,
-      "sha256": "c7e3f7aef4587af6ab4b675b4b9d01072bdbed24f1d69c0fc932ecccbba640c8"
+      "bytes": 45148,
+      "sha256": "d7e1ab88b96de79ff64d1826e4012d762c76ea84acc2a09595f784158209b9f4"
     },
     {
       "file": "inventory-catalogue.css",
@@ -37,8 +37,8 @@
     },
     {
       "file": "native-library-protocol.js",
-      "bytes": 11917,
-      "sha256": "df44e52c736f0758b9e7ce12ab7801cd9aacbb23be694eaa28decb9b4d62589c"
+      "bytes": 11946,
+      "sha256": "802a22cad5bf81ca7f9234a469e98045fa228183ecfaa44efbf9f9b75bb1e675"
     }
   ]
 }
