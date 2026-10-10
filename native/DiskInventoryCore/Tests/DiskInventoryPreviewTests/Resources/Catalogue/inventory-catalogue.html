@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Disk Organiser · Storage catalogue</title>
+    <link rel="stylesheet" href="manual-workspace.css" />
+    <link rel="stylesheet" href="inventory-catalogue.css" />
+    <script src="manual-planning-model.js" defer></script>
+    <script src="inventory-snapshot-model.js" defer></script>
+    <script src="inventory-comparison-model.js" defer></script>
+    <script src="inventory-catalogue.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#catalogue">Skip to storage catalogue</a>
+    <header class="app-header">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Disk Organiser</div>
+      <span class="header-context">Storage catalogue</span>
+      <div class="header-actions">
+        <button id="open-inventory" class="primary-button" type="button">
+          Open snapshot or catalogue
+        </button>
+        <button id="save-catalogue" class="secondary-button" type="button" disabled>
+          Save catalogue
+        </button>
+        <button id="catalogue-details" class="quiet-button" type="button" aria-pressed="false">
+          Show details
+        </button>
+      </div>
+    </header>
+    <main id="catalogue" class="catalogue-shell" tabindex="-1">
+      <section class="catalogue-intro">
+        <div>
+          <p class="eyebrow">YOUR STORED PICTURE</p>
+          <h1>Where did you keep it?</h1>
+          <p>
+            Keep a picture of your labelled locations. Find recorded files even when the storage is
+            unplugged, then choose what belongs together.
+          </p>
+        </div>
+        <aside class="boundary-card">
+          <strong>Historical records · current presence unknown</strong>
+          <p>
+            Each snapshot covers one selected folder. Labels are yours; physical drive identity,
+            whole-drive space and backup protection are unknown.
+          </p>
+        </aside>
+      </section>
+      <section id="empty-catalogue" class="empty-catalogue">
+        <div class="empty-disks" aria-hidden="true"><i></i><i></i><i></i></div>
+        <h2>Start with a saved folder snapshot</h2>
+        <p>
+          Your catalogue starts empty. This preview has no drive connection or live scanner. Open a
+          snapshot produced by the owned-fixture bridge, or reopen your saved catalogue.
+        </p>
+        <p>
+          Keep distinct names for external drives and folders. A missing snapshot means “not
+          recorded”, never “empty”.
+        </p>
+      </section>
+      <section id="loaded-catalogue" hidden>
+        <div class="section-title">
+          <h2>Your labelled locations</h2>
+          <p id="catalogue-count" class="muted"></p>
+        </div>
+        <p class="muted">
+          Saved snapshots remain searchable offline. Reconnect the location named on a result to
+          check it in your own tools; this page cannot detect a connection.
+        </p>
+        <div id="source-cards" class="source-grid"></div>
+        <section class="comparison-section" aria-labelledby="comparison-heading">
+          <div class="comparison-heading">
+            <div>
+              <p class="eyebrow">COMPARE SAVED LOCATIONS</p>
+              <h2 id="comparison-heading">Where is your project recorded?</h2>
+              <p>Compare two saved locations before deciding which one to reconnect and check.</p>
+            </div>
+            <button id="choose-comparison" class="secondary-button" type="button" disabled>
+              Compare two locations
+            </button>
+          </div>
+          <p id="comparison-hint" class="small muted">
+            Add a second saved record to compare locations.
+          </p>
+          <div id="comparison-view" hidden>
+            <div id="comparison-sources" class="comparison-sources"></div>
+            <p class="comparison-caution">
+              Matching names and sizes do not prove identical contents or a backup. “Not listed”
+              never means deleted or absent from a live drive.
+            </p>
+            <div
+              id="comparison-counts"
+              class="comparison-counts"
+              aria-label="Recorded path groups"
+            ></div>
+            <div class="comparison-controls">
+              <div>
+                <label for="comparison-filter">Show recorded paths</label
+                ><select id="comparison-filter">
+                  <option value="">All groups</option>
+                  <option value="left">Only listed in Left</option>
+                  <option value="right">Only listed in Right</option>
+                  <option value="different">Different recorded details</option>
+                  <option value="uncertain">Needs a closer look</option>
+                  <option value="matching">Matching listed details</option>
+                </select>
+              </div>
+              <button id="clear-comparison" class="text-button" type="button">
+                Close comparison
+              </button>
+            </div>
+            <p id="comparison-result-count" role="status" class="small muted"></p>
+            <div id="comparison-results"></div>
+            <nav class="result-pages" aria-label="Comparison result pages">
+              <button
+                id="comparison-previous"
+                class="secondary-button"
+                type="button"
+                aria-label="Previous comparison page"
+              >
+                Previous</button
+              ><span id="comparison-page"></span
+              ><button
+                id="comparison-next"
+                class="secondary-button"
+                type="button"
+                aria-label="Next comparison page"
+              >
+                Next
+              </button>
+            </nav>
+            <details class="comparison-details">
+              <summary>How to read this comparison</summary>
+              <p>
+                Paths are matched exactly, relative to each recorded folder. A completed listing
+                means complete within the recorded folder policy, not a whole-drive inventory.
+                Folder names do not prove matching contents. No identity, ordering in time, file
+                version, current presence or protection is verified. Gaps can hide entries, even
+                where other entries were observed.
+              </p>
+              <div id="comparison-source-details"></div>
+            </details>
+          </div>
+        </section>
+        <section class="catalogue-work">
+          <div class="catalogue-browser">
+            <h2>Find files and build a project</h2>
+            <div class="search-controls">
+              <div>
+                <label for="catalogue-search">Search recorded names and paths</label
+                ><input
+                  id="catalogue-search"
+                  type="search"
+                  maxlength="240"
+                  placeholder="Try a project, folder or file name"
+                />
+              </div>
+              <div>
+                <label for="catalogue-filter">Look in</label
+                ><select id="catalogue-filter">
+                  <option value="">All saved locations</option>
+                </select>
+              </div>
+            </div>
+            <p id="result-count" role="status" class="small muted"></p>
+            <div id="catalogue-results" class="catalogue-results"></div>
+            <nav class="result-pages" aria-label="Search result pages">
+              <button id="previous-results" class="secondary-button" type="button">Previous</button
+              ><span id="result-page"></span
+              ><button id="next-results" class="secondary-button" type="button">Next</button>
+            </nav>
+          </div>
+          <aside class="project-selection">
+            <p class="eyebrow">YOUR NEXT DECISION</p>
+            <h2>What belongs together?</h2>
+            <p>
+              Choose files or folders across recorded locations. Choose a folder or its contents,
+              not both.
+            </p>
+            <p id="selection-count" class="selection-number">0 files or folders selected</p>
+            <p class="small muted">Folder contents are not counted separately.</p>
+            <div id="selected-scopes"></div>
+            <button id="clear-selection" class="text-button" type="button" disabled>
+              Clear selection</button
+            ><button id="prepare-plan" class="primary-button" type="button" disabled>
+              Create a manual plan
+            </button>
+            <p class="small">
+              Selection is temporary until you export a plan. In the
+              <a href="manual-workspace.html" target="_blank" rel="noopener">manual workspace</a>,
+              open that plan to choose intended homes and backup targets.
+            </p>
+            <div class="unknown-protection">
+              <strong>Protection unknown</strong>
+              <p>
+                Catalogue entries are not verified backups. No provider is connected and no deal is
+                offered here.
+              </p>
+            </div>
+          </aside>
+        </section>
+      </section>
+      <section id="catalogue-precision" class="precision-panel" hidden>
+        <h2>Source and coverage details</h2>
+        <p>
+          Imported fields are unauthenticated claims. Source labels and dates remain unchanged when
+          you rename a catalogue card. Scan references identify claims, not devices or content
+          versions. Displayed dates use the recorded timezone offset and show minutes; the exact
+          original dates below retain seconds and any fractional seconds.
+        </p>
+        <div id="source-details"></div>
+      </section>
+    </main>
+    <div class="status-dock">
+      <p id="catalogue-status" role="status" aria-live="polite">
+        No catalogue loaded · kept only in this tab until saved
+      </p>
+      <button id="catalogue-saved" class="text-button" type="button" hidden>
+        I saved the catalogue
+      </button>
+    </div>
+    <footer class="app-footer">
+      <p>
+        Read-only planning. No paths are opened and no files are copied, moved, backed up, restored
+        or deleted.
+      </p>
+      <p>
+        Local plaintext files can contain private names and paths. No browser storage, uploads,
+        accounts or network requests.
+      </p>
+    </footer>
+    <input id="inventory-file" type="file" accept=".json,application/json" hidden />
+    <dialog
+      id="catalogue-dialog"
+      aria-labelledby="catalogue-dialog-title"
+      aria-describedby="catalogue-dialog-intro"
+    >
+      <form id="catalogue-form">
+        <div class="dialog-heading">
+          <h2 id="catalogue-dialog-title"></h2>
+          <button id="catalogue-close" type="button" class="text-button">Close</button>
+        </div>
+        <p id="catalogue-dialog-intro" class="muted"></p>
+        <div id="catalogue-dialog-body"></div>
+        <p id="catalogue-error" class="inline-warning" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button id="catalogue-cancel" type="button" class="secondary-button">Cancel</button
+          ><button id="catalogue-confirm" type="submit" class="primary-button">Confirm</button>
+        </div>
+      </form>
+    </dialog>
+    <noscript
+      >This local catalogue needs JavaScript. It cannot connect to drives or backup
+      services.</noscript
+    >
+  </body>
+</html>

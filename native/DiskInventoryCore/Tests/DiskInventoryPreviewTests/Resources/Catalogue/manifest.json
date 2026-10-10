@@ -1,0 +1,39 @@
+{
+  "assets": [
+    {
+      "file": "inventory-catalogue.html",
+      "bytes": 11771,
+      "sha256": "772c72af21ec7192eb98b2e7b66699c2a6dbf7cb4a810dc147ddd03eddf1dfa8"
+    },
+    {
+      "file": "inventory-catalogue.js",
+      "bytes": 37650,
+      "sha256": "8caea20bca893d404d64e00630c1899e65ba78d548838405dd94d5256a270e2d"
+    },
+    {
+      "file": "inventory-catalogue.css",
+      "bytes": 9341,
+      "sha256": "9d6f7b08dab48eaf20acb51557351652948b1a67353299f3a89e6ea9bf0e28d5"
+    },
+    {
+      "file": "inventory-snapshot-model.js",
+      "bytes": 16065,
+      "sha256": "d6b412a30ad589758d5ffc76bbada25087ac33e43dc1542850b2732af01e5473"
+    },
+    {
+      "file": "inventory-comparison-model.js",
+      "bytes": 2598,
+      "sha256": "e3db427a4b85ebcf9661aeaf2c717ef7f70cb1d43e3c524bf4e8c74cf9232e0c"
+    },
+    {
+      "file": "manual-planning-model.js",
+      "bytes": 56598,
+      "sha256": "45d714de3a18f902e9e7329bd62d19ac12786be4ed70356688a1380f52dc6154"
+    },
+    {
+      "file": "manual-workspace.css",
+      "bytes": 26130,
+      "sha256": "e6eec59bcf1d4ee3a1c28678600d5f5807c2faa4a559bf11298d884340ec1200"
+    }
+  ]
+}

@@ -24,6 +24,8 @@ jobs:
         run: npx jest --config jest.config.js --runInBand frontend/__tests__/inventory-snapshot-model.test.js frontend/__tests__/inventory-comparison-model.test.js
       - name: Test offline catalogue without a browser or backend
         run: node scripts/test_inventory_catalogue.cjs
+      - name: Test data-only native ingress without granting native authority
+        run: node scripts/test_native_catalogue_bridge.cjs
 
   catalogue-browser:
     runs-on: ubuntu-22.04

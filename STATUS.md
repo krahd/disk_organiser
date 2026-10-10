@@ -1,6 +1,56 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 00:06
+Last updated: 2026-10-10 01:58
+
+## Owned native visual handoff checkpoint
+
+- Successful source `356ff01aa663d8cd3504f98bcc4f110364d6a089` passes all twelve push/PR workflow runs. Native [push](https://github.com/krahd/disk_organiser/actions/runs/38013732010) checks out that exact source; native [PR](https://github.com/krahd/disk_organiser/actions/runs/38013734331) checks out `f096b7a82a86b742ab635ab039a9ed9e03c12c2a`, with the same tree `245dce0ca035faa0353bdd710ef71c8aaeebd2ba`. Both pass all 64 XCTest cases (59 core + five WebKit), six independent native/Python differential and six unchanged-parser/catalogue cases. Pinned Xcode 16.4/16F6, SDK 15.5 and Swift 6.1.2 are verified; APFS invalid-name refusal remains an explicit limitation.
+- The bounded own-app event drain establishes active/key/visible readiness after three queued events. Genuine in-process AppKit pointer Add/comparison/close and Escape cancellation then pass with trusted WebKit event traces, checked native/DOM hit coordinates, preserved retirement fences and focus return. Earlier failed logs/partial images remain failure evidence. No JS-click substitution, forced interaction, physical-mouse or user-device claim is made.
+- Both native artifacts contain five byte-identical original PNGs (468,477 image bytes) with all hashes verified. Actual viewports are 1024×656 and 390×656 after runner window clamping; no larger/full-page capture is claimed. Implementation inspection covers all five views; root evidence review covers desktop comparison/narrow uncertainty. Independent final evidence review accepts the exact source, both native logs and all five originals, with no blocking implementation or visual defect. This is an evidence review, not another hardware test. [Detailed evidence, original artifact links, hashes and limits](native/DiskInventoryCore/OWNED-PREVIEW.md#hosted-owned-preview-validation--10-october-2026).
+- Catalogue CI passes 115 model + 39 DOM + 16 bridge groups on Linux and Windows and ten browser journeys. Aggregate CI passes Linux 709 backend, Windows 607 passed/102 existing skips, 665 Jest, OpenAPI 44, audits/formatting and 27 existing browser journeys. This closeout changes documentation only; all successful runtime, test, asset and workflow blobs remain unchanged. Final-head checks and guarded actual-main verification remain open. No picker, grant, entitlement, application product, user-drive read, native save or file operation is added.
+
+### Historical diagnostic checkpoints (superseded)
+
+- Source `9d55bd54` also compiled and confirmed that the bootstrap executed, but the owned XCTest window remained inactive/non-key, so three pointer cases stopped before dispatch. The bounded own-application queue diagnostic was then prepared without weakening readiness or input assertions. That checkpoint did not establish native visual acceptance; the successful result above supersedes it.
+
+- Diagnostic source `447380fe` compiled; its PR native run retained 59 core and two WebKit passes, while all three pointer flows failed the new pre-dispatch guard with `active=false`, `key=false`, `visible=true`. No pointer success was established. A test-only AppKit launch bootstrap was then prepared with launch-file/default and delegate refusal guards; it was unverified at that checkpoint.
+
+- First hosted source `f60ad3b9a949b5ed308ffc1ade4a2c60c525ea1f` compiled on the pinned Xcode/SDK. All 59 core and two new WebKit security/lifecycle cases passed, but three native pointer Add flows failed; downstream differential/parser checks were skipped and are not counted. The failed logs and partial original preview PNGs remain preserved. The harness-only event-routing/activation repair was prepared next; its result was unknown at that checkpoint.
+
+### Implementation and prior validation context
+
+- Added a test-only AppKit/WebKit catalogue host under `DiskInventoryPreviewTests`. It receives only fresh owned-core snapshot bytes after descriptor release and renders the exact bundled catalogue through fixed structured arguments. There is no app product/executable, picker, source grant, entitlement, persistent access, native save, file operation or JavaScript-to-native command handler. Existing core production source and all v1 formats are unchanged.
+- The standalone catalogue remains empty-first with no bridge exposed. Embedded presentation explicitly hides/disables unsupported Open/Save/manual export and marks edits temporary. Native delivery shares the strict parser and existing Add/Cancel admission; wrong version/session, oversized/wrong-schema input, busy edits and replay reject. A bounded 128-ID view session and matching retirement fence preserve prior records and newer edits. Native session ownership never makes imported JSON trusted.
+- The seven bundled assets have exact canonical parity and an explicit update command. The nonpersistent view has a narrow resource read root, a fixed network blocker, unchanged CSP and fail-closed navigation/window/upload/drop rules. The test harness prepares WebKit's compiled-rule cache in a fresh owned temporary directory; the host has no filesystem writer. Framework/OS internal file activity is not claimed absent.
+- Initial local source checks passed 16 new bridge DOM groups, 39 existing catalogue DOM checks, 665 Jest and frontend formatting. Nine supported local HTTP Chromium journeys also pass; the unchanged direct-file case remains locally administrator-blocked and is not counted. All five new macOS UI/lifecycle tests compile and run at `f60ad3b9`; two pass and three pointer-driven flows fail as recorded above. The existing 59 native core tests and six differential/parser cases remain required. Independent boundary review and actual hosted WebKit event/pixel evidence were still open at that initial checkpoint; the successful source and evidence above supersede that state. Final-head/main integration checks remain open. Local JavaScript tests alone establish no native success. [Owned preview boundary and evidence plan](native/DiskInventoryCore/OWNED-PREVIEW.md).
+- Previous comparison PR22 is now merged at `9f890d83bb25e2d5f23496dc687d4a54acc4ed3e`; all six actual-main workflows passed. Native [38008947846](https://github.com/krahd/disk_organiser/actions/runs/38008947846) confirms that exact checkout and 59 + 6 + 6 results; catalogue [38008947834](https://github.com/krahd/disk_organiser/actions/runs/38008947834) confirms ten browser journeys. Its final documentation head `b99bf700b4c53e5a97b33ed302471dc8ec873fa4` passed all twelve push/PR runs, and the merged tree equals the reviewed final tree `f5947d6a3de4834ed08d9a96e416eb5319c47098`.
+
+The prototype host adds a data-only view after the existing core diagram's snapshot output. No source-access or execution arrow is added; product picker/sandbox/save gates remain separate.
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 175" role="img" aria-labelledby="preview-title preview-desc">
+  <title id="preview-title">Owned native visual handoff</title>
+  <desc id="preview-desc">A test creates fresh temporary sources. The existing core releases all source descriptors and returns metadata bytes. A test-only native host stages those bytes in the exact bundled catalogue. The user-visible Add or Cancel preview retains untrusted history and has no native command channel.</desc>
+  <defs><marker id="preview-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#52657a"/></marker></defs>
+  <rect x="15" y="30" width="200" height="110" rx="10" fill="#eef4fb" stroke="#52657a"/>
+  <text x="115" y="60" text-anchor="middle" font-family="sans-serif" font-size="15">Owned test sources</text>
+  <text x="115" y="88" text-anchor="middle" font-family="sans-serif" font-size="14">Temporary fixtures</text>
+  <text x="115" y="114" text-anchor="middle" font-family="sans-serif" font-size="14">No user folder picker</text>
+  <line x1="215" y1="85" x2="250" y2="85" stroke="#52657a" stroke-width="2" marker-end="url(#preview-arrow)"/>
+  <rect x="250" y="30" width="205" height="110" rx="10" fill="#eef4fb" stroke="#52657a"/>
+  <text x="352" y="60" text-anchor="middle" font-family="sans-serif" font-size="15">Existing Swift core</text>
+  <text x="352" y="88" text-anchor="middle" font-family="sans-serif" font-size="14">Release before return</text>
+  <text x="352" y="114" text-anchor="middle" font-family="sans-serif" font-size="14">Bounded v1 bytes</text>
+  <line x1="455" y1="85" x2="490" y2="85" stroke="#52657a" stroke-width="2" marker-end="url(#preview-arrow)"/>
+  <rect x="490" y="30" width="230" height="110" rx="10" fill="#f3f1fb" stroke="#52657a"/>
+  <text x="605" y="60" text-anchor="middle" font-family="sans-serif" font-size="15">Test-only native host</text>
+  <text x="605" y="88" text-anchor="middle" font-family="sans-serif" font-size="14">Session + retirement fence</text>
+  <text x="605" y="114" text-anchor="middle" font-family="sans-serif" font-size="14">Structured data arguments</text>
+  <line x1="720" y1="85" x2="755" y2="85" stroke="#52657a" stroke-width="2" marker-end="url(#preview-arrow)"/>
+  <rect x="755" y="30" width="250" height="110" rx="10" fill="#f1f8f2" stroke="#52657a"/>
+  <text x="880" y="60" text-anchor="middle" font-family="sans-serif" font-size="15">Bundled visual catalogue</text>
+  <text x="880" y="88" text-anchor="middle" font-family="sans-serif" font-size="14">Untrusted preview: Add / Cancel</text>
+  <text x="880" y="114" text-anchor="middle" font-family="sans-serif" font-size="14">No native command channel</text>
+</svg>
 
 ## Historical location comparison checkpoint
 
@@ -625,4 +675,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 00:06
+Last updated: 2026-10-10 01:58

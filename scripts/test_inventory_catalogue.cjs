@@ -24,7 +24,7 @@ class OwnedOnly extends ResourceLoader {
     return super.fetch(url, options);
   }
 }
-async function launch() {
+async function launch({ embedded = false } = {}) {
   const errors = [],
     downloads = [],
     revoked = [];
@@ -36,8 +36,10 @@ async function launch() {
     pretendToBeVisual: true,
     virtualConsole: vc,
     beforeParse(w) {
+      if (embedded) Object.defineProperty(w, "DiskCatalogueEmbedded", { value: true });
       w.TextEncoder = TextEncoder;
       w.TextDecoder = TextDecoder;
+      w.HTMLElement.prototype.scrollIntoView = function () {};
       w.HTMLDialogElement.prototype.showModal = function () {
         this.open = true;
       };
@@ -91,7 +93,7 @@ async function launch() {
   };
   return { dom, d, click, submit, file, readBlob, text, cards, add, errors, downloads, revoked };
 }
-(async () => {
+if (require.main === module) (async () => {
   const a = await launch(),
     { dom, d, click, submit, file, readBlob, text, cards, add } = a;
   assert.equal(cards().length, 0);
@@ -493,3 +495,5 @@ async function launch() {
   console.error(e);
   process.exitCode = 1;
 });
+
+module.exports = { launch, example, partial, C };
