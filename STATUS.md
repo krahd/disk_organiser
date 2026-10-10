@@ -1,6 +1,16 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 11:16
+Last updated: 2026-10-10 11:38
+
+## Isolated selection adapter: local source authoring
+
+- PR27 is merged normally at `41ad370cdfffe729458c6c319ccdce30afe00bb2`, tree `2e6ae086dc6ef17a227edd035c90680c8e65dfe7`. All six actual-main workflows pass. Native [38048236523](https://github.com/krahd/disk_organiser/actions/runs/38048236523) verifies exact main with 194 XCTest methods, six differential/six parser cases, ordinary empty startup/normal Quit and the separate owned-process persistence checks. Original visual attribution remains `86d3620b`.
+- The approved next [selected-folder source tranche](native/DiskInventoryCore/SELECTION-ADAPTER.md) adds an isolated, unlinked Swift target. Its production host gate always rejects before window lookup or panel construction. The ordinary app/observer and all existing UI/assets remain unchanged; no `.ownedFixture` reclassification, signing, entitlement, persistent access or real-folder capability is activated.
+- The lifecycle uses one claimant, distinct picker/read generations, late-result disposal and retained ownership while an injected worker retires. No URL, path, descriptor, grant or snapshot output crosses these testable ports. The actual panel callback and security-scope ownership are authored only; tests use memory-owned doubles and never present a panel.
+- Five pure dependency-graph oracle tests pass locally. Nineteen new XCTest methods are authored, retaining all 194 prior methods for 213 total. Exact macOS compilation/execution and independent frozen-source review are pending. The graph checker is not OS-sandbox or panel evidence.
+- The obsolete missing research-file link is replaced with checked Apple primary sources. A separately reviewed owned signed-host probe remains required before native panel activation, observer admission or ordinary-button wiring. No user Mac/default-path execution, permission or storage-authority change is included.
+
+The following PR27 section records its pre-merge evidence checkpoint; actual-main integration is confirmed above.
 
 ## Ordinary application persistence: owned native validation
 
@@ -772,4 +782,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 11:16
+Last updated: 2026-10-10 11:38

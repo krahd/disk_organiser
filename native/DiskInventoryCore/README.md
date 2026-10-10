@@ -4,6 +4,10 @@ The Swift/Darwin observation core remains an isolated bounded metadata-only prot
 
 Only the test target constructs a source lease, from a fresh temporary directory it creates and owns. A private held descriptor and the test's address guard are process-local objects, never JSON, persisted permissions or physical-drive identity. No production source-class admission is implemented. The supplied classifier means only “owned test fixture”. The test adapter supplies the absolute-address ancestor re-walk; a production picker/admission adapter does not exist.
 
+## Isolated selected-folder source
+
+An unlinked `DiskInventorySelection` target now authors the future native directory panel and single-owner choice/read-retirement lifecycle. Its production gate always refuses before window lookup; the ordinary application has no dependency on it and the observer remains owned-fixture-only. New native compilation/tests are pending. [Exact source and later signed-host gates](SELECTION-ADAPTER.md).
+
 ## Ordinary Save/Open: owned native validation
 
 The ordinary development executable supplies a lazy, fixed Application Support provider for native Save/Open. Empty startup does not resolve or create library storage. This is unsandboxed application data, not a signed container. Real-folder controls remain unavailable. [The contract](APP-PERSISTENCE.md) describes fixed names, descriptor identity, private metadata checks, lease lifetime and cancellation.
