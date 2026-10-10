@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 09:14
+Last updated: 2026-10-10 09:22
 
 ## Native Save/Open interaction: owned runtime verification
 
@@ -13,6 +13,9 @@ Last updated: 2026-10-10 09:14
 
 - First actual interaction source `36d7226e32a9a4d55f6c6d6136b622b0424a29ec` compiles and executes all 153 XCTest methods. Native [push 38039642864](https://github.com/krahd/disk_organiser/actions/runs/38039642864) passes 151 methods and fails two (three assertions); [PR 38039668011](https://github.com/krahd/disk_organiser/actions/runs/38039668011) passes 152 methods and fails one (two assertions). Push checks out the source; PR checks out merge `74c937fc4811237c4ebc9c70590fdc2a83572f4a`. Ten non-native workflows pass. Downstream six differential/six parser gates are skipped after native failure and are not counted as passes.
 - Both native runs complete the main genuine Save/Open/Replace/Cancel/Close journey and generate all eight new originals. The two repeated Close assertions come from an assertion-bearing lookup used for expected absence. Push additionally refuses a native hit test in selected-version failure recovery; that flow passes in PR, so its precise layout/timing cause is not established. Original chooser pixels show short lists bottom-aligned below blank space. A bounded local successor uses a shared non-asserting absence/readiness lookup, top-origin document stacks, completed chooser layout and stronger positive-size/visible-centre/first-row geometry diagnostics while retaining native events and hit testing. Its actual outcome remains unverified; there is no acceptance from opacity alone.
+
+
+- Reviewed lookup/top-origin source `803393ba` compiles and runs all 153 methods in both native push 38040916056 and PR 38040918325: each passes 151 methods and fails two, with six strict first-row geometry assertions. The Close lost-acknowledgement test now passes; all emitted native hit/visible-centre checks pass. The first button frame is (-7, -5, 201, 32) while its visible document starts at (0, 0), so the complete-frame containment gate correctly remains red. Both runs generate the eight new originals; the six differential/six parser steps remain skipped. A local successor adds eight-point internal version-stack padding and subtracts that padding from child width. It leaves every test, native event and capture criterion unchanged and requires source review and actual execution.
 
 ## Saved-library preparation: executed owned-storage engine
 
@@ -743,4 +746,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 09:14
+Last updated: 2026-10-10 09:22

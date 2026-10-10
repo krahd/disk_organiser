@@ -56,6 +56,9 @@ final class LibrarySavedPanel {
         let counts = label(summary); stack.addArrangedSubview(counts)
         let columns = NSStackView(); columns.orientation = .horizontal; columns.alignment = .top; columns.spacing = 12
         let rows = LibraryTopOriginStack(); rows.orientation = .vertical; rows.alignment = .leading; rows.spacing = 8
+        // Keep the full native button frame inside the scroll document, including
+        // the measured bezel extent beyond its Auto Layout alignment rectangle.
+        rows.edgeInsets = NSEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         let detail = LibraryTopOriginStack(); detail.orientation = .vertical; detail.alignment = .leading; detail.spacing = 10
         let formatter = DateFormatter(); formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone(secondsFromGMT: 0); formatter.dateFormat = "dd MMM yyyy HH:mm:ss 'UTC'"
@@ -119,7 +122,7 @@ final class LibrarySavedPanel {
             explanation.widthAnchor.constraint(equalTo: stack.widthAnchor), counts.widthAnchor.constraint(equalTo: stack.widthAnchor),
             warning.widthAnchor.constraint(equalTo: stack.widthAnchor), status.widthAnchor.constraint(equalTo: stack.widthAnchor),
         ])
-        for child in rows.arrangedSubviews { child.widthAnchor.constraint(equalTo: rows.widthAnchor).isActive = true }
+        for child in rows.arrangedSubviews { child.widthAnchor.constraint(equalTo: rows.widthAnchor, constant: -(rows.edgeInsets.left + rows.edgeInsets.right)).isActive = true }
         for child in detail.arrangedSubviews { child.widthAnchor.constraint(equalTo: detail.widthAnchor).isActive = true }
         content.layoutSubtreeIfNeeded()
         window.makeFirstResponder(cancel)
