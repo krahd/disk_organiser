@@ -1,6 +1,15 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 12:36
+Last updated: 2026-10-10 13:04
+
+## Synchronous selection cancellation: executed owned regression
+
+- Draft [PR29](https://github.com/krahd/disk_organiser/pull/29), source `dbb55a0963f3cab2a60c401dabc4db4c8d9b8aa0`, tree `2ace110bcc677e2288b7b2c19c4e9cb8727618b8`, passes all twelve push/PR workflows and 28 check runs. Exactly two paths changed; all 347 other baseline blobs preserve main `ecc64105fe05049ea23ccc2831b1078d5d3bb73f`.
+- Both native [push 38053041626](https://github.com/krahd/disk_organiser/actions/runs/38053041626) and [PR 38053048220](https://github.com/krahd/disk_organiser/actions/runs/38053048220) execute **217 distinct XCTest methods + six differential + six parser cases**, retaining all 213 actual-main method identities. The four synchronous cancellation methods actually run, including weak request retirement while the owning session stays alive and before any replacement flight. PR checkout `ce9242917b66852721b7a2f7bfb3237937a28acf` is a distinct commit with the same source tree.
+- The executed delta is entirely memory-owned cancellation/reentrant completion coverage. Production, ordinary UI/assets, workflow, observer admission and closed panel gate bytes are unchanged. There is no new pixel claim; earlier accepted original-source attribution, capture regions and 14-day artifact limit remain in force. [Exact source/log scope](native/DiskInventoryCore/SELECTION-ADAPTER.md).
+- Independent exact-source/raw-log closeout accepts this memory-owned execution. Its fresh originals correct two locally transformed diagnostic copies; test outcomes remain unchanged and no native rerun was needed. Final documentation-head CI, guarded integration and actual-main verification remain open. A quarantined signed-host proposal is separate; no host build, signing, entitlement, real panel, grant, user-device/default-path access or permission action is part of PR29.
+
+The source-authoring checkpoint below is retained as history; its unrun statements apply to that earlier checkpoint.
 
 ## Synchronous selection cancellation: source-only regression tranche
 
@@ -798,4 +807,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 12:36
+Last updated: 2026-10-10 13:04
