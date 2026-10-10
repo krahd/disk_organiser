@@ -29,6 +29,18 @@ private final class PreviewCallback<Value: Sendable> {
 @MainActor
 private final class PreviewRuleResult { var rule: WKContentRuleList? }
 
+// This is only the standalone XCTest process's AppKit bootstrap. It cannot
+// accept an external document/URL request or create an untitled document.
+@MainActor
+private final class OwnedPreviewApplicationDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldOpenUntitledFile(_ sender: NSApplication) -> Bool { false }
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool { false }
+    func application(_ sender: NSApplication, openFile filename: String) -> Bool { false }
+    func application(_ sender: NSApplication, openFiles filenames: [String]) { sender.reply(toOpenOrPrint: .failure) }
+    func application(_ application: NSApplication, open urls: [URL]) { /* Reject every URL. */ }
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
+}
+
 // All test setup and evidence writes stay outside the host. The WebKit rule
 // compiler persists its cache, so it is given a fresh owned test directory,
 // never the default/shared rule store or a user directory.
@@ -39,6 +51,27 @@ final class OwnedPreviewHarness {
     let ruleStore: WKContentRuleListStore
     let cacheDirectory: URL
     private var eventNumber = 0
+    private static var applicationPrepared = false
+    private static let applicationDelegate = OwnedPreviewApplicationDelegate()
+
+    private static func prepareApplication() throws {
+        guard !applicationPrepared else { return }
+        let app = NSApplication.shared
+        // finishLaunching can consume NSOpen defaults. Reject any such launch
+        // context rather than clearing defaults or opening an external source.
+        guard app.delegate == nil,
+              UserDefaults.standard.object(forKey: "NSOpen") == nil,
+              UserDefaults.standard.object(forKey: "NSPrint") == nil else {
+            throw OwnedPreviewHost.Failure.unavailable
+        }
+        let regularPolicy = app.setActivationPolicy(.regular)
+        print("OWNED_APP_BOOTSTRAP regularPolicy=\(regularPolicy) runningBefore=\(app.isRunning)")
+        guard regularPolicy else { throw OwnedPreviewHost.Failure.unavailable }
+        app.delegate = applicationDelegate
+        app.finishLaunching()
+        applicationPrepared = true
+        print("OWNED_APP_BOOTSTRAP finishLaunchingReturned=true active=\(app.isActive)")
+    }
 
     private init(host: OwnedPreviewHost, ruleStore: WKContentRuleListStore, cacheDirectory: URL) {
         self.host = host; self.ruleStore = ruleStore; self.cacheDirectory = cacheDirectory
@@ -52,8 +85,7 @@ final class OwnedPreviewHarness {
         window.makeFirstResponder(host.webView)
     }
     static func open(width: CGFloat = 1280, height: CGFloat = 960) async throws -> OwnedPreviewHarness {
-        _ = NSApplication.shared
-        NSApp.setActivationPolicy(.regular)
+        try prepareApplication()
         var template = Array("/private/tmp/disk-preview-rules-XXXXXX".utf8CString)
         let path = try template.withUnsafeMutableBufferPointer { buffer in
             guard let created = mkdtemp(buffer.baseAddress!) else { throw CoreFailure.filesystem(errno) }

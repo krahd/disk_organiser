@@ -1,8 +1,10 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 01:15
+Last updated: 2026-10-10 01:26
 
 ## Owned native visual handoff source checkpoint
+
+- Diagnostic source `447380fe` compiles; its PR native run retains 59 core and two WebKit passes, while all three pointer flows fail the new pre-dispatch guard with `active=false`, `key=false`, `visible=true`. No pointer success is claimed. A test-only one-time AppKit launch bootstrap is prepared with launch-file/default and delegate refusal guards; it preserves all native event assertions and remains unverified.
 
 - First hosted source `f60ad3b9a949b5ed308ffc1ade4a2c60c525ea1f` compiles on the pinned Xcode/SDK. All 59 existing core cases and two new WebKit security/lifecycle cases pass, but three native pointer Add flows fail; downstream differential/parser checks are skipped and not counted. The failed logs and single original preview PNG are preserved. A harness-only event-routing/activation repair adds native/DOM coordinate and trusted-event diagnostics without replacing pointer actions; its hosted result remains pending.
 
@@ -662,4 +664,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 01:15
+Last updated: 2026-10-10 01:26
