@@ -1,8 +1,47 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 01:58
+Last updated: 2026-10-10 03:12
 
-## Owned native visual handoff checkpoint
+## Native application slice 1: development/sample source checkpoint
+
+- PR23 is merged at `2952fa64db55944096cc80777964e24a187857c0`, tree `1e25f6784d8060ce3111f9b2d4c5f2e2f88da768`. All twelve final-head checks and all six actual-main workflows passed. Native [38017300172](https://github.com/krahd/disk_organiser/actions/runs/38017300172) verifies the actual merged checkout and 64 XCTest + six differential + six parser cases; catalogue [38017300212](https://github.com/krahd/disk_organiser/actions/runs/38017300212) verifies ten Chromium journeys. Aggregate [38017300327](https://github.com/krahd/disk_organiser/actions/runs/38017300327) retains 709 Linux backend, Windows 607 passed/102 existing skips, 665 Jest and 27 existing browser journeys. Its original source/pixel attribution and 14-day artifact limitation remain below.
+- Approved next scope is a coherent native library window, explicit owned-sample selection/scope/progress/cancel, then separately reviewed bounded app-owned Save/Open/relaunch. The [canonical source plan](docs/drive-administration/NATIVE-APPLICATION.md) preserves the later signed-picker and user-device gates. No new app-source test or compilation pass is claimed at this checkpoint.
+- Added `DiskInventoryDesktop` and the explicit `DiskOrganiserPreview` sample executable. The app entry rejects external arguments/document/URL requests; its only provider reads two fixed bundled owned-example JSON resources. It does not depend on the observer core. Real directory reads still use private fresh-fixture constructors in tests only. The core’s five source files, all prior 59 core tests, strict v1 formats and authority rules remain unchanged.
+- Extracted the data-only WebKit host/resources into that shared desktop module. Existing five native WebKit tests retain their event/lifecycle/security assertions; acknowledgement barriers, event injection and screenshot writers remain in tests. The narrow asset allowlist now checks seven frontend assets plus two fixed example files outside the WebKit read root. Shared embedded copy says development preview without claiming a live connection.
+- The native shell starts with an empty library and prominent sample/real-folder/Save/Open limits. Native sample selection and scope review precede preparation; Cancel, repeated actions, late completion and window close have generation fences. Records remain temporary, with explicit discard confirmation on dirty close. No fake scan percentage or real source permission is shown. “Choose my folder” is disabled with its unavailable reason.
+- The application’s fixed WebKit blocker uses a newly created private temporary framework-cache directory. This cache is not a saved catalogue or source grant; OS/framework persistence is disclosed. No source traversal, content reads, catalogue persistence, arbitrary file opening, provider, native operation interface or entitlement is connected.
+- Independent initial source review found a pre-provider cancellation gap and synchronous Quit re-entry; both are repaired locally. The new pre-call/current-generation fence prevents provider invocation after immediate Cancel/Close, and the final termination request is deferred until the current delegate returns. Native focus restoration waits for sheets and does not steal an active close question. Eighteen new native application cases are authored, including those regressions, delayed-stage/Add races, actual Keep/Discard and focus paths, startup gating and bounded separate-process startup/normal Quit/unknown-argument rejection. Together with the prior 64 cases, 82 XCTest cases are required. No new native case has run yet in this Linux workspace.
+- The process test launches only the package’s just-built sample executable, proves actual empty-view/window readiness via fixed non-sensitive receipts and requests normal quit only for its verified live child. Bounded failure cleanup is never counted as a pass. No global app enumeration, source argument or OS permission is introduced. Six original named-view/viewport captures are planned, including the native discard confirmation; there is no whole-screen/composite claim. Tests use fresh owned sources or fixed public examples.
+- Local unchanged frontend checks pass 665 Jest, 39 catalogue DOM, 16 bridge DOM and formatting; seven canonical view assets and two example files match. Actual hosted app compile, all existing native tests plus eighteen new cases, differential/parser checks, independent source review and original visual inspection remain required before acceptance. This source is a development/sample preview, not a usable real-folder application. Complete slice 1, then bounded Save/Open and signed-picker feasibility rather than indefinite sample-only polishing.
+
+The application source has no observer dependency. Only tests can construct and read owned source folders; the shipped sample provider supplies fixed bytes to the same presentation.
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 175" role="img" aria-labelledby="app-title app-desc">
+  <title id="app-title">Development library application boundary</title>
+  <desc id="app-desc">A native sample selector and scope review chooses a fixed example. Generation fencing passes bounded bytes to the shared catalogue. A separate owned test provider exercises actual core metadata. No production source picker or save is connected.</desc>
+  <defs><marker id="app-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#52657a"/></marker></defs>
+  <rect x="15" y="30" width="230" height="110" rx="10" fill="#eef4fb" stroke="#52657a"/>
+  <text x="130" y="60" text-anchor="middle" font-family="sans-serif" font-size="15">Native library window</text>
+  <text x="130" y="88" text-anchor="middle" font-family="sans-serif" font-size="14">Sample selector + scope</text>
+  <text x="130" y="114" text-anchor="middle" font-family="sans-serif" font-size="14">No live folder picker</text>
+  <line x1="245" y1="85" x2="280" y2="85" stroke="#52657a" stroke-width="2" marker-end="url(#app-arrow)"/>
+  <rect x="280" y="30" width="205" height="110" rx="10" fill="#eef4fb" stroke="#52657a"/>
+  <text x="382" y="60" text-anchor="middle" font-family="sans-serif" font-size="15">Fixed example bytes</text>
+  <text x="382" y="88" text-anchor="middle" font-family="sans-serif" font-size="14">Tests: owned sources only</text>
+  <text x="382" y="114" text-anchor="middle" font-family="sans-serif" font-size="14">No source capability</text>
+  <line x1="485" y1="85" x2="520" y2="85" stroke="#52657a" stroke-width="2" marker-end="url(#app-arrow)"/>
+  <rect x="520" y="30" width="205" height="110" rx="10" fill="#f3f1fb" stroke="#52657a"/>
+  <text x="622" y="60" text-anchor="middle" font-family="sans-serif" font-size="15">Session generation</text>
+  <text x="622" y="88" text-anchor="middle" font-family="sans-serif" font-size="14">Prepare / Cancel / Review</text>
+  <text x="622" y="114" text-anchor="middle" font-family="sans-serif" font-size="14">Retire late completion</text>
+  <line x1="725" y1="85" x2="760" y2="85" stroke="#52657a" stroke-width="2" marker-end="url(#app-arrow)"/>
+  <rect x="760" y="30" width="245" height="110" rx="10" fill="#f1f8f2" stroke="#52657a"/>
+  <text x="882" y="60" text-anchor="middle" font-family="sans-serif" font-size="15">Shared visual catalogue</text>
+  <text x="882" y="88" text-anchor="middle" font-family="sans-serif" font-size="14">Preview + separate Add</text>
+  <text x="882" y="114" text-anchor="middle" font-family="sans-serif" font-size="14">Temporary unsaved library</text>
+</svg>
+
+## Previous owned native visual handoff checkpoint
 
 - Successful source `356ff01aa663d8cd3504f98bcc4f110364d6a089` passes all twelve push/PR workflow runs. Native [push](https://github.com/krahd/disk_organiser/actions/runs/38013732010) checks out that exact source; native [PR](https://github.com/krahd/disk_organiser/actions/runs/38013734331) checks out `f096b7a82a86b742ab635ab039a9ed9e03c12c2a`, with the same tree `245dce0ca035faa0353bdd710ef71c8aaeebd2ba`. Both pass all 64 XCTest cases (59 core + five WebKit), six independent native/Python differential and six unchanged-parser/catalogue cases. Pinned Xcode 16.4/16F6, SDK 15.5 and Swift 6.1.2 are verified; APFS invalid-name refusal remains an explicit limitation.
 - The bounded own-app event drain establishes active/key/visible readiness after three queued events. Genuine in-process AppKit pointer Add/comparison/close and Escape cancellation then pass with trusted WebKit event traces, checked native/DOM hit coordinates, preserved retirement fences and focus return. Earlier failed logs/partial images remain failure evidence. No JS-click substitution, forced interaction, physical-mouse or user-device claim is made.
@@ -675,4 +714,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 01:58
+Last updated: 2026-10-10 03:12

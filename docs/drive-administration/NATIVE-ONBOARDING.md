@@ -2,6 +2,10 @@
 
 Native onboarding design · 10 October 2026 · owned-fixture core and test-only visual handoff; native product access remains gated
 
+## Current application-source slice
+
+PR23 owned-only visual-host integration is complete at main `2952fa64`; all six actual-main workflows passed. The approved [native application plan](NATIVE-APPLICATION.md) now starts an explicit AppKit development/sample shell with shared catalogue presentation and owned-fixture tests. No live NSOpenPanel adapter, source admission, entitlement/profile activation or save/reopen is added in slice 1. Actual user-drive administration remains the product goal and a separate signed-picker/device gate.
+
 ## Decision
 
 Build an **export-only, macOS-first native reader** before connecting the catalogue to a service. A person chooses one project folder, sees the exact read-only scope, requests a bounded metadata observation, reviews its limits, and can explicitly save metadata in the reader's private app container. A primary “Review in catalogue” action sends only the bounded snapshot bytes to a bundled catalogue pane; its existing untrusted import preview remains mandatory. A separate Reveal in Finder action is a fallback, not the main product handoff.

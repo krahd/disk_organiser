@@ -1,5 +1,7 @@
 # Owned WebKit catalogue preview
 
+Historical PR23 boundary/evidence below applies to source `356ff01`. PR23 is merged at `2952fa64` with all six actual-main workflows passing. The next source slice extracts the host/resources into the shared desktop module and adds a separately tested development/sample executable; [current application scope](APPLICATION-PREVIEW.md). Its new execution and visual gates are still open.
+
 This test-only host exercises the native-to-visual handoff with freshly created test folders. It is not an application target or a signed/sandboxed user-folder integration. There is no picker, source grant, entitlement, bookmark, provider, persistent catalogue, container save, file operation or JavaScript-to-native message handler.
 
 ## Hosted owned-preview validation — 10 October 2026

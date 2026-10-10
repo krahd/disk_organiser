@@ -5,6 +5,7 @@ import WebKit
 import CryptoKit
 import Darwin
 @testable import DiskInventoryCore
+@testable import DiskInventoryDesktop
 
 // Each asynchronous test observation has a one-shot deadline. A missing WebKit
 // callback fails the test rather than hanging until the workflow timeout. Values
@@ -47,7 +48,7 @@ private final class OwnedPreviewApplicationDelegate: NSObject, NSApplicationDele
 @MainActor
 final class OwnedPreviewHarness {
     let host: OwnedPreviewHost
-    let window: NSWindow
+    private(set) var window: NSWindow
     let ruleStore: WKContentRuleListStore
     let cacheDirectory: URL
     private var eventNumber = 0
@@ -83,6 +84,11 @@ final class OwnedPreviewHarness {
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
         window.makeFirstResponder(host.webView)
+    }
+    // Attach the same tested host to the actual application window for app tests.
+    func useApplicationWindow(_ selected: NSWindow) throws {
+        guard host.webView.window === selected else { throw OwnedPreviewHost.Failure.unavailable }
+        window.orderOut(nil); window.close(); window = selected
     }
     static func open(width: CGFloat = 1280, height: CGFloat = 960) async throws -> OwnedPreviewHarness {
         try prepareApplication()
@@ -139,7 +145,7 @@ final class OwnedPreviewHarness {
     // Drain only this process's AppKit queue, without a global event tap, blocking
     // wait, unbounded loop or alternative click route.
     @discardableResult
-    private func pumpApplicationEvents() -> Int {
+    func pumpApplicationEvents() -> Int {
         var count = 0
         for _ in 0..<32 {
             guard let event = NSApp.nextEvent(matching: .any, until: .distantPast,

@@ -1,0 +1,16 @@
+{
+  "examples": [
+    {
+      "file": "working.json",
+      "canonical": "prototypes/inventory_catalogue/owned-creative.example.json",
+      "bytes": 1233,
+      "sha256": "4a7fff47954259057a8c6bcc65dda1595bd681419c6a79e09a5f1db217028d42"
+    },
+    {
+      "file": "archive.json",
+      "canonical": "prototypes/inventory_catalogue/owned-archive.example.json",
+      "bytes": 1452,
+      "sha256": "1bc3fc017581fa3294c08c20f2983f6e2c626de1f6acd4cae6ff06c242eefc22"
+    }
+  ]
+}
