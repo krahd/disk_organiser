@@ -1,7 +1,8 @@
 import Foundation
 import Darwin
 
-// Internal descriptor-only primitives. Raw root construction belongs to tests.
+// Internal descriptor-only primitives. Sources still belong only to tests;
+// application-data admission has a separate fixed namespace factory.
 enum LibraryStorageFailure: Error { case unavailable, invalidScope, invalidFile, limit, changed, busy, interrupted, uncertain, filesystem(Int32) }
 
 struct LibraryFileStamp: Equatable, Sendable {
@@ -30,16 +31,18 @@ struct LibraryFileStamp: Equatable, Sendable {
 struct LibraryIOBudget {
     private let until = ProcessInfo.processInfo.systemUptime + 5
     private var calls = 0
+    private let cancelled: @Sendable () -> Bool
+    init(cancelled: @escaping @Sendable () -> Bool = { false }) { self.cancelled = cancelled }
     mutating func check() throws {
         calls += 1
-        guard calls <= 4096, ProcessInfo.processInfo.systemUptime < until, !Task.isCancelled else {
+        guard calls <= 4096, ProcessInfo.processInfo.systemUptime < until, !Task.isCancelled, !cancelled() else {
             throw LibraryStorageFailure.interrupted
         }
     }
 }
 
 // The actor owns this object. Tests subclass syscall methods for bounded faults;
-// production has no instance or storage-root factory in this source tranche.
+// application data uses its stricter namespace/privacy subclass.
 class LibraryFileIO: @unchecked Sendable {
     func metadata(_ descriptor: Int32) throws -> LibraryFileStamp {
         var info = stat()
@@ -86,6 +89,10 @@ class LibraryFileIO: @unchecked Sendable {
     func close(_ descriptor: Int32) { _ = Darwin.close(descriptor) }
 
     func names(_ parent: Int32, budget: inout LibraryIOBudget) throws -> [Data] {
+        try names(parent, maximum: 256, budget: &budget)
+    }
+    func names(_ parent: Int32, maximum: Int, budget: inout LibraryIOBudget) throws -> [Data] {
+        guard (0...256).contains(maximum) else { throw LibraryStorageFailure.limit }
         try budget.check()
         // A new file description gives each listing an independent directory cursor.
         let fd = openat(parent, ".", O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
@@ -115,7 +122,7 @@ class LibraryFileIO: @unchecked Sendable {
             }
             if name == Data(".".utf8) || name == Data("..".utf8) { continue }
             result.append(name)
-            guard result.count <= 256 else { throw LibraryStorageFailure.limit }
+            guard result.count <= maximum else { throw LibraryStorageFailure.limit }
         }
     }
 }

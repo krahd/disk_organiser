@@ -38,7 +38,7 @@ class CataloguePreviewHost: NSObject, WKNavigationDelegate, WKUIDelegate, Librar
         var retiring = false
         init(navigation: UUID) { self.navigation = navigation }
     }
-    enum StorageMode: String { case temporary, ownedStorage = "owned-storage" }
+    enum StorageMode: String { case temporary, ownedStorage = "owned-storage", applicationData = "application-data" }
     let storageMode: StorageMode
     let webView: NoDropWebView
     let document: URL
@@ -206,7 +206,7 @@ class CataloguePreviewHost: NSObject, WKNavigationDelegate, WKUIDelegate, Librar
     func libraryCall(_ operation: LibraryBridgeOperation, id: UUID,
                      fields: [String: String] = [:]) async throws -> LibraryBridgeReply {
         guard state == .ready, pending == nil, webView.url == document,
-              !operation.needsStorage || storageMode == .ownedStorage else { throw Failure.busy }
+              !operation.needsStorage || storageMode != .temporary else { throw Failure.busy }
         let request = try LibraryBridgeWire.request(operation, session: session, id: id, fields: fields)
         let generation = navigationGeneration
         return try await withCheckedThrowingContinuation { continuation in

@@ -40,9 +40,10 @@ final class LibraryWindowController: NSObject, NSWindowDelegate {
     private(set) var saveButton: LibraryActionButton!
     private(set) var openButton: LibraryActionButton!
     private(set) var checkButton: LibraryActionButton!
+    private(set) var cancelSaveButton: LibraryActionButton!
 
-    init(session: LibrarySession, startReady: Bool = true, injection: OwnedLibraryInjection? = nil) throws {
-        interaction = try LibraryInteraction(session: session, injection: injection)
+    init(session: LibrarySession, startReady: Bool = true, injection: OwnedLibraryInjection? = nil, provider: (any LibraryStorageProviding)? = nil) throws {
+        interaction = try LibraryInteraction(session: session, injection: injection, provider: provider)
         self.session = session
         startupReady = startReady
         window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1100, height: 850),
@@ -56,7 +57,9 @@ final class LibraryWindowController: NSObject, NSWindowDelegate {
         let title = NSTextField(labelWithString: "Your storage library")
         title.font = .systemFont(ofSize: 23, weight: .semibold)
         chrome.addArrangedSubview(title)
-        let boundary = NSTextField(wrappingLabelWithString: interaction.hasStorage
+        let boundary = NSTextField(wrappingLabelWithString: interaction.applicationData
+            ? "DEVELOPMENT PREVIEW · Save library versions on this Mac. Built-in examples only; real-folder access is unavailable."
+            : interaction.hasStorage
             ? "DEVELOPMENT PREVIEW · Temporary test library storage. Each Save creates a new version. Real-folder access is unavailable."
             : "DEVELOPMENT PREVIEW · Built-in examples only. Real-folder access and saved library storage are unavailable.")
         boundary.font = .systemFont(ofSize: 12, weight: .medium)
@@ -81,9 +84,10 @@ final class LibraryWindowController: NSObject, NSWindowDelegate {
             if self.interaction.canCheckReplacement { self.interaction.checkReplacement() }
             else { self.interaction.checkSave() }
         }
+        cancelSaveButton = LibraryActionButton("Cancel Save preparation", identifier: "library-save-cancel") { [weak self] in self?.interaction.cancelSavePreparation() }
         let unavailableStorage = "Unavailable: this sample executable has no admitted library storage."
         if !interaction.hasStorage { saveButton.toolTip = unavailableStorage; openButton.toolTip = unavailableStorage }
-        for button in [saveButton!, openButton!, checkButton!] { persistence.addArrangedSubview(button) }
+        for button in [saveButton!, openButton!, checkButton!, cancelSaveButton!] { persistence.addArrangedSubview(button) }
         chrome.addArrangedSubview(persistence)
         status.font = .systemFont(ofSize: 12); status.setAccessibilityIdentifier("library-status")
         chrome.addArrangedSubview(status)
@@ -128,6 +132,8 @@ final class LibraryWindowController: NSObject, NSWindowDelegate {
         exploreButton.isEnabled = startupReady && interaction.canExplore
         saveButton.isEnabled = startupReady && interaction.canSave
         openButton.isEnabled = startupReady && interaction.canOpen
+        cancelSaveButton.isHidden = !interaction.canCancelSavePreparation
+        cancelSaveButton.isEnabled = interaction.canCancelSavePreparation
         checkButton.isHidden = !interaction.canCheckResult
         checkButton.isEnabled = interaction.canCheckResult
         doneButton.isEnabled = interaction.flight == .sample

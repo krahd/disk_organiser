@@ -4,6 +4,20 @@ The Swift/Darwin observation core remains an isolated bounded metadata-only prot
 
 Only the test target constructs a source lease, from a fresh temporary directory it creates and owns. A private held descriptor and the test's address guard are process-local objects, never JSON, persisted permissions or physical-drive identity. No production source-class admission is implemented. The supplied classifier means only “owned test fixture”. The test adapter supplies the absolute-address ancestor re-walk; a production picker/admission adapter does not exist.
 
+## Ordinary Save/Open: owned native validation
+
+The ordinary development executable supplies a lazy, fixed Application Support provider for native Save/Open. Empty startup does not resolve or create library storage. This is unsandboxed application data, not a signed container. Real-folder controls remain unavailable. [The contract](APP-PERSISTENCE.md) describes fixed names, descriptor identity, private metadata checks, lease lifetime and cancellation.
+
+Exact source `86d3620b` compiles and passes **194 XCTest + six differential + six parser cases** in both macOS lanes. Storage execution uses fresh owned parent capabilities; the default Application Support resolver is unexecuted in CI. A separate test-only process probe verifies exact saved bytes after fresh-process reopening, contention and lease release. The ordinary executable separately proves empty startup and normal Quit. [Exact source, process and original-pixel evidence](APP-PERSISTENCE-ACCEPTANCE.md) preserves those distinct claims. Default-path user-device save/relaunch, signed distribution and real-folder use remain unverified.
+
+The following source-candidate section records the first hosted `4a11d4f2` checkpoint; current owned validation is recorded above.
+
+## Ordinary Save/Open source candidate
+
+The ordinary development executable now supplies a lazy, fixed Application Support provider for native Save/Open. Empty startup does not resolve or create library storage. This is unsandboxed application data, not a signed container. Real-folder controls remain explicitly unavailable. [The approved contract and source/test boundary](APP-PERSISTENCE.md) describe fixed names, descriptor identity, private metadata checks, lease lifetime and cancellation.
+
+At source `4a11d4f2`, the ordinary preview and separate owned-capability probe compile on macOS. **XCTest compilation fails** on a private helper used by a cross-file test extension; no tests, process interactions or new captures execute. The helper-visibility successor remains unverified. Its new application-path UI is tested only through an internal fresh-owned-parent capability; the separate owned process probe has no ordinary-product root override. Historical executed evidence below belongs to its named sources, not this candidate. Default-path user-device save/relaunch and distribution remain unverified.
+
 ## Purpose and limits
 
 The core is the first verification gate towards explicitly selecting one project folder in a future native catalogue. It observes directory metadata and logical file sizes without intentionally reading file contents. Results use the unchanged inventory-snapshot v1 format and remain historical claims when imported or reopened. Names do not grant access. Listed logical bytes are neither disk capacity nor independent copies or backup protection.
@@ -21,8 +35,10 @@ The dedicated `Owned native inventory core` workflow uses `macos-15` with Xcode 
 On a suitable owned macOS development checkout, the test command is:
 
 ```sh
-DEVELOPER_DIR=/Applications/Xcode_16.4.app/Contents/Developer \
-  xcrun swift test --package-path native/DiskInventoryCore
+export DEVELOPER_DIR=/Applications/Xcode_16.4.app/Contents/Developer
+xcrun swift build --package-path native/DiskInventoryCore --product DiskOrganiserPreview
+python native/DiskInventoryCore/Validation/build_owned_application_probe.py
+xcrun swift test --package-path native/DiskInventoryCore
 ```
 
 This command takes no source-path argument. Darwin tests do not substitute a weaker Linux or Windows walker. Tests create only temporary sources and adjacent owned sentinels; no existing user folders are scanned.
@@ -63,6 +79,6 @@ Source `5dd71ae3` passes both owned macOS runs with 123 XCTest (the existing 84 
 
 ## Executed owned Save/Open interaction
 
-Source `c530fc19` passes all twelve push/PR workflows. Both actual macOS runs pass 153 XCTest, six differential comparisons and six parser/catalogue roundtrips. Native Save/Open/Replace/Cancel, close-loss decisions and same-attempt recovery work only when tests inject one fresh owned-storage lease. The normal sample executable still has no storage factory and shows unavailable Save/Open controls with a reason.
+Source `c530fc19` passes all twelve push/PR workflows. Both actual macOS runs pass 153 XCTest, six differential comparisons and six parser/catalogue roundtrips. Native Save/Open/Replace/Cancel, close-loss decisions and same-attempt recovery work only when tests inject one fresh owned-storage lease. At that checkpoint, the normal sample executable had no storage factory and showed unavailable Save/Open controls with a reason. The ordinary-app source candidate above changes this explicitly, with separate review/execution gates.
 
-The fixed, strictly decoded v2 data bridge preserves catalogue v1 and has no JavaScript-to-native command handler or source-folder access. The complete-frame chooser regression now passes without weakening native events or geometry checks. [Exact executed source, original images, independent review and remaining gates](SAVE-OPEN-ACCEPTANCE.md); [approved interaction contract and diagnostic history](SAVE-OPEN-INTERACTION.md). This is owned development-preview evidence, not a usable real-folder or signed-product release. Final documentation-head and actual merged-main checks remain separate gates.
+The fixed, strictly decoded v2 data bridge preserves catalogue v1 and has no JavaScript-to-native command handler or source-folder access. The complete-frame chooser regression now passes without weakening native events or geometry checks. [Exact executed source, original images, independent review and remaining gates](SAVE-OPEN-ACCEPTANCE.md); [approved interaction contract and diagnostic history](SAVE-OPEN-INTERACTION.md). This is owned development-preview evidence, not a usable real-folder or signed-product release. PR26 final-head and actual merged-main checks passed at `26f6e671`; new candidate checks remain separate gates.

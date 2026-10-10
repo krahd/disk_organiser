@@ -31,6 +31,10 @@ check("temporary mode can close honestly but cannot save/open",()=>{
  const f=fixture("temporary");assert.throws(()=>f.api.exportCatalogue(request(1,{fence:""})));assert.throws(()=>f.api.prepareOpen(request(2)));
  assert.equal(f.api.prepareClose(request(3)).state,"fenced");assert.equal(f.fenced,true);f.api.releaseClose(request(3));assert.equal(f.fenced,false);
 });
+check("application-data mode permits only the same data operations and exact admission",()=>{
+ const f=fixture("application-data");f.edit();const saved=f.api.exportCatalogue(request(1,{fence:""}));assert.equal(saved.text,sample);assert.equal(f.state.dirty,"dirty");f.api.acknowledgeSaved(request(1,{revision:"1"}));assert.equal(f.state.dirty,"clean");f.api.prepareOpen(request(2));f.api.cancelOpen(request(2));
+ for(const mode of ["application-data ","APPLICATION-DATA","applicationData","user-drive",null]){const g=fixture(mode);assert.throws(()=>g.api.exportCatalogue(request(1,{fence:""})));assert.throws(()=>g.api.prepareOpen(request(2)));}
+});
 check("export is data-only, immutable and one-use",()=>{
  const f=fixture();f.edit();const reply=f.api.exportCatalogue(request(1,{fence:""}));assert.equal(reply.text,sample);assert.equal(reply.revision,"1");assert.equal(Object.isFrozen(reply),true);assert.equal(f.state.dirty,"dirty");assert.equal(f.cleans,0);assert.throws(()=>f.api.exportCatalogue(request(1,{fence:""})));
 });

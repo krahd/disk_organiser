@@ -25,7 +25,9 @@ final class LibraryInteraction {
         let fence: UUID?
         var revision: String?
         var bytes: Data?
+        var bootstrapStarted = false
         var invokedStorage = false
+        var cancelled = false
         var receipt: LibrarySaveReceipt?
         var storageAcknowledged = false
         init(session: String, fence: UUID?) { self.session = session; self.fence = fence }
@@ -42,7 +44,8 @@ final class LibraryInteraction {
     }
     let session: LibrarySession
     private let page: any LibraryPageClient
-    private let storage: LibraryStorage?
+    let bootstrap: LibraryStorageBootstrap
+    private var storage: LibraryStorage? { bootstrap.storage }
     private let codec: any CatalogueValidating
     private(set) var flight = Flight.idle
     private(set) var busy = false
@@ -57,13 +60,18 @@ final class LibraryInteraction {
     private(set) var closeSample = false
     private(set) var closeID: UUID?
     private var resumeSampleAfterClose = false
+    private var closeAfterPreparation = false
     private var saved: SaveAttempt?
     private var opened: OpenAttempt?
     private var acknowledgedRevision: String?
     private var work: Task<Void, Never>?
     private var generation = UUID()
     var changed: (() -> Void)?
-    var hasStorage: Bool { storage != nil }
+    var hasStorage: Bool { bootstrap.enabled }
+    var applicationData: Bool { bootstrap.applicationData }
+    var canCancelSavePreparation: Bool {
+        busy && (flight == .save || flight == .close) && saved?.invokedStorage == false && saved?.cancelled == false
+    }
     var unresolved: Bool { saveOutcome == .storageUnresolved || saveOutcome == .pageUnresolved || openPhase == .unresolved }
     var canSave: Bool { hasStorage && flight == .idle && !busy && !unresolved && session.state == .ready }
     var canOpen: Bool { canSave }
@@ -84,14 +92,28 @@ final class LibraryInteraction {
     var canReplace: Bool { flight == .open && !busy && openPhase == .prepared && preview != nil }
 
     init(session: LibrarySession, injection: OwnedLibraryInjection? = nil,
-         codec: any CatalogueValidating = CatalogueCodec()) throws {
+         provider: (any LibraryStorageProviding)? = nil, codec: any CatalogueValidating = CatalogueCodec()) throws {
         let client = session.host
         guard (injection != nil) == (client.storageMode == .ownedStorage),
+              (provider != nil) == (client.storageMode == .applicationData),
               session.intentAdmission == nil else { throw LibraryStorageFailure.invalidScope }
         self.session = session; self.page = client; self.codec = codec
-        storage = try injection?.claim()
+        bootstrap = try LibraryStorageBootstrap(owned: injection, provider: provider)
+        bootstrap.changed = { [weak self] in self?.emit() }
         session.intentAdmission = { [weak self] intent in self?.admitSample(intent) == true }
         session.ownerChanged = { [weak self] in self?.sampleChanged() }
+    }
+    private func finishWork() {
+        busy = false; work = nil; emit()
+        if closeAfterPreparation {
+            closeAfterPreparation = false
+            enquireClose()
+        }
+    }
+    func cancelSavePreparation() {
+        guard canCancelSavePreparation, let attempt = saved else { return }
+        attempt.cancelled = true; bootstrap.cancel()
+        emit("Cancelling storage preparation after the current check returns. Your work stays open; setup data may remain.")
     }
     private func emit(_ text: String? = nil) { if let text { message = text }; changed?() }
     private func admitSample(_ intent: LibrarySession.Intent) -> Bool {
@@ -125,13 +147,13 @@ final class LibraryInteraction {
         beginSave(fence: nil)
     }
     private func beginSave(fence: UUID?) {
-        guard !busy, let storage else { return }
+        guard !busy, hasStorage else { return }
         let attempt = SaveAttempt(session: page.session, fence: fence), token = generation
         saved = attempt; saveOutcome = .none; busy = true
         if fence == nil { flight = .save }
         emit("Saving a new library version. Temporary project selections are not included.")
         work = Task { @MainActor [self] in
-            defer { busy = false; work = nil; emit() }
+            defer { finishWork() }
             do {
                 try Task.checkCancellation()
                 let status = try await call(.status, fence ?? attempt.id)
@@ -141,6 +163,14 @@ final class LibraryInteraction {
                     emit("No catalogue changes since that saved version.")
                     return
                 }
+                guard status.loss?.hasDraft == false else { throw LibraryBridgeWire.Failure.invalid }
+                guard !attempt.cancelled else { throw CancellationError() }
+                // Capture only after storage admission: edits made while the
+                // lazy namespace opens belong to this same requested Save.
+                attempt.bootstrapStarted = bootstrap.storage == nil
+                if attempt.bootstrapStarted { emit("Opening saved library storage. Your current edits remain here.") }
+                guard let storage = try await bootstrap.obtain(.save) else { throw LibraryStorageFailure.unavailable }
+                guard !attempt.cancelled, current(token, attempt.session) else { throw CancellationError() }
                 let result = try await call(.exportCatalogue, attempt.id, ["fence": fence?.uuidString.lowercased() ?? ""])
                 attempt.revision = result.values["revision"]
                 attempt.bytes = Data(result.values["text"]!.utf8)
@@ -149,6 +179,7 @@ final class LibraryInteraction {
                 let admitted = try await codec.validate(attempt.bytes!)
                 try Task.checkCancellation()
                 guard current(token, attempt.session) else { saveOutcome = .retired; return }
+                guard !attempt.cancelled else { throw CancellationError() }
                 attempt.invokedStorage = true
                 do {
                     let receipt = try await storage.save(admitted, attempt: attempt.id)
@@ -161,14 +192,19 @@ final class LibraryInteraction {
                 } catch {
                     saveOutcome = .notPublished
                     if fence == nil { flight = .idle }
-                    emit("The version was not published. Incomplete data may remain in the test library; current edits are retained.")
+                    emit("The version was not published. Incomplete data may remain in library storage; current edits are retained.")
                     return
                 }
                 await acknowledge(attempt, token: token)
             } catch {
                 saveOutcome = .rejected
                 if fence == nil { flight = .idle }
-                emit("Saving could not start. Finish or cancel any open edit, then try Save again. Current records are retained.")
+                if attempt.cancelled {
+                    if attempt.bootstrapStarted { await bootstrap.releasePreparedStorage() }
+                    emit("Save preparation cancelled. No catalogue save was started; app-private setup data may remain. Your work is retained.")
+                } else {
+                    emit((attempt.bootstrapStarted ? bootstrap.failureMessage : nil) ?? "Saving could not start. Finish or cancel any open edit, then try Save again. Current records are retained.")
+                }
             }
         }
     }
@@ -214,7 +250,7 @@ final class LibraryInteraction {
         // A fresh task deliberately does not inherit the cancelled operation's
         // cancellation flag. It reconciles one attempt and never calls save.
         work = Task { @MainActor [self] in
-            defer { busy = false; work = nil; emit() }
+            defer { finishWork() }
             if !attempt.storageAcknowledged {
                 do {
                     switch try await storage.reconcile() {
@@ -243,13 +279,13 @@ final class LibraryInteraction {
     }
 
     func open() {
-        guard canOpen, let storage else { return }
+        guard canOpen else { return }
         let item = OpenAttempt(session: page.session), token = generation
         opened = item; flight = .open; openPhase = .listing; busy = true
         listing = nil; selected = nil; preview = nil
         emit("Checking saved version names and sizes. Contents are checked only after you select a version.")
         work = Task { @MainActor [self] in
-            defer { busy = false; work = nil; emit() }
+            defer { finishWork() }
             do {
                 let before = try await call(.status, item.id)
                 if before.loss?.hasDraft == true || before.state != "idle" {
@@ -261,6 +297,13 @@ final class LibraryInteraction {
                 item.loss = result.loss
                 guard current(token, item.session) else { return }
                 if item.cancelled { await cancelOpened(item); return }
+                guard let storage = try await bootstrap.obtain(.open) else {
+                    await cancelOpened(item)
+                    if flight == .idle { emit("No saved library versions yet. Nothing was created. Save your first version when you are ready.") }
+                    return
+                }
+                guard current(token, item.session) else { return }
+                if item.cancelled { await cancelOpened(item); return }
                 listing = try await storage.list()
                 guard current(token, item.session) else { return }
                 if item.cancelled { await cancelOpened(item); return }
@@ -269,7 +312,7 @@ final class LibraryInteraction {
             } catch {
                 // prepareOpen may have fenced before its reply was lost.
                 await cancelOpened(item)
-                if flight == .idle { emit("Saved versions could not be listed safely. Your current library is unchanged.") }
+                if flight == .idle { emit(bootstrap.failureMessage ?? "Saved versions could not be listed safely. Your current library is unchanged.") }
             }
         }
     }
@@ -280,7 +323,7 @@ final class LibraryInteraction {
         let token = generation
         emit("Checking this saved version and preparing its full location preview…")
         work = Task { @MainActor [self] in
-            defer { busy = false; work = nil; emit() }
+            defer { finishWork() }
             do {
                 if let previous = item.candidate {
                     let reply = try await call(.retireCandidate, item.id, ["candidate": previous.uuidString.lowercased()])
@@ -323,7 +366,7 @@ final class LibraryInteraction {
         guard canReplace, let item = opened, let candidate = item.candidate, let loss = item.loss else { return }
         busy = true; openPhase = .committing; item.commitInvoked = true
         work = Task { @MainActor [self] in
-            defer { busy = false; work = nil; emit() }
+            defer { finishWork() }
             do {
                 let reply = try await call(.commitReplacement, item.id, ["candidate": candidate.uuidString.lowercased(), "revision": loss.revision, "epoch": loss.epoch])
                 try finishReplacement(reply, item: item)
@@ -345,7 +388,7 @@ final class LibraryInteraction {
         guard canCheckReplacement, let item = opened, let candidate = item.candidate else { return }
         busy = true
         work = Task { @MainActor [self] in
-            defer { busy = false; work = nil; emit() }
+            defer { finishWork() }
             do {
                 let reply = try await call(.replacementResult, item.id, ["candidate": candidate.uuidString.lowercased()])
                 if reply.state == "committed" { try finishReplacement(reply, item: item) }
@@ -356,6 +399,7 @@ final class LibraryInteraction {
     func cancelOpen() {
         guard flight == .open, let item = opened else { return }
         item.cancelled = true
+        if bootstrap.resolving { bootstrap.cancel() }
         guard !busy else { emit("Cancelling Open after the current check returns…"); return }
         busy = true
         work = Task { @MainActor [self] in
@@ -375,6 +419,11 @@ final class LibraryInteraction {
 
     func enquireClose() {
         guard flight != .closed, flight != .close else { return }
+        if busy, (flight == .save && saved?.invokedStorage == false) || (flight == .open && bootstrap.resolving) {
+            closeAfterPreparation = true
+            if flight == .save { cancelSavePreparation() } else { cancelOpen() }
+            return
+        }
         if busy || unresolved || flight == .open {
             closeUnknown = true; closeSample = false; emit("An operation is unfinished. Check its result before closing, or explicitly discard unconfirmed temporary work.")
             return
@@ -388,7 +437,7 @@ final class LibraryInteraction {
         if closeSample { closeUnknown = true; emit(); return }
         busy = true
         work = Task { @MainActor [self] in
-            defer { busy = false; work = nil; emit() }
+            defer { finishWork() }
             do {
                 let reply = try await call(.prepareClose, id)
                 closeLoss = reply.loss
@@ -403,7 +452,7 @@ final class LibraryInteraction {
         guard let id = closeID else { return }
         busy = true
         work = Task { @MainActor [self] in
-            defer { busy = false; work = nil; emit() }
+            defer { finishWork() }
             do {
                 _ = try await call(.releaseClose, id)
                 flight = .idle; closeID = nil; closeLoss = nil; closeUnknown = false
@@ -419,7 +468,7 @@ final class LibraryInteraction {
         guard flight == .close, !busy, !unresolved, let id = closeID, !closeSample else { return }
         busy = true
         work = Task { @MainActor [self] in
-            defer { busy = false; work = nil; emit() }
+            defer { finishWork() }
             do { closeLoss = try await call(.status, id).loss }
             catch { closeUnknown = true }
         }
@@ -429,7 +478,7 @@ final class LibraryInteraction {
     @discardableResult func finalClose() -> Bool {
         guard !busy, flight != .closed else { return flight == .closed }
         flight = .closed; generation = UUID(); session.close()
-        if let storage { Task { await storage.close() } }
+        bootstrap.retire()
         emit(); return true
     }
 }
