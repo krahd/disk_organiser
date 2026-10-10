@@ -2,7 +2,8 @@
 (() => {
   "use strict";
   const C = window.InventoryCatalogue,
-    M = window.ManualPlanningModel;
+    M = window.ManualPlanningModel,
+    X = window.InventoryComparison;
   const $ = (id) => document.getElementById(id);
   const el = (tag, text, cls) => {
     const n = document.createElement(tag);
@@ -10,7 +11,7 @@
     if (cls) n.className = cls;
     return n;
   };
-  if (!C || !M) {
+  if (!C || !M || !X) {
     $("catalogue-status").textContent =
       "Catalogue files could not load. Keep the HTML, styles and JavaScript files together.";
     return;
@@ -24,7 +25,9 @@
     revision = 0,
     downloadedRevision = null,
     action = null,
-    origin = null;
+    origin = null,
+    comparison = null,
+    comparisonPage = 0;
   const PAGE_SIZE = 50;
   const status = (text) => {
     $("catalogue-status").textContent = text;
@@ -387,6 +390,211 @@
       $("selected-scopes").append(el("p", `${r.label}: ${s.path}`, "selected-scope"));
     });
   }
+  const comparisonLabels = {
+    matching: "Matching listed details",
+    different: "Different recorded details",
+    left: "Only listed in Left",
+    right: "Only listed in Right",
+    uncertain: "Needs a closer look",
+  };
+  function renderComparison() {
+    $("choose-comparison").disabled = catalogue.records.length < 2;
+    $("comparison-hint").textContent =
+      catalogue.records.length < 2
+        ? "Add a second saved record to compare locations."
+        : "You choose the pair. Similar labels never mean the same physical drive.";
+    $("comparison-view").hidden = !comparison;
+    if (!comparison) return;
+    const result = X.compare(catalogue, comparison[0], comparison[1]);
+    $("comparison-sources").replaceChildren();
+    $("comparison-source-details").replaceChildren();
+    [result.left, result.right].forEach((record, index) => {
+      const side = index ? "Right" : "Left",
+        card = el("article", undefined, "comparison-source"),
+        source = record.source;
+      card.append(
+        el("p", side, "eyebrow"),
+        el("h3", record.label),
+        observationDate("p", "Snapshot date (claimed): ", source.observed_at, "small"),
+        el("p", `Original folder: ${source.label}`, "small muted"),
+        el(
+          "p",
+          source.coverage === "partial"
+            ? "Partial picture · some entries may not be listed"
+            : "Folder listing completed · live storage not checked",
+          "small"
+        )
+      );
+      $("comparison-sources").append(card);
+      const details = el("div");
+      details.append(
+        el("h3", `${side}: ${record.label}`),
+        el("p", `Saved record key: ${record.id}`),
+        el("p", `Original claimed date (ISO): ${source.observed_at}`),
+        el("p", `Source reference: ${source.scan_id}`),
+        el(
+          "p",
+          `Reported errors: ${record.gaps.error_count}; stop reason: ${
+            record.gaps.stop_reason || "none recorded"
+          }.`
+        )
+      );
+      record.gaps.exclusions.forEach((gap) =>
+        details.append(el("p", `Exclusion: ${gap.reason} (${gap.count})`))
+      );
+      $("comparison-source-details").append(details);
+    });
+    $("comparison-counts").replaceChildren();
+    ["left", "right", "different", "uncertain", "matching"].forEach((category) => {
+      const box = el("div", undefined, "comparison-count");
+      box.append(el("strong", result.counts[category]), el("span", comparisonLabels[category]));
+      $("comparison-counts").append(box);
+    });
+    const filter = $("comparison-filter").value,
+      rows = result.rows.filter((row) => !filter || row.category === filter),
+      pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+    comparisonPage = Math.min(comparisonPage, pages - 1);
+    $("comparison-result-count").textContent = `${count(
+      rows.length,
+      "recorded path"
+    )} shown in this group out of ${
+      result.rows.length
+    } across the pair. Folder roots are shown above, not counted here.`;
+    $("comparison-results").replaceChildren();
+    rows.slice(comparisonPage * PAGE_SIZE, (comparisonPage + 1) * PAGE_SIZE).forEach((row) => {
+      const box = el("article", undefined, "comparison-row"),
+        cells = el("div", undefined, "comparison-cells");
+      box.append(el("h3", row.path), el("p", comparisonLabels[row.category]));
+      [row.left, row.right].forEach((entry, index) => {
+        const cell = el("p"),
+          side = index ? "Right" : "Left";
+        cell.append(el("strong", side));
+        cell.append(
+          el(
+            "span",
+            !entry
+              ? "Not listed in this snapshot"
+              : `${entry.kind === "directory" ? "folder" : entry.kind} · ${
+                  entry.status === "observed" ? "recorded" : entry.status
+                }${entry.kind === "file" ? ` · ${bytes(entry.logical_bytes)} listed size` : ""}`
+          )
+        );
+        cells.append(cell);
+      });
+      box.append(cells);
+      if (row.left?.kind === "file" || row.right?.kind === "file") {
+        const exact = el("details", undefined, "comparison-exact");
+        exact.append(el("summary", "Exact recorded sizes"));
+        [row.left, row.right].forEach((entry, index) =>
+          exact.append(
+            el(
+              "p",
+              `${index ? "Right" : "Left"}: ${
+                entry?.kind === "file"
+                  ? entry.logical_bytes + " logical bytes"
+                  : "no file-size record"
+              }`
+            )
+          )
+        );
+        box.append(exact);
+      }
+      if (row.category === "uncertain")
+        box.append(
+          el(
+            "p",
+            "An entry or its containing folder has an uncertain or unsupported record. Reconnect and inspect the source before relying on it.",
+            "small muted"
+          )
+        );
+      if (row.category === "matching")
+        box.append(
+          el(
+            "p",
+            row.left.kind === "directory"
+              ? "Same listed folder kind; its contents may differ."
+              : "Same listed path and size; file contents have not been compared.",
+            "small muted"
+          )
+        );
+      $("comparison-results").append(box);
+    });
+    if (!rows.length)
+      $("comparison-results").append(
+        el(
+          "p",
+          result.rows.length
+            ? "No recorded paths in this group. This does not verify live storage."
+            : "Only the selected-folder roots are recorded. There are no listed child paths to compare; gaps may hide contents.",
+          "boundary-card"
+        )
+      );
+    $("comparison-previous").disabled = comparisonPage === 0;
+    $("comparison-next").disabled = comparisonPage + 1 >= pages;
+    $("comparison-page").textContent = `Page ${
+      comparisonPage + 1
+    } of ${pages} · up to ${PAGE_SIZE} per page`;
+  }
+  $("choose-comparison").addEventListener("click", () => {
+    const before = catalogue;
+    let left, right;
+    dialog(
+      "Choose two recorded locations",
+      "Compare their saved folder pictures. This does not identify drives or check file contents. Your project selection stays unchanged.",
+      (body) => {
+        ["Left", "Right"].forEach((side, index) => {
+          const label = el("label", `${side} saved record`),
+            select = el("select");
+          select.id = `comparison-${side.toLowerCase()}-choice`;
+          label.htmlFor = select.id;
+          catalogue.records.forEach((record, n) =>
+            select.append(new Option(`Record ${n + 1}: ${record.label}`, record.id))
+          );
+          select.value = comparison?.[index] || catalogue.records[index]?.id || "";
+          body.append(label, select);
+          if (index) right = select;
+          else left = select;
+        });
+        body.append(
+          el(
+            "p",
+            "Record numbers distinguish repeated labels. Left and Right do not mean older and newer.",
+            "small muted"
+          )
+        );
+      },
+      () => {
+        if (catalogue !== before) throw Error("Catalogue changed; choose the pair again.");
+        X.compare(catalogue, left.value, right.value);
+        comparison = [left.value, right.value];
+        comparisonPage = 0;
+        $("comparison-filter").value = "";
+        renderComparison();
+        status(
+          "Recorded locations compared · reconnect the named sources to check live contents. Project selection unchanged."
+        );
+      },
+      "Compare saved records"
+    );
+  });
+  $("clear-comparison").addEventListener("click", () => {
+    comparison = null;
+    comparisonPage = 0;
+    renderComparison();
+    $("choose-comparison").focus();
+    status("Comparison closed; saved records and project selection unchanged.");
+  });
+  $("comparison-filter").addEventListener("change", () => {
+    comparisonPage = 0;
+    renderComparison();
+  });
+  ["previous", "next"].forEach((direction) => {
+    $(`comparison-${direction}`).addEventListener("click", () => {
+      comparisonPage += direction === "next" ? 1 : -1;
+      renderComparison();
+      $("comparison-filter").focus();
+    });
+  });
   function render() {
     const loaded = catalogue.records.length > 0;
     $("empty-catalogue").hidden = loaded;
@@ -404,6 +612,7 @@
     renderSelection();
     renderResults();
     renderDetails();
+    renderComparison();
   }
   $("open-inventory").addEventListener("click", () => {
     generation++;
@@ -490,6 +699,8 @@
           () => {
             if (catalogue !== before) throw Error("Catalogue changed; review the file again.");
             catalogue = parsed;
+            comparison = null;
+            comparisonPage = 0;
             selections = [];
             page = 0;
             revision++;

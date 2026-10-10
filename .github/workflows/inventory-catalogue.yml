@@ -21,7 +21,7 @@ jobs:
           node-version: "20.x"
       - run: npm ci
       - name: Test strict inventory catalogue model
-        run: npx jest --config jest.config.js --runInBand frontend/__tests__/inventory-snapshot-model.test.js
+        run: npx jest --config jest.config.js --runInBand frontend/__tests__/inventory-snapshot-model.test.js frontend/__tests__/inventory-comparison-model.test.js
       - name: Test offline catalogue without a browser or backend
         run: node scripts/test_inventory_catalogue.cjs
 

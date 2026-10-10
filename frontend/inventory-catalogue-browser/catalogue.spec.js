@@ -466,3 +466,126 @@ test.describe("readable claimed dates", () => {
     await expect(page.locator(".source-date time").last()).toHaveAttribute("datetime", unknown);
   });
 });
+
+const comparisonFixture = path.resolve(
+  __dirname,
+  "../../prototypes/inventory_catalogue/owned-comparison.example.json"
+);
+async function comparePair(page) {
+  await page.getByRole("button", { name: "Compare two locations", exact: true }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByRole("button", { name: "Compare saved records", exact: true }).click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page.locator("#comparison-view")).toBeVisible();
+}
+async function comparisonTop(page) {
+  await page
+    .locator(".comparison-section")
+    .evaluate((node) => node.scrollIntoView({ block: "start" }));
+  await page.evaluate(() => window.scrollBy(0, -20));
+}
+test("saved locations compare through explicit records without changing manual selection", async ({
+  page,
+}, info) => {
+  const errors = [],
+    external = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("request", (r) => {
+    if (!r.url().startsWith("http://127.0.0.1:8768/")) external.push(r.url());
+  });
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await open(page);
+  await add(page, first, "Working drive · projects");
+  await expect(
+    page.getByRole("button", { name: "Compare two locations", exact: true })
+  ).toBeDisabled();
+  await add(page, comparisonFixture, "Archive drive · projects");
+  await page
+    .getByRole("checkbox", { name: "Select Drafts from Working drive · projects", exact: true })
+    .check();
+  await comparePair(page);
+  await expect(page.locator("#comparison-result-count")).toContainText("8 recorded paths");
+  await expect(page.locator("#selection-count")).toHaveText("1 folder selected");
+  await expect(page.locator("#comparison-sources")).toContainText("Partial picture");
+  await expect(page.locator("#comparison-view")).toContainText(
+    "do not prove identical contents or a backup"
+  );
+  await comparisonTop(page);
+  await geometry(page);
+  await shot(page, info, "40-comparison-overview.png", { fullPage: false });
+  await page.getByLabel("Show recorded paths", { exact: true }).selectOption("different");
+  await expect(page.locator(".comparison-row")).toHaveCount(1);
+  await expect(page.locator(".comparison-row")).toContainText("Photos/Trip.jpg");
+  await expect(page.locator(".comparison-row")).toContainText("4.0 MiB");
+  await expect(page.locator(".comparison-row")).toContainText("5.0 MiB");
+  await comparisonTop(page);
+  await shot(page, info, "41-comparison-different.png", { fullPage: false });
+  await page.getByLabel("Show recorded paths", { exact: true }).selectOption("matching");
+  await expect(page.locator(".comparison-row")).toHaveCount(3);
+  await expect(page.locator("#comparison-results")).toContainText(
+    "file contents have not been compared"
+  );
+  await page.getByLabel("Show recorded paths", { exact: true }).selectOption("left");
+  await expect(page.locator(".comparison-row")).toHaveCount(2);
+  await expect(page.locator("#comparison-results")).toContainText("Not listed in this snapshot");
+  await page.getByRole("button", { name: "Compare two locations", exact: true }).click();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(page.getByLabel("Show recorded paths", { exact: true })).toHaveValue("left");
+  await page.getByText("How to read this comparison", { exact: true }).click();
+  await expect(page.locator("#comparison-source-details")).toContainText(
+    "2026-10-08T20:15:00-03:00"
+  );
+  await page.locator(".comparison-details").scrollIntoViewIfNeeded();
+  await shot(page, info, "42-comparison-source-details.png", { fullPage: false });
+  await page.getByRole("button", { name: "Close comparison", exact: true }).click();
+  await expect(page.locator("#comparison-view")).not.toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Compare two locations", exact: true })
+  ).toBeFocused();
+  await expect(page.locator("#selection-count")).toHaveText("1 folder selected");
+  expect(errors).toEqual([]);
+  expect(external).toEqual([]);
+});
+test("comparison stays readable on narrow screens and keyboard zoom with duplicate labels", async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 390, height: 1000 });
+  await open(page);
+  await add(page, first, "Shelf drive <img src=x onerror=alert(1)>");
+  await add(page, comparisonFixture, "Shelf drive <img src=x onerror=alert(1)>");
+  await page.getByRole("button", { name: "Compare two locations", exact: true }).click();
+  await expect(
+    page.getByLabel("Left saved record", { exact: true }).locator("option").first()
+  ).toContainText("Record 1:");
+  await page.getByLabel("Right saved record", { exact: true }).selectOption({ index: 0 });
+  await page.getByRole("button", { name: "Compare saved records", exact: true }).click();
+  await expect(page.locator("#catalogue-error")).toContainText("different saved records");
+  await page.getByLabel("Right saved record", { exact: true }).selectOption({ index: 1 });
+  await page.getByRole("button", { name: "Compare saved records", exact: true }).click();
+  await expect(page.locator("#comparison-sources img")).toHaveCount(0);
+  await page.getByLabel("Show recorded paths", { exact: true }).selectOption("uncertain");
+  await expect(page.locator(".comparison-row")).toContainText("unsupported");
+  await comparisonTop(page);
+  await geometry(page);
+  await shot(page, info, "43-comparison-mobile.png", { fullPage: false });
+  await page.locator(".comparison-row").scrollIntoViewIfNeeded();
+  await geometry(page);
+  await shot(page, info, "44-comparison-mobile-uncertain.png", { fullPage: false });
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await page.evaluate(() => {
+    document.body.style.zoom = "200%";
+  });
+  await page.getByRole("button", { name: "Close comparison", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#comparison-view")).not.toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Compare two locations", exact: true })
+  ).toBeFocused();
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "Compare saved records", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#comparison-view")).toBeVisible();
+  await comparisonTop(page);
+  await geometry(page);
+  await shot(page, info, "45-comparison-css-zoom.png", { fullPage: false });
+});

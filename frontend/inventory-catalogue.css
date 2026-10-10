@@ -340,3 +340,168 @@
 #catalogue-dialog-body input + p {
   margin-top: 0.75rem;
 }
+
+.comparison-section {
+  margin: 0 0 2.5rem;
+  padding: 1.5rem;
+  background: #f4f6ef;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  min-width: 0;
+}
+.comparison-heading,
+.comparison-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.comparison-heading > div {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+.comparison-heading h2 {
+  margin: 0.35rem 0 0.65rem;
+}
+.comparison-heading p {
+  max-width: 640px;
+}
+#comparison-hint {
+  margin: 1rem 0 0;
+}
+.comparison-sources,
+.comparison-cells {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.comparison-sources {
+  margin: 1.5rem 0 1rem;
+}
+.comparison-source {
+  padding: 1rem;
+  background: #fffefa;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.comparison-source h3 {
+  font-size: 1.05rem;
+  margin: 0.4rem 0;
+}
+.comparison-source p {
+  margin: 0.5rem 0;
+}
+.comparison-source .eyebrow {
+  margin: 0;
+}
+.comparison-caution {
+  padding: 1rem;
+  border-left: 3px solid #a98536;
+  background: #fcf3df;
+  font-size: 0.9rem;
+}
+.comparison-counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 0.65rem;
+  margin: 1rem 0;
+}
+.comparison-count {
+  background: #fffefa;
+  border: 1px solid var(--line);
+  padding: 0.8rem;
+  border-radius: 8px;
+}
+.comparison-count strong {
+  display: block;
+  font-size: 1.65rem;
+}
+.comparison-count span {
+  font-size: 0.8rem;
+}
+.comparison-controls {
+  margin: 1.3rem 0 0.8rem;
+}
+.comparison-controls > div {
+  flex: 0 1 340px;
+  min-width: 0;
+}
+.comparison-controls select {
+  width: 100%;
+}
+.comparison-row {
+  background: #fffefa;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0.65rem 0;
+}
+.comparison-row h3 {
+  font-size: 1rem;
+  margin: 0 0 0.35rem;
+}
+.comparison-row > p {
+  margin-bottom: 0.75rem;
+  color: #58645b;
+  font-size: 0.83rem;
+}
+.comparison-cells p {
+  margin: 0;
+  padding: 0.65rem;
+  background: #f1f4ed;
+  font-size: 0.85rem;
+}
+.comparison-cells strong {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+.comparison-details {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+.comparison-details summary,
+.comparison-exact summary {
+  min-height: 44px;
+  padding: 0.7rem 0;
+  cursor: pointer;
+}
+.comparison-details p {
+  margin: 0.5rem 0;
+}
+.comparison-section :is(h3, p, span, summary),
+#catalogue-dialog-body select {
+  overflow-wrap: anywhere;
+}
+.comparison-section button {
+  white-space: normal;
+}
+#catalogue-dialog-body select {
+  width: 100%;
+  min-width: 0;
+  margin: 0.4rem 0 1rem;
+}
+@media (max-width: 600px) {
+  .comparison-section {
+    padding: 1rem;
+  }
+  .comparison-sources,
+  .comparison-cells {
+    grid-template-columns: 1fr;
+  }
+  .comparison-counts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .comparison-controls > div {
+    flex-basis: 100%;
+  }
+}
+
+.comparison-exact {
+  font-size: 0.8rem;
+  color: #58645b;
+}
+.comparison-exact p {
+  overflow-wrap: anywhere;
+  margin: 0.3rem 0;
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": "disk-organiser/inventory-snapshot/v1",
+  "source": {
+    "label": "Owned example \u00b7 second project folder",
+    "observed_at": "2026-10-08T20:15:00-03:00",
+    "scan_id": "scan_333333333333333333333333",
+    "coverage": "partial"
+  },
+  "entries": [
+    {
+      "path": ".",
+      "kind": "directory",
+      "status": "observed",
+      "logical_bytes": null
+    },
+    {
+      "path": "Drafts",
+      "kind": "directory",
+      "status": "observed",
+      "logical_bytes": null
+    },
+    {
+      "path": "Drafts/Notes.txt",
+      "kind": "file",
+      "status": "observed",
+      "logical_bytes": "12000"
+    },
+    {
+      "path": "Photos",
+      "kind": "directory",
+      "status": "observed",
+      "logical_bytes": null
+    },
+    {
+      "path": "Photos/Trip.jpg",
+      "kind": "file",
+      "status": "observed",
+      "logical_bytes": "5242880"
+    },
+    {
+      "path": "Photos/Interview.mov",
+      "kind": "file",
+      "status": "observed",
+      "logical_bytes": "8388608"
+    },
+    {
+      "path": "External link",
+      "kind": "symlink",
+      "status": "unsupported",
+      "logical_bytes": null
+    }
+  ],
+  "gaps": {
+    "exclusions": [
+      {
+        "reason": "symlink_not_followed",
+        "count": "1"
+      }
+    ],
+    "error_count": "0",
+    "stop_reason": null
+  }
+}
