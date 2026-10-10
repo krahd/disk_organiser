@@ -773,13 +773,13 @@
     });
     const note = el(
       "p",
-      "Owned-fixture native preview · temporary only. Open, Save and manual-plan export are unavailable in this test host.",
+      "Development native preview · temporary only. Open, Save and manual-plan export are unavailable in this preview.",
       "boundary-card"
     );
     note.id = "native-preview-note";
     $("catalogue").prepend(note);
     $("empty-catalogue").querySelector("p").textContent =
-      "Waiting for an owned test snapshot from the native host. No user folder picker, drive connection or saved catalogue is available here.";
+      "Waiting for an example snapshot from the native window. No user folder picker, drive connection or saved catalogue is available here.";
     document.querySelectorAll('a[href]:not([href^="#"])').forEach((link) => {
       link.closest("p").textContent =
         "Project selection is temporary. Manual-plan export is unavailable in this native test preview.";

@@ -4,6 +4,7 @@ import Foundation
 import WebKit
 import Darwin
 @testable import DiskInventoryCore
+@testable import DiskInventoryDesktop
 
 @MainActor
 final class OwnedPreviewTests: XCTestCase {
