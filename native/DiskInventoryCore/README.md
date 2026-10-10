@@ -56,3 +56,7 @@ PR23 established five isolated owned-fixture AppKit/WebKit tests. The current so
 ## Executed sample application checkpoint
 
 Source `c55f1894` passes all twelve workflows, including both native runs with 84 XCTest cases, six differential comparisons and six parser/catalogue roundtrips. The just-built sample executable proves actual empty-window readiness and normal Quit. Six application and five existing WebKit originals are verified per run; independent source/log/all-original-pixel closeout accepts the scoped sample evidence. This is bounded development/sample evidence, not real-folder or signed-product acceptance. [Exact source/run identities, diagnostic history, screenshot scope and retention limits](APPLICATION-PREVIEW.md).
+
+## Executed saved-library preparation
+
+Source `5dd71ae3` passes both owned macOS runs with 123 XCTest (the existing 84 plus four codec and 35 storage), six differential comparisons, six parser roundtrips and the 22-case catalogue/4,102-sample encoding parity gate. The descriptor-only storage engine and strict data codec remain unwired: there is no production container/path factory or application Save/Open activation. [Exact source/run evidence, storage contract and remaining gates](LIBRARY-STORAGE.md). Independent source review, repair recheck and exact-source/raw-log closeout are complete; final documentation-head checks and integration remain open. The existing UI is unchanged and gains no new pixel-acceptance claim from these tests.
