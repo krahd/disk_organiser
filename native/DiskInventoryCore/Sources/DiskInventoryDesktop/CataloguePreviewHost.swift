@@ -5,17 +5,17 @@ import WebKit
 // Shared data-only presentation. No filesystem writer, source selection,
 // persistent grant or JavaScript-to-native message handler exists in this host.
 @MainActor
-class CataloguePreviewHost: NSObject, WKNavigationDelegate, WKUIDelegate {
+class CataloguePreviewHost: NSObject, WKNavigationDelegate, WKUIDelegate, LibraryPageClient {
     enum Failure: Error { case unavailable, wrongDocument, invalidPayload, invalidReply, busy, expired }
     enum State: Equatable { case idle, loading, ready, staging, staged, retiring, blocked, closed }
-    static let version = "catalogue-data-bridge/v1"
+    static let version = "catalogue-data-bridge/v2"
     static let ruleJSON = #"[{"trigger":{"url-filter":"^https?://"},"action":{"type":"block"}},{"trigger":{"url-filter":"^wss?://"},"action":{"type":"block"}},{"trigger":{"url-filter":"^ftp://"},"action":{"type":"block"}}]"#
     static let modeScript = "Object.defineProperty(globalThis, 'DiskCatalogueEmbedded', {value:true,writable:false,configurable:false});"
     private enum Operation {
         case initialise, stage, retire, emptyReadiness
         var body: String {
             switch self {
-            case .initialise: return "return window.DiskCatalogueNativeBridge.initialise(version, session);"
+            case .initialise: return "return window.DiskCatalogueNativeBridge.initialise(version, session, mode);"
             case .stage: return "return window.DiskCatalogueNativeBridge.stage(version, session, delivery, text);"
             case .retire: return "return window.DiskCatalogueNativeBridge.retire(version, session, delivery);"
             case .emptyReadiness: return "return {version, session, state: document.querySelectorAll('.source-card').length === 0 && !document.getElementById('catalogue-dialog').open ? 'empty' : 'not-empty'};"
@@ -38,6 +38,8 @@ class CataloguePreviewHost: NSObject, WKNavigationDelegate, WKUIDelegate {
         var retiring = false
         init(navigation: UUID) { self.navigation = navigation }
     }
+    enum StorageMode: String { case temporary, ownedStorage = "owned-storage" }
+    let storageMode: StorageMode
     let webView: NoDropWebView
     let document: URL
     let readRoot: URL
@@ -54,7 +56,8 @@ class CataloguePreviewHost: NSObject, WKNavigationDelegate, WKUIDelegate {
     // supplies an acknowledgement barrier, outside the application target.
     func stageAcknowledged() async {}
 
-    init(rule: WKContentRuleList, width: CGFloat = 1280, height: CGFloat = 960) throws {
+    init(rule: WKContentRuleList, width: CGFloat = 1280, height: CGFloat = 960, storageMode: StorageMode = .temporary) throws {
+        self.storageMode = storageMode
         guard let root = Bundle.module.resourceURL?.appendingPathComponent("Catalogue", isDirectory: true) else {
             throw Failure.unavailable
         }
@@ -90,8 +93,8 @@ class CataloguePreviewHost: NSObject, WKNavigationDelegate, WKUIDelegate {
                 }
             }
             guard state == .loading, webView.url == document else { throw Failure.wrongDocument }
-            let reply = try await call(.initialise, arguments: ["version": Self.version, "session": session])
-            guard state == .loading, reply == ["version": Self.version, "session": session, "state": "ready"] else {
+            let reply = try await call(.initialise, arguments: ["version": Self.version, "session": session, "mode": storageMode.rawValue])
+            guard state == .loading, reply == ["version": Self.version, "session": session, "mode": storageMode.rawValue, "state": "ready"] else {
                 throw Failure.invalidReply
             }
             state = .ready
@@ -193,6 +196,37 @@ class CataloguePreviewHost: NSObject, WKNavigationDelegate, WKUIDelegate {
             }
             Task { @MainActor in
                 try? await Task.sleep(for: .seconds(10))
+                once.finish(.failure(Failure.expired))
+            }
+        }
+    }
+
+    // Fixed persistence operations have their own exact decoder. The existing
+    // five-field snapshot decoder above deliberately remains unchanged.
+    func libraryCall(_ operation: LibraryBridgeOperation, id: UUID,
+                     fields: [String: String] = [:]) async throws -> LibraryBridgeReply {
+        guard state == .ready, pending == nil, webView.url == document,
+              !operation.needsStorage || storageMode == .ownedStorage else { throw Failure.busy }
+        let request = try LibraryBridgeWire.request(operation, session: session, id: id, fields: fields)
+        let generation = navigationGeneration
+        return try await withCheckedThrowingContinuation { continuation in
+            let once = Once(continuation)
+            webView.callAsyncJavaScript(operation.body, arguments: ["request": request], in: nil, in: .page) { [weak self] result in
+                guard let self, self.navigationGeneration == generation, self.webView.url == self.document,
+                      self.state == .ready, self.pending == nil else {
+                    once.finish(.failure(Failure.expired)); return
+                }
+                switch result {
+                case .success(let value):
+                    do { once.finish(.success(try LibraryBridgeWire.decode(value, operation: operation, request: request))) }
+                    catch { once.finish(.failure(Failure.invalidReply)) }
+                case .failure: once.finish(.failure(Failure.unavailable))
+                }
+            }
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(10))
+                // The owner must reconcile the same nonce; timeout is not proof
+                // that an acknowledgement or replacement was not applied.
                 once.finish(.failure(Failure.expired))
             }
         }

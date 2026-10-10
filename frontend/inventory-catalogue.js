@@ -29,15 +29,163 @@
     comparison = null,
     comparisonPage = 0;
   const embedded = window.DiskCatalogueEmbedded === true;
-  const BRIDGE_VERSION = "catalogue-data-bridge/v1";
+  const BRIDGE_VERSION = "catalogue-data-bridge/v2";
   const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
   let nativeSession = null,
     nativePending = null,
     nativeRetired = null,
-    nativeInvalidated = false;
+    nativeInvalidated = false,
+    nativeMode = "temporary",
+    nativeProtocol = null,
+    nativeEpoch = 0,
+    nativeDialog = "none";
+  let fencedControls = null,
+    fencedFocus = null;
   const nativeUsed = new Set();
   function dismissNativePreview() {
     if (nativePending?.phase === "staged") nativePending.phase = "dismissed";
+  }
+  const persistenceOperations = [
+    "status",
+    "exportCatalogue",
+    "acknowledgeSaved",
+    "savedResult",
+    "prepareClose",
+    "releaseClose",
+    "prepareOpen",
+    "prepareReplacement",
+    "retireCandidate",
+    "commitReplacement",
+    "replacementResult",
+    "cancelOpen",
+  ];
+  function requireMutable() {
+    nativeProtocol?.requireMutable();
+  }
+  function advanceEpoch() {
+    if (!embedded || nativeInvalidated) return;
+    if (!Number.isSafeInteger(nativeEpoch) || nativeEpoch >= Number.MAX_SAFE_INTEGER)
+      throw Error("This preview has reached its interaction limit. Current data is retained.");
+    nativeEpoch++;
+  }
+  function requireRevisionSpace() {
+    if (
+      embedded &&
+      (!Number.isSafeInteger(revision) ||
+        revision >= Number.MAX_SAFE_INTEGER ||
+        nativeEpoch >= Number.MAX_SAFE_INTEGER)
+    )
+      throw Error("This preview has reached its revision limit. Current data is retained.");
+  }
+  function setPageFence(enabled) {
+    if (enabled) {
+      if (!fencedControls) {
+        fencedControls = new Map();
+        fencedFocus = document.activeElement;
+      }
+      document.querySelectorAll("button,input,select,textarea").forEach((control) => {
+        if (!fencedControls.has(control)) fencedControls.set(control, control.disabled);
+        control.disabled = true;
+      });
+      document.body.setAttribute("aria-busy", "true");
+    } else if (fencedControls) {
+      fencedControls.forEach((disabled, control) => {
+        if (control.isConnected) control.disabled = disabled;
+      });
+      fencedControls = null;
+      document.body.removeAttribute("aria-busy");
+      if (fencedFocus?.isConnected) fencedFocus.focus();
+      fencedFocus = null;
+    }
+  }
+  if (embedded) {
+    ["click", "keydown", "beforeinput", "input", "change", "submit", "cancel"].forEach((type) => {
+      document.addEventListener(
+        type,
+        (event) => {
+          if (nativeProtocol?.fenced) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            return;
+          }
+          if (type === "beforeinput" && nativeEpoch >= Number.MAX_SAFE_INTEGER) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            return;
+          }
+          if (["click", "input", "change", "submit", "cancel"].includes(type)) {
+            try {
+              advanceEpoch();
+            } catch {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+            }
+          }
+        },
+        true
+      );
+    });
+  }
+  function makePersistenceProtocol() {
+    return window.NativeLibraryProtocol.create({
+      check: nativeEnvelope,
+      mode: () => nativeMode,
+      state: () => ({
+        revision: String(revision),
+        epoch: String(nativeEpoch),
+        dirty: dirty ? "dirty" : "clean",
+        selections: String(selections.length),
+        dialog: $("catalogue-dialog").open ? nativeDialog : "none",
+        draft: $("catalogue-dialog").open ? "uncommitted" : "none",
+        busy: nativePending !== null,
+      }),
+      export: () => C.exportCatalogue(catalogue),
+      fence: setPageFence,
+      clean: (captured) => {
+        if (captured !== String(revision)) throw Error("Revision changed.");
+        dirty = false;
+      },
+      parse: (text) => {
+        const parsed = C.parse(text);
+        if (parsed.schema_version !== C.CATALOGUE) throw Error("A catalogue is required.");
+        return parsed;
+      },
+      commit: (parsed) => {
+        // All validation/counter checks precede these local assignments. DOM work
+        // is deliberately in render, after the protocol records the commit fact.
+        catalogue = parsed;
+        revision++;
+        nativeEpoch++;
+        dirty = false;
+        selections = [];
+        comparison = null;
+        comparisonPage = 0;
+        page = 0;
+        downloadedRevision = null;
+      },
+      render: () => {
+        $("catalogue-search").value = "";
+        $("catalogue-filter").value = "";
+        $("comparison-filter").value = "";
+        $("catalogue-saved").hidden = true;
+        render();
+        setPageFence(true);
+        status(
+          "Saved library opened from temporary test storage. Source history remains unverified."
+        );
+      },
+    });
+  }
+  function nativePersistenceCall(name, request) {
+    if (!nativeProtocol) throw Error("Native library session is unavailable.");
+    const reply = nativeProtocol[name](request);
+    if (name === "acknowledgeSaved")
+      status(
+        reply.state === "current-saved"
+          ? "Library revision saved in temporary test storage. Project selections remain temporary."
+          : "An earlier library revision was saved. Your newer edits are still unsaved."
+      );
+    return reply;
   }
   const PAGE_SIZE = 50;
   const status = (text) => {
@@ -91,6 +239,9 @@
     return b;
   };
   function changed(next, message) {
+    requireMutable();
+    requireRevisionSpace();
+    advanceEpoch();
     dismissNativePreview();
     generation++;
     catalogue = next;
@@ -102,6 +253,9 @@
     status(message);
   }
   function close() {
+    if (!nativeInvalidated) requireMutable();
+    advanceEpoch();
+    nativeDialog = "none";
     dismissNativePreview();
     generation++;
     $("catalogue-dialog").close();
@@ -109,6 +263,16 @@
     if (origin?.isConnected) origin.focus();
   }
   function dialog(title, intro, build, submit, label) {
+    requireMutable();
+    advanceEpoch();
+    nativeDialog =
+      title === "Name this saved location"
+        ? "label-edit"
+        : title === "Review this folder snapshot"
+        ? "snapshot-review"
+        : title === "Replace with saved catalogue?"
+        ? "catalogue-review"
+        : "other-edit";
     dismissNativePreview();
     generation++;
     origin = document.activeElement;
@@ -168,7 +332,9 @@
         changed(
           C.rename(catalogue, record.id, input.value),
           embedded
-            ? "Location label updated in this temporary native preview · nothing saved"
+            ? nativeMode === "owned-storage"
+              ? "Location label updated · save a new library version in the native window"
+              : "Location label updated in this temporary native preview · nothing saved"
             : "Location label updated · save the catalogue to keep it"
         );
       },
@@ -359,6 +525,8 @@
           )
         );
       input.addEventListener("change", () => {
+        requireMutable();
+        advanceEpoch();
         generation++;
         if (input.checked) {
           if (selections.length >= 2000) {
@@ -378,7 +546,11 @@
           (n) => n.dataset.selectionKey === input.dataset.selectionKey
         );
         replacement?.focus();
-        status("Project selection updated · export a manual plan to keep these choices");
+        status(
+          embedded
+            ? "Project selection is temporary and is not included in library saving. Manual-plan export is unavailable here."
+            : "Project selection updated · export a manual plan to keep these choices"
+        );
       });
       row.append(input, content);
       $("catalogue-results").append(row);
@@ -659,7 +831,9 @@
         changed(
           next,
           embedded
-            ? "Snapshot record added to this temporary native preview · nothing saved"
+            ? nativeMode === "owned-storage"
+              ? "Snapshot record added · save a new library version in the native window"
+              : "Snapshot record added to this temporary native preview · nothing saved"
             : "Snapshot record added · save the catalogue to keep it"
         );
       },
@@ -686,8 +860,17 @@
       configurable: false,
       writable: false,
       value: Object.freeze({
-        initialise(version, session) {
+        ...Object.fromEntries(
+          persistenceOperations.map((name) => [
+            name,
+            (request) => nativePersistenceCall(name, request),
+          ])
+        ),
+        initialise(version, session, mode) {
           if (
+            arguments.length !== 3 ||
+            !["temporary", "owned-storage"].includes(mode) ||
+            !window.NativeLibraryProtocol ||
             nativeSession !== null ||
             nativeInvalidated ||
             window.top !== window ||
@@ -697,10 +880,19 @@
           )
             throw Error("Native preview session cannot initialise.");
           nativeSession = session;
-          return Object.freeze({ version, session, state: "ready" });
+          nativeMode = mode;
+          nativeProtocol = makePersistenceProtocol();
+          if (mode === "owned-storage") {
+            $("native-preview-note").textContent =
+              "Development preview · temporary test library storage. Native Save/Open keep catalogue versions here; real folders and manual-plan export remain unavailable.";
+            $("empty-catalogue").querySelector("p").textContent =
+              "Explore sample folders, then save and reopen a library version using the native window. No real source drive is connected.";
+          }
+          return Object.freeze({ version, session, mode, state: "ready" });
         },
         stage(version, session, delivery, text) {
           nativeEnvelope(version, session);
+          requireMutable();
           if (typeof delivery !== "string" || !UUID.test(delivery) || nativeUsed.has(delivery))
             throw Error("Native preview delivery is invalid or already used.");
           if (nativePending || $("catalogue-dialog").open || action)
@@ -932,6 +1124,8 @@
     );
   });
   $("clear-selection").addEventListener("click", () => {
+    requireMutable();
+    advanceEpoch();
     generation++;
     selections = [];
     renderCards();

@@ -1,4 +1,4 @@
-"""Keep the shared bundled catalogue byte-identical to seven canonical assets."""
+"""Keep the shared bundled catalogue byte-identical to eight canonical assets."""
 from pathlib import Path
 import hashlib
 import json
@@ -9,7 +9,7 @@ TARGET = ROOT / "native/DiskInventoryCore/Sources/DiskInventoryDesktop/Resources
 NAMES = (
     "inventory-catalogue.html", "inventory-catalogue.js", "inventory-catalogue.css",
     "inventory-snapshot-model.js", "inventory-comparison-model.js",
-    "manual-planning-model.js", "manual-workspace.css",
+    "manual-planning-model.js", "manual-workspace.css", "native-library-protocol.js",
 )
 
 

@@ -38,6 +38,10 @@ final class BundledLibraryExamples: LibrarySource {
 
 @MainActor
 final class LibrarySession {
+    enum Intent { case choose, select, prepare, cancel, finish, close }
+    var intentAdmission: ((Intent) -> Bool)?
+    var ownerChanged: (() -> Void)?
+    private func admitted(_ intent: Intent) -> Bool { intentAdmission?(intent) ?? true }
     enum State: Equatable { case ready, choosing, scope, preparing, stopping, reviewing, finishing, failed, closed }
     let host: CataloguePreviewHost
     let source: any LibrarySource
@@ -50,19 +54,19 @@ final class LibrarySession {
     private var work: Task<Void, Never>?
 
     init(host: CataloguePreviewHost, source: any LibrarySource) { self.host = host; self.source = source }
-    private func show(_ next: State, _ text: String) { state = next; message = text; changed?() }
+    private func show(_ next: State, _ text: String) { state = next; message = text; ownerChanged?(); changed?() }
     func choose() {
-        guard state == .ready, host.state == .ready else { return }
+        guard state == .ready, host.state == .ready, admitted(.choose) else { return }
         choice = nil
         show(.choosing, "Choose an example to review. No source folder access is available.")
     }
     func select(_ item: LibraryChoice) {
-        guard state == .choosing, source.choices.contains(item) else { return }
+        guard state == .choosing, source.choices.contains(item), admitted(.select) else { return }
         choice = item
         show(.scope, source.scopeDescription)
     }
     func prepare() {
-        guard state == .scope, let selected = choice, source.choices.contains(selected) else { return }
+        guard state == .scope, let selected = choice, source.choices.contains(selected), admitted(.prepare) else { return }
         let token = generation
         show(.preparing, "Preparing the selected example. Nothing has been added yet.")
         work = Task { @MainActor [weak self] in
@@ -95,6 +99,7 @@ final class LibrarySession {
         else { show(.failed, "The catalogue view stopped safely. Close this preview and start a new one.") }
     }
     func cancel() {
+        guard admitted(.cancel) else { return }
         switch state {
         case .choosing, .scope:
             choice = nil; show(.ready, "Selection cancelled. Nothing was read or added.")
@@ -105,7 +110,7 @@ final class LibrarySession {
         }
     }
     func finishReview() {
-        guard state == .reviewing else { return }
+        guard state == .reviewing, admitted(.finish) else { return }
         let token = generation
         show(.finishing, "Finishing this snapshot review…")
         work = Task { @MainActor [weak self] in
@@ -123,9 +128,9 @@ final class LibrarySession {
         }
     }
     func close() {
-        guard state != .closed else { return }
+        guard state != .closed, admitted(.close) else { return }
         generation = UUID(); source.cancel(); work?.cancel(); host.close()
-        show(.closed, "Preview closed. No folder access or saved library was retained.")
-        changed = nil
+        show(.closed, "Preview closed. Saved versions, if any, are retained.")
+        changed = nil; ownerChanged = nil; intentAdmission = nil
     }
 }

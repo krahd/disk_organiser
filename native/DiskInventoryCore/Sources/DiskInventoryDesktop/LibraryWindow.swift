@@ -20,6 +20,7 @@ final class LibraryActionButton: NSButton {
 final class LibraryWindowController: NSObject, NSWindowDelegate {
     let window: NSWindow
     let session: LibrarySession
+    let interaction: LibraryInteraction
     let chrome = NSStackView()
     private let status = NSTextField(wrappingLabelWithString: "")
     private let actions = NSStackView()
@@ -27,13 +28,21 @@ final class LibraryWindowController: NSObject, NSWindowDelegate {
     private var panelState: LibrarySession.State?
     private var closing = false
     private var closeQuestion = false
+    private var closeDiscardButton: NSButton?
+    private var savedPanel: LibrarySavedPanel?
     private var startupReady: Bool
+    private var lastSessionState: LibrarySession.State?
+    private var lastFlight: LibraryInteraction.Flight?
     var didClose: (() -> Void)?
     private(set) var exploreButton: LibraryActionButton!
     private(set) var doneButton: LibraryActionButton!
     private(set) var cancelButton: LibraryActionButton!
+    private(set) var saveButton: LibraryActionButton!
+    private(set) var openButton: LibraryActionButton!
+    private(set) var checkButton: LibraryActionButton!
 
-    init(session: LibrarySession, startReady: Bool = true) {
+    init(session: LibrarySession, startReady: Bool = true, injection: OwnedLibraryInjection? = nil) throws {
+        interaction = try LibraryInteraction(session: session, injection: injection)
         self.session = session
         startupReady = startReady
         window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1100, height: 850),
@@ -47,7 +56,9 @@ final class LibraryWindowController: NSObject, NSWindowDelegate {
         let title = NSTextField(labelWithString: "Your storage library")
         title.font = .systemFont(ofSize: 23, weight: .semibold)
         chrome.addArrangedSubview(title)
-        let boundary = NSTextField(wrappingLabelWithString: "DEVELOPMENT PREVIEW · Built-in examples only. Real folder reading, Save and Open are not connected yet.")
+        let boundary = NSTextField(wrappingLabelWithString: interaction.hasStorage
+            ? "DEVELOPMENT PREVIEW · Temporary test library storage. Each Save creates a new version. Real-folder access is unavailable."
+            : "DEVELOPMENT PREVIEW · Built-in examples only. Real-folder access and saved library storage are unavailable.")
         boundary.font = .systemFont(ofSize: 12, weight: .medium)
         boundary.textColor = .secondaryLabelColor
         chrome.addArrangedSubview(boundary)
@@ -60,6 +71,20 @@ final class LibraryWindowController: NSObject, NSWindowDelegate {
         unavailable.toolTip = "Unavailable: real folder selection needs a separately verified read-only native integration."
         for button in [exploreButton!, unavailable, doneButton!, cancelButton!] { actions.addArrangedSubview(button) }
         chrome.addArrangedSubview(actions)
+        let persistence = NSStackView(); persistence.orientation = .horizontal; persistence.spacing = 8
+        saveButton = LibraryActionButton("Save new library version", identifier: "library-save") { [weak self] in self?.interaction.save() }
+        saveButton.keyEquivalent = "s"; saveButton.keyEquivalentModifierMask = [.command]
+        openButton = LibraryActionButton("Open saved library", identifier: "library-open") { [weak self] in self?.interaction.open() }
+        openButton.keyEquivalent = "o"; openButton.keyEquivalentModifierMask = [.command]
+        checkButton = LibraryActionButton("Check same result", identifier: "library-check") { [weak self] in
+            guard let self else { return }
+            if self.interaction.canCheckReplacement { self.interaction.checkReplacement() }
+            else { self.interaction.checkSave() }
+        }
+        let unavailableStorage = "Unavailable: this sample executable has no admitted library storage."
+        if !interaction.hasStorage { saveButton.toolTip = unavailableStorage; openButton.toolTip = unavailableStorage }
+        for button in [saveButton!, openButton!, checkButton!] { persistence.addArrangedSubview(button) }
+        chrome.addArrangedSubview(persistence)
         status.font = .systemFont(ofSize: 12); status.setAccessibilityIdentifier("library-status")
         chrome.addArrangedSubview(status)
         let view = session.host.webView
@@ -76,7 +101,7 @@ final class LibraryWindowController: NSObject, NSWindowDelegate {
             view.trailingAnchor.constraint(equalTo: content.trailingAnchor),
             view.bottomAnchor.constraint(equalTo: content.bottomAnchor),
         ])
-        session.changed = { [weak self] in self?.refresh() }
+        interaction.changed = { [weak self] in self?.refresh() }
         refresh()
     }
 
@@ -94,17 +119,47 @@ final class LibraryWindowController: NSObject, NSWindowDelegate {
         panel = nil; panelState = nil
     }
     private func refresh() {
-        status.stringValue = startupReady ? session.message : "Opening the bundled example library…"
-        exploreButton.isEnabled = startupReady && session.state == .ready
+        guard !closing else { return }
+        let sampleStateChanged = lastSessionState != session.state
+        let releasedPage = lastFlight == .close && interaction.flight == .idle && !interaction.closeSample
+        lastSessionState = session.state; lastFlight = interaction.flight
+        if releasedPage { restorePageFocusAfterSheet() }
+        status.stringValue = startupReady ? (interaction.message ?? session.message) : "Opening the bundled example library…"
+        exploreButton.isEnabled = startupReady && interaction.canExplore
+        saveButton.isEnabled = startupReady && interaction.canSave
+        openButton.isEnabled = startupReady && interaction.canOpen
+        checkButton.isHidden = !interaction.canCheckResult
+        checkButton.isEnabled = interaction.canCheckResult
+        doneButton.isEnabled = interaction.flight == .sample
+        closeDiscardButton?.isEnabled = !interaction.busy
+        // An awaited result may update status, never replace an active close sheet.
+        guard !closeQuestion else { return }
+        if interaction.canCloseWithoutLoss { discardAndClose(); return }
+        if interaction.flight == .close, !interaction.busy, !closeQuestion { presentCloseQuestion(); return }
+        if interaction.flight == .open {
+            if savedPanel == nil { dismissPanel(); savedPanel = LibrarySavedPanel(owner: interaction, parent: window) }
+            savedPanel?.refresh(); return
+        } else if let savedPanel {
+            savedPanel.dismiss(); self.savedPanel = nil
+            restorePageFocusAfterSheet()
+        }
         doneButton.isHidden = session.state != .reviewing
         cancelButton.isHidden = session.state != .preparing && session.state != .stopping
-        cancelButton.isEnabled = session.state == .preparing
-        // State completion must never replace a pending native close question.
-        guard !closeQuestion else { return }
+        cancelButton.isEnabled = session.state == .preparing && interaction.flight == .sample
         if session.state == .choosing || session.state == .scope {
             if panelState != session.state { presentPanel() }
         } else { dismissPanel() }
-        restoreNativeFocus()
+        if sampleStateChanged { restoreNativeFocus() }
+    }
+    private func restorePageFocusAfterSheet() {
+        Task { @MainActor [weak self] in
+            await Task.yield()
+            guard let self, !self.closing, self.window.isVisible,
+                  self.window.attachedSheet == nil, self.interaction.flight == .idle else { return }
+            // The released page fence restores its exact prior DOM element.
+            // Return AppKit keyboard dispatch to that same hosted view.
+            self.window.makeFirstResponder(self.session.host.webView)
+        }
     }
     private func restoreNativeFocus() {
         guard !closing, !closeQuestion, window.isVisible, window.attachedSheet == nil else { return }
@@ -160,25 +215,73 @@ final class LibraryWindowController: NSObject, NSWindowDelegate {
     }
     func requestClose() {
         guard !closeQuestion, !closing else { return }
-        if !session.hasTemporaryRecords && session.state == .ready { discardAndClose(); return }
-        closeQuestion = true
-        dismissPanel()
-        let alert = NSAlert(); alert.messageText = "Close this temporary library?"
-        alert.informativeText = "Unsaved example records and the current review will be discarded. Save is unavailable in this development preview."
-        alert.addButton(withTitle: "Keep exploring"); alert.addButton(withTitle: "Discard and close")
-        alert.buttons[0].identifier = NSUserInterfaceItemIdentifier("library-keep")
-        alert.buttons[1].identifier = NSUserInterfaceItemIdentifier("library-discard")
-        alert.buttons[0].setAccessibilityIdentifier("library-keep")
-        alert.buttons[1].setAccessibilityIdentifier("library-discard")
+        interaction.enquireClose()
+        if interaction.closeUnknown, interaction.flight != .close { presentCloseQuestion() }
+    }
+    private func presentCloseQuestion() {
+        guard !closeQuestion, !closing else { return }
+        closeQuestion = true; dismissPanel()
+        if let savedPanel { savedPanel.dismiss(); self.savedPanel = nil }
+        let alert = NSAlert()
+        let loss = interaction.closeLoss
+        let draft = loss?.hasDraft == true
+        let unknown = interaction.closeUnknown || interaction.unresolved
+        alert.messageText = draft ? "Finish this edit before closing" : "Close this library?"
+        if draft {
+            alert.informativeText = "An unfinished edit or review is still open. Return to it so its draft is preserved. Saving the catalogue does not save that draft."
+        } else if unknown {
+            alert.informativeText = interaction.closeSample
+                ? "An example selection, preparation or review is unfinished. Keep exploring to return to it, or explicitly discard the current temporary records and review."
+                : "The current operation or view state is unconfirmed. Keep this window open and check its result. Closing abandons unconfirmed temporary work; retained files are not deleted and a save is not guaranteed."
+        } else {
+            let selections = loss?.selections ?? 0
+            alert.informativeText = (loss?.dirty == true ? "The library has unsaved catalogue changes. " : "The catalogue has no unsaved changes. ") +
+                (selections > 0 ? "There are \(selections) temporary project selections. Library saving does not include them. " : "") +
+                (interaction.hasStorage ? "Saved versions are never overwritten." : "Saving is unavailable in this development preview.")
+        }
+        alert.addButton(withTitle: draft ? "Finish editing" : "Keep exploring")
+        var saveIndex: Int?
+        var checkIndex: Int?
+        if !draft {
+            let title = unknown && !interaction.closeSample ? "Discard unconfirmed work and close" :
+                ((loss?.selections ?? 0) > 0 ? "Discard temporary work and close" : "Discard and close")
+            alert.addButton(withTitle: title)
+            alert.buttons[1].isEnabled = !interaction.busy
+            closeDiscardButton = alert.buttons[1]
+            if unknown, interaction.canCheckResult {
+                checkIndex = alert.buttons.count
+                alert.addButton(withTitle: "Check same result")
+            }
+            if !unknown, interaction.hasStorage, loss?.dirty == true {
+                saveIndex = alert.buttons.count
+                alert.addButton(withTitle: (loss?.selections ?? 0) > 0 ? "Save library, keep selections" : "Save library and close")
+            }
+        }
+        for (index, button) in alert.buttons.enumerated() {
+            let id = index == 0 ? "library-keep" : index == saveIndex ? "library-close-save" : index == checkIndex ? "library-close-check" : "library-discard"
+            button.identifier = NSUserInterfaceItemIdentifier(id); button.setAccessibilityIdentifier(id)
+        }
         alert.beginSheetModal(for: window) { [weak self] response in
             guard let self else { return }
-            self.closeQuestion = false
-            if response == .alertSecondButtonReturn { self.discardAndClose() }
-            else { self.refresh() }
+            self.closeQuestion = false; self.closeDiscardButton = nil
+            let index = response.rawValue - NSApplication.ModalResponse.alertFirstButtonReturn.rawValue
+            if index == 1, !draft { self.discardAndClose() }
+            else if index == saveIndex { self.interaction.saveBeforeClose() }
+            else if index == checkIndex {
+                if self.interaction.canCheckReplacement { self.interaction.checkReplacement() }
+                else { self.interaction.checkSave() }
+            } else {
+                let sample = self.interaction.closeSample
+                self.interaction.keepOpen(); self.refresh()
+                if sample { self.restoreNativeFocus() }
+            }
         }
     }
     func discardAndClose() {
         guard !closing else { return }
-        closing = true; dismissPanel(); session.close(); window.close(); didClose?()
+        closing = true
+        guard interaction.finalClose() else { closing = false; return }
+         dismissPanel(); savedPanel?.dismiss(); savedPanel = nil
+        window.close(); didClose?()
     }
 }

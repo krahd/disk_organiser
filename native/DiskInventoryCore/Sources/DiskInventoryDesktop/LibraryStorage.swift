@@ -30,8 +30,26 @@ struct LibrarySaveReceipt: Sendable, Equatable {
 
 enum LibrarySaveReconciliation: Sendable { case published(LibrarySaveReceipt), notPublishedPendingRetained }
 
-// Unwired descriptor capability. Only a test-target factory creates/adopts an
-// owned root. No production path/container constructor or UI invocation exists.
+// Synchronous one-lifetime interaction admission belongs to the actor identity,
+// not to an injection wrapper. The lock protects only this in-memory bit; it is
+// not a filesystem/root-wide or cross-process lock and is never reset.
+private final class LibraryInteractionClaim: @unchecked Sendable {
+    private let lock = NSLock()
+    private var claimedOrRetired = false
+    func claim() throws {
+        lock.lock(); defer { lock.unlock() }
+        guard !claimedOrRetired else { throw LibraryStorageFailure.busy }
+        claimedOrRetired = true
+    }
+    func retire() {
+        lock.lock(); defer { lock.unlock() }
+        claimedOrRetired = true
+    }
+}
+
+// Descriptor capability. Only a test-target factory creates/adopts an owned
+// root; native interaction requires its one-use injected lease. No production
+// path/container constructor or default executable storage capability exists.
 actor LibraryStorage {
     static let maximumEntries = 256
     static let maximumListedBytes: Int64 = 64 * 1_024 * 1_024
@@ -41,6 +59,7 @@ actor LibraryStorage {
         let original: LibraryFileStamp
         var receipt: LibrarySaveReceipt?
     }
+    private nonisolated let interactionClaim = LibraryInteractionClaim()
     private var descriptor: Int32
     private let identity: LibraryFileStamp
     private let owner = UUID()
@@ -69,7 +88,10 @@ actor LibraryStorage {
     }
     deinit { if descriptor >= 0 { io.close(descriptor) } }
 
+    nonisolated func claimInteractionOwner() throws { try interactionClaim.claim() }
+
     func close() {
+        interactionClaim.retire()
         generation = UUID()
         if descriptor >= 0 { io.close(descriptor); descriptor = -1 }
         pending = nil

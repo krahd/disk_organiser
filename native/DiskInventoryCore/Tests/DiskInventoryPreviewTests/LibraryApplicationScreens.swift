@@ -11,13 +11,21 @@ import Darwin
 final class LibraryApplicationScreens {
     private var descriptor: Int32?
     private var rows = [[String: String]]()
-    private let names: Set<String> = ["70-native-library-controls.png", "71-native-sample-selector.png",
+    enum SetKind { case application, saveOpen }
+    private let names: Set<String>
+    private static let applicationNames: Set<String> = ["70-native-library-controls.png", "71-native-sample-selector.png",
         "72-native-scope-review.png", "73-native-progress-controls.png", "74-native-library-record.png", "75-native-close-confirmation.png"]
-    init() throws {
+    init(_ kind: SetKind = .application) throws {
+        names = kind == .application ? Self.applicationNames : [
+            "80-native-library-saved.png", "81-native-open-two-locations.png", "82-native-replace-result.png",
+            "83-native-selection-close.png", "84-native-draft-close.png", "85-native-save-unconfirmed.png",
+            "86-native-open-narrow.png", "87-native-reopened-records.png"]
+        let key = kind == .application ? "DISK_APPLICATION_PREVIEW_OUTPUT" : "DISK_LIBRARY_INTERACTION_OUTPUT"
+        let suffix = kind == .application ? "/disk-application-preview-screens" : "/disk-library-interaction-screens"
         let environment = ProcessInfo.processInfo.environment
-        if let output = environment["DISK_APPLICATION_PREVIEW_OUTPUT"] {
+        if let output = environment[key] {
             let root = try XCTUnwrap(environment["RUNNER_TEMP"])
-            guard root.hasPrefix("/"), output == root + "/disk-application-preview-screens" else { throw CoreFailure.invalidProjection }
+            guard root.hasPrefix("/"), output == root + suffix else { throw CoreFailure.invalidProjection }
             guard mkdir(output, 0o700) == 0 else { throw CoreFailure.filesystem(errno) }
             let fd = Darwin.open(output, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
             guard fd >= 0 else { throw CoreFailure.filesystem(errno) }; descriptor = fd
@@ -88,7 +96,7 @@ final class LibraryApplicationScreens {
         try admit(bytes, name: name, kind: "original WebKit viewport capture")
     }
     private func admit(_ bytes: Data, name: String, kind: String) throws {
-        guard names.contains(name), !rows.contains(where: { $0["file"] == name }), rows.count < 6,
+        guard names.contains(name), !rows.contains(where: { $0["file"] == name }), rows.count < names.count,
               !bytes.isEmpty, bytes.count <= 5 * 1024 * 1024 else { throw CoreFailure.invalidProjection }
         let hash = SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined()
         try write(bytes, name: name)

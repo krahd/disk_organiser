@@ -49,7 +49,7 @@ final class LibraryApplicationTests: XCTestCase {
     }
     func open(_ source: any LibrarySource) async throws -> (OwnedPreviewHarness, LibraryWindowController) {
         let h = try await OwnedPreviewHarness.open()
-        let window = LibraryWindowController(session: LibrarySession(host: h.host, source: source))
+        let window = try LibraryWindowController(session: LibrarySession(host: h.host, source: source))
         try h.useApplicationWindow(window.window); window.show()
         return (h, window)
     }

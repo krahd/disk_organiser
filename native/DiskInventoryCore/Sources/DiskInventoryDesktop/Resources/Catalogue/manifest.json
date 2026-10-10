@@ -2,13 +2,13 @@
   "assets": [
     {
       "file": "inventory-catalogue.html",
-      "bytes": 11771,
-      "sha256": "772c72af21ec7192eb98b2e7b66699c2a6dbf7cb4a810dc147ddd03eddf1dfa8"
+      "bytes": 11832,
+      "sha256": "c0c48dc6061931fa66133d33f2afbd7ff776679ae103e26e2a3999c4c3194290"
     },
     {
       "file": "inventory-catalogue.js",
-      "bytes": 37645,
-      "sha256": "49a81fb3b0a0f6373b9c4773450799cd312affe24f1c4d9df6ce1b04eb356d21"
+      "bytes": 44544,
+      "sha256": "c7e3f7aef4587af6ab4b675b4b9d01072bdbed24f1d69c0fc932ecccbba640c8"
     },
     {
       "file": "inventory-catalogue.css",
@@ -34,6 +34,11 @@
       "file": "manual-workspace.css",
       "bytes": 26130,
       "sha256": "e6eec59bcf1d4ee3a1c28678600d5f5807c2faa4a559bf11298d884340ec1200"
+    },
+    {
+      "file": "native-library-protocol.js",
+      "bytes": 11917,
+      "sha256": "df44e52c736f0758b9e7ce12ab7801cd9aacbb23be694eaa28decb9b4d62589c"
     }
   ]
 }
