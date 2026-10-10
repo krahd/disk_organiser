@@ -2,6 +2,28 @@
 
 This test-only host exercises the native-to-visual handoff with freshly created test folders. It is not an application target or a signed/sandboxed user-folder integration. There is no picker, source grant, entitlement, bookmark, provider, persistent catalogue, container save, file operation or JavaScript-to-native message handler.
 
+## Hosted owned-preview validation — 10 October 2026
+
+Source `356ff01aa663d8cd3504f98bcc4f110364d6a089` passes all twelve push/PR workflow runs. The [native push run](https://github.com/krahd/disk_organiser/actions/runs/38013732010) checks out that exact source. The [native PR run](https://github.com/krahd/disk_organiser/actions/runs/38013734331) checks out GitHub merge ref `f096b7a82a86b742ab635ab039a9ed9e03c12c2a`; both share tree `245dce0ca035faa0353bdd710ef71c8aaeebd2ba`. Each executes all 64 XCTest cases with zero failures: 59 existing core and five new WebKit cases, followed by six independent native/Python differential and six unchanged-parser/catalogue roundtrips. Xcode 16.4 build 16F6, SDK 15.5 and Swift 6.1.2 are verified on macOS 15.7.9 build 24G830, runner image 20260907.0337.1. The existing APFS invalid-UTF-8-name refusal (errno 92) is still explicit; only synthetic invalid-name rejection is unconditional.
+
+The event-driver diagnosis is now supported by actual AppKit/WebKit evidence. The earlier sources compile but fail pointer flows; the subsequent readiness logs show inactive/non-key windows. At the successful source, processing three queued application events establishes active/key/visible state. The unchanged pointer path then reaches the enabled DOM/native hit target and produces trusted mousedown, mouseup and click events at the expected coordinates. Native Escape produces a trusted keydown on the focused label and cancels the preview. Add-before-retirement, late completion invalidation, strict rejection, CSP/navigation denial and focus return all pass. There is no JavaScript-click replacement, forced element action or waived assertion. These programmatically generated in-process AppKit events are not a physical mouse, human usability or assistive-technology test.
+
+Both complete original WebKit screenshot artifacts contain the same five byte-identical PNGs, totalling 468,477 image bytes. Push artifact [11655173874](https://github.com/krahd/disk_organiser/actions/runs/38013732010/artifacts/11655173874) is 438,672 bytes, ZIP SHA-256 `11c7a40d56f5305892cbd87bd1951d166b0293788366a7c4462725f605d45b7a`; PR artifact [11655743662](https://github.com/krahd/disk_organiser/actions/runs/38013734331/artifacts/11655743662) has the same length, ZIP SHA-256 `0d2788db820b60dc3ea360b71895f2e1bfcbabac8b241654c034d454a8e4978a`. Every manifest length/hash verifies. CI artifacts have 14-day retention; no permanent screenshot archive is claimed by this documentation-only closeout. The actual runner-clamped viewports are 1024×656 (preview, overview, comparison) and 390×656 (history, uncertainty), not the larger requested window sizes. These are original viewport images; content below the viewport is not claimed captured.
+
+| Original | Pixels | Bytes | SHA-256 |
+| --- | --- | --- | --- |
+| `60-native-add-preview.png` | 1024×656 | 126710 | `e28868b7ec366e502abecc63d0ef2f0952cb42fcc99dd77373a4e72adb1df3eb` |
+| `61-native-overview.png` | 1024×656 | 124714 | `d3ea20053a6bc383245a9b023f3a59bbe9530067630f78149411763669b11b57` |
+| `62-native-comparison.png` | 1024×656 | 102283 | `e3c9c0fc0fbfc11a823fbc001c84137ee640d8c6f5084d7aca1ce542c05507e3` |
+| `63-native-narrow-history.png` | 390×656 | 64117 | `8c73ac2fa73a8c7e11dfa8edb5c0ccd1cf907d2af719b4ac10aaefe16e15673a` |
+| `64-native-narrow-uncertainty.png` | 390×656 | 50653 | `c5770048ca96bfa05c65783891617598306c07628536a095b5d4798ab3e18bdd` |
+
+Implementation review inspected all five originals; separate root evidence review inspected the desktop comparison and narrow uncertainty. The focus ring, unavailable controls, claimed dates, historical/partial scope, inert hostile label and unsupported symlink remain visible. Independent final evidence review accepts the exact source, both hosted native logs and all five originals, with no blocking implementation or visual defect. It independently verified commit/tree identity, all twelve workflow results, source/asset hashes and image integrity, and reran the local source checks. This review is not an additional hardware execution. No signed app, native browser-UI zoom, actual user-drive, physical-volume identity, persistent access, save/reopen, backup or restore acceptance follows from these tests.
+
+[Catalogue CI](https://github.com/krahd/disk_organiser/actions/runs/38013734335) passes 115 model, 39 existing DOM and 16 new bridge DOM checks on each of Linux and Windows, plus all ten Chromium journeys. [Aggregate CI](https://github.com/krahd/disk_organiser/actions/runs/38013734363) passes Linux 709 backend, Windows 607 passed/102 existing skips, 665 Jest, OpenAPI 44, dependency audits, formatting and 27 existing Chromium journeys. Windows skips are not native coverage. The standalone frontend and all v1 formats retain their existing boundaries.
+
+This closeout changes documentation only. Native/JS source, fixtures, copied assets, tests and workflows remain exactly those of the cited successful source. Final-documentation-head CI, current-main preservation and actual merged-main checks remain the integration gates.
+
 ## Data and view boundary
 
 `DiskInventoryPreviewTests` contains the entire AppKit/WebKit host and its harness. The package still has no products or executable. Its existing core source is unchanged. A test creates its own `OwnedFixture`, obtains one core result, checks that source descriptors and ownership have been released, and passes only the bounded immutable UTF-8 snapshot bytes to the host. Absolute roots, descriptor numbers and native permission objects do not cross into the page.
@@ -26,7 +48,7 @@ The native host authenticates only its own current view/session/delivery objects
 
 The host waits for stage completion before issuing a requested retirement, including when Add was already displayed before that completion arrived. It checks exact shallow reply fields and current navigation identity. Invalid replies, missing acknowledgement or a retired view fail closed. Native calls have a ten-second acknowledgement timer; it retires the application state but cannot interrupt an arbitrary blocked OS/WebKit operation. A blocked view is hidden and cannot receive a new delivery. Recovery must construct a new host; no automatic retry or silent catalogue persistence is offered. Page navigation also permanently invalidates its bridge session.
 
-## Verification plan and current evidence
+## Initial verification plan and source evidence
 
 The initial source checkpoint has 16 new DOM groups passing, together with the existing 39 catalogue checks, 665 Jest cases and formatting. It covers strict schema/byte checks, wrong sessions/versions, repeated delivery, busy edits, retirement ordering, inert hostile labels, unavailable controls, unchanged standalone operation and the explicit replay budget. Actual macOS compilation and WebKit test execution have **not yet run** at this checkpoint.
 
@@ -44,7 +66,7 @@ The existing macOS workflow retains its Xcode 16.4/16F6, SDK 15.5 and runner-ide
 
 ## Remaining gates
 
-Independent source/trust-boundary review precedes publication. Exact-source hosted macOS compilation, actual WebKit interaction, original-pixel review, final-head CI and guarded main verification are required before accepting this host slice. Unsigned XCTest success cannot establish signed sandbox permissions, picker behaviour, grant lifetime, removable-volume identity, real user-drive behaviour, catalogue persistence, native browser-UI zoom or assistive-technology usability. Those remain separate implementation and device gates.
+Initial independent source/trust-boundary review preceded publication. The successful source above establishes hosted macOS compilation, actual WebKit interaction and complete original-pixel evidence. Independent final source/runtime/all-five-pixel evidence closeout is accepted; exact-final-documentation-head CI, current-main preservation and actual merged-main verification remain the integration gates. Unsigned XCTest success cannot establish signed sandbox permissions, picker behaviour, grant lifetime, removable-volume identity, real user-drive behaviour, catalogue persistence, native browser-UI zoom or assistive-technology usability. Those remain separate implementation and device gates.
 
 ### Pre-review native API and timeout audit
 
