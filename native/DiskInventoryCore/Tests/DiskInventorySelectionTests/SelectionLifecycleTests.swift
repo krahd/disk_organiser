@@ -32,6 +32,7 @@ private final class Picker: FolderPicking {
     private(set) var replies: [@MainActor (FolderPickOutcome) -> Void] = []
     private(set) var requests: [Request] = []
     var inline: FolderPickOutcome?
+    func dropRequestOwnership() { requests.removeAll() }
     func begin(_ reply: @escaping @MainActor (FolderPickOutcome) -> Void) -> any SelectionCancellation {
         let request = Request(); replies.append(reply); requests.append(request)
         if let inline { reply(inline) }
@@ -43,6 +44,7 @@ private final class Reader: FolderReading {
     private(set) var replies: [@MainActor (FolderReadOutcome) -> Void] = []
     private(set) var requests: [Request] = []
     var inline: FolderReadOutcome?
+    func dropRequestOwnership() { requests.removeAll() }
     func begin(_ choice: any TransientFolderChoice,
                reply: @escaping @MainActor (FolderReadOutcome) -> Void) -> any SelectionCancellation {
         let request = Request(); replies.append(reply); requests.append(request)
@@ -174,5 +176,113 @@ final class SelectionLifecycleTests: XCTestCase {
         var owner: FolderSelectionSession? = FolderSelectionSession(picker: picker, reader: reader)
         owner?.choose(); picker.replies[0](.selected(choice)); owner?.readMetadata(); owner = nil
         XCTAssertEqual(choice.releases, 0); reader.replies[0](.completed); XCTAssertEqual(choice.releases, 1)
+    }
+    func testPickerCancelCanCompleteSynchronouslyInsideCancellation() {
+        let picker = Picker(), owner = FolderSelectionSession(picker: picker)
+        owner.choose()
+        var request: Request? = picker.requests[0]
+        var hooks = 0
+        request!.onCancel = {
+            hooks += 1
+            XCTAssertEqual(owner.state, .stopping)
+            XCTAssertFalse(owner.hasLiveChoice)
+            owner.choose(); XCTAssertEqual(picker.replies.count, 1)
+            picker.replies[0](.cancelled)
+        }
+        owner.cancel(); request!.onCancel = nil
+        XCTAssertEqual(hooks, 1); XCTAssertEqual(request!.cancellations, 1)
+        XCTAssertEqual(owner.state, .idle); XCTAssertEqual(owner.notice, .cancelled)
+        owner.cancel(); picker.replies[0](.cancelled)
+        XCTAssertEqual(request!.cancellations, 1)
+        weak var retiredRequest = request
+        picker.dropRequestOwnership(); request = nil
+        withExtendedLifetime(owner) {
+            XCTAssertNil(retiredRequest, "Session must not retain its completed cancellation request")
+            XCTAssertEqual(owner.state, .idle)
+        }
+        owner.choose(); XCTAssertEqual(picker.replies.count, 2)
+        picker.replies[1](.cancelled); owner.close()
+        XCTAssertEqual(owner.state, .closed)
+    }
+    func testPickerCloseDisposesSynchronousSelectedResultExactlyOnce() {
+        let picker = Picker(), choice = Choice(), owner = FolderSelectionSession(picker: picker)
+        owner.choose()
+        var request: Request? = picker.requests[0]
+        var hooks = 0
+        request!.onCancel = {
+            hooks += 1
+            XCTAssertEqual(owner.state, .stopping); XCTAssertEqual(choice.releases, 0)
+            owner.choose(); XCTAssertEqual(picker.replies.count, 1)
+            picker.replies[0](.selected(choice))
+        }
+        owner.close(); request!.onCancel = nil
+        XCTAssertEqual(hooks, 1); XCTAssertEqual(request!.cancellations, 1)
+        XCTAssertEqual(owner.state, .closed); XCTAssertEqual(owner.notice, .cancelled)
+        XCTAssertEqual(choice.releases, 1); XCTAssertFalse(owner.hasLiveChoice)
+        picker.replies[0](.selected(choice)); owner.close(); owner.cancel(); owner.choose()
+        XCTAssertEqual(choice.releases, 1); XCTAssertEqual(request!.cancellations, 1)
+        XCTAssertEqual(owner.state, .closed); XCTAssertEqual(picker.replies.count, 1)
+        weak var retiredRequest = request
+        picker.dropRequestOwnership(); request = nil
+        withExtendedLifetime(owner) {
+            XCTAssertNil(retiredRequest, "Session must not retain its completed cancellation request")
+            XCTAssertEqual(owner.state, .closed)
+        }
+    }
+    func testReaderCancelDiscardsSynchronousSuccessAfterStopping() {
+        let picker = Picker(), reader = Reader(), choice = Choice()
+        let owner = FolderSelectionSession(picker: picker, reader: reader)
+        owner.choose(); picker.replies[0](.selected(choice)); owner.readMetadata()
+        var request: Request? = reader.requests[0]
+        var hooks = 0
+        request!.onCancel = {
+            hooks += 1
+            XCTAssertEqual(owner.state, .stopping); XCTAssertTrue(owner.hasLiveChoice)
+            XCTAssertEqual(choice.releases, 0)
+            owner.choose(); owner.readMetadata()
+            XCTAssertEqual(picker.replies.count, 1); XCTAssertEqual(reader.replies.count, 1)
+            reader.replies[0](.completed)
+        }
+        owner.cancel(); request!.onCancel = nil
+        XCTAssertEqual(hooks, 1); XCTAssertEqual(request!.cancellations, 1)
+        XCTAssertEqual(owner.state, .idle); XCTAssertEqual(owner.notice, .cancelled)
+        XCTAssertFalse(owner.hasLiveChoice); XCTAssertEqual(choice.releases, 1)
+        reader.replies[0](.completed); owner.cancel(); owner.close()
+        XCTAssertEqual(choice.releases, 1); XCTAssertEqual(request!.cancellations, 1)
+        XCTAssertEqual(owner.state, .closed)
+        weak var retiredRequest = request
+        reader.dropRequestOwnership(); request = nil
+        withExtendedLifetime(owner) {
+            XCTAssertNil(retiredRequest, "Session must not retain its completed cancellation request")
+            XCTAssertEqual(owner.state, .closed)
+        }
+    }
+    func testReaderCloseRetiresSynchronousFailureAndStaysClosed() {
+        let picker = Picker(), reader = Reader(), choice = Choice()
+        let owner = FolderSelectionSession(picker: picker, reader: reader)
+        owner.choose(); picker.replies[0](.selected(choice)); owner.readMetadata()
+        var request: Request? = reader.requests[0]
+        var hooks = 0
+        request!.onCancel = {
+            hooks += 1
+            XCTAssertEqual(owner.state, .stopping); XCTAssertTrue(owner.hasLiveChoice)
+            XCTAssertEqual(choice.releases, 0)
+            owner.choose(); owner.readMetadata()
+            XCTAssertEqual(picker.replies.count, 1); XCTAssertEqual(reader.replies.count, 1)
+            reader.replies[0](.failed)
+        }
+        owner.close(); request!.onCancel = nil
+        XCTAssertEqual(hooks, 1); XCTAssertEqual(request!.cancellations, 1)
+        XCTAssertEqual(owner.state, .closed); XCTAssertEqual(owner.notice, .cancelled)
+        XCTAssertEqual(choice.releases, 1); XCTAssertFalse(owner.hasLiveChoice)
+        reader.replies[0](.failed); owner.cancel(); owner.close(); owner.choose()
+        XCTAssertEqual(choice.releases, 1); XCTAssertEqual(request!.cancellations, 1)
+        XCTAssertEqual(owner.state, .closed); XCTAssertEqual(picker.replies.count, 1)
+        weak var retiredRequest = request
+        reader.dropRequestOwnership(); request = nil
+        withExtendedLifetime(owner) {
+            XCTAssertNil(retiredRequest, "Session must not retain its completed cancellation request")
+            XCTAssertEqual(owner.state, .closed)
+        }
     }
 }
