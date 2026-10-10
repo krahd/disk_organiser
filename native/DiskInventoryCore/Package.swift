@@ -8,10 +8,10 @@ let package = Package(
     products: [.executable(name: "DiskOrganiserPreview", targets: ["DiskOrganiserPreview"])],
     targets: [
         .target(name: "DiskInventoryCore"),
-        .target(name: "DiskInventoryDesktop", resources: [.copy("Resources/Catalogue"), .copy("Resources/Examples")]),
+        .target(name: "DiskInventoryDesktop", resources: [.copy("Resources/Catalogue"), .copy("Resources/Examples"), .copy("Resources/CatalogueValidation")]),
         .executableTarget(name: "DiskOrganiserPreview", dependencies: ["DiskInventoryDesktop"]),
         .testTarget(name: "DiskInventoryCoreTests", dependencies: ["DiskInventoryCore"]),
-        .testTarget(name: "DiskInventoryPreviewTests", dependencies: ["DiskInventoryCore", "DiskInventoryDesktop"]),
+        .testTarget(name: "DiskInventoryPreviewTests", dependencies: ["DiskInventoryCore", "DiskInventoryDesktop"], resources: [.copy("Resources/LibraryValidation")]),
     ],
     swiftLanguageModes: [.v6]
 )
