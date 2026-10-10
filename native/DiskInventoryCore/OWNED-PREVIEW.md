@@ -49,3 +49,9 @@ Independent source/trust-boundary review precedes publication. Exact-source host
 ### Pre-review native API and timeout audit
 
 The harness initializes NSApplication before WebKit and uses one-shot 10-second deadlines for rule compilation, script observations and snapshots. Framework objects remain on MainActor; snapshot continuations carry PNG Data. Delegate callback signatures explicitly retain MainActor/Sendable isolation. These source checks do not substitute for the pinned macOS compile and actual WebKit tests.
+
+### First hosted event-driver failure
+
+Source `f60ad3b9a949b5ed308ffc1ade4a2c60c525ea1f` compiled on the pinned toolchain. All 59 existing core cases and two new resource/lifecycle cases passed. The three new flows requiring native pointer Add failed; the differential/parser steps were skipped. The single original preview screenshot is failure evidence only, not a complete visual packet.
+
+The original harness invoked `NSWindow.sendEvent` directly and did not wait for asynchronous app activation. [AppKit's window documentation](https://developer.apple.com/documentation/appkit/nswindow/sendevent(_:)) says not to invoke that dispatcher directly; [NSApplication dispatch](https://developer.apple.com/documentation/appkit/nsapplication/sendevent(_:)) routes events through the application. [Activation can lag](https://developer.apple.com/documentation/appkit/nsapplication/activate(ignoringotherapps:)). The proposed harness repair waits for active/key/visible state, preserves DOM/native geometry and enabled-state checks, dispatches ordered native events through NSApplication, and requires observed trusted mousedown/up/click events at the intended DOM coordinates. It logs the actual view dimensions, native hit target, activation/focus and event trace. No JavaScript click or keyboard substitute is used for Add. This is a source-supported diagnosis; the repaired hosted run must establish the actual cause and outcome.

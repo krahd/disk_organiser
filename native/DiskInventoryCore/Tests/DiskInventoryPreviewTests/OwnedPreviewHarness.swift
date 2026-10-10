@@ -38,6 +38,7 @@ final class OwnedPreviewHarness {
     let window: NSWindow
     let ruleStore: WKContentRuleListStore
     let cacheDirectory: URL
+    private var eventNumber = 0
 
     private init(host: OwnedPreviewHost, ruleStore: WKContentRuleListStore, cacheDirectory: URL) {
         self.host = host; self.ruleStore = ruleStore; self.cacheDirectory = cacheDirectory
@@ -46,8 +47,8 @@ final class OwnedPreviewHarness {
         window.title = "Disk Organiser · owned-fixture test preview"
         window.isReleasedWhenClosed = false
         window.contentView = host.webView
-        window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
         window.makeFirstResponder(host.webView)
     }
     static func open(width: CGFloat = 1280, height: CGFloat = 960) async throws -> OwnedPreviewHarness {
@@ -102,41 +103,98 @@ final class OwnedPreviewHarness {
         XCTFail("Owned WebKit condition did not reach the expected state")
         throw OwnedPreviewHost.Failure.expired
     }
+    private func prepareInteraction() async throws {
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+        let deadline = Date().addingTimeInterval(3)
+        while (!NSApp.isActive || !window.isKeyWindow) && Date() < deadline {
+            try await Task.sleep(for: .milliseconds(30))
+        }
+        print("OWNED_EVENT_WINDOW active=\(NSApp.isActive) key=\(window.isKeyWindow) visible=\(window.isVisible) responder=\(String(describing: window.firstResponder)) bounds=\(host.webView.bounds)")
+        guard NSApp.isActive, window.isKeyWindow, window.isVisible, !host.webView.isHidden else {
+            throw OwnedPreviewHost.Failure.unavailable
+        }
+    }
+    private func startEventTrace() async throws {
+        _ = try await script("""
+            window.__ownedEventTrace=[];
+            if(!window.__ownedEventListener) {
+                window.__ownedEventListener=e=>{
+                    if(window.__ownedEventTrace.length<16) window.__ownedEventTrace.push({
+                        type:e.type,id:String(e.target.id||'').slice(0,64),trusted:e.isTrusted,
+                        x:e.clientX??null,y:e.clientY??null,key:e.key??null});
+                };
+                for(const type of ['mousedown','mouseup','click','keydown','keyup'])
+                    document.addEventListener(type,window.__ownedEventListener,true);
+            }
+            return 'tracing';
+            """)
+    }
     func click(_ id: String) async throws {
+        try await prepareInteraction()
+        try await startEventTrace()
         let text = try await script("""
             const e = document.getElementById(id);
             e.scrollIntoView({block:'center'});
             const r = e.getBoundingClientRect();
             const x = r.left + r.width / 2, y = r.top + r.height / 2;
-            return JSON.stringify({x,y,hit:document.elementFromPoint(x,y)===e,visible:r.width>0&&r.height>0});
+            return JSON.stringify({x,y,hit:document.elementFromPoint(x,y)===e,
+                visible:r.width>0&&r.height>0,enabled:!e.disabled,width:innerWidth,height:innerHeight});
             """, arguments: ["id": id])
         let data = try XCTUnwrap(text.data(using: .utf8))
         let rect = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         XCTAssertEqual(rect["hit"] as? Bool, true); XCTAssertEqual(rect["visible"] as? Bool, true)
-        guard rect["hit"] as? Bool == true, let x = rect["x"] as? Double, let y = rect["y"] as? Double else {
+        XCTAssertEqual(rect["enabled"] as? Bool, true)
+        guard rect["hit"] as? Bool == true, rect["visible"] as? Bool == true,
+              rect["enabled"] as? Bool == true,
+              let x = rect["x"] as? Double, let y = rect["y"] as? Double else {
             throw OwnedPreviewHost.Failure.unavailable
         }
         let view = host.webView
         let local = NSPoint(x: x, y: view.isFlipped ? y : view.bounds.height - y)
         let point = view.convert(local, to: nil)
-        window.makeKeyAndOrderFront(nil); NSApp.activate(ignoringOtherApps: true)
+        let parent = try XCTUnwrap(view.superview)
+        let hit = view.hitTest(parent.convert(point, from: nil))
+        print("OWNED_EVENT_GEOMETRY id=\(id) dom=\(text) flipped=\(view.isFlipped) local=\(local) window=\(point) nativeHit=\(String(describing: hit))")
+        guard let hit, hit === view || hit.isDescendant(of: view) else { throw OwnedPreviewHost.Failure.unavailable }
         for type in [NSEvent.EventType.leftMouseDown, .leftMouseUp] {
+            eventNumber += 1
             let event = try XCTUnwrap(NSEvent.mouseEvent(with: type, location: point, modifierFlags: [],
                 timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
-                context: nil, eventNumber: 1, clickCount: 1, pressure: 1))
-            window.sendEvent(event)
+                context: nil, eventNumber: eventNumber, clickCount: 1, pressure: type == .leftMouseDown ? 1 : 0))
+            // NSApplication performs responder dispatch; direct NSWindow.sendEvent
+            // bypasses that route and is explicitly discouraged by AppKit.
+            NSApp.sendEvent(event)
+            try await Task.sleep(for: .milliseconds(40))
         }
-        try await Task.sleep(for: .milliseconds(80))
+        let trace = try await script("return JSON.stringify(window.__ownedEventTrace);")
+        print("OWNED_EVENT_TRACE id=\(id) events=\(trace)")
+        let rows = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(trace.utf8)) as? [[String: Any]])
+        let events = rows.filter { $0["id"] as? String == id }
+        XCTAssertEqual(events.compactMap { $0["type"] as? String }, ["mousedown", "mouseup", "click"])
+        guard events.count == 3, events.allSatisfy({ $0["trusted"] as? Bool == true }) else {
+            throw OwnedPreviewHost.Failure.unavailable
+        }
+        for event in events {
+            XCTAssertEqual(try XCTUnwrap(event["x"] as? Double), x, accuracy: 1)
+            XCTAssertEqual(try XCTUnwrap(event["y"] as? Double), y, accuracy: 1)
+        }
     }
     func key(_ characters: String, code: UInt16) async throws {
+        try await prepareInteraction()
+        try await startEventTrace()
         for type in [NSEvent.EventType.keyDown, .keyUp] {
             let event = try XCTUnwrap(NSEvent.keyEvent(with: type, location: .zero, modifierFlags: [],
                 timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
                 context: nil, characters: characters, charactersIgnoringModifiers: characters,
                 isARepeat: false, keyCode: code))
-            window.sendEvent(event)
+            NSApp.sendEvent(event)
+            try await Task.sleep(for: .milliseconds(40))
         }
-        try await Task.sleep(for: .milliseconds(80))
+        let trace = try await script("return JSON.stringify(window.__ownedEventTrace);")
+        print("OWNED_KEY_TRACE events=\(trace)")
+        let rows = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(trace.utf8)) as? [[String: Any]])
+        XCTAssertTrue(rows.contains { $0["type"] as? String == "keydown" && $0["id"] as? String == "catalogue-name" && $0["trusted"] as? Bool == true })
     }
     func snapshot() async throws -> Data {
         let configuration = WKSnapshotConfiguration()

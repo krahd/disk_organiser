@@ -1,13 +1,15 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 01:06
+Last updated: 2026-10-10 01:15
 
 ## Owned native visual handoff source checkpoint
+
+- First hosted source `f60ad3b9a949b5ed308ffc1ade4a2c60c525ea1f` compiles on the pinned Xcode/SDK. All 59 existing core cases and two new WebKit security/lifecycle cases pass, but three native pointer Add flows fail; downstream differential/parser checks are skipped and not counted. The failed logs and single original preview PNG are preserved. A harness-only event-routing/activation repair adds native/DOM coordinate and trusted-event diagnostics without replacing pointer actions; its hosted result remains pending.
 
 - Added a test-only AppKit/WebKit catalogue host under `DiskInventoryPreviewTests`. It receives only fresh owned-core snapshot bytes after descriptor release and renders the exact bundled catalogue through fixed structured arguments. There is no app product/executable, picker, source grant, entitlement, persistent access, native save, file operation or JavaScript-to-native command handler. Existing core production source and all v1 formats are unchanged.
 - The standalone catalogue remains empty-first with no bridge exposed. Embedded presentation explicitly hides/disables unsupported Open/Save/manual export and marks edits temporary. Native delivery shares the strict parser and existing Add/Cancel admission; wrong version/session, oversized/wrong-schema input, busy edits and replay reject. A bounded 128-ID view session and matching retirement fence preserve prior records and newer edits. Native session ownership never makes imported JSON trusted.
 - The seven bundled assets have exact canonical parity and an explicit update command. The nonpersistent view has a narrow resource read root, a fixed network blocker, unchanged CSP and fail-closed navigation/window/upload/drop rules. The test harness prepares WebKit's compiled-rule cache in a fresh owned temporary directory; the host has no filesystem writer. Framework/OS internal file activity is not claimed absent.
-- Local source checks pass 16 new bridge DOM groups, 39 existing catalogue DOM checks, 665 Jest and frontend formatting. Nine supported local HTTP Chromium journeys also pass; the unchanged direct-file case remains locally administrator-blocked and is not counted. Five new macOS UI/lifecycle tests are authored but not yet compiled or executed. The existing 59 native core tests and six differential/parser cases remain required. Independent boundary review, actual hosted WebKit event/pixel evidence and exact-head integration checks remain open. No native success follows from local JavaScript tests. [Owned preview boundary and evidence plan](native/DiskInventoryCore/OWNED-PREVIEW.md).
+- Local source checks pass 16 new bridge DOM groups, 39 existing catalogue DOM checks, 665 Jest and frontend formatting. Nine supported local HTTP Chromium journeys also pass; the unchanged direct-file case remains locally administrator-blocked and is not counted. All five new macOS UI/lifecycle tests compile and run at `f60ad3b9`; two pass and three pointer-driven flows fail as recorded above. The existing 59 native core tests and six differential/parser cases remain required. Independent boundary review, actual hosted WebKit event/pixel evidence and exact-head integration checks remain open. No native success follows from local JavaScript tests. [Owned preview boundary and evidence plan](native/DiskInventoryCore/OWNED-PREVIEW.md).
 - Previous comparison PR22 is now merged at `9f890d83bb25e2d5f23496dc687d4a54acc4ed3e`; all six actual-main workflows passed. Native [38008947846](https://github.com/krahd/disk_organiser/actions/runs/38008947846) confirms that exact checkout and 59 + 6 + 6 results; catalogue [38008947834](https://github.com/krahd/disk_organiser/actions/runs/38008947834) confirms ten browser journeys. Its final documentation head `b99bf700b4c53e5a97b33ed302471dc8ec873fa4` passed all twelve push/PR runs, and the merged tree equals the reviewed final tree `f5947d6a3de4834ed08d9a96e416eb5319c47098`.
 
 The prototype host adds a data-only view after the existing core diagram's snapshot output. No source-access or execution arrow is added; product picker/sandbox/save gates remain separate.
@@ -660,4 +662,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 01:06
+Last updated: 2026-10-10 01:15
