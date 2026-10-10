@@ -43,6 +43,8 @@ final class LibraryApplicationScreens {
         // Render this exact visible region from its actual opaque ancestor;
         // never fill, composite, restyle or resize the evidence after capture.
         let ancestor = try XCTUnwrap(view.opaqueAncestor)
+        guard names.contains(name) else { throw CoreFailure.invalidProjection }
+        print("OWNED_APP_CAPTURE id=\(name) sameWindow=\(ancestor.window === window) opaque=\(ancestor.isOpaque) descendant=\(ancestor === view || view.isDescendant(of: ancestor)) visible=\(view.visibleRect) bounds=\(view.bounds) ancestorBounds=\(ancestor.bounds)")
         guard ancestor.window === window, ancestor.isOpaque,
               (ancestor === view || view.isDescendant(of: ancestor)), view.visibleRect.contains(view.bounds) else { throw CoreFailure.invalidProjection }
         let region = ancestor.convert(view.bounds, from: view)

@@ -1,6 +1,6 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 03:42
+Last updated: 2026-10-10 03:48
 
 ## Native application slice 1: development/sample source checkpoint
 
@@ -8,6 +8,7 @@ Last updated: 2026-10-10 03:42
 - First hosted source `66bed5675a6cbc0782d8a827e009d792df69ff7f` compiles the sample executable and all tests with pinned Xcode 16.4. Both native runs execute 82 cases: 81 pass; one separate-process readiness case fails with two assertions after its 20-second bound. The 59 core, five original WebKit, 16 new native window/lifecycle cases and unknown-argument rejection pass. Normal Quit is not reached; downstream six differential/six parser checks are skipped. All ten non-native workflows pass. The preserved failure does not identify which child-startup phase stopped. A narrow fixed-phase/boolean diagnostic is prepared; readiness, timing and normal-Quit requirements are unchanged.
 - Diagnostic source `32c88e958af8cd5394f4cbbf9e1044dcd2ad3ece` preserves the same failure in the push run: the exact owned child is registered, finished launching and active, but the test collects zero bytes, including the synchronous entry receipt. This suggests a receipt-collection problem; it does not prove the child window is ready. A test-only successor uses one 1-KiB nonblocking read on its own pipe, retains the 4-KiB aggregate bound and adds short-write-before-EOF and overflow regressions. It does not alter application activation, readiness, timing or normal-Quit requirements. All prior 82 tests remain; 84 are now required. This repair is not yet run.
 - Initial AppKit named-view captures have transparent undrawn backgrounds, as the documented cache API permits; the image viewer’s black backdrop is not an observed application background defect. Original PNGs are preserved. A separate test-only capture correction renders the same visible rectangle through its actual opaque ancestor, requires same-window/ancestry/visibility/bounds checks and exact original bitmap dimensions, and refuses missing or incompatible ancestors. No fill, composite, resize, style change or screen permission is added. New original captures and readable pixel review remain pending.
+- Source `a86de13fd077a2fecc053788f600ce6831e97df7` passes all twelve workflow runs, including 84 XCTest + six differential + six parser cases in both native runs. The short-live-write/overflow regressions pass, and the unchanged actual child proves empty active/key-window readiness and normal exit. Capture successor `f82e249d0bf46038bbbfa803cdc17f557cd5ccaf` preserves process success but fails its new pre-capture ancestor/visibility guard in both runs (83/84 cases pass; downstream checks skip). A fixed identifier/boolean/rectangle diagnostic is added before that unchanged guard; no fallback, resize or pixel substitution is introduced. Original native capture acceptance remains open.
 - Approved next scope is a coherent native library window, explicit owned-sample selection/scope/progress/cancel, then separately reviewed bounded app-owned Save/Open/relaunch. The [canonical source plan](docs/drive-administration/NATIVE-APPLICATION.md) preserves the later signed-picker and user-device gates. The failed process gate prevents application acceptance despite the successful compile and other native cases.
 - Added `DiskInventoryDesktop` and the explicit `DiskOrganiserPreview` sample executable. The app entry rejects external arguments/document/URL requests; its only provider reads two fixed bundled owned-example JSON resources. It does not depend on the observer core. Real directory reads still use private fresh-fixture constructors in tests only. The core’s five source files, all prior 59 core tests, strict v1 formats and authority rules remain unchanged.
 - Extracted the data-only WebKit host/resources into that shared desktop module. Existing five native WebKit tests retain their event/lifecycle/security assertions; acknowledgement barriers, event injection and screenshot writers remain in tests. The narrow asset allowlist now checks seven frontend assets plus two fixed example files outside the WebKit read root. Shared embedded copy says development preview without claiming a live connection.
@@ -717,4 +718,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 03:42
+Last updated: 2026-10-10 03:48
