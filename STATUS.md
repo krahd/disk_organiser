@@ -1,6 +1,16 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 11:38
+Last updated: 2026-10-10 12:03
+
+## Isolated selected-folder adapter: owned native validation
+
+- Draft [PR28](https://github.com/krahd/disk_organiser/pull/28), exact source `1e669bdc36033b6165a460b7f80f48d4b1577acd`, tree `9b3cf7de79f45f6693152d556eb3f3074e9f1d11`, passes all twelve push/PR workflows. The twelve changed/new paths and all 337 unaffected blobs preserve main `41ad370cdfffe729458c6c319ccdce30afe00bb2`.
+- Both native [push 38049840760](https://github.com/krahd/disk_organiser/actions/runs/38049840760) and [PR 38049859463](https://github.com/krahd/disk_organiser/actions/runs/38049859463) pass the actual SwiftPM isolation graph, target/app/probe compilation and **213 XCTest + six differential + six parser cases**. All 194 baseline methods remain; 19 new methods actually execute. PR merge checkout `0d174c4ad2c58454f5b4ebbde3895c48dfb4416a` has the identical source tree, not the same commit identity.
+- Executed new coverage is the memory-owned single-claim lifecycle, cancellation/Close, duplicate/stale callback and abandonment ordering, plus production-gate refusal before window lookup or panel construction. The actual native panel and private OS scope owner remain unexecuted. The ordinary app, observer admission, storage, UI/assets and source schema are unchanged; graph isolation is not OS sandbox proof.
+- Independent exact-source/raw-log closeout verifies the method maps and preserved bytes. Five generated fixture archive digests and 26 originals reconcile. No new UI claim is needed: 19 images match the earlier source exactly, and the author opened seven refreshed date/time originals. Earlier full pixel acceptance remains `86d3620b`; named view/sheet/scrolled capture limits and 14-day retention remain explicit. [Full evidence and scope](native/DiskInventoryCore/SELECTION-ADAPTER.md).
+- Future real integration still needs synchronous-onCancel callback coverage and a separately reviewed signed-host selection/scope/traversal probe. No signing, entitlement, persistent access, native panel presentation, user Mac/default-path execution, observer-source admission or real-drive authority is activated. Final documentation-head CI, guarded integration and actual-main checks remain open.
+
+The following source-authoring section is retained as the pre-execution checkpoint.
 
 ## Isolated selection adapter: local source authoring
 
@@ -782,4 +792,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 11:38
+Last updated: 2026-10-10 12:03

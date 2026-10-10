@@ -4,6 +4,12 @@ The Swift/Darwin observation core remains an isolated bounded metadata-only prot
 
 Only the test target constructs a source lease, from a fresh temporary directory it creates and owns. A private held descriptor and the test's address guard are process-local objects, never JSON, persisted permissions or physical-drive identity. No production source-class admission is implemented. The supplied classifier means only “owned test fixture”. The test adapter supplies the absolute-address ancestor re-walk; a production picker/admission adapter does not exist.
 
+## Isolated selection: owned native result
+
+Exact source `1e669bdc` passes all twelve workflows and **213 XCTest + six differential + six parser cases** in both macOS lanes, retaining all 194 prior methods. The actual SwiftPM graph and target compile pass. The 19 new methods exercise memory-owned lifecycle and the closed production gate only; no panel or OS scope executes and the ordinary app remains unlinked. [Exact source/log attribution and later activation gates](SELECTION-ADAPTER.md) preserve that boundary. Final documentation-head and actual-main verification remain open.
+
+The following source-authoring paragraph is retained as its earlier checkpoint.
+
 ## Isolated selected-folder source
 
 An unlinked `DiskInventorySelection` target now authors the future native directory panel and single-owner choice/read-retirement lifecycle. Its production gate always refuses before window lookup; the ordinary application has no dependency on it and the observer remains owned-fixture-only. New native compilation/tests are pending. [Exact source and later signed-host gates](SELECTION-ADAPTER.md).

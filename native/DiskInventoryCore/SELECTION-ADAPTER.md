@@ -1,5 +1,19 @@
 # Isolated selected-folder adapter: source tranche
 
+## Isolated selection: executed owned validation
+
+At exact source `1e669bdc36033b6165a460b7f80f48d4b1577acd`, tree `9b3cf7de79f45f6693152d556eb3f3074e9f1d11`, all twelve push/PR workflows pass. Both native [push 38049840760](https://github.com/krahd/disk_organiser/actions/runs/38049840760) and [PR 38049859463](https://github.com/krahd/disk_organiser/actions/runs/38049859463) validate the actual SwiftPM dependency graph, compile the isolated selection target, ordinary app and owned probe, and pass **213 XCTest methods + six differential + six parser cases**. All 194 baseline method identities remain, with 19 new methods. Xcode 16.4 build 16F6, SDK 15.5 and Swift 6.1.2 are recorded. PR checks out merge `0d174c4ad2c58454f5b4ebbde3895c48dfb4416a`, independently read back to the same tree; it is not the source commit.
+
+The new executed methods prove memory-owned choice lifecycle and rejection before window lookup/panel construction. No real panel, private OS scope owner, selected-folder observer or signed host ran. Neither the ordinary product nor Desktop gains a selection/observer dependency. The 194 unchanged existing tests retain their own bounded fixture/process/UI evidence; this does not activate default-path user-device persistence or a real source grant.
+
+Independent source and raw-log closeout verifies the exact twelve changed/new paths and 337 preserved repository blobs. Both logs contain 213 unique started/passed identities, without counting skipped or merely authored methods. The push log SHA-256 is `91bdc5513bd8f6ac7f8e345c34771eafeb4e9f986a2701b06e9a3e0fc874d65f`; PR log SHA-256 is `51dd64214540ce99c11e637574072718e1c54673241bc3555ad25c9d8974e8da`. This is review of hosted evidence, not another device test.
+
+Five fixture archive digests and all 26 original captures are retained locally. Ordinary UI/assets and capture tests are unchanged. Nineteen PNGs match the earlier `86d3620b` originals byte-for-byte; the author opened the seven refreshed date/time views without alteration. Earlier complete pixel acceptance remains attributed to `86d3620b`; no new panel or full-window acceptance is claimed. These are named native chrome/sheet/WebKit regions, with view 87 scrolled and view 96 showing the reopened count. GitHub artifact retention remains 14 days; this is not a durable screenshot archive.
+
+The earlier APFS invalid-UTF-8 filename refusal and synthetic rejection, in-memory ACL fixtures versus actual absent-ACL descriptor checks, and owned process-probe limitations remain as documented in [ordinary persistence acceptance](APP-PERSISTENCE-ACCEPTANCE.md). No aggregate browser/Windows coverage count is newly claimed here. Future integration must add synchronous cancellation-callback coverage and separately prove signed-host selection/scope retirement, source-write/sibling/parent denial and no-follow traversal compatibility before activation. Current signing, entitlement, bookmark, grant, user-device and real-drive gates remain closed.
+
+Final documentation-head CI, guarded integration and actual-main checks remain required. The source-candidate checkpoint below is retained as history; its pending compile/review statements are superseded only for the exact executed source above.
+
 10 October 2026. Approved source proposal SHA-256 `1c405bd117a46d31110668ee4fbea5059ef203e5b4b159ce929b624106f07d73`. Baseline PR27 main `41ad370cdfffe729458c6c319ccdce30afe00bb2` has all six workflows green, including 194 XCTest methods plus six differential and six parser cases. The following new code is authored but not yet compiled or executed on macOS.
 
 ## Purpose and build boundary
