@@ -39,6 +39,8 @@ jobs:
           test ! -e "$DISK_INVENTORY_GOLDEN_OUTPUT"
       - name: Verify the exact bundled catalogue before native execution
         run: python native/DiskInventoryCore/Validation/check_preview_assets.py
+      - name: Verify canonical parser and isolated UTF-8 codec parity
+        run: node native/DiskInventoryCore/Validation/check_catalogue_codec.cjs
       - name: Compile the development preview entry point without activating folder access
         run: xcrun swift build --package-path native/DiskInventoryCore --product DiskOrganiserPreview
       - name: Test only fresh owned Darwin fixtures, lifecycle and WebKit preview

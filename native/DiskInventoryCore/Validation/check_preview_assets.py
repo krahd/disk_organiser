@@ -69,6 +69,22 @@ def main():
         raise SystemExit("Unexpected example resource.")
     print("Application example parity passed: 2 fixed owned-example snapshots")
 
+    validation = TARGET.parent / "CatalogueValidation"
+    if validation.is_symlink() or (validation / "utf8-encoder.js").is_symlink():
+        raise SystemExit("Validation resources must not be symlinks.")
+    raw = (validation / "utf8-encoder.js").read_bytes()
+    if not 0 < len(raw) <= 8192:
+        raise SystemExit("Unexpected parser shim size.")
+    manifest = (json.dumps({"assets": [{"file": "utf8-encoder.js", "bytes": len(raw),
+                                     "sha256": hashlib.sha256(raw).hexdigest()}]}, indent=2) + "\n").encode()
+    if sync:
+        (validation / "manifest.json").write_bytes(manifest)
+    elif (validation / "manifest.json").read_bytes() != manifest:
+        raise SystemExit("Parser shim manifest differs.")
+    if {p.name for p in validation.iterdir()} != {"utf8-encoder.js", "manifest.json"}:
+        raise SystemExit("Unexpected parser-only validation resource.")
+    print("Parser validation resources passed: one bounded UTF-8 shim outside the WebKit read root")
+
 
 if __name__ == "__main__":
     main()
