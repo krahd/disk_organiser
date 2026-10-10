@@ -1,6 +1,26 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 11:16
+Last updated: 2026-10-10 12:03
+
+## Isolated selected-folder adapter: owned native validation
+
+- Draft [PR28](https://github.com/krahd/disk_organiser/pull/28), exact source `1e669bdc36033b6165a460b7f80f48d4b1577acd`, tree `9b3cf7de79f45f6693152d556eb3f3074e9f1d11`, passes all twelve push/PR workflows. The twelve changed/new paths and all 337 unaffected blobs preserve main `41ad370cdfffe729458c6c319ccdce30afe00bb2`.
+- Both native [push 38049840760](https://github.com/krahd/disk_organiser/actions/runs/38049840760) and [PR 38049859463](https://github.com/krahd/disk_organiser/actions/runs/38049859463) pass the actual SwiftPM isolation graph, target/app/probe compilation and **213 XCTest + six differential + six parser cases**. All 194 baseline methods remain; 19 new methods actually execute. PR merge checkout `0d174c4ad2c58454f5b4ebbde3895c48dfb4416a` has the identical source tree, not the same commit identity.
+- Executed new coverage is the memory-owned single-claim lifecycle, cancellation/Close, duplicate/stale callback and abandonment ordering, plus production-gate refusal before window lookup or panel construction. The actual native panel and private OS scope owner remain unexecuted. The ordinary app, observer admission, storage, UI/assets and source schema are unchanged; graph isolation is not OS sandbox proof.
+- Independent exact-source/raw-log closeout verifies the method maps and preserved bytes. Five generated fixture archive digests and 26 originals reconcile. No new UI claim is needed: 19 images match the earlier source exactly, and the author opened seven refreshed date/time originals. Earlier full pixel acceptance remains `86d3620b`; named view/sheet/scrolled capture limits and 14-day retention remain explicit. [Full evidence and scope](native/DiskInventoryCore/SELECTION-ADAPTER.md).
+- Future real integration still needs synchronous-onCancel callback coverage and a separately reviewed signed-host selection/scope/traversal probe. No signing, entitlement, persistent access, native panel presentation, user Mac/default-path execution, observer-source admission or real-drive authority is activated. Final documentation-head CI, guarded integration and actual-main checks remain open.
+
+The following source-authoring section is retained as the pre-execution checkpoint.
+
+## Isolated selection adapter: local source authoring
+
+- PR27 is merged normally at `41ad370cdfffe729458c6c319ccdce30afe00bb2`, tree `2e6ae086dc6ef17a227edd035c90680c8e65dfe7`. All six actual-main workflows pass. Native [38048236523](https://github.com/krahd/disk_organiser/actions/runs/38048236523) verifies exact main with 194 XCTest methods, six differential/six parser cases, ordinary empty startup/normal Quit and the separate owned-process persistence checks. Original visual attribution remains `86d3620b`.
+- The approved next [selected-folder source tranche](native/DiskInventoryCore/SELECTION-ADAPTER.md) adds an isolated, unlinked Swift target. Its production host gate always rejects before window lookup or panel construction. The ordinary app/observer and all existing UI/assets remain unchanged; no `.ownedFixture` reclassification, signing, entitlement, persistent access or real-folder capability is activated.
+- The lifecycle uses one claimant, distinct picker/read generations, late-result disposal and retained ownership while an injected worker retires. No URL, path, descriptor, grant or snapshot output crosses these testable ports. The actual panel callback and security-scope ownership are authored only; tests use memory-owned doubles and never present a panel.
+- Five pure dependency-graph oracle tests pass locally. Nineteen new XCTest methods are authored, retaining all 194 prior methods for 213 total. Exact macOS compilation/execution and independent frozen-source review are pending. The graph checker is not OS-sandbox or panel evidence.
+- The obsolete missing research-file link is replaced with checked Apple primary sources. A separately reviewed owned signed-host probe remains required before native panel activation, observer admission or ordinary-button wiring. No user Mac/default-path execution, permission or storage-authority change is included.
+
+The following PR27 section records its pre-merge evidence checkpoint; actual-main integration is confirmed above.
 
 ## Ordinary application persistence: owned native validation
 
@@ -772,4 +792,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 11:16
+Last updated: 2026-10-10 12:03

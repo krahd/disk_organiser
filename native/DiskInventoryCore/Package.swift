@@ -8,9 +8,12 @@ let package = Package(
     products: [.executable(name: "DiskOrganiserPreview", targets: ["DiskOrganiserPreview"])],
     targets: [
         .target(name: "DiskInventoryCore"),
+        // Isolated compile-only platform adapter; never an application dependency.
+        .target(name: "DiskInventorySelection"),
         .target(name: "DiskInventoryDesktop", resources: [.copy("Resources/Catalogue"), .copy("Resources/Examples"), .copy("Resources/CatalogueValidation")]),
         .executableTarget(name: "DiskOrganiserPreview", dependencies: ["DiskInventoryDesktop"]),
         .testTarget(name: "DiskInventoryCoreTests", dependencies: ["DiskInventoryCore"]),
+        .testTarget(name: "DiskInventorySelectionTests", dependencies: ["DiskInventorySelection"]),
         .testTarget(name: "DiskInventoryPreviewTests", dependencies: ["DiskInventoryCore", "DiskInventoryDesktop"], resources: [.copy("Resources/LibraryValidation")]),
     ],
     swiftLanguageModes: [.v6]

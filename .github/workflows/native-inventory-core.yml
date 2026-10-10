@@ -43,6 +43,11 @@ jobs:
         run: node native/DiskInventoryCore/Validation/check_catalogue_codec.cjs
       - name: Test the fixed data-only library protocol
         run: node scripts/test_native_library_protocol.cjs
+      - name: Verify isolated selection graph and compile without presenting a panel
+        run: |
+          python native/DiskInventoryCore/Validation/test_selection_isolation.py
+          python native/DiskInventoryCore/Validation/check_selection_isolation.py
+          xcrun swift build --package-path native/DiskInventoryCore --target DiskInventorySelection
       - name: Compile the development preview entry point without activating folder access
         run: xcrun swift build --package-path native/DiskInventoryCore --product DiskOrganiserPreview
       - name: Compile the separate owned-capability process probe

@@ -34,7 +34,7 @@ All observations so far use owned temporary fixtures. Windows tests establish po
 3. **Container-only output:** the sandbox normally allows writes inside its own container. An explicit save may create a new snapshot there while source selections retain the read-only entitlement. Do not enable user-selected read-write, Downloads-wide write access or arbitrary Save As just to simplify export.
 4. **One-way product handoff:** native UI owns Choose/Observe/Cancel/Save. A bundled, nonpersistent WebKit catalogue receives only validated v1 bytes as untrusted import data through a fixed structured-argument call. It has no native message handler, filesystem capability or operation API. No localhost service is needed. The handoff's new origin/navigation/generation controls require explicit owned tests before activation.
 
-Official-source support and caveats are in `OFFICIAL-NATIVE-ROUTE-RESEARCH.md`. These are design inferences from documented primitives, not a tested packaging recipe.
+Official-source support was rechecked on 10 October 2026 in [Apple’s sandbox file-access guidance](https://developer.apple.com/documentation/security/accessing-files-from-the-macos-app-sandbox) and [user-selected read-only entitlement reference](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.security.files.user-selected.read-only). The earlier relative research-file link had no repository target. These remain design inferences, not a tested packaging recipe; [the isolated selection-adapter tranche](../../native/DiskInventoryCore/SELECTION-ADAPTER.md) keeps panel execution and signing gated.
 
 ## User journey and honest messages
 
