@@ -39,10 +39,22 @@ final class LibraryApplicationScreens {
         guard window.isVisible, window.isKeyWindow, NSApp.isActive,
               !view.isHiddenOrHasHiddenAncestor else { throw CoreFailure.invalidProjection }
         view.layoutSubtreeIfNeeded(); view.displayIfNeeded()
-        let representation = try XCTUnwrap(view.bitmapImageRepForCachingDisplay(in: view.bounds))
-        view.cacheDisplay(in: view.bounds, to: representation)
+        // A transparent child omits its real window background in cacheDisplay.
+        // Render this exact visible region from its actual opaque ancestor;
+        // never fill, composite, restyle or resize the evidence after capture.
+        let ancestor = try XCTUnwrap(view.opaqueAncestor)
+        guard ancestor.window === window, ancestor.isOpaque,
+              (ancestor === view || view.isDescendant(of: ancestor)), view.visibleRect.contains(view.bounds) else { throw CoreFailure.invalidProjection }
+        let region = ancestor.convert(view.bounds, from: view)
+        guard ancestor.bounds.contains(region) else { throw CoreFailure.invalidProjection }
+        ancestor.layoutSubtreeIfNeeded(); ancestor.displayIfNeeded()
+        let originalDimensions = try XCTUnwrap(view.bitmapImageRepForCachingDisplay(in: view.bounds))
+        let representation = try XCTUnwrap(ancestor.bitmapImageRepForCachingDisplay(in: region))
+        guard representation.pixelsWide == originalDimensions.pixelsWide,
+              representation.pixelsHigh == originalDimensions.pixelsHigh else { throw CoreFailure.invalidProjection }
+        ancestor.cacheDisplay(in: region, to: representation)
         let bytes = try XCTUnwrap(representation.representation(using: .png, properties: [:]))
-        try admit(bytes, name: name, kind: "original AppKit named-view capture")
+        try admit(bytes, name: name, kind: "original AppKit named-view region from actual opaque ancestor")
     }
     func web(_ name: String, harness: OwnedPreviewHarness) async throws {
         let bytes = try await harness.snapshot()
