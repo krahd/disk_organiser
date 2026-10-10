@@ -24,6 +24,10 @@ jobs:
         run: npx jest --config jest.config.js --runInBand frontend/__tests__/inventory-snapshot-model.test.js frontend/__tests__/inventory-comparison-model.test.js
       - name: Test offline catalogue without a browser or backend
         run: node scripts/test_inventory_catalogue.cjs
+      - name: Test bounded library acknowledgements and DOM mutation fences
+        run: |
+          node scripts/test_native_library_protocol.cjs
+          node scripts/test_native_library_dom.cjs
       - name: Test data-only native ingress without granting native authority
         run: node scripts/test_native_catalogue_bridge.cjs
 

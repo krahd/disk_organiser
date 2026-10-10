@@ -145,7 +145,7 @@ extension LibraryApplicationTests {
     func testStartupKeepsActionsUnavailableUntilEmptyReadyViewConfirmed() async throws {
         let source = OwnedLibrarySource()
         let h = try await OwnedPreviewHarness.open(); defer { h.close() }
-        let window = LibraryWindowController(session: LibrarySession(host: h.host, source: source), startReady: false)
+        let window = try LibraryWindowController(session: LibrarySession(host: h.host, source: source), startReady: false)
         defer { window.discardAndClose() }
         try h.useApplicationWindow(window.window); window.show()
         XCTAssertFalse(window.exploreButton.isEnabled); XCTAssertEqual(source.calls, 0)

@@ -69,7 +69,7 @@ private final class PreviewApplicationDelegate: NSObject, NSApplicationDelegate 
                 FileHandle.standardOutput.write(Data("DISK_PREVIEW_HOST_CREATED\n".utf8))
                 try await host.load()
                 FileHandle.standardOutput.write(Data("DISK_PREVIEW_VIEW_READY\n".utf8))
-                let library = LibraryWindowController(session: LibrarySession(host: host, source: BundledLibraryExamples()), startReady: false)
+                let library = try LibraryWindowController(session: LibrarySession(host: host, source: BundledLibraryExamples()), startReady: false)
                 opened = library
                 self.library = library
                 library.didClose = { [weak self] in

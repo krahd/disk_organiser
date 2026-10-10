@@ -90,7 +90,7 @@ final class OwnedPreviewHarness {
         guard host.webView.window === selected else { throw OwnedPreviewHost.Failure.unavailable }
         window.orderOut(nil); window.close(); window = selected
     }
-    static func open(width: CGFloat = 1280, height: CGFloat = 960) async throws -> OwnedPreviewHarness {
+    static func open(width: CGFloat = 1280, height: CGFloat = 960, storageMode: CataloguePreviewHost.StorageMode = .temporary) async throws -> OwnedPreviewHarness {
         try prepareApplication()
         var template = Array("/private/tmp/disk-preview-rules-XXXXXX".utf8CString)
         let path = try template.withUnsafeMutableBufferPointer { buffer in
@@ -110,7 +110,7 @@ final class OwnedPreviewHarness {
             }
         }
         let rule = try XCTUnwrap(compiled.rule)
-        let host = try OwnedPreviewHost(rule: rule, width: width, height: height)
+        let host = try OwnedPreviewHost(rule: rule, width: width, height: height, storageMode: storageMode)
         let harness = OwnedPreviewHarness(host: host, ruleStore: store, cacheDirectory: directory)
         do { try await host.load(); return harness }
         catch { harness.close(); throw error }

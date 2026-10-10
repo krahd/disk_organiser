@@ -49,17 +49,21 @@ final class LibraryApplicationTests: XCTestCase {
     }
     func open(_ source: any LibrarySource) async throws -> (OwnedPreviewHarness, LibraryWindowController) {
         let h = try await OwnedPreviewHarness.open()
-        let window = LibraryWindowController(session: LibrarySession(host: h.host, source: source))
+        let window = try LibraryWindowController(session: LibrarySession(host: h.host, source: source))
         try h.useApplicationWindow(window.window); window.show()
         return (h, window)
     }
-    func button(_ id: String, in window: NSWindow) throws -> NSButton {
+    // Polling and expected absence must not record an XCTest failure.
+    func optionalButton(_ id: String, in window: NSWindow) -> NSButton? {
         func find(_ view: NSView) -> NSButton? {
             if let button = view as? NSButton, button.identifier?.rawValue == id { return button }
             for child in view.subviews { if let result = find(child) { return result } }
             return nil
         }
-        return try XCTUnwrap(window.contentView.flatMap(find))
+        return window.contentView.flatMap(find)
+    }
+    func button(_ id: String, in window: NSWindow) throws -> NSButton {
+        try XCTUnwrap(optionalButton(id, in: window))
     }
     // AppKit controls use a tracking loop. Queue both events before dispatching
     // down so that the control can consume its corresponding native mouse-up.
@@ -70,10 +74,11 @@ final class LibraryApplicationTests: XCTestCase {
         repeat {
             h.pumpApplicationEvents()
             let candidate = id == "window-close" ? h.window : (h.window.attachedSheet ?? h.window)
+            candidate.contentView?.layoutSubtreeIfNeeded()
             let control: NSButton?
             if id == "window-close" {
                 control = h.window.attachedSheet == nil ? candidate.standardWindowButton(.closeButton) : nil
-            } else { control = try? button(id, in: candidate) }
+            } else { control = optionalButton(id, in: candidate) }
             if let control, control.isEnabled, !control.isHiddenOrHasHiddenAncestor {
                 NSApp.activate(ignoringOtherApps: true); candidate.makeKeyAndOrderFront(nil)
                 if NSApp.isActive, candidate.isKeyWindow, candidate.isVisible {
@@ -89,7 +94,11 @@ final class LibraryApplicationTests: XCTestCase {
         let point = control.convert(NSPoint(x: control.bounds.midX, y: control.bounds.midY), to: nil)
         let parent = try XCTUnwrap(control.superview)
         let hit = control.hitTest(parent.convert(point, from: nil))
-        guard let hit, hit === control || hit.isDescendant(of: control) else { throw CataloguePreviewHost.Failure.unavailable }
+        let localVisible = control.visibleRect
+        let centre = NSPoint(x: control.bounds.midX, y: control.bounds.midY)
+        let ownHit = hit.map { $0 === control || $0.isDescendant(of: control) } ?? false
+        print("OWNED_APP_HIT id=\(id) frame=\(control.frame) bounds=\(control.bounds) visible=\(localVisible) windowPoint=\(point) ownHit=\(ownHit) centreVisible=\(localVisible.contains(centre))")
+        guard ownHit, localVisible.contains(centre) else { throw CataloguePreviewHost.Failure.unavailable }
         print("OWNED_APP_CONTROL id=\(id) active=\(NSApp.isActive) key=\(window.isKeyWindow) enabled=\(control.isEnabled) point=\(point)")
         for (offset, type) in [NSEvent.EventType.leftMouseDown, .leftMouseUp].enumerated() {
             controlEventNumber += 1

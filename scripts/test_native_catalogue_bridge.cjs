@@ -1,7 +1,7 @@
 "use strict";
 const assert = require("node:assert/strict");
 const { launch, example, partial, C } = require("./test_inventory_catalogue.cjs");
-const V = "catalogue-data-bridge/v1", S = "01234567-89ab-cdef-0123-456789abcdef";
+const V = "catalogue-data-bridge/v2", S = "01234567-89ab-cdef-0123-456789abcdef";
 const id = n => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`;
 const checks = [];
 (async () => {
@@ -12,7 +12,7 @@ const checks = [];
   const a = await launch({ embedded: true }), { d, dom } = a, B = dom.window.DiskCatalogueNativeBridge;
   assert.ok(Object.isFrozen(B));
   assert.equal(Object.getOwnPropertyDescriptor(dom.window, "DiskCatalogueNativeBridge").writable, false);
-  assert.deepEqual(Object.keys(B).sort(), ["initialise", "retire", "stage"]);
+  assert.deepEqual(Object.keys(B).sort(), ["initialise", "retire", "stage", "status", "exportCatalogue", "acknowledgeSaved", "savedResult", "prepareClose", "releaseClose", "prepareOpen", "prepareReplacement", "retireCandidate", "commitReplacement", "replacementResult", "cancelOpen"].sort());
   ["open-inventory", "save-catalogue", "inventory-file", "prepare-plan", "catalogue-saved"].forEach(x => {
     assert.equal(d.getElementById(x).hidden, true); assert.equal(d.getElementById(x).disabled, true);
   });
@@ -32,9 +32,9 @@ const checks = [];
   assert.equal(a.downloads.length, 0);
   checks.push("embedded file events and unavailable export controls have no read or download path");
   assert.throws(() => B.stage(V, S, id(1), example));
-  for (const [v, s] of [["next", S], [V, "invalid"], [V, null]]) assert.throws(() => B.initialise(v, s));
-  const ready = B.initialise(V, S); assert.equal(ready.state, "ready");
-  assert.throws(() => B.initialise(V, S));
+  for (const [v, s] of [["next", S], [V, "invalid"], [V, null]]) assert.throws(() => B.initialise(v, s, "temporary"));
+  const ready = B.initialise(V, S, "temporary"); assert.equal(ready.state, "ready");
+  assert.throws(() => B.initialise(V, S, "temporary"));
   checks.push("session initialisation is explicit, bounded and one-use");
   for (const [v, s, i] of [["next", S, id(1)], [V, id(99), id(1)], [V, S, "bad"]])
     assert.throws(() => B.stage(v, s, i, example));
@@ -100,11 +100,11 @@ const checks = [];
   assert.equal(a.cards().length, 2);
   assert.throws(() => B.stage(V, S, id(7), example));
   assert.throws(() => B.retire(V, S, id(6)));
-  assert.throws(() => B.initialise(V, S));
+  assert.throws(() => B.initialise(V, S, "temporary"));
   checks.push("navigation permanently invalidates the document session and staged Add");
   assert.deepEqual(a.errors, []); assert.equal(a.downloads.length, 0); dom.window.close();
   const cap = await launch({ embedded: true }), cb = cap.dom.window.DiskCatalogueNativeBridge;
-  cb.initialise(V, S);
+  cb.initialise(V, S, "temporary");
   for (let i=0;i<128;i++) { cb.stage(V, S, id(i), example); cb.retire(V, S, id(i)); }
   assert.throws(() => cb.stage(V, S, id(128), example), /session is full/);
   assert.equal(cap.cards().length, 0); assert.deepEqual(cap.errors, []); cap.dom.window.close();

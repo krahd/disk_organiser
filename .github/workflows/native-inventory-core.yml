@@ -41,6 +41,8 @@ jobs:
         run: python native/DiskInventoryCore/Validation/check_preview_assets.py
       - name: Verify canonical parser and isolated UTF-8 codec parity
         run: node native/DiskInventoryCore/Validation/check_catalogue_codec.cjs
+      - name: Test the fixed data-only library protocol
+        run: node scripts/test_native_library_protocol.cjs
       - name: Compile the development preview entry point without activating folder access
         run: xcrun swift build --package-path native/DiskInventoryCore --product DiskOrganiserPreview
       - name: Test only fresh owned Darwin fixtures, lifecycle and WebKit preview
@@ -48,6 +50,7 @@ jobs:
           DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
           DISK_INVENTORY_PREVIEW_OUTPUT: ${{ runner.temp }}/disk-inventory-preview-screens
           DISK_APPLICATION_PREVIEW_OUTPUT: ${{ runner.temp }}/disk-application-preview-screens
+          DISK_LIBRARY_INTERACTION_OUTPUT: ${{ runner.temp }}/disk-library-interaction-screens
         run: xcrun swift test --package-path native/DiskInventoryCore
       - name: Compare native snapshots with an independently created Python fixture oracle
         env:
@@ -79,5 +82,13 @@ jobs:
         with:
           name: owned-native-application-screens
           path: ${{ runner.temp }}/disk-application-preview-screens/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Preserve original owned Save/Open interaction captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-native-library-interaction-screens
+          path: ${{ runner.temp }}/disk-library-interaction-screens/
           if-no-files-found: warn
           retention-days: 14
