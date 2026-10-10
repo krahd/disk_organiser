@@ -1,6 +1,6 @@
 # Owned native inventory core
 
-An isolated Swift/Darwin engineering prototype for bounded, metadata-only observations. It has **no package product, public scanner API, executable, production selection factory, picker, entitlement, WebKit bridge or app entry point**. Existing Python and browser runtimes remain unchanged.
+An isolated Swift/Darwin engineering prototype for bounded, metadata-only observations. It has **no package product, public scanner API, executable, production selection factory, picker, entitlement or app entry point**. The core library and Python runtime remain unchanged; a separate owned-fixture test target now exercises an embedded WebKit catalogue, while standalone browser behaviour is preserved.
 
 Only the test target constructs a source lease, from a fresh temporary directory it creates and owns. A private held descriptor and the test's address guard are process-local objects, never JSON, persisted permissions or physical-drive identity. No production source-class admission is implemented. The supplied classifier means only “owned test fixture”. The test adapter supplies the absolute-address ancestor re-walk; a production picker/admission adapter does not exist.
 
@@ -48,3 +48,7 @@ Both native runs used Xcode 16.4 (16F6), SDK 15.5 and Apple Swift 6.1.2 on macOS
 - Real external-drive reads, unplug/reconnect behaviour, user usability, backup/restore or provider integration
 
 Those remain separately reviewed gates. Passing a descriptor test or producing a valid JSON snapshot cannot activate them.
+
+## Owned visual handoff test target
+
+The separate `DiskInventoryPreviewTests` target now contains an isolated AppKit/WebKit host and five owned-fixture UI/lifecycle tests. It is not a package product, application entry point or signed sandbox integration. Canonical frontend assets are copied into its narrow resource bundle and checked byte-for-byte before execution. The source checkpoint has only local JS/DOM validation; actual macOS compilation and WebKit/pixel acceptance remain pending. See [the exact preview boundary and test plan](OWNED-PREVIEW.md). Existing core source, limits and saved formats are unchanged.

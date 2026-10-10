@@ -37,9 +37,12 @@ jobs:
           sw_vers
           printf 'Runner image: %s %s\n' "${ImageOS:-unknown}" "${ImageVersion:-unknown}"
           test ! -e "$DISK_INVENTORY_GOLDEN_OUTPUT"
-      - name: Test only fresh owned Darwin fixtures and internal lifecycle
+      - name: Verify the exact bundled catalogue before native execution
+        run: python native/DiskInventoryCore/Validation/check_preview_assets.py
+      - name: Test only fresh owned Darwin fixtures, lifecycle and WebKit preview
         env:
           DISK_INVENTORY_GOLDEN_OUTPUT: ${{ runner.temp }}/disk-inventory-goldens
+          DISK_INVENTORY_PREVIEW_OUTPUT: ${{ runner.temp }}/disk-inventory-preview-screens
         run: xcrun swift test --package-path native/DiskInventoryCore
       - name: Compare native snapshots with an independently created Python fixture oracle
         env:
@@ -56,4 +59,12 @@ jobs:
           name: owned-native-inventory-goldens
           path: ${{ runner.temp }}/disk-inventory-goldens/*.json
           if-no-files-found: error
+          retention-days: 14
+      - name: Preserve original owned WebKit screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-native-preview-screens
+          path: ${{ runner.temp }}/disk-inventory-preview-screens/
+          if-no-files-found: warn
           retention-days: 14

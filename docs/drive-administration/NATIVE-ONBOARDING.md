@@ -1,6 +1,6 @@
 # Native selected-folder onboarding contract
 
-Native onboarding design · 9 October 2026 · isolated owned-fixture core only; native product access remains gated
+Native onboarding design · 10 October 2026 · owned-fixture core and test-only visual handoff; native product access remains gated
 
 ## Decision
 
@@ -258,3 +258,7 @@ Research was read on 9 October 2026. Exact current SDK behaviour still needs the
 - [Swift canonical string equality](https://docs.swift.org/swift-book/LanguageGuide/StringsAndCharacters.html)
 
 `OFFICIAL-NATIVE-ROUTE-RESEARCH.md` retains further source links, the rejected Python-transfer/Save-As shortcuts, Windows/Linux contrasts and the distinction between source-backed primitives and design recommendations.
+
+## Isolated visual-host source checkpoint
+
+A separately scoped test-only `DiskInventoryPreviewTests` target now authors the one-way structured snapshot staging/retirement handoff and renders the exact bundled catalogue. It adds no product, actual picker/grant, entitlement, container save/reopen or user-drive access. Unsupported embedded Open/Save/manual export are explicitly unavailable. The existing strict import preview stays shared and all saved JSON remains untrusted. This is a smaller owned-only probe before the signed Phase B host, not Phase B completion. [Implementation contract and currently unexecuted native acceptance plan](../../native/DiskInventoryCore/OWNED-PREVIEW.md) records the exact limits.
