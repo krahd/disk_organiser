@@ -1,6 +1,16 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 13:04
+Last updated: 2026-10-11 03:07
+
+## Owned-folder feasibility: small reconstructed source checkpoint
+
+- Main `57078cd37e112fe611c2f3bb36ebc63a017863e2` remains intact, with all six workflows successful. Its [owned native run 38054978952](https://github.com/krahd/disk_organiser/actions/runs/38054978952) records the existing 217 XCTest methods plus six differential and six parser cases. These are prior main results, not execution of this reconstruction.
+- The unpublished next host candidate and its local review files became unavailable after the workspace changed. Exact recovery was not possible. This [new, smaller source checkpoint](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/README.md) reconstructs only pure fixture/inventory claim validation and the portable containment corpus. It has a new source identity and needs fresh independent review; no old host/test acceptance is inherited.
+- The module performs no filesystem, native, signing, panel, grant, process or network operation. Byte/nesting limits precede JSON decoding; exact schema validation follows decoding; complete inventory/root/parent checks and component-wise bounded link resolution reject escaping and invalid intermediates. Parsed imported claims are never source authority, observed files, physical-drive identities or backup verification.
+- Locally, 32 memory-only methods pass, including 19 corpus cases. Python source parses and the operational entry refuses. The first author run exposed a recursion-limit assumption, corrected with an explicit nesting guard and boundary regression. No native or actual folder probe ran. The prior candidate's larger tests and Swift consumer have not been recovered.
+- Missing configuration/signature sealing, descriptor ownership/ACL controls, same-object access evidence, native host/UI source and parser parity are explicit future gates. Ordinary app, closed selection gate, observer, package, workflows and all prior history are unchanged. New host build/sign/panel execution remains unapproved; real-folder controls stay unavailable.
+
+The following PR29 sections retain their historical source/closeout checkpoints; merged-main success is confirmed above.
 
 ## Synchronous selection cancellation: executed owned regression
 
@@ -807,4 +817,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 13:04
+Last updated: 2026-10-11 03:07

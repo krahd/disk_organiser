@@ -1,0 +1,47 @@
+{
+  "absentPath": "/owned-fixture-placeholder/selected/must-remain-absent.bin",
+  "bundleIdentifier": "org.diskorganiser.owned-selection-probe.22222222-2222-4222-8222-222222222222",
+  "caseID": "22222222-2222-4222-8222-222222222222",
+  "fixtureParent": "/owned-fixture-placeholder",
+  "objects": {
+    "parent": {
+      "device": 1,
+      "gid": 20,
+      "inode": 1,
+      "mode": 16832,
+      "size": 0,
+      "uid": 501
+    },
+    "selected": {
+      "device": 1,
+      "gid": 20,
+      "inode": 2,
+      "mode": 16832,
+      "size": 0,
+      "uid": 501
+    },
+    "selectedFile": {
+      "device": 1,
+      "gid": 20,
+      "inode": 3,
+      "mode": 33152,
+      "size": 32,
+      "uid": 501
+    },
+    "siblingFile": {
+      "device": 1,
+      "gid": 20,
+      "inode": 4,
+      "mode": 33152,
+      "size": 32,
+      "uid": 501
+    }
+  },
+  "runID": "11111111-1111-4111-8111-111111111111",
+  "schemaVersion": 1,
+  "selectedBytesHex": "3031323334353637383961626364656630313233343536373839616263646566",
+  "selectedFile": "/owned-fixture-placeholder/selected/probe.bin",
+  "selectedPath": "/owned-fixture-placeholder/selected",
+  "siblingBytesHex": "6665646362613938373635343332313066656463626139383736353433323130",
+  "siblingFile": "/owned-fixture-placeholder/outside/sentinel.bin"
+}
