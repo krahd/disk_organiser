@@ -1,6 +1,51 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 01:34
+Last updated: 2026-10-12 04:20
+
+## Catalogue clarity: independently reviewed execution
+
+- Source `3cb622a2937a7527cdb98930e7d0e4da625fb29a`, tree `1d9506f7a780f56fe2247e5b2cbd03ddcd203cd0`, passes all twelve push/PR workflows. The distinct PR checkout `d7ad16c9fbd8ac9e7f96f9784bbba6968dfae7f2` has that exact tree. Eleven successor paths and all 338 other parent blobs match the frozen source review; across PR31, twelve paths change and 337 other main blobs remain exact.
+- Both native [push](https://github.com/krahd/disk_organiser/actions/runs/38201624382) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38201627561) pass all 217 distinct XCTest methods exactly once, retaining the baseline, plus six differential/six parser cases and 78 true native hit/visible-centre pairs per lane. Both catalogue [push](https://github.com/krahd/disk_organiser/actions/runs/38201624355) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38201627516) pass thirteen actual browser journeys. The added journey exercises the contextual/source disclosures with keyboard focus while a narrow file query and selection remain intact.
+- Independent fresh source/log/archive/original-pixel review accepts the scoped refinement. All 68 distinct image contents across 110 lane PNGs were opened; 42 duplicates match by exact bytes. The 320px/200% search pager has complete stacked controls and a readable description; rows prioritise path, numbered source and listed size. Partial/gap/refusal states remain visible; connection, capacity and backup are not inferred. Root separately inspected browser originals 50–53. This is development-preview acceptance, not arbitrary-device or commercial-readiness validation.
+- All twelve provider archive digests and all extracted members, including manifests, verify. Current browser manifests are byte-exact; the older 8a6 extracted-manifest newline issue remains documented only for that checkpoint. Native screenshots remain named/scrolled regions; 87 is scrolled and 96 shows the reopened header/context/count. Tall browser 26/30 originals are viewer-scaled to 6,000px without changing stored bytes. APFS refused the invalid-UTF8-name fixture with errno 92; synthetic rejection is unconditional. Actions retention is fourteen days; no durable image archive is claimed.
+- The recovery source `8e62c9d9fd68b15f1fcbfb18420d49f69e80595a` has a separate independent 32-method memory-contract review, including the 19-case corpus, and all twelve existing push/PR workflows pass. The configuration child `10b77d170e19478fd6bb5411d512b94115912444` separately passes 54 memory methods (32 retained plus 22 new), independently reviewed with admitted mutation and negative-control checks. A fresh 54-method rerun preserves every reviewed helper byte. Existing CI does not run those new Python methods; its native counts do not stand in for them. The helpers remain inert claims, with no Xcode parser, observed signature/launch seal or access authority.
+- This combined documentation preserves every earlier shelf, recovery and configuration status section. The exact tested catalogue/runtime assets and reviewed helper blobs remain unchanged. New combined-tree CI is required before integration; the source runs and originals above are not relabelled as later-head evidence. The real-folder control, observer admission and production dependency graph remain closed. The next proposed functional slice is responsive, cancellable owned observation with progress and offline Save/Open validation; it does not activate a user-folder entry point.
+
+The following sections retain their source-specific historical pending/failure states. They do not supersede this exact-source closeout.
+
+## Catalogue clarity: scoped usability successor
+
+- One contextual saved-snapshot notice carries unverified dates/details and unknown connection/backup state. File rows prioritise path, numbered record and listed size; repeated per-row historical dates move to the existing record context and expandable source details. Original raw dates/labels, partial records, unsupported rows, exclusions and recorded errors remain available, with gap/error summaries visible outside the collapsed details.
+- At narrow widths both search and comparison pagers use full-width vertical controls and a full-width description. The project heading is shortened to “Group your files”. No fonts are reduced; pager labels and description remain complete, with no clipped overflow. Canonical/native asset parity and all data, storage, source and native capability gates are unchanged.
+- Local validation passes 665 Jest, 50 catalogue DOM checks, 12 persistence DOM, 16 ingress, 18 protocol, eight-asset/two-example parity and 22 parser cases/4,102 UTF-8 samples. Thirteen browser journeys are authored/listed, preserving the prior twelve and adding real keyboard expansion of contextual/provenance details while a narrow file selection remains intact. The 200% pager test now requires every child to fill the row width and stack in DOM order, retaining the <=1px overflow, 44px button and real pointer/keyboard paging assertions.
+- This successor has not yet had frozen-source independent review or hosted browser/native/pixel execution. The accepted evidence immediately below belongs only to `8a6b7244`, not these changed UI bytes. No local browser restriction was bypassed and no new native experiment is introduced.
+
+## Saved-location shelf: exact-head executed closeout
+
+- Source `8a6b724485d35723a6371e338019c9a44017ca3e`, tree `519e36e503473d1a4171be0cf18ab6ace80e57c0`, passes all twelve push/PR workflows. Main stays `57078cd37e112fe611c2f3bb36ebc63a017863e2`; PR31 is draft and unmerged at this checkpoint. Twelve changed paths and 337 other preserved blobs reconcile. PR checkout `cca25310992297e8f9540806c209310b5118f1e9` is a distinct commit with that same tree.
+- Both native [push](https://github.com/krahd/disk_organiser/actions/runs/38196200524) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38196203329) retain all 217 distinct XCTest methods, plus six differential/six parser cases and 78 strict true native hit/visible-centre pairs per lane. Both catalogue [push](https://github.com/krahd/disk_organiser/actions/runs/38196200497) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38196203320) pass twelve browser journeys. Prior 11/12 failures below remain failed checkpoints.
+- Independent source/log/original-pixel closeout verifies all 63 distinct image contents across 104 lane PNGs. The 200% pagination repair contains both buttons; awkward description/heading composition and repetitive warnings remain known usability issues addressed only by the separately tested successor above. Native images are named chrome/sheet/WebKit regions, not full-window composites; browser49 and native87 are scrolled portions, native96 shows the reopened header/count. Tall26/30 browser originals are viewer-scaled to 6,000px while stored PNG bytes remain unchanged.
+- All native/archive/image digests verify. Two extracted browser manifest copies have one appended newline; their parsed contents match, but only the retained inner-ZIP manifests are exact bytes. The PNG originals are exact. The filesystem refusal of an invalid-UTF8 fixture name remains explicit; no successful native creation is claimed. Actions retention is fourteen days, and no durable screenshot archive is claimed.
+- No actual user-folder, ordinary default-storage-path, panel/grant, signing, screen-reader, arbitrary-device or commercial-readiness claim follows. Detailed scope is in [the catalogue guide](docs/INVENTORY-CATALOGUE.md#shelf-executed-closeout-and-clarity-successor). Recovery PR30 and the configuration-pair checkpoint remain separate.
+
+## Saved-location shelf: measured pagination repair
+
+- Diagnostic source `50917dc7adb513ac122d1f6db232fbafdf7ee3c9`, owned browser job `114638165656`, identifies the sole overflowing rectangle: `next-results`, left 258.234375px, right 396.828125px, width 138.59375px in a 320px viewport. The no-wrap, non-shrinking button row exceeded the page width at 200% root text; the 77px gate correctly failed.
+- The repair allows the existing pagination flex row to wrap. Buttons keep their full labels, no-wrap/non-shrinking safeguards and minimum targets; no overflow is hidden or clipped. Canonical/native CSS parity is retained.
+- The enlarged-text journey retains the strict <=1px overflow gate and adds 110 owned entries in record 1, genuine Next pointer/Previous keyboard paging, positive parent containment/44px geometry and an original pager capture. Twelve journeys remain authored. Native execution, repaired browser outcome and original-pixel acceptance remain pending; earlier failed checkpoints are preserved below.
+
+## Saved-location shelf: first hosted diagnostic
+
+- Draft PR31 source `a0d7c088fe2bc38e1561e35147f477b5c22252f7` passes 11 of 12 browser journeys in both push and PR runs. The new 320px viewport with 200% root text exposes 77px horizontal overflow. Normal narrow layout and keyboard browsing of record 32 pass. This is a real unresolved layout gate, not visual acceptance.
+- Both Linux/Windows catalogue contract lanes and the other four non-native workflows pass. The two native workflows are still queued at this checkpoint. Original screenshot/failure archives were retrieved and their GitHub SHA-256 digests verified; no image was altered or durably archived.
+- A test-only diagnostic adds bounded element geometry to the unchanged horizontal-overflow assertion. It does not change runtime CSS, controls, thresholds, interaction actions or workflow. The next hosted result must identify the offending layout before a source repair is claimed.
+
+## Saved-location shelf: source checkpoint
+
+- The historical catalogue has a compact, fully enumerated saved-record shelf and focused folder breakdown. Duplicate labels have record numbers; scope changes retain the search query and cross-record project selection. Current connection, physical identity, capacity and backup status are not inferred.
+- Primary search/selection now precedes optional comparison. Exact original source/date details, partial/root-only uncertainty and native persistence fences remain. This changes presentation and owned tests only; all source, schema, storage and real-folder gates are unchanged.
+- Local checks pass: 665 Jest, 47 catalogue DOM, 12 native persistence DOM, 16 ingress, 18 protocol, eight bundled assets/two examples and 22 parser cases/4,102 UTF-8 samples. Formatting passes. Twelve browser journeys are authored, including two new shelf cases; actual browser/native execution and independent original-pixel acceptance remain pending. Local Chromium failed at its socket restriction, without a security workaround.
+- This tranche starts from accepted main `57078cd37e112fe611c2f3bb36ebc63a017863e2`. Recovery PR30 and the separate memory-only configuration-pair branch remain separate checkpoints; this UI does not reconstruct or activate the missing signed host. [Workflow and limits](docs/INVENTORY-CATALOGUE.md#compact-saved-location-shelf-source-checkpoint).
 
 ## Owned-folder feasibility: local configuration-pair consistency
 
@@ -827,4 +872,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 01:34
+Last updated: 2026-10-12 04:20

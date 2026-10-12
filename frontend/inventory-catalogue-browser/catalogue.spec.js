@@ -45,11 +45,33 @@ async function singleLineControl(control) {
   expect(lines).toBe(1);
 }
 async function geometry(page) {
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
-    )
-  ).toBeLessThanOrEqual(1);
+  const horizontal = await page.evaluate(() => {
+    const viewport = document.documentElement.clientWidth;
+    return {
+      overflow: document.documentElement.scrollWidth - viewport,
+      viewport,
+      offenders: [...document.body.querySelectorAll("*")]
+        .filter((n) => n.getClientRects().length && n.getBoundingClientRect().right > viewport + 1)
+        .map((n) => {
+          const rect = n.getBoundingClientRect(),
+            style = getComputedStyle(n);
+          return {
+            tag: n.tagName,
+            id: n.id,
+            class: String(n.className).slice(0, 100),
+            left: rect.left,
+            right: rect.right,
+            width: rect.width,
+            overflowX: style.overflowX,
+            whiteSpace: style.whiteSpace,
+            parent: n.parentElement?.id || n.parentElement?.className || "",
+          };
+        })
+        .sort((a, b) => b.right - a.right)
+        .slice(0, 24),
+    };
+  });
+  expect(horizontal.overflow, JSON.stringify(horizontal)).toBeLessThanOrEqual(1);
   const buttons = await page.locator("button:visible").evaluateAll((nodes) =>
     nodes.map((n) => ({
       h: n.getBoundingClientRect().height,
@@ -76,13 +98,19 @@ test("multi-location overview, offline search, source-preserving plan and catalo
   await add(page, first, "Working drive · creative folder");
   await add(page, second, "Archive drive · saved projects");
   await expect(page.locator(".source-card")).toHaveCount(2);
-  await expect(page.locator("#catalogue-count")).toContainText("physical drives unverified");
+  await expect(page.locator("#snapshot-context")).toContainText(
+    "connection and backup status unknown"
+  );
   await expect(page.locator(".source-card").last()).toContainText("Partial folder record");
   await shot(page, info, "21-catalogue-overview.png");
   await page.getByLabel("Search recorded names and paths", { exact: true }).fill("Film.mov");
   await expect(page.locator(".catalogue-entry")).toHaveCount(1);
   await expect(page.locator(".catalogue-entry")).toContainText("Archive drive");
-  await expect(page.locator(".catalogue-entry")).toContainText("Historical source date");
+  await expect(page.locator(".catalogue-entry")).toContainText("File · 9.0 MiB listed");
+  await expect(page.locator(".source-date time").last()).toHaveAttribute(
+    "datetime",
+    JSON.parse(fs.readFileSync(second, "utf8")).source.observed_at
+  );
   await shot(page, info, "22-catalogue-offline-search.png");
   await page
     .getByRole("checkbox", {
@@ -588,4 +616,212 @@ test("comparison stays readable on narrow screens and keyboard zoom with duplica
   await comparisonTop(page);
   await geometry(page);
   await shot(page, info, "45-comparison-css-zoom.png", { fullPage: false });
+});
+
+test("saved-location shelf keeps query, source identity and cross-record choices", async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page);
+  await add(page, first, "Project drive");
+  await add(page, second, "Project drive");
+  const browse = (n) =>
+    page.getByRole("button", { name: `Browse record ${n}: Project drive`, exact: true });
+  const search = page.getByLabel("Search recorded names and paths", { exact: true });
+  await search.fill("Photos");
+  await browse(1).focus();
+  await page.keyboard.press("Enter");
+  await expect(browse(1)).toBeFocused();
+  await expect(browse(1)).toHaveAttribute("aria-pressed", "true");
+  await expect(search).toHaveValue("Photos");
+  await expect(page.locator("#location-focus-heading")).toHaveText("Record 1: Project drive");
+  await page
+    .getByRole("checkbox", { name: "Select Photos from Project drive", exact: true })
+    .check();
+  await expect(page.locator("#selected-scopes")).toContainText("Record 1: Project drive");
+  await page.locator(".location-focus").scrollIntoViewIfNeeded();
+  await geometry(page);
+  await shot(page, info, "46-shelf-focused-record.png", { fullPage: false });
+  await browse(2).click();
+  await expect(browse(2)).toBeFocused();
+  await expect(search).toHaveValue("Photos");
+  await expect(page.locator("#catalogue-results")).toContainText("No recorded matches");
+  await expect(page.locator("#location-focus-body")).toContainText("partial folder record");
+  await expect(page.locator("#selection-count")).toContainText("1 folder selected");
+  await page.locator(".location-evidence summary").click();
+  await expect(page.locator(".location-evidence")).toContainText(
+    "Original source label: Owned example"
+  );
+  await expect(page.locator(".location-evidence")).toContainText("not used/free disk space");
+  await search.fill("Film.mov");
+  await page
+    .getByRole("checkbox", { name: "Select Exports/Film.mov from Project drive", exact: true })
+    .check();
+  await page.getByRole("button", { name: "All saved locations", exact: true }).click();
+  await expect(search).toHaveValue("Film.mov");
+  await expect(page.locator("#selection-count")).toContainText("1 file and 1 folder selected");
+  await expect(page.locator("#selected-scopes")).toContainText("Record 2: Project drive");
+  await search.fill("");
+  await page.locator("#all-locations").scrollIntoViewIfNeeded();
+  await shot(page, info, "47-shelf-all-records.png", { fullPage: false });
+  await geometry(page);
+});
+
+test("saved shelf exposes every record at narrow width and enlarged text", async ({
+  page,
+}, info) => {
+  const C = require("../inventory-snapshot-model.js");
+  const snapshot = JSON.parse(fs.readFileSync(first, "utf8"));
+  snapshot.entries = [snapshot.entries[0]];
+  let catalogue = C.empty();
+  const label = "外付け · Saved archive <img onerror=alert(1)> · a very long location label";
+  const pagedSnapshot = {
+    ...snapshot,
+    entries: [
+      snapshot.entries[0],
+      ...Array.from({ length: 110 }, (_, n) => ({
+        path: `owned-${n}.txt`,
+        kind: "file",
+        status: "observed",
+        logical_bytes: "1",
+      })),
+    ],
+  };
+  for (let n = 0; n < 32; n++)
+    catalogue = C.add(catalogue, n === 0 ? pagedSnapshot : snapshot, label);
+  await page.setViewportSize({ width: 320, height: 900 });
+  await open(page);
+  await page.locator("#inventory-file").setInputFiles({
+    name: "owned-many-records.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(C.exportCatalogue(catalogue)),
+  });
+  await page.getByRole("button", { name: "Replace catalogue and open", exact: true }).click();
+  await expect(page.locator(".source-card")).toHaveCount(32);
+  const last = page.getByRole("button", { name: `Browse record 32: ${label}`, exact: true });
+  await last.focus();
+  await page.keyboard.press("Space");
+  await expect(last).toBeFocused();
+  await expect(last).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#location-focus-heading")).toHaveText(`Record 32: ${label}`);
+  await expect(page.locator(".location-focus img")).toHaveCount(0);
+  await expect(page.locator("#location-focus-body")).toContainText(
+    "does not establish that the location is empty"
+  );
+  await page.locator("#source-cards").scrollIntoViewIfNeeded();
+  await geometry(page);
+  await shot(page, info, "48-shelf-narrow-last-record.png", { fullPage: false });
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+  await page.locator(".location-focus").scrollIntoViewIfNeeded();
+  await geometry(page);
+  await shot(page, info, "49-shelf-enlarged-empty-record.png", { fullPage: false });
+  const filter = page.getByLabel("Look in", { exact: true });
+  await filter.selectOption(catalogue.records[0].id);
+  await expect(page.locator("#location-focus-heading")).toHaveText(`Record 1: ${label}`);
+  await expect(
+    page.getByRole("button", { name: `Browse record 1: ${label}`, exact: true })
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#result-page")).toContainText("Page 1 of 3");
+  await page.locator("#next-results").click();
+  await expect(page.locator("#result-page")).toContainText("Page 2 of 3");
+  await page.locator("#previous-results").focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#result-page")).toContainText("Page 1 of 3");
+  await page.locator("#next-results").scrollIntoViewIfNeeded();
+  const pager = await page.locator("#next-results").evaluate((next) => {
+    const parent = next.parentElement.getBoundingClientRect();
+    return [...next.parentElement.children].map((node) => {
+      const r = node.getBoundingClientRect();
+      return {
+        left: r.left - parent.left,
+        right: parent.right - r.right,
+        width: r.width,
+        height: r.height,
+        top: r.top,
+        bottom: r.bottom,
+        parentWidth: parent.width,
+        tag: node.tagName,
+      };
+    });
+  });
+  for (const rect of pager) {
+    expect(rect.left).toBeGreaterThanOrEqual(-1);
+    expect(rect.right).toBeGreaterThanOrEqual(-1);
+    expect(rect.width).toBeGreaterThanOrEqual(44);
+    expect(rect.height).toBeGreaterThan(0);
+    expect(Math.abs(rect.width - rect.parentWidth)).toBeLessThanOrEqual(1);
+    if (rect.tag === "BUTTON") expect(rect.height).toBeGreaterThanOrEqual(44);
+  }
+  expect(pager[0].bottom).toBeLessThanOrEqual(pager[1].top);
+  expect(pager[1].bottom).toBeLessThanOrEqual(pager[2].top);
+  await geometry(page);
+  await shot(page, info, "50-shelf-enlarged-pagination.png", { fullPage: false });
+  const heading = page.locator(".project-selection h2");
+  await expect(heading).toHaveText("Group your files");
+  const wordLines = await heading.evaluate((h) => {
+    const range = document.createRange();
+    const start = h.firstChild.textContent.indexOf("files");
+    range.setStart(h.firstChild, start);
+    range.setEnd(h.firstChild, start + 5);
+    return [...range.getClientRects()].map((r) => ({ width: r.width, height: r.height }));
+  });
+  expect(wordLines).toHaveLength(1);
+  expect(wordLines[0].width).toBeGreaterThan(0);
+  expect(wordLines[0].height).toBeGreaterThan(0);
+});
+
+test("contextual history and expandable provenance keep the narrow file task clear", async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page);
+  await add(page, first, "Projects");
+  await add(page, second, "Archive");
+  const notice = page.locator("#snapshot-context");
+  await expect(notice.locator("strong")).toHaveText(
+    "Saved snapshots · connection and backup status unknown"
+  );
+  await expect(notice.locator("p").first()).toContainText(
+    "Dates and details come from saved records and have not been verified"
+  );
+  await expect(notice.locator("details")).not.toHaveAttribute("open", "");
+  await shot(page, info, "51-clear-snapshot-context.png", { fullPage: false });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Browse record 2: Archive", exact: true }).click();
+  await page.getByLabel("Search recorded names and paths", { exact: true }).fill("Film.mov");
+  const row = page.locator(".catalogue-entry");
+  await expect(row.locator("strong")).toHaveText("Exports/Film.mov");
+  await expect(row).toContainText("Record 2: Archive");
+  await expect(row).toContainText("File · 9.0 MiB listed");
+  await expect(row.locator("time")).toHaveCount(0);
+  await row.getByRole("checkbox").check();
+  await expect(page.locator("#selection-count")).toHaveText("1 file selected");
+  await page.locator("#catalogue-results").scrollIntoViewIfNeeded();
+  await geometry(page);
+  await shot(page, info, "52-clear-narrow-file-task.png", { fullPage: false });
+  const provenance = page.locator(".location-evidence");
+  await provenance.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(provenance).toHaveAttribute("open", "");
+  await expect(provenance).toContainText("Raw claimed date:");
+  await expect(provenance).toContainText("Imported source claims are not authenticated");
+  await expect(provenance).toContainText("Exclusion: symlink_not_followed (1)");
+  await expect(page.locator(".record-warning")).toContainText("1 skipped item");
+  await expect(page.getByLabel("Search recorded names and paths", { exact: true })).toHaveValue(
+    "Film.mov"
+  );
+  await expect(page.locator("#selection-count")).toHaveText("1 file selected");
+  await provenance.locator("summary").focus();
+  await shot(page, info, "53-expandable-source-detail.png", { fullPage: false });
+  await page.keyboard.press("Enter");
+  await expect(provenance).not.toHaveAttribute("open", "");
+  await notice.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(notice.locator("details")).toHaveAttribute("open", "");
+  await expect(notice).toContainText("not disk capacity");
+  await expect(notice).toContainText("Missing results do not prove");
+  await expect(page.locator("#selection-count")).toHaveText("1 file selected");
+  await geometry(page);
 });

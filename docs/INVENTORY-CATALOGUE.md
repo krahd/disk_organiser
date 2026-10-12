@@ -10,7 +10,7 @@ This is a useful first offline catalogue, not a live drive connection. No defaul
 
 1. Open one snapshot JSON. Review its original folder label, claimed date and complete/partial status, then give the separate catalogue record a useful location label.
 2. Add further snapshots. A record might be labelled “Blue external drive · photos”, but this remains your label for one selected-folder observation, not verified physical-drive identity.
-3. Compare each card's top-level content groups and listed observed file sizes. Search across all records, including historical records of disconnected storage. Each result names its recorded location and source date so you know which storage to reconnect and check in your own tools.
+3. Browse a saved record to see its top-level content groups and listed observed file sizes. Search across all records, including historical records of disconnected storage. Each result names its recorded location and source date so you know which storage to reconnect and check in your own tools.
 4. Select plain observed files or folders across records. The interface prevents overlapping folder/descendant choices within a record. It cannot establish whether different records describe the same physical storage.
 5. Create and download a manual project plan. Open it in `manual-workspace.html` to choose intended homes, planned backup targets and restore checklists. The export does not replace any existing workspace or execute anything.
 6. Save the catalogue privately and acknowledge the download only after confirming it in Downloads. Reopen that file explicitly to resume. Temporary project selections are not part of the catalogue; export a manual plan to retain them.
@@ -24,7 +24,7 @@ The illustrative snapshots in `prototypes/inventory_catalogue/` were generated b
 - Logical-size composition sums only listed `observed` file paths. Directory sizes and uncertain-status file bytes are excluded. Hard links and repeated source snapshots can represent the same bytes more than once. These figures are not used/free space, recoverable capacity, deduplicated physical allocation or backup billing.
 - Complete means complete within that selected folder's bounded producer policy at the claimed time, not a whole-drive survey or an atomic snapshot. Partial records retain their gaps and may omit entire branches.
 - Current connection, physical identity, authenticated versions, dependencies, available capacity and protection are unknown. Missing search results never establish that a file is absent. The catalogue cannot notice a reconnection or refresh itself.
-- Four named content groups are shown on a card; any remaining groups are explicitly aggregated. All recorded entry matches remain accessible through 50-row pagination with total and page counts. Nothing is silently cut out of search.
+- Four named content groups are shown in the focused record view; any remaining groups are explicitly aggregated. All recorded entry matches remain accessible through 50-row pagination with total and page counts. Nothing is silently cut out of search.
 - Show details exposes original source labels, dates, source references, record keys, coverage, stop reasons, errors and exclusion counts. It changes presentation only.
 
 ## Readable dates and selection counts
@@ -139,3 +139,111 @@ Intermediate source `a34d9d8d44a23a5cb16d9d654df8180144a11ab2` passed all seven 
 ### Remaining product gates
 
 Native OS file-dialog controls, native browser-UI zoom, screen readers/forced colours, nontechnical participant success, additional browser engines, native volume identity and reconnection, representative real user-drive hardware, and physical backup/restore remain unverified separate gates. A well-formed snapshot or passing fixture test is not authority to operate on user files, proof of current connection, protection evidence or a commercial-readiness certificate.
+
+
+## Compact saved-location shelf (source checkpoint)
+
+The catalogue now presents a compact shelf of saved folder records, with a single focused breakdown rather than repeating every folder breakdown on every card. Record numbers distinguish duplicate labels in the shelf, the location selector, search-result descriptions and the project selection. These are catalogue positions, not hardware identities.
+
+- Choose **Browse record** or **Look in** to focus one historical record. **All saved locations** searches across the catalogue. Changing scope preserves the typed query and project choices; result pagination returns to the first page. Shelf button focus is restored after rendering, and the active choice has an explicit pressed state.
+- The shelf retains every supported record, up to the existing 32-record/aggregate-entry limits, in a bounded scrolling area. It does not discard or silently hide records from the selector or search.
+- The focused view shows claimed date, listed file sizes and the largest recorded folder groups. **Source and limits** retains the original label and raw claimed date. Renaming a label does not rewrite its historical origin.
+- A root-only snapshot explicitly says no file sizes are listed; it does not imply an empty live drive. Partial coverage, unknown connection and unauthenticated imported claims remain explicit. Listed bytes are logical sizes by path, not capacity, free space, physical storage or proof of a backup.
+- The primary search/project task precedes optional two-record comparison. No import/export schema, native data protocol, observer admission, storage authority or real-folder gate changes. Bundled native assets must match canonical frontend bytes.
+
+The design takes interaction lessons from [DaisyDisk's compact disk overview](https://daisydiskapp.com/guide/4/en/DisksOverview/) and [NeoFinder's catalogue library](https://www.cdfinder.de/guide/1/1.1/neofinder_overview.html). Their screenshots/assets/code are not included. This viewer has no live volume capacity or connection evidence, so those indicators are deliberately absent.
+
+Local source validation passes 665 Jest tests, 47 catalogue DOM checks, 12 persistence DOM checks, 16 ingress checks, 18 protocol checks, exact eight-asset/two-example parity and 22 parser cases/4,102 UTF-8 samples. The 12 browser journeys include two new shelf cases for keyboard scope changes, duplicate labels, retained selections, all 32 records, narrow layout and enlarged text. They are authored, not yet executed at this checkpoint. The ordinary local Chromium attempt failed at the environment's socket restriction; hosted owned-fixture browser/native runs and original-pixel review remain required. No new signed host, panel, grant or user-drive experiment is included.
+
+
+## Shelf executed closeout and clarity successor
+
+The source-only shelf checkpoint above was subsequently executed as source
+`8a6b724485d35723a6371e338019c9a44017ca3e`. All twelve push/PR workflows pass.
+The [native PR lane](https://github.com/krahd/disk_organiser/actions/runs/38196203329)
+and its push counterpart each retain all 217 XCTest identities plus six
+independent-fixture differential and six parser cases. Both catalogue browser
+lanes pass twelve journeys. The PR merge checkout is a distinct commit with the
+exact same source tree, not the source-head commit itself.
+
+Independent review verifies the source successors, fresh raw logs, archive
+hashes and all 63 distinct image contents across both native/browser lanes.
+The earlier 77px overflow is repaired without hiding overflow, shrinking text
+or weakening geometry. However, the description next to the enlarged pager and
+the following heading still compose awkwardly. That bounded containment pass
+is not professional large-text acceptance. Warning density also remains a
+separate usability concern. Named/scrolled capture limits, viewer scaling of
+the tallest originals, the APFS invalid-name refusal and fourteen-day Actions
+retention remain explicit. Two local browser manifest copies contain an extra
+newline; the original inner-ZIP manifest bytes and all PNG originals verify.
+No durable image archive, user-drive, permission or release claim follows.
+
+The next presentation-only successor makes those concerns concrete:
+
+- A single contextual notice identifies saved snapshots, unverified dates and
+  details, and unknown current connection/backup status. **About these records**
+  expands the selected-folder, physical-identity, listed-size and missing-result
+  limits. The comparison action retains its own necessary content/backup caution.
+- Cards and the focused record retain **Last recorded** dates with unchanged
+  recorded offsets. The existing **Source and limits** and **Show details**
+  paths retain exact raw dates, original labels and source provenance. Dates
+  are no longer repeated on every file row.
+- Rows keep the exact path, numbered source label, kind and listed size primary.
+  Unsupported or uncertain status and planning refusal stay visible. Partial
+  records still warn of gaps. The focused record shows nonzero errors, skipped
+  items and uncertain items before the expandable details; exact exclusion
+  reasons and stop reason remain in the details.
+- Narrow search/comparison pagers stack in their DOM order, with both controls
+  and the description using the full width. **Group your files** avoids the
+  previous long heading. Text size, content, 44px targets and strict overflow
+  checks remain intact.
+
+Local checks for this successor pass 665 Jest, 50 catalogue DOM, 12 persistence
+DOM, 16 ingress, 18 protocol, asset/example parity and 22 parser/4,102 UTF-8
+cases. Thirteen browser journeys are authored and listed, with all prior twelve
+retained. The new journey exercises keyboard expansion of both detail controls
+and keeps a narrow file task's query and selection. Strengthened 200% geometry
+requires full-width, nonoverlapping stacked pager children and an unsplit final
+heading word. Hosted successor browser/native execution, independent review and
+new original pixels remain required; the previous source's evidence is not
+relabelled as a pass for this UI. No runtime authority or product gate changes.
+
+## Clarity successor: exact executed acceptance
+
+Source `3cb622a2937a7527cdb98930e7d0e4da625fb29a` closes the presentation-only
+successor above. Its twelve push/PR workflows pass. Both native lanes retain
+all 217 distinct XCTest identities and six differential/six parser cases,
+with 78 true native hit/visible-centre pairs per lane. Both catalogue lanes
+pass thirteen browser journeys. See the [native PR run](https://github.com/krahd/disk_organiser/actions/runs/38201627561)
+and [catalogue PR run](https://github.com/krahd/disk_organiser/actions/runs/38201627516).
+The PR checkout `d7ad16c9fbd8ac9e7f96f9784bbba6968dfae7f2` is a distinct merge
+commit with the same tree `1d9506f7a780f56fe2247e5b2cbd03ddcd203cd0`.
+
+Independent fresh source/log/archive review and direct inspection of all 68
+distinct original image contents across 110 lane PNGs find no scoped blocker.
+Browser 50 shows the full-width Previous/description/Next stack at 320px with
+200% root text. The description and shorter heading are readable; the test
+preserves genuine pointer/keyboard paging, <=1px overflow, positive full-width
+nonoverlap bounds and >=44px targets. This is not a 300% claim. The comparison
+pager shares the CSS and is visible in browser 44/native 64, but has no new
+comparison-specific full-width geometric oracle.
+
+Originals 51–53 show the visible saved-snapshot context, clearer file row and
+keyboard-expanded provenance with the query/selection retained. Partial badges,
+gap/error counts, unsupported/refused rows and exact source details remain.
+Root separately inspected those originals and 50. The new journey exercises
+both disclosures; not every expanded state has a separate screenshot.
+
+Every provider archive and extracted member, including the current inner
+manifests, verifies byte-for-byte. Browser 26/30 exceed the viewer's 6,000px
+height limit, while the stored originals are unchanged. Native captures remain
+named chrome/sheet/WebKit regions: 87 is scrolled and 96 shows the reopened
+header/context/two-record count, not a full-window composite. The APFS
+invalid-name fixture refusal and unconditional synthetic rejection remain
+distinct. Fourteen-day Actions retention remains; no durable screenshot
+archive, screen-reader, real user-drive, OS permission or release acceptance
+is established.
+
+The later documentation/integration preserves these runtime and asset bytes.
+Exact combined-tree checks remain necessary; the cited runs and original
+pixels belong to this source, not a later commit.
