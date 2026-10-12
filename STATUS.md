@@ -1,6 +1,17 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 05:34
+Last updated: 2026-10-12 06:07
+
+## Responsive owned observation: independently reviewed execution
+
+- Source `49ef9aa88183161047bc951b087e611c7918fe33`, tree `35c1e170b260cc5f7bf6ab3ce0af4ccb187e014e`, passes all twelve push/PR workflows. The actual PR checkout `9b7a38d9d3295d5ca8191309514826e9e809f8c9` is a distinct commit with that exact tree. Ten changed paths and all 349 other baseline blobs match; the earlier zero-test compiler failure below remains a failed checkpoint.
+- Both native [push](https://github.com/krahd/disk_organiser/actions/runs/38208661231) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38208664712) pass 233 distinct XCTest identities once each, retaining all 217 actual baseline identities, plus six native/Python differential cases and six parser/catalogue roundtrips. Pinned toolchain, asset/codec parity, isolated selection graph/target, app and owned-probe compilation pass. Both browser lanes pass thirteen journeys; both Windows backend logs report 607 passed / 102 skipped without identifying skip reasons.
+- Independent exact-source/raw-log/archive/original-pixel review accepts this owned-fixture result. Active observation runs off-main, actual native Cancel and retry work, late success/progress remain fenced, and saved records can be searched after the test source folders are removed. Each lane has 82 strict native hit/control pairs and 48 successful DOM/native geometry records. This proves the bounded test-owned workflow, not real user-volume access or a hard cancellation deadline.
+- All ten native ZIPs and their extracted members verify. All 33 distinct original contents across 52 PNGs were independently opened. Capture 73 shows the actual three-entry count and native Cancel. Capture 96 now shows a scrolled search viewport with two separate `Projects/Design.txt` records and 600/700 listed bytes; its partial badge is asserted above that viewport, not visible in the image. Root separately inspected 73/96. The unchanged capture helper preserves named-region/viewport limits, original dimensions and pixels; no full-window or commercial-readiness claim follows.
+- Both native logs record filesystem refusal of the invalid-UTF8 name with errno 92; synthetic rejection is unconditional. Cancellation is cooperative and may suppress bytes after final guard/projection. Initial owned fixture/lease setup remains on the main actor. Actions artifacts expire after fourteen days; no durable image archive is claimed. The separate memory-only configuration checks are not part of the native test count.
+- Integration of PR30, PR32 and PR31 previously completed at main `b7d3747d74327a3fa7db661c7afcba0fd669a8ff`, with all six actual-main workflows green, 217 native methods plus six/six cases, and thirteen browser journeys. This documentation successor still requires its exact checks, guarded integration and actual merged-main verification. Runtime/test/assets/limits and the ordinary app's closed real-folder gate are unchanged. [Ownership and evidence limits](native/DiskInventoryCore/OWNED-ASYNC-OBSERVATION.md#executed-owned-fixture-closeout).
+
+The following pending and failed checkpoints retain their original source-specific meaning.
 
 ## Hosted compile checkpoint and test-import repair
 
@@ -888,4 +899,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 05:34
+Last updated: 2026-10-12 06:07

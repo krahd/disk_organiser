@@ -6,6 +6,51 @@ The ordinary app still depends only on DiskInventoryDesktop and uses bundled
 examples. DiskInventoryCore and the closed selection adapter remain unlinked
 from that product; no user-folder control is activated.
 
+## Executed owned-fixture closeout
+
+Exact source `49ef9aa88183161047bc951b087e611c7918fe33` passed all twelve
+push/PR workflows. Its distinct PR checkout
+`9b7a38d9d3295d5ca8191309514826e9e809f8c9` has the same tree
+`35c1e170b260cc5f7bf6ab3ce0af4ccb187e014e`.
+Both [push native](https://github.com/krahd/disk_organiser/actions/runs/38208661231)
+and [PR native](https://github.com/krahd/disk_organiser/actions/runs/38208664712)
+logs show 233 distinct XCTest identities passed once, retaining every 217
+baseline identity, plus six differential and six unchanged parser cases.
+Pinned Xcode 16.4/16F6, Swift 6.1.2, SDK, graph/target/app/probe compilation and
+asset/codec checks passed. Existing catalogue browser journeys passed thirteen
+per lane. Windows reported 607 passed / 102 skipped; reasons are not inferred.
+
+Independent source, raw-log, archive and original-pixel review found no blocking
+issue within that exact owned-fixture scope. All ten source paths and 349
+preserved blobs reconcile. Each native lane includes 82 true native hit/control
+pairs, 48 successful DOM/native geometry records, actual Cancel/retry,
+Close-from-progress, descriptor/weak-lifetime tests and positive late-success
+fencing. The offline Save/Open journey removes its own source folders before
+reopening and genuinely typing `Design`, then checks each path/size/record pair
+and zero new source calls. It does not prove physical unplug or drive identity.
+
+All ten native archives and 52 original PNGs verify; independent review opened
+all 33 distinct contents. Capture 73 shows actual progress and Cancel. Capture
+96 is now the scrolled search viewport with 600 B/700 B listed rows, not the old
+header/count-only view. Its partial badge is covered by the executed assertion
+above the viewport, not claimed visible in 96. Capture 87 also remains scrolled;
+all images retain named chrome/sheet/WebKit-region limits, not full-window
+completeness. Root separately inspected 73 and 96. Original pixels/dimensions
+and the capture helper are unchanged. Fourteen-day Actions retention does not
+constitute a durable image archive.
+
+Both logs explicitly retain the filesystem's errno-92 refusal of an invalid
+UTF-8 fixture name; only synthetic rejection is unconditional. Cooperative
+cancellation, final-guard/projection ordering and main-actor fixture setup
+limits below still apply. No real folder, panel, grant, signing, default app-data
+path or user-drive capability was exercised. The ordinary application remains
+unlinked from the observer and selection adapter.
+
+This acceptance belongs to the named source and original captures. Documentation
+successor checks, guarded integration and actual-main verification are separate.
+The compiler failure and authored-only checkpoint below are historical, not
+relabelled as successful execution.
+
 ## Ownership and cancellation
 
 The existing synchronous observer remains the only metadata walker. Its
