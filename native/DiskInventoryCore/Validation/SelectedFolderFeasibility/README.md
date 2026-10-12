@@ -1,165 +1,265 @@
-# Owned-folder feasibility: reconstructed contract checkpoint
+# Owned-folder selection feasibility: quarantined source
 
-This is a small, inert source checkpoint for a future read-only selected-folder
-experiment. It is outside SwiftPM and workflows. It supplies no app, picker,
-filesystem reader, signature observer, signing step or executable host.
+This directory contains an isolated AppKit probe, its UI-test project and bounded
+build/configuration observers. It is **source-only and unexecuted**. It is outside
+the production SwiftPM graph and every repository workflow. The ordinary app's
+real-folder control remains closed. The checked-in probe seal is `UNSEALED`,
+signing is disabled, and the two-entitlement template is inactive.
 
-The earlier unpublished 21-file host candidate became unavailable after the
-local workspace changed. Its exact bytes and review artefacts could not be
-recovered. These files are newly reconstructed and require their own review;
-they are not the earlier candidate and inherit none of its test claims. Accepted
-repository history through main `57078cd3` remains intact.
+This is a new reconstruction. The earlier unpublished host became unavailable;
+its bytes and native claims are not recovered or inherited. The reviewed memory
+contracts added in PR30/32 are retained exactly. Current integrated main
+`2417a402` has its own completed six workflows and 233 native methods plus six
+differential/six parser cases. Those results do not execute this new project.
 
-## Implemented now
+## The concrete question
 
-`Tools/probe_contract.py` validates only bounded, caller-supplied JSON bytes or
-in-memory inventory rows. Its immutable results are **claims**, not observed
-files, authenticated seals, physical-drive identities or access grants. No
-filesystem operation, path resolution, process, network or permission API is
-called. Imported JSON cannot activate the existing observer or real-folder
-button. The module's command entry refuses with exit 2 and reads no arguments.
+Can a genuine read-only folder selection support the observer's exact no-follow
+ancestor acquisition, then relinquish the selected access after all borrowed
+descriptors and the original panel-returned scope retire? This probe measures
+that question with a fresh, fixed 32-byte test control. It does not catalogue a
+user folder, implement another inventory walker, or establish physical-drive,
+backup, release or ordinary-app readiness.
 
-- Fixture claims require an exact version/field set, canonical UUIDs, a
-  case-bound bundle identifier, five fixed derived paths, four distinct claimed
-  objects on one claimed filesystem/owner, owner-only fixture modes and the two
-  fixed nonempty 32-byte controls. The example contains synthetic identifiers
-  and a placeholder address which is never opened.
-- Inventory claims require one directory root row, exact unique relative paths,
-  complete real-directory parents, kind/mode agreement and bounded file sizes.
-  Root metadata is validated; only descendants enter the descendant result.
-- Links resolve against the complete supplied inventory, component by component.
-  Each encountered link expands before any following parent component. Missing
-  or regular-file intermediates, root escape, cycles and exhausted budgets
-  refuse. No `normpath`, `realpath` or filesystem target lookup is used.
-- JSON is checked for byte and nesting limits before parsing. Duplicate keys,
-  invalid UTF-8, non-finite numbers, Boolean-as-integer and unknown fields refuse.
-  Paths preserve exact Unicode spelling; size/path agreement is no content or
-  backup proof.
+Three authored UI methods use real buttons and the standard panel:
 
-Limits: 4 KiB fixture JSON, 8 MiB inventory JSON, 16 JSON nesting levels, 20,000
-inventory rows, 1 KiB exact path/target text, 512 MiB per file and 2 GiB total
-claimed bytes. Link resolution allows at most 40 expansions, 4,096 steps per
-link, 200,000 aggregate steps, 1,024 pending components/16 KiB pending bytes and
-128 resolved components/1 KiB resolved bytes, including the initial parent.
-These are experiment limits, not product capacity or whole-drive coverage.
+1. Select the one sealed owned folder. The identical selected-file operation
+   must be denied before selection, succeed with identity and exact bytes while
+   selected, and be denied again after retirement.
+2. Cancel the actual panel. No selected scope or observing worker is adopted.
+3. Cancel a held successful read. The worker retains its descriptors until it
+   returns; only then does its owner retire the scope. Recheck denial and retry.
 
-## Local source-only verification
+The positive operation retains checked descriptors through the held interval.
+Cancel signals condition-protected memory; it does not close another thread's
+resources. Terminal ordering is defined under that lock, and a later Cancel
+cannot rewrite the worker result. A visible Cancel/Close accepted before queued
+main-actor publication separately suppresses success; real failures remain
+failures. Pure policy checks are authored in the UI module and remain unrun. Generation and identity guards reject stale
+completion. Close requests retain the operation until retirement; the three new
+UI methods exercise Cancel, while existing synchronous Close regressions remain
+in the unchanged production test suite.
 
-From this directory:
+Parent **listing**, sibling read-open, selected write-open and exclusive-create
+controls must be denied during the positive read. A parent-open denial would be
+contradictory: the positive ancestor algorithm needs that same metadata-only
+parent open. The parent control therefore performs one `readdir` attempt without
+copying or reporting an entry name. No write or truncation is attempted; an
+unexpected exclusive-create success leaves the owned failure evidence intact.
+Only `EACCES`/`EPERM` from the explicitly permitted measured operation family
+qualify as denial. `fstat`, ACL queries and other setup syscalls never qualify. Missing objects, `EEXIST`, changed identity,
+ACL/type failures, cleanup failures and other errors cannot count as success.
+Every denial retains its operation and errno in the bounded terminal receipt.
+
+The separate UI runner positively proves the sealed fixture's identities,
+private modes, empty ACLs, bytes and absent control before launch and after each
+terminal result. It reads through those same checked descriptors and retires
+all of them before the next host action. No descriptor, bookmark or reusable
+grant is passed to the host. `HostIdentity.swift` validates static and running
+code with public Security APIs, binds the actual executable and identifier, and
+requires exactly App Sandbox and user-selected read-only entitlements, both
+true Booleans. Successful signing-information retrieval alone is insufficient. The unsupported
+private status API from the first local freeze has been removed; no dynamic
+status word is fabricated from a validity result.
+
+The runner additionally requires the exact B-observed host CDHash before
+launch and again for the actual launched PID before any Choose/panel action.
+Seven reserved runner-only comparison fields bind path, identifier, CDHash,
+source commit, fixture digest and run/case identities. Missing, colliding,
+extra or changed values refuse. These values are data checks, never permission
+or a mechanism to acquire an owned root; the host launch environment stays empty.
+
+## Source components and trust boundaries
+
+- `Host/`: fixed-input AppKit controller, thread-safe worker, single-owner
+  descriptor ledger, measured syscall matrix, fixture decoder and actual
+  Security-framework identity observer. Acquisitions register immediately;
+  cleanup continues after one error and never retries an ambiguous descriptor.
+  Reads admit type/identity/size first and use no-follow/nonblocking descriptors.
+- `Generated/`: deliberately inert placeholders. `Tools/fixture_inputs.py` can
+  render three exact source inputs from strictly admitted **claimed** bytes;
+  this supplies no access or execution permit. Fresh fixture creation is authored
+  for a later approved stage and has not run.
+- `Probe.xcodeproj` and its shared test scheme: one app and one UI-test target.
+  `CODE_SIGNING_ALLOWED=NO`, sandbox activation is off, the host entitlement build
+  variable is empty, and there are no launch/archive actions or workflow links.
+- `Tools/probe_contract.py` / `configuration_pair.py`: unchanged memory-only
+  contracts. Imported JSON and matching pairs remain claims. The 19-case link
+  corpus resolves components against a complete inventory, never filesystem
+  `realpath` or lexical `normpath`.
+- `Tools/owned_build_observation.py`: a fresh-created owned-root capability, with
+  no reopen-from-path/JSON constructor. It streams a bounded product inventory,
+  validates the root separately from descendants through the existing contract,
+  and binds raw configuration, full parsed tree, all three fixed products and
+  exact driver context. Named/held product identity is checked; a replacement
+  refuses. Whole-byte context changes invalidate the retained freeze.
+- `Tools/experiment_controller.py`, `bounded_process.py` and `native_observations.py`:
+  a single-thread owner creates and retains fresh build/fixture capabilities,
+  exclusively writes the pinned source and generated inputs, runs only fixed
+  build/sign/observation commands, and binds the real observations to a retained
+  immutable inspection. Both B/C gates return false, the source pins are
+  `UNREVIEWED`, and the CLI refuses. These operations are authored, not run.
+  Stage C consumes that exact retained inspection once, re-observes it before
+  `test-without-building` and after process retirement, and refuses changed
+  configuration, signatures, products, source or fixture. No rebuild/re-sign,
+  receipt deserialisation-to-capability, workflow or production entry point is
+  supplied.
+- `Tools/runner_expectations.py`: derives one fixed, separately named test
+  configuration during B after actual signature observation. The original emitted
+  configuration stays byte-exact; only seven reserved runner expectation fields
+  may be added to its runner environment. Full parsed equality after removing
+  those fields, original/derived raw bytes and observed values are all bound.
+  Exclusive no-follow creation refuses any existing destination. C consumes the
+  already frozen configuration and never writes expectations or re-signs products.
+- `Tools/xctestrun_binding.py`: a strict XML FormatVersion-2 **prototype**, tested
+  with synthetic configurations. A strict UTF-8/XML-1.0 declaration is required; conflicting/unsupported
+  encodings refuse. Duplicate/unknown fields, entities, excessive
+  nesting and unsupported versions refuse. Both environments, methods, skips,
+  product paths and raw bytes are retained. This is not a verified parser for
+  actual Xcode 16.4 output: that output must be inspected before any use.
+
+The driver-context record pins source/fixture identities, roots, working
+directory, executable, exact arguments/environment, toolchain and all three
+signature observations. Supplying JSON is still only a claim. The closed
+controller obtains observations through fixed bounded vendor calls and native
+source-bound runner records. It requires executable and fixture-resource rows,
+not merely product directory names, and binds preparation logs and generated
+source hashes to the inspection. Its versioned fingerprint covers every
+Inspection dataclass field, including nested raw configurations, observations,
+source/generated rows and preparation evidence; it is only an evidence reference,
+not an ownership deserializer. Static runner/test signatures must have no
+extra entitlements; the host must have the exact two. Unexpected tool output,
+identifiers, extra privileges or schema fields stop the experiment.
+
+Each actual direct child would have one Popen owner, isolated process group,
+closed inherited FDs, finite pipe capture/deadlines and bounded terminate/kill/
+reap handling. Group absence is observed separately, with signal zero only;
+service-launched host and UI-runner PIDs come from the source-bound native
+records and must also be observed absent. A signal or test tearDown alone is
+insufficient. Unknown/reused/alive processes refuse; no process-name kill or
+unverified-PID termination is used. Missing process observations after partial
+startup are an explicit failure, not successful cleanup. Failure output, source
+checks and owned result/capture files remain for review; there is no automatic
+recursive deletion or repeated attempt.
+
+All three method outcomes must bind to that inspection's source, fixture,
+host identifier/path/CDHash and per-method launched PID. Four original window
+captures are written only by the isolated UI runner to a fixed newly created
+capture directory whose device/inode is compiled into the seal. PNG bytes are
+not resized, filled, composited or re-encoded. The controller requires exactly
+those four filenames and their observed byte counts/hashes/dimensions, and
+retains the complete original result-bundle inventory. These source checks
+cannot replace later independent inspection of the actual pixels/results.
+
+The host's bundled JSON is bound by its exact compiled digest and signature,
+and the producer must admit the same bytes with the strict Python contract.
+Foundation's JSON decoder is not claimed to have independent duplicate-key
+parity. Native parser/signature behaviour still requires actual execution.
+
+## Bounds and local checks
+
+The unchanged contracts cap fixture JSON at 4 KiB, inventory JSON at 8 MiB,
+20,000 inventory rows, 512 MiB per product file and 2 GiB total product bytes.
+Containment uses the existing 19-case corpus and its 40-link / 128-component
+limits. The observer additionally caps depth at 64 and checks a 30-second
+cooperative budget between operations; it does not promise to interrupt a
+blocked kernel call. Configuration reads cap allocation at 1 MiB, XML depth at
+16, nodes at 4,096 and text at 4 KiB. Driver context is at most 64 KiB. Native
+control reads are at most 33 bytes / 64 attempts, held reads at most five seconds,
+and terminal receipts at most 2 KiB. Each tool captures at most 8 MiB, with
+32 MiB aggregate / 64 calls per owner; observation calls cap output at 64 KiB.
+Build and runtime deadlines are respectively 600/900 seconds, with bounded
+retirement checks. PNG captures cap at 4 MiB and 8,192 pixels per dimension. None of these is whole-drive capacity.
+
+Run only the source/memory checks from this directory:
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s Tools -p 'test_*.py' -v
+PYTHONDONTWRITEBYTECODE=1 python3 Tools/check_source_isolation.py
 ```
 
-The reconstructed checkpoint has **32 passing memory-only methods**, including
-a 19-case portable inventory corpus. The only test-file reads load the two
-repository-owned JSON examples. No temporary disk probe, ACL, OS panel, native
-application or user folder is created or accessed. A first author test exposed
-an assumed Python recursion limit; the explicit 16-level parser guard and a
-positive/negative boundary regression now pass.
+The authored checkpoint passes 151 memory/mock methods: all 54 existing methods
+(including the unchanged 19-case corpus), all 27 first-freeze additions and
+fifty new encoding, process, observation, fixture-owner and controller
+regressions, including twenty additional exact-derivation, whole-inspection
+fingerprint and partial-failure/write-ownership methods. Nineteen source-isolation checks also pass. Mocks perform no
+real fixture/build-root operations. Source checks are not Swift compilation,
+Xcode project validation, panel execution, grant proof or pixel acceptance.
+All 233 existing native methods remain unchanged; the three new UI methods have
+not compiled or run. No new native screenshot exists.
 
-The corpus includes both previously identified symlink-pivot escapes, valid
-nested and parent-relative links, file/missing/cyclic intermediates, root and
-absolute escapes, trailing-slash refusal, a 40/41 expansion boundary and input
-budgets. Accepted cases assert exact resolved destinations as well as descendant
-sets; refusals assert their exact reason. Paired below/above pending-budget cases
-resolve ultimately to a directory, so a regular-file guard cannot mask the
-budget oracle. Python consumes it here; a future Swift consumer and differential
-negative-parser corpus remain unimplemented. These results cannot be counted as
-native or prior-candidate coverage.
+## Retained source review checkpoints
 
-## Additional configuration-pair claim checkpoint
+The first local freeze was changes-requested for the private Security call,
+late visible cancellation, overbroad denial families, XML declaration mismatch
+and missing controller. The second repaired those areas but its review still
+found three defects: B host identity was checked only after panel actions,
+partial B failures omitted disposition evidence, and the inspection fingerprint
+omitted retained fields. This separate successor addresses all three; its independent source recheck
+clears them without a new blocking finding. Earlier bytes and findings are
+preserved, not relabelled accepted.
 
-`Tools/configuration_pair.py` adds a pure consistency check between two supplied
-byte pairs. Each pair retains opaque raw configuration bytes and a strict,
-versioned resolved JSON claim. A candidate must match a separately supplied
-expected pair byte for byte. Whitespace, object order, ordered arrays and exact
-Unicode are retained; nothing is canonicalised away. The operation returns no
-permit. Both expected and candidate inputs remain caller-supplied claims.
+On B failure, bounded raw tool results (including direct-child/group retirement
+ambiguity) remain retained. Source, fixture, partial-product and capture
+observations are attempted independently; any missing/unreadable state is marked
+unproved without erasing the original failure. Partial state is not described as
+an accepted FrozenBuild. There is no signing retry, repair or deletion. A surviving
+descendant/service process is a failed retirement observation; this controller
+does not promise to terminate unverified processes.
 
-The local schema binds source/fixture identity claims, configuration enablement,
-toolchain/destination, all three product paths/identifiers/inventory digests,
-arguments, both environments, enabled/skipped test identities and instrumentation.
-Unknown fields and unsupported versions refuse. It is a complete comparison of
-this local record, **not the complete Xcode format**. Raw configuration stays
-opaque: even matching pairs do not prove the JSON describes the raw bytes, any
-file exists, a signature is valid, a runner will launch, or access was approved.
-A real format-specific parser and independently admitted expected identity remain
-required. Build/configuration roots and the driver working directory/environment
-are not represented; these and observed product identity must be bound before
-any operational use. This record is not a fully resolved launch-context seal.
-Tests deliberately use non-plist bytes to keep that limitation visible.
+## Independent source closeout
 
-Bounds are 1 MiB raw bytes, 64 KiB resolved JSON, the existing 16-level nesting
-limit, 128 arguments/test identities/environment entries per collection,
-1 KiB product paths/destination, 256-byte names/keys/toolchain text and 4 KiB
-argument/environment values. Text is strict UTF-8 without ASCII C0/DEL control
-characters; Unicode C1 characters remain admitted and are compared exactly.
-Empty argument/environment values are supported. Product paths are exact
-relative claims, never opened. These conservative limits are not an assertion
-that every real Xcode configuration is supported.
+The source review binds manifest
+`94a7695beb77079a84a574f01862f60e11241d694869f416046a2e02763fb8d9`:
+151 supplied memory/mock methods, eleven independently authored mocked checks
+and nineteen source checks pass. All 38 paths and the twelve-path v2 repair
+delta reconstruct exactly, preserving 357 other baseline blobs and all 233
+existing native methods. Original v1/v2 failures remain recorded above.
+This documentation-only closeout changes no reviewed source/test/project bytes.
+It establishes source clearance only; none of the native or permission gates
+below has run or been approved by that review.
 
-Local execution passes **54 memory-only methods: the unchanged 32 methods and
-19 containment cases, plus 22 new configuration-pair methods**. Every mutation
-comparison has an admitted positive baseline; changed candidates first pass
-schema checks so malformed input cannot mask the equality oracle. Coverage
-includes all product fields, both environment keys/values, raw-only and paired
-changes, fixture/source/toolchain claims, test selection, argument/test order,
-instrumentation, strict types and paired byte/collection limits. No new file
-reads, workflow, native target, dependency or operational CLI are introduced.
-The module's command entry refuses with exit 2. Independent source review is a
-publication gate; none of these results is native execution.
+## Separate next gates
 
-### Concrete bridge to a usable folder workflow
+A. Freeze this source identity, independently review it, then save a reversible
+repository checkpoint. No host execution is included.
 
-After this guard, the missing bridge is still an exact reviewed parser/observer,
-bounded descriptor ownership and a quarantined native host. A separately
-approved owned-runner experiment must prove the same selected-file read is
-actually allowed during the transient grant and denied before/after retirement,
-while preserving immutable product/configuration identity. Only subsequent
-independent source/native/pixel acceptance could justify wiring the ordinary
-app's disabled folder control into a read-only scope/progress/cancel/snapshot
-flow. Existing library Save/Open then retains that snapshot for offline search.
-This source checkpoint activates none of those steps and adds no new sample UI.
+B. After explicit build/sign approval, prepare fresh owned fixtures on a fresh
+macOS runner, compile and ad-hoc sign only these experiment products, inspect the
+actual toolchain/test configuration and exact two host entitlements. Unknown
+fields, extra entitlements, signing profiles or privileges stop the attempt.
+Freeze app, runner, test bundles, configuration and fixture inputs after sealing.
+The retained owned workspace and in-process controller must remain available
+through the later gate; if it
+expires, restart an approved B preparation rather than adopt paths from a claim.
 
-## Retained defect lessons and missing work
+C. Only after the actual B receipt is reviewed and runtime approval is explicit,
+reverify the immutable products and run without rebuild/re-sign. Actual process retirement, real Xcode configuration compatibility, real panel
+accessibility hierarchy, all source-bound results and original screenshots
+remain required acceptance work. The source controller exists; its activation
+and hosted execution wiring still require separate review and permission. No new permission prompt may be
+accepted automatically. If the exact ancestor operation is denied while the
+grant is active, report its operation/errno and stop; do not follow aliases,
+relax admission or substitute an unsandboxed/broader-access experiment.
 
-1. Root rows and descendants must use the same representation. This checkpoint
-   implements that pure contract; actual produced/observed inventory comparison
-   still needs the future controller.
-2. Freeze and verification must bind the **complete** approved raw test
-   configuration and resolved paths/environment, not just the method name.
-   Pair consistency is implemented above; raw-to-resolved parser congruence,
-   observed configuration sealing and signature inspection are not implemented.
-3. Future reads must acquire nonblocking, no-follow regular descriptors and
-   admit type, identity and size before bounded reads/enumeration. This module
-   admits only already-supplied bytes; it is not a safe file-reading API.
-4. Each acquired descriptor must be registered immediately, transferred
-   explicitly and retired once. Ambiguous close must refuse, attempt the other
-   owned retirements and never retry the ambiguous integer. No descriptor
-   lifecycle exists in this checkpoint.
-5. Future control bytes must be read through the identity/ACL-checked descriptor;
-   any separate write-open must match the same object. Claimed metadata here
-   supplies no causal OS-access evidence.
-6. Link expansion must precede parent traversal. The pure inventory resolver and
-   corpus implement this, including an explicit initial-depth bound. They do
-   not prove anything about a real filesystem or sandbox.
+Only a later independent production-admission/wiring review could connect a
+real selected folder to progress, Cancel, reviewed Add and the existing offline
+library. This source adds no ordinary-app capability, persistent grant,
+user-computer/default-data-path execution, file move or backup claim.
 
-## Next gates
+## Primary references
 
-Reconstruct and independently review only the next small missing source slice,
-then save it reversibly before expanding further. The later host needs a native
-signature/ACL observer, bounded descriptor controller, exact SDK/runner review,
-complete immutable build-to-run configuration, AppKit/UI source and native
-compilation. Existing product source admission and the real-folder control stay
-closed. There is no new workflow or host dependency.
+Apple's [sandbox file-access guidance](https://developer.apple.com/documentation/security/accessing-files-from-the-macos-app-sandbox)
+describes standard-panel scope access and explicit retirement; it does not prove
+compatibility of this ancestor algorithm. The [read-only entitlement](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.security.files.user-selected.read-only)
+is the intended category. [TN2339](https://developer.apple.com/library/archive/technotes/tn2339/_index.html)
+describes build-for-testing/test-without-building separation, not current ad-hoc
+runner acceptance. Apple's [SecCode header](https://github.com/apple-oss-distributions/Security/blob/main/OSX/libsecurity_codesigning/lib/SecCode.h)
+distinguishes validity/status from copied signing information. These sources
+were checked on 12 October 2026; all platform results above remain unexecuted.
 
-Build/ad-hoc signing and genuine sandbox-panel selection are separate runtime
-authority gates. They would use only fresh owned GitHub-runner fixtures, exact
-reviewed products and the two proposed host entitlements: App Sandbox and
-user-selected read-only files. Unknown runner permissions, profiles or extra
-entitlements must stop the experiment. No user-device/default-path execution,
-persistent bookmark, security setting, filesystem ACL change or release is
-included. General repository-save permission does not supply these runtime
-permissions. Original native pixels and independent execution acceptance are
-still required before any real-folder capability claim.
+The fixed CLI observation adapters use Apple's documented [entitlement display](https://developer.apple.com/documentation/technotes/tn3125-inside-code-signing-provisioning-profiles)
+and [CodeDirectory hash display](https://developer.apple.com/documentation/technotes/tn3126-inside-code-signing-hashes)
+forms. Their exact output-format assumptions, runner identifiers and the actual
+Xcode configuration still require inspection on the pinned toolchain. No
+non-Apple CLI example is treated as proof of runtime compatibility.

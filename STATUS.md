@@ -1,6 +1,20 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 06:07
+Last updated: 2026-10-12 08:39
+
+## Selected-folder feasibility: repaired quarantined source checkpoint
+
+- PR33 is integrated at actual main `2417a40271aa8e355328347eee9a3292d0f8d1c4`, tree `4c8a81b18023f4806f50dea6a2f009162dbb7f76`. All six actual-main workflows pass. The [native lane](https://github.com/krahd/disk_organiser/actions/runs/38212177606) runs all 233 distinct methods plus six differential/six parser cases; the [catalogue lane](https://github.com/krahd/disk_organiser/actions/runs/38212177705) passes thirteen browser journeys. Earlier failed/source-specific checkpoints and capture limitations below retain their meaning.
+- A newly reconstructed isolated AppKit feasibility project is authored under `Validation/SelectedFolderFeasibility`; it is not the lost earlier host. It contains a public-API native signature observer, single-owner descriptor controller, genuine panel/cancel/held-read UI cases, fresh-owned preparation source and a closed-default build/inspection/runtime owner. The ordinary app, existing tests, dependencies, workflows and real-folder gate remain unchanged.
+- The first local source review found five blockers: a private Security API, queued-success publication after visible cancellation, overly broad denial classification, conflicting XML encoding semantics and an incomplete inspection/runtime owner. This separate successor removes the private call, consults accepted Cancel before success publication, limits denial to explicit operation families, admits only UTF-8/XML-1.0, and implements the missing bounded ownership/observation path. The second review then found a pre-panel B-identity gap, missing partial-B disposition evidence and an incomplete inspection fingerprint. This separate successor adds prelaunch/static and launched-guest expectations, independent best-effort failure observations and a versioned whole-inspection digest; independent source recheck now clears those three repairs without a new blocking finding.
+- Independent source closeout binds author manifest `94a7695beb77079a84a574f01862f60e11241d694869f416046a2e02763fb8d9`. All 151 supplied memory/mock tests, eleven additional independent mocked checks and nineteen source checks pass. The full/base and v2-delta patches reconstruct exactly, with all 357 other main blobs and 233 existing native methods preserved. This factual documentation successor changes no runtime/test/project bytes; it does not inherit native execution from main.
+- Both B/C gates return false, source pins are `UNREVIEWED`, generated inputs are unsealed, signing is disabled and the exact two-entitlement template is inactive. No new host build, signing, fixture creation, native process, panel, grant, user-device/default-data-path execution or screenshot has occurred. All 233 existing native method identities remain; three separate UI methods and their policy checks are authored and uncompiled.
+- Actual local checks pass 151 memory/mock methods: all prior 131, including the original 54/nineteen containment cases, plus twenty exact-derivation/fingerprint/failure/write-ownership checks. Nineteen source checks cover the isolated graph, inactive defaults, complete source references, public validity API and absence of workflow wiring. Every new process/filesystem operation is mocked in these checks; none supplies native acceptance.
+- The causal experiment requires the same identity-bound 32-byte read to be denied before selection, succeed during the grant and be denied after descriptor/scope retirement. Parent listing, sibling read-open and selected write/create controls must remain denied. Setup/ACL errors cannot qualify. Parent listing is distinct from metadata-only ancestor opens needed by the positive sequence.
+- The authored driver retains fresh capabilities, pinned source inputs, actual fixed-tool observations and an immutable inspection. It retains the original emitted configuration and derives one separately named configuration with exactly seven runner-only comparison fields. The UI runner requires the B-observed static CDHash before launch and the actual guest identity before any panel action. It binds later per-method host path/identifier/CDHash/PID and all three method outcomes; observes direct-child, owned-group and service-process retirement; and verifies four original capture files plus the retained original result bundle. Unknown/alive processes, changed bytes, incomplete captures or failed retirement refuse. The inspection fingerprint includes every retained field; partial B failures preserve raw results and independent source/fixture/product/capture dispositions. No unverified process is killed and no failure evidence is automatically deleted.
+- Build/sign inspection, source-bound gate activation and actual panel runtime remain separate approval gates. Real Xcode/CLI-format compatibility, public-SDK compilation, runner privileges, sandbox grant/revocation/ancestor semantics, actual process retirement and original pixels remain unrun. The source owner now exists; its platform effectiveness is not established. See [the source boundary, retained defects and next gates](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/README.md).
+
+The following accepted and failed checkpoints retain their source-specific evidence.
 
 ## Responsive owned observation: independently reviewed execution
 
@@ -899,4 +913,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 06:07
+Last updated: 2026-10-12 08:39
