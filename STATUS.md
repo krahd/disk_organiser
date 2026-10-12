@@ -1,6 +1,16 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 16:58
+Last updated: 2026-10-12 17:18
+
+## Disabled Stage B driver: reviewed public checkpoint and ordinary CI
+
+- [PR35](https://github.com/krahd/disk_organiser/pull/35) source `59c48630b7607409fc171d6155eaace30f1cf7ce`, tree `4c536b52176992d258efb186a8614ccd092ce0a3`, has all twelve existing push/PR workflows green. Independent closeout verifies all 31 changed/new blobs and 387 preserved blobs, including modes. The publication delta from the cleared source candidate is STATUS-only; all thirty other paths remain exact. Earlier failed source-review checkpoints below retain their original attribution.
+- Both [native push](https://github.com/krahd/disk_organiser/actions/runs/38281893805/job/114920893308) and [native PR](https://github.com/krahd/disk_organiser/actions/runs/38281961512/job/114921116156) logs retain all 233 actual-main method identities, each started and passed exactly once, plus six differential and six parser cases. Push tests the named source; PR tests merge checkout `32999455d288f9c003a053c06714732ed2ba46be`, whose tree is identical. Existing selection, preview and owned-capability probe compilation succeeds; these are not the new feasibility host.
+- Xcode16.4/16F6 and SDK15.5 assertions pass; Swift6.1.2 is observed output. The filesystem refuses the attempted invalid-UTF8 name with errno92, so native projection of such a name remains unexercised; synthetic rejection stays unconditional. This log observation does not establish a filesystem type.
+- Both [catalogue push](https://github.com/krahd/disk_organiser/actions/runs/38281894017/job/114920894304) and [catalogue PR](https://github.com/krahd/disk_organiser/actions/runs/38281961321/job/114921115519) pass thirteen browser journeys. Four fresh connector-decoded logs match the retained UTF-8 bytes exactly, including BOM. No new pixel inspection or durable image archive is claimed; unchanged UI retains its earlier source-specific visual evidence.
+- The 299 memory/mock methods, nineteen source checks and five inert refusals below remain separate local and independent source-review evidence. Ordinary CI does not run those new methods or establish Stage B. The profile/default gates remain false and no active build-only workflow exists. Actual new-host compilation, ad-hoc signing, vendor schema compatibility, process retirement and packet export remain unrun; activation requires its separately reviewed delta and one-run owner approval. Stage C, panels/grants, production folder admission and user-drive access remain closed.
+
+The sections below preserve the earlier candidate chronology and source-specific results.
 
 ## Disabled driver: final bounded closure/capacity repair candidate
 
@@ -954,4 +964,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 16:58
+Last updated: 2026-10-12 17:18
