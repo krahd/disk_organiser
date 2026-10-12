@@ -336,3 +336,20 @@ only. Actual build/signature/parser acceptance still requires the one recorded r
 The scheduler filter ignores case, so a case-variant reserved name may allocate
 a runner and run checkout/startup. The unchanged strict bootstrap then refuses
 before operational owners or build tools. Exact-case preallocation is not claimed.
+
+
+## Terminal build-only attempt and closed gate
+
+The connector-triggered [single attempt 38315666563](https://github.com/krahd/disk_organiser/actions/runs/38315666563)
+checked out `ba901b91d4f0d00cb0fbe8b954b16dcb50154e76` and refused at the
+fixed-interpreter startup check. Python 3.12.10 reported its Frameworks executable
+rather than the exact pinned cache path. No operational owners or native build,
+signing, host launch, panel or grant were admitted. No report packet was produced;
+artifact upload consequently failed for a missing path. The alias mechanism and
+actual compiler/signature/xctestrun compatibility remain unverified.
+
+This deactivation restores the profile to False and removes the active workflow.
+Both inactive anchors and the original reserved branch remain intact. The sections
+above retain their historical source/activation claims; this terminal result and
+STATUS.md supersede their pending-attempt state. There is no automatic retry or
+new attempt, and Stage C and ordinary real-folder access remain closed.

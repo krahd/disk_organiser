@@ -1,6 +1,15 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 21:34
+Last updated: 2026-10-12 22:28
+
+## Single build-only attempt: startup refusal and deactivation
+
+- [PR37](https://github.com/krahd/disk_organiser/pull/37) merged at `ba901b91d4f0d00cb0fbe8b954b16dcb50154e76`, tree `4b30c443b6e3eb76e5297979e9d63051ae4ff2f4`. All twelve source push/PR and six actual-main ordinary workflows passed. Both source native lanes and the [actual-main native lane](https://github.com/krahd/disk_organiser/actions/runs/38314177910/job/115026747183) retained all 233 distinct method identities once, plus six differential and six parser cases; the corresponding catalogue lanes passed thirteen browser journeys. PR checkout `c3b51c40094f1bafdd0ce3664861c7d91c00b3ea` had the same tree. These are ordinary checks, not new-host build evidence; no new pixel acceptance is claimed.
+- The reviewed connector request created `validation/owned-build-once-20261012` exactly once at that main SHA. Remote ref and [create-event run 38315666563](https://github.com/krahd/disk_organiser/actions/runs/38315666563), attempt 1, agree. The reserved branch remains unchanged as the attempt marker. An earlier source-publication create record, run `38312759179`, was skipped without job steps or a runner; it was not a build attempt.
+- The actual [build-only job 115031558161](https://github.com/krahd/disk_organiser/actions/runs/38315666563/job/115031558161) checked out exact `ba901b91` on the reported macOS 15.7.9 ARM64 image `20260907.0337.1`, then exited 2 at the bootstrap's fixed-interpreter check. CPython reported version 3.12.10 and executable `/Library/Frameworks/Python.framework/Versions/3.12/bin/python3`, which differs from the pinned `/Users/runner/hostedtoolcache/Python/3.12.10/arm64/bin/python3`. The log does not establish the alias/redirect mechanism. That refusal precedes dispatch/source-module admission, operational owner creation and all 31 planned native tool calls. No new host build, ad-hoc signature, launch, panel or grant occurred.
+- No `OWNED_BUILD_TERMINAL` receipt or verified report path was produced. The subsequent artifact step failed because its required path was absent; the run reports zero artifacts. The original connector-decoded UTF-8 job log, including BOM, is 14,627 bytes with SHA-256 `80c8ba6a7d7ced88c4dd6cf81421fff246bb47fea63f642fbcd6b817e9880a3f`; retained local bytes round-trip exactly to the connector text. This is a startup failure, not compiler/signature/parser acceptance or successful evidence export. No report owner or source owner was admitted, so no owner-retirement execution is claimed.
+- This successor restores `BUILD_ONLY_ENABLED = False` and removes only the active workflow copy. Both inactive workflow anchors, all fourteen operational helper bodies, nineteen host inputs, native command tuples, 233 baseline native identities and the reserved remote branch are preserved. Current source tests and ordinary successor CI remain separately required; neither supplies the missing new-host evidence.
+- No rerun, replacement branch or second attempt is authorised by this failure. Any proposed interpreter-identity compatibility repair must have exact source review and a separately authorised execution decision; a guessed path or relaxed identity check is not a fallback. Stage C, both default controller gates, the ordinary real-folder control and user-drive access remain closed. The source-specific history below is retained unchanged apart from the mandatory matching status timestamps.
 
 ## Connector-only build-trigger transport candidate
 
@@ -984,4 +993,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 21:34
+Last updated: 2026-10-12 22:28
