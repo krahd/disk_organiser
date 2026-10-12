@@ -1,6 +1,21 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 22:28
+Last updated: 2026-10-12 23:27
+
+## Owned Cancel: bounded failure observations
+
+- PR38 source `65937f47` had one intermittent failure in `testActualLibraryWindowNativeSelectionScopeAddAndCancel`: [ordinary native job115037301825](https://github.com/krahd/disk_organiser/actions/runs/38317430691/job/115037301825) ended the first Cancel wait in `reviewing` instead of `ready`. The strict hit/visible-centre and enabled/key/active diagnostics passed, and original capture73 shows three inspected entries plus Cancel. Worker-gate expiry and source cancellation count were not recorded, so the cause remains unproved. A missing keybinding file was reported during failure cleanup, not established as the initial cause. The same-tree PR lane, one ordinary-job retry and actual main `9156c6f9` passed unchanged source; no timing fix is claimed.
+- This separate test-only diagnostic adds at most four fixed-phase observations to that one native Cancel: before the helper, immediately before posting its events, after the unchanged event pump/settle, and after the existing readiness wait immediately before its assertion. Each records only the finite session state, source cancellation count, a lock-consistent gate-entered/expired pair, worker presence and inspected-entry count or null. No path, source content, additional wait, retry, event or direct button action is added.
+- The five-second worker hold, three-second native readiness, 30ms settling, five-second ready wait, strict hit/centre assertions and genuine NSApplication mouse-down/up path are preserved. Later failure still fails; observations improve attribution and do not establish robustness. All 233 method identities and product/runtime bytes are unchanged. Only the test file, its explicit ordinary-source closure hash and this status section change.
+- Local source checks for the separate diagnostic freeze pass the existing 310 memory/mock methods, nineteen structural checks, five inert entry refusals and exact source/patch preservation checks. Swift compilation and the new diagnostic output are unrun until the separately reviewed ordinary owned-fixture CI. The build-only profile stays False with no active workflow; this change grants no new Stage B attempt, panel/grant or user-drive access. Earlier failed and successful checkpoints retain their original attribution.
+
+## Disabled framework-launcher identity repair
+
+- [PR38](https://github.com/krahd/disk_organiser/pull/38) merged at `9156c6f96c9f86e1e0da32e31a17729e39762989`, tree `1953a6f402edb82c6e42310973bb850f91b221bc`. All six actual-main ordinary workflows pass: [native](https://github.com/krahd/disk_organiser/actions/runs/38320042423/job/115045684003) retains all 233 distinct baseline methods once plus six differential/six parser cases; [catalogue](https://github.com/krahd/disk_organiser/actions/runs/38320042481/job/115045684562) passes thirteen browser journeys. No new-host or new pixel acceptance follows from those ordinary checks.
+- The original source push [native job](https://github.com/krahd/disk_organiser/actions/runs/38317430691/job/115037301825) had one failing Cancel method among 233, with two failures including an unexpected cleanup exception. The session was `reviewing` rather than `ready`; the failure record did not capture worker-gate expiry or source cancellation count. A same-tree PR lane, one explicitly bounded ordinary-job retry and actual main passed unchanged source. This is an intermittent unexplained failure, not a repaired timing defect. Original failed log and four original captures remain retained; no build-only retry occurred.
+- This source-only candidate replaces the cache alias with one fixed versioned framework launcher in the disabled profile and a third inactive anchor. Exact executable equality, 3.12.10 version, isolation flags, Darwin/ARM64 and all existing toolchain gates stay fail-closed. A bounded seven-key CPython facts object is prepared before dispatch/source/owner admission and included in the existing identity envelope. The [contract](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/FRAMEWORK-IDENTITY.md) specifies field bounds, immutable primary-source rationale and the distinction between observed facts and binary authentication.
+- The reported path for that direct launcher is predicted from immutable CPython and runner-image source, not measured on another runner. Local checks pass 321 distinct memory/mock methods, retaining all 310 prior identities, plus nineteen source checks and five default-entry refusals. The eleven new methods cover exact facts, malformed/alternate identity, pre-owner refusal, bounded shape and preserved historical anchors. New-host compilation, signing, signature/schema compatibility and export remain unrun.
+- Both historical inactive anchors and the consumed remote marker are unchanged. The profile remains False and no active build-only workflow exists. The new provisional ref is only source text; no branch is created or attempt authorised. All nineteen host inputs, the other thirteen operational modules, 233 native identities and ordinary runtime bytes remain unchanged. Stage C, real panels/grants, user devices/drives and default application access gates remain closed. Fresh independent source review and ordinary successor CI are required before acceptance; a new build-only attempt requires its own explicit decision.
 
 ## Single build-only attempt: startup refusal and deactivation
 
@@ -993,4 +1008,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 22:28
+Last updated: 2026-10-12 23:27

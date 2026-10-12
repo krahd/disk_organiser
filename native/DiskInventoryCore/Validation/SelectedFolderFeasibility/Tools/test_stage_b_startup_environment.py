@@ -19,7 +19,7 @@ IDENTITY = {
     'CREATED_REF', 'CREATED_REF_TYPE',
     'GITHUB_SHA', 'CHECKED_OUT_SHA', 'GITHUB_WORKFLOW_SHA', 'GITHUB_RUN_ATTEMPT',
     'GITHUB_WORKFLOW_REF', 'GITHUB_WORKSPACE', 'GITHUB_RUN_ID', 'ImageOS', 'ImageVersion'}
-PYTHON = '/Users/runner/hostedtoolcache/Python/3.12.10/arm64/bin/python3'
+PYTHON = '/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12'
 TOOLS = 'native/DiskInventoryCore/Validation/SelectedFolderFeasibility/Tools/'
 
 
@@ -81,7 +81,7 @@ class StartupEnvironmentTests(unittest.TestCase):
         self.assertEqual(read.call_count,1);dispatch.assert_not_called();load.assert_not_called()
 
     def shell(self):
-        raw=(Path(__file__).parents[1]/'StageB/owned-selected-folder-build.create.yml.inert').read_text()
+        raw=(Path(__file__).parents[1]/'StageB/owned-selected-folder-build.framework.yml.inert').read_text()
         run=raw.split('        run: |\n',1)[1].split('      - name:',1)[0]
         return '\n'.join(line[10:] for line in run.splitlines())
 
