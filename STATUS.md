@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-10 13:04
+Last updated: 2026-10-12 02:07
+
+## Saved-location shelf: source checkpoint
+
+- The historical catalogue has a compact, fully enumerated saved-record shelf and focused folder breakdown. Duplicate labels have record numbers; scope changes retain the search query and cross-record project selection. Current connection, physical identity, capacity and backup status are not inferred.
+- Primary search/selection now precedes optional comparison. Exact original source/date details, partial/root-only uncertainty and native persistence fences remain. This changes presentation and owned tests only; all source, schema, storage and real-folder gates are unchanged.
+- Local checks pass: 665 Jest, 47 catalogue DOM, 12 native persistence DOM, 16 ingress, 18 protocol, eight bundled assets/two examples and 22 parser cases/4,102 UTF-8 samples. Formatting passes. Twelve browser journeys are authored, including two new shelf cases; actual browser/native execution and independent original-pixel acceptance remain pending. Local Chromium failed at its socket restriction, without a security workaround.
+- This tranche starts from accepted main `57078cd37e112fe611c2f3bb36ebc63a017863e2`. Recovery PR30 and the separate memory-only configuration-pair branch remain separate checkpoints; this UI does not reconstruct or activate the missing signed host. [Workflow and limits](docs/INVENTORY-CATALOGUE.md#compact-saved-location-shelf-source-checkpoint).
 
 ## Synchronous selection cancellation: executed owned regression
 
@@ -807,4 +814,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-10 13:04
+Last updated: 2026-10-12 02:07

@@ -65,14 +65,84 @@
       </section>
       <section id="loaded-catalogue" hidden>
         <div class="section-title">
-          <h2>Your labelled locations</h2>
+          <h2>Your saved locations</h2>
           <p id="catalogue-count" class="muted"></p>
         </div>
         <p class="muted">
           Saved snapshots remain searchable offline. Reconnect the location named on a result to
           check it in your own tools; this page cannot detect a connection.
         </p>
-        <div id="source-cards" class="source-grid"></div>
+        <div class="shelf-toolbar">
+          <button id="all-locations" class="secondary-button" type="button" aria-pressed="true">
+            All saved locations
+          </button>
+          <p class="small muted">
+            Saved folder snapshots · connection unknown · listed sizes are not disk capacity
+          </p>
+        </div>
+        <div id="source-cards" class="source-grid" aria-label="Saved location records"></div>
+        <section class="catalogue-work">
+          <div class="catalogue-browser">
+            <section class="location-focus" aria-labelledby="location-focus-heading">
+              <p class="eyebrow">BROWSING SAVED HISTORY</p>
+              <h2 id="location-focus-heading">Search across your saved locations</h2>
+              <div id="location-focus-body"></div>
+            </section>
+            <h2 class="search-heading">Find files and build a project</h2>
+            <div class="search-controls">
+              <div>
+                <label for="catalogue-search">Search recorded names and paths</label
+                ><input
+                  id="catalogue-search"
+                  type="search"
+                  maxlength="240"
+                  placeholder="Try a project, folder or file name"
+                />
+              </div>
+              <div>
+                <label for="catalogue-filter">Look in</label
+                ><select id="catalogue-filter">
+                  <option value="">All saved locations</option>
+                </select>
+              </div>
+            </div>
+            <p id="result-count" role="status" class="small muted"></p>
+            <div id="catalogue-results" class="catalogue-results"></div>
+            <nav class="result-pages" aria-label="Search result pages">
+              <button id="previous-results" class="secondary-button" type="button">Previous</button
+              ><span id="result-page"></span
+              ><button id="next-results" class="secondary-button" type="button">Next</button>
+            </nav>
+          </div>
+          <aside class="project-selection">
+            <p class="eyebrow">YOUR NEXT DECISION</p>
+            <h2>What belongs together?</h2>
+            <p>
+              Choose files or folders across recorded locations. Choose a folder or its contents,
+              not both.
+            </p>
+            <p id="selection-count" class="selection-number">0 files or folders selected</p>
+            <p class="small muted">Folder contents are not counted separately.</p>
+            <div id="selected-scopes"></div>
+            <button id="clear-selection" class="text-button" type="button" disabled>
+              Clear selection</button
+            ><button id="prepare-plan" class="primary-button" type="button" disabled>
+              Create a manual plan
+            </button>
+            <p class="small">
+              Selection is temporary until you export a plan. In the
+              <a href="manual-workspace.html" target="_blank" rel="noopener">manual workspace</a>,
+              open that plan to choose intended homes and backup targets.
+            </p>
+            <div class="unknown-protection">
+              <strong>Protection unknown</strong>
+              <p>
+                Catalogue entries are not verified backups. No provider is connected and no deal is
+                offered here.
+              </p>
+            </div>
+          </aside>
+        </section>
         <section class="comparison-section" aria-labelledby="comparison-heading">
           <div class="comparison-heading">
             <div>
@@ -146,63 +216,6 @@
               <div id="comparison-source-details"></div>
             </details>
           </div>
-        </section>
-        <section class="catalogue-work">
-          <div class="catalogue-browser">
-            <h2>Find files and build a project</h2>
-            <div class="search-controls">
-              <div>
-                <label for="catalogue-search">Search recorded names and paths</label
-                ><input
-                  id="catalogue-search"
-                  type="search"
-                  maxlength="240"
-                  placeholder="Try a project, folder or file name"
-                />
-              </div>
-              <div>
-                <label for="catalogue-filter">Look in</label
-                ><select id="catalogue-filter">
-                  <option value="">All saved locations</option>
-                </select>
-              </div>
-            </div>
-            <p id="result-count" role="status" class="small muted"></p>
-            <div id="catalogue-results" class="catalogue-results"></div>
-            <nav class="result-pages" aria-label="Search result pages">
-              <button id="previous-results" class="secondary-button" type="button">Previous</button
-              ><span id="result-page"></span
-              ><button id="next-results" class="secondary-button" type="button">Next</button>
-            </nav>
-          </div>
-          <aside class="project-selection">
-            <p class="eyebrow">YOUR NEXT DECISION</p>
-            <h2>What belongs together?</h2>
-            <p>
-              Choose files or folders across recorded locations. Choose a folder or its contents,
-              not both.
-            </p>
-            <p id="selection-count" class="selection-number">0 files or folders selected</p>
-            <p class="small muted">Folder contents are not counted separately.</p>
-            <div id="selected-scopes"></div>
-            <button id="clear-selection" class="text-button" type="button" disabled>
-              Clear selection</button
-            ><button id="prepare-plan" class="primary-button" type="button" disabled>
-              Create a manual plan
-            </button>
-            <p class="small">
-              Selection is temporary until you export a plan. In the
-              <a href="manual-workspace.html" target="_blank" rel="noopener">manual workspace</a>,
-              open that plan to choose intended homes and backup targets.
-            </p>
-            <div class="unknown-protection">
-              <strong>Protection unknown</strong>
-              <p>
-                Catalogue entries are not verified backups. No provider is connected and no deal is
-                offered here.
-              </p>
-            </div>
-          </aside>
         </section>
       </section>
       <section id="catalogue-precision" class="precision-panel" hidden>

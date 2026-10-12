@@ -2,18 +2,18 @@
   "assets": [
     {
       "file": "inventory-catalogue.html",
-      "bytes": 11832,
-      "sha256": "c0c48dc6061931fa66133d33f2afbd7ff776679ae103e26e2a3999c4c3194290"
+      "bytes": 12538,
+      "sha256": "cfa3c5bb454b75ebccc0fdaf39fa492b75a31b882b1f0837c8d71b9074d179fc"
     },
     {
       "file": "inventory-catalogue.js",
-      "bytes": 45148,
-      "sha256": "d7e1ab88b96de79ff64d1826e4012d762c76ea84acc2a09595f784158209b9f4"
+      "bytes": 48115,
+      "sha256": "5c5c181257b01decf654a5bb793be81d64a5d741aad2afd379e7938edb2ac3ef"
     },
     {
       "file": "inventory-catalogue.css",
-      "bytes": 9341,
-      "sha256": "9d6f7b08dab48eaf20acb51557351652948b1a67353299f3a89e6ea9bf0e28d5"
+      "bytes": 10698,
+      "sha256": "8249ea001376b01b090af323928ac13587e26ea1cc32a562c211fd4bffca64e4"
     },
     {
       "file": "inventory-snapshot-model.js",

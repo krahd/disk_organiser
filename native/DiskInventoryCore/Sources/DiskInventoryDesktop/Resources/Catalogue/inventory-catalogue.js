@@ -341,89 +341,154 @@
       "Save label"
     );
   }
+  function recordNumber(record) {
+    return catalogue.records.indexOf(record) + 1;
+  }
+  function focusLocation(id, fromShelf = false) {
+    requireMutable();
+    $("catalogue-filter").value = id;
+    page = 0;
+    renderCards();
+    renderResults();
+    if (fromShelf) {
+      const control = [...$("source-cards").querySelectorAll("[data-location]")].find(
+        (n) => n.dataset.location === id
+      );
+      (control || $("all-locations")).focus();
+    }
+  }
   function renderCards() {
+    const current = $("catalogue-filter").value;
+    $("all-locations").setAttribute("aria-pressed", String(!current));
     $("source-cards").replaceChildren();
     catalogue.records.forEach((record) => {
       const s = record.snapshot,
         sum = C.summary(s),
         card = el("article", undefined, "source-card"),
-        icon = el("span", undefined, "source-icon");
+        header = el("div", undefined, "source-heading"),
+        icon = el("span", undefined, "source-icon"),
+        heading = el("div");
+      card.classList.toggle("is-current", record.id === current);
       icon.setAttribute("aria-hidden", "true");
+      heading.append(el("p", `RECORD ${recordNumber(record)}`, "eyebrow"), el("h3", record.label));
+      header.append(icon, heading);
       card.append(
-        icon,
-        el("h3", record.label),
-        observationDate("p", "Snapshot date (claimed): ", s.source.observed_at, "source-date"),
-        el("p", bytes(sum.bytes), "source-stat"),
-        el("p", `Listed observed file sizes · ${count(sum.files, "file path")}`, "small muted"),
+        header,
+        observationDate("p", "Recorded (claimed): ", s.source.observed_at, "source-date"),
+        el("p", `${bytes(sum.bytes)} listed · ${count(sum.files, "file path")}`, "source-stat"),
         el(
           "span",
           s.source.coverage === "partial"
             ? "Partial folder record · gaps remain"
-            : "Complete within the recorded folder policy",
+            : "Folder listing completed",
           `coverage-label ${s.source.coverage === "partial" ? "partial" : ""}`
         )
       );
-      const groups = [...sum.groups].sort((a, b) =>
-          a.bytes === b.bytes ? a.path.localeCompare(b.path) : a.bytes > b.bytes ? -1 : 1
-        ),
-        shown = groups.slice(0, 4);
-      if (groups.length > 4)
-        shown.push({
-          path: `${groups.length - 4} other groups`,
-          bytes: groups.slice(4).reduce((a, g) => a + g.bytes, 0n),
-        });
-      const bar = el("div", undefined, "composition");
+      const chosen = selections.filter((x) => x.source_id === record.id);
+      card.append(
+        el("p", `${selectionWords(chosen)} in your project selection`, "small source-selection")
+      );
+      const actions = el("div", undefined, "source-actions"),
+        browse = button("Browse record", () => focusLocation(record.id, true));
+      browse.dataset.location = record.id;
+      browse.setAttribute("aria-label", `Browse record ${recordNumber(record)}: ${record.label}`);
+      browse.setAttribute("aria-pressed", String(record.id === current));
+      actions.append(
+        browse,
+        button("Rename label", () => rename(record), "text-button")
+      );
+      card.append(actions);
+      $("source-cards").append(card);
+    });
+    renderLocationFocus();
+  }
+  function renderLocationFocus() {
+    const record = catalogue.records.find((r) => r.id === $("catalogue-filter").value),
+      body = $("location-focus-body");
+    body.replaceChildren();
+    $("location-focus-heading").textContent = record
+      ? `Record ${recordNumber(record)}: ${record.label}`
+      : "Search across your saved locations";
+    if (!record) {
+      body.append(
+        el(
+          "p",
+          "Choose a record above to see its folder breakdown, or search all saved locations below. Your project selection stays with you.",
+          "muted"
+        )
+      );
+      return;
+    }
+    const s = record.snapshot,
+      sum = C.summary(s);
+    body.append(
+      observationDate("p", "Snapshot date (claimed): ", s.source.observed_at, "source-date"),
+      el(
+        "p",
+        `${bytes(sum.bytes)} in listed file sizes · ${count(sum.files, "file path")}`,
+        "focus-stat"
+      ),
+      el(
+        "p",
+        s.source.coverage === "partial"
+          ? "This is a partial folder record. Gaps can hide files, even when other entries were recorded."
+          : "Folder listing completed within its recorded policy. Live storage has not been checked.",
+        "small"
+      )
+    );
+    const groups = [...sum.groups].sort((a, b) =>
+        a.bytes === b.bytes ? a.path.localeCompare(b.path) : a.bytes > b.bytes ? -1 : 1
+      ),
+      shown = groups.slice(0, 4);
+    if (groups.length > 4)
+      shown.push({
+        path: `${groups.length - 4} other groups`,
+        bytes: groups.slice(4).reduce((a, g) => a + g.bytes, 0n),
+      });
+    if (shown.length) {
+      body.append(el("h4", "Where the listed bytes are", "breakdown-heading"));
+      const bar = el("div", undefined, "composition"),
+        list = el("ul", undefined, "group-list");
       bar.setAttribute("aria-hidden", "true");
       shown.forEach((g) => {
-        const part = el("span");
+        const part = el("span"),
+          row = el("li");
         part.style.flexGrow = sum.bytes ? String(Number((g.bytes * 10000n) / sum.bytes)) : "1";
         bar.append(part);
-      });
-      const list = el("ul", undefined, "group-list");
-      shown.forEach((g) => {
-        const row = el("li");
         row.append(
           el("span", g.path || "Files directly in the folder"),
           el("span", bytes(g.bytes))
         );
         list.append(row);
       });
-      card.append(
-        bar,
-        list,
+      if (sum.bytes > 0n) body.append(bar);
+      body.append(list);
+    } else
+      body.append(
         el(
           "p",
-          "Logical sizes by path, not used/free disk space. Links may count the same bytes again.",
+          "No file sizes are listed in this snapshot. This does not establish that the location is empty.",
           "small muted"
         )
       );
-      if (sum.uncertain || s.source.coverage === "partial")
-        card.append(
-          el(
-            "p",
-            `${count(
-              sum.uncertain,
-              "listed entry"
-            )} with uncertain status; other entries may be absent.`,
-            "small muted"
-          )
-        );
-      const chosen = selections.filter((x) => x.source_id === record.id);
-      card.append(el("p", `${selectionWords(chosen)} in your project selection`, "small"));
-      const actions = el("div", undefined, "source-actions");
-      actions.append(
-        button("Browse record", () => {
-          $("catalogue-filter").value = record.id;
-          $("catalogue-search").value = "";
-          page = 0;
-          renderResults();
-          $("catalogue-search").focus();
-        }),
-        button("Rename label", () => rename(record), "text-button")
-      );
-      card.append(actions);
-      $("source-cards").append(card);
-    });
+    const more = el("details", undefined, "location-evidence");
+    more.append(
+      el("summary", "Source and limits"),
+      el("p", `Original source label: ${s.source.label}`),
+      el("p", `Raw claimed date: ${s.source.observed_at}`),
+      el(
+        "p",
+        `${count(
+          sum.uncertain,
+          "listed entry"
+        )} with uncertain status. Imported source claims are not authenticated.`
+      ),
+      el(
+        "p",
+        "Logical sizes by path, not used/free disk space. Links may count the same bytes again. This record does not establish physical drive identity, current connection or backup protection."
+      )
+    );
+    body.append(more);
   }
   function renderDetails() {
     $("catalogue-precision").hidden = !details;
@@ -482,7 +547,7 @@
       "matching record"
     )}. Historical entries only; missing results do not prove absence.`;
     $("catalogue-results").replaceChildren();
-    rows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).forEach(({ record, entry }) => {
+    rows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).forEach(({ record, entry }, index) => {
       const row = el("label", undefined, "catalogue-entry"),
         input = el("input"),
         content = el("span", undefined, "entry-text");
@@ -491,9 +556,12 @@
       input.checked = selected(record.id, entry.path);
       input.disabled = !C.selectable(entry) || overlaps(record.id, entry.path);
       input.setAttribute("aria-label", `Select ${entry.path} from ${record.label}`);
+      const sourceName = el("small", `Record ${recordNumber(record)}: ${record.label}`);
+      sourceName.id = `result-source-${index}`;
+      input.setAttribute("aria-describedby", sourceName.id);
       content.append(
         el("strong", entry.path),
-        el("small", record.label),
+        sourceName,
         el(
           "small",
           `${entry.kind} · ${entry.status}${
@@ -576,7 +644,9 @@
     $("selected-scopes").replaceChildren();
     selections.forEach((s) => {
       const r = catalogue.records.find((x) => x.id === s.source_id);
-      $("selected-scopes").append(el("p", `${r.label}: ${s.path}`, "selected-scope"));
+      $("selected-scopes").append(
+        el("p", `Record ${recordNumber(r)}: ${r.label}: ${s.path}`, "selected-scope")
+      );
     });
   }
   const comparisonLabels = {
@@ -795,7 +865,9 @@
     )} · physical drives unverified`;
     const prior = $("catalogue-filter").value;
     $("catalogue-filter").replaceChildren(new Option("All saved locations", ""));
-    catalogue.records.forEach((r) => $("catalogue-filter").append(new Option(r.label, r.id)));
+    catalogue.records.forEach((r) =>
+      $("catalogue-filter").append(new Option(`Record ${recordNumber(r)}: ${r.label}`, r.id))
+    );
     if (catalogue.records.some((r) => r.id === prior)) $("catalogue-filter").value = prior;
     renderCards();
     renderSelection();
@@ -1142,10 +1214,10 @@
     page = 0;
     renderResults();
   });
-  $("catalogue-filter").addEventListener("change", () => {
-    page = 0;
-    renderResults();
-  });
+  $("catalogue-filter").addEventListener("change", () =>
+    focusLocation($("catalogue-filter").value)
+  );
+  $("all-locations").addEventListener("click", () => focusLocation("", true));
   $("previous-results").addEventListener("click", () => {
     page--;
     renderResults();

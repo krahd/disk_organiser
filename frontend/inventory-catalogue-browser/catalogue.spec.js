@@ -589,3 +589,97 @@ test("comparison stays readable on narrow screens and keyboard zoom with duplica
   await geometry(page);
   await shot(page, info, "45-comparison-css-zoom.png", { fullPage: false });
 });
+
+test("saved-location shelf keeps query, source identity and cross-record choices", async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page);
+  await add(page, first, "Project drive");
+  await add(page, second, "Project drive");
+  const browse = (n) =>
+    page.getByRole("button", { name: `Browse record ${n}: Project drive`, exact: true });
+  const search = page.getByLabel("Search recorded names and paths", { exact: true });
+  await search.fill("Photos");
+  await browse(1).focus();
+  await page.keyboard.press("Enter");
+  await expect(browse(1)).toBeFocused();
+  await expect(browse(1)).toHaveAttribute("aria-pressed", "true");
+  await expect(search).toHaveValue("Photos");
+  await expect(page.locator("#location-focus-heading")).toHaveText("Record 1: Project drive");
+  await page
+    .getByRole("checkbox", { name: "Select Photos from Project drive", exact: true })
+    .check();
+  await expect(page.locator("#selected-scopes")).toContainText("Record 1: Project drive");
+  await page.locator(".location-focus").scrollIntoViewIfNeeded();
+  await geometry(page);
+  await shot(page, info, "46-shelf-focused-record.png", { fullPage: false });
+  await browse(2).click();
+  await expect(browse(2)).toBeFocused();
+  await expect(search).toHaveValue("Photos");
+  await expect(page.locator("#catalogue-results")).toContainText("No recorded matches");
+  await expect(page.locator("#location-focus-body")).toContainText("partial folder record");
+  await expect(page.locator("#selection-count")).toContainText("1 folder selected");
+  await page.locator(".location-evidence summary").click();
+  await expect(page.locator(".location-evidence")).toContainText(
+    "Original source label: Owned example"
+  );
+  await expect(page.locator(".location-evidence")).toContainText("not used/free disk space");
+  await search.fill("Film.mov");
+  await page
+    .getByRole("checkbox", { name: "Select Exports/Film.mov from Project drive", exact: true })
+    .check();
+  await page.getByRole("button", { name: "All saved locations", exact: true }).click();
+  await expect(search).toHaveValue("Film.mov");
+  await expect(page.locator("#selection-count")).toContainText("1 file and 1 folder selected");
+  await expect(page.locator("#selected-scopes")).toContainText("Record 2: Project drive");
+  await search.fill("");
+  await page.locator("#all-locations").scrollIntoViewIfNeeded();
+  await shot(page, info, "47-shelf-all-records.png", { fullPage: false });
+  await geometry(page);
+});
+
+test("saved shelf exposes every record at narrow width and enlarged text", async ({
+  page,
+}, info) => {
+  const C = require("../inventory-snapshot-model.js");
+  const snapshot = JSON.parse(fs.readFileSync(first, "utf8"));
+  snapshot.entries = [snapshot.entries[0]];
+  let catalogue = C.empty();
+  const label = "外付け · Saved archive <img onerror=alert(1)> · a very long location label";
+  for (let n = 0; n < 32; n++) catalogue = C.add(catalogue, snapshot, label);
+  await page.setViewportSize({ width: 320, height: 900 });
+  await open(page);
+  await page.locator("#inventory-file").setInputFiles({
+    name: "owned-many-records.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(C.exportCatalogue(catalogue)),
+  });
+  await page.getByRole("button", { name: "Replace catalogue and open", exact: true }).click();
+  await expect(page.locator(".source-card")).toHaveCount(32);
+  const last = page.getByRole("button", { name: `Browse record 32: ${label}`, exact: true });
+  await last.focus();
+  await page.keyboard.press("Space");
+  await expect(last).toBeFocused();
+  await expect(last).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#location-focus-heading")).toHaveText(`Record 32: ${label}`);
+  await expect(page.locator(".location-focus img")).toHaveCount(0);
+  await expect(page.locator("#location-focus-body")).toContainText(
+    "does not establish that the location is empty"
+  );
+  await page.locator("#source-cards").scrollIntoViewIfNeeded();
+  await geometry(page);
+  await shot(page, info, "48-shelf-narrow-last-record.png", { fullPage: false });
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+  await page.locator(".location-focus").scrollIntoViewIfNeeded();
+  await geometry(page);
+  await shot(page, info, "49-shelf-enlarged-empty-record.png", { fullPage: false });
+  const filter = page.getByLabel("Look in", { exact: true });
+  await filter.selectOption(catalogue.records[0].id);
+  await expect(page.locator("#location-focus-heading")).toHaveText(`Record 1: ${label}`);
+  await expect(
+    page.getByRole("button", { name: `Browse record 1: ${label}`, exact: true })
+  ).toHaveAttribute("aria-pressed", "true");
+});

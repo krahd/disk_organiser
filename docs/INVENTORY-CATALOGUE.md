@@ -10,7 +10,7 @@ This is a useful first offline catalogue, not a live drive connection. No defaul
 
 1. Open one snapshot JSON. Review its original folder label, claimed date and complete/partial status, then give the separate catalogue record a useful location label.
 2. Add further snapshots. A record might be labelled “Blue external drive · photos”, but this remains your label for one selected-folder observation, not verified physical-drive identity.
-3. Compare each card's top-level content groups and listed observed file sizes. Search across all records, including historical records of disconnected storage. Each result names its recorded location and source date so you know which storage to reconnect and check in your own tools.
+3. Browse a saved record to see its top-level content groups and listed observed file sizes. Search across all records, including historical records of disconnected storage. Each result names its recorded location and source date so you know which storage to reconnect and check in your own tools.
 4. Select plain observed files or folders across records. The interface prevents overlapping folder/descendant choices within a record. It cannot establish whether different records describe the same physical storage.
 5. Create and download a manual project plan. Open it in `manual-workspace.html` to choose intended homes, planned backup targets and restore checklists. The export does not replace any existing workspace or execute anything.
 6. Save the catalogue privately and acknowledge the download only after confirming it in Downloads. Reopen that file explicitly to resume. Temporary project selections are not part of the catalogue; export a manual plan to retain them.
@@ -24,7 +24,7 @@ The illustrative snapshots in `prototypes/inventory_catalogue/` were generated b
 - Logical-size composition sums only listed `observed` file paths. Directory sizes and uncertain-status file bytes are excluded. Hard links and repeated source snapshots can represent the same bytes more than once. These figures are not used/free space, recoverable capacity, deduplicated physical allocation or backup billing.
 - Complete means complete within that selected folder's bounded producer policy at the claimed time, not a whole-drive survey or an atomic snapshot. Partial records retain their gaps and may omit entire branches.
 - Current connection, physical identity, authenticated versions, dependencies, available capacity and protection are unknown. Missing search results never establish that a file is absent. The catalogue cannot notice a reconnection or refresh itself.
-- Four named content groups are shown on a card; any remaining groups are explicitly aggregated. All recorded entry matches remain accessible through 50-row pagination with total and page counts. Nothing is silently cut out of search.
+- Four named content groups are shown in the focused record view; any remaining groups are explicitly aggregated. All recorded entry matches remain accessible through 50-row pagination with total and page counts. Nothing is silently cut out of search.
 - Show details exposes original source labels, dates, source references, record keys, coverage, stop reasons, errors and exclusion counts. It changes presentation only.
 
 ## Readable dates and selection counts
@@ -139,3 +139,18 @@ Intermediate source `a34d9d8d44a23a5cb16d9d654df8180144a11ab2` passed all seven 
 ### Remaining product gates
 
 Native OS file-dialog controls, native browser-UI zoom, screen readers/forced colours, nontechnical participant success, additional browser engines, native volume identity and reconnection, representative real user-drive hardware, and physical backup/restore remain unverified separate gates. A well-formed snapshot or passing fixture test is not authority to operate on user files, proof of current connection, protection evidence or a commercial-readiness certificate.
+
+
+## Compact saved-location shelf (source checkpoint)
+
+The catalogue now presents a compact shelf of saved folder records, with a single focused breakdown rather than repeating every folder breakdown on every card. Record numbers distinguish duplicate labels in the shelf, the location selector, search-result descriptions and the project selection. These are catalogue positions, not hardware identities.
+
+- Choose **Browse record** or **Look in** to focus one historical record. **All saved locations** searches across the catalogue. Changing scope preserves the typed query and project choices; result pagination returns to the first page. Shelf button focus is restored after rendering, and the active choice has an explicit pressed state.
+- The shelf retains every supported record, up to the existing 32-record/aggregate-entry limits, in a bounded scrolling area. It does not discard or silently hide records from the selector or search.
+- The focused view shows claimed date, listed file sizes and the largest recorded folder groups. **Source and limits** retains the original label and raw claimed date. Renaming a label does not rewrite its historical origin.
+- A root-only snapshot explicitly says no file sizes are listed; it does not imply an empty live drive. Partial coverage, unknown connection and unauthenticated imported claims remain explicit. Listed bytes are logical sizes by path, not capacity, free space, physical storage or proof of a backup.
+- The primary search/project task precedes optional two-record comparison. No import/export schema, native data protocol, observer admission, storage authority or real-folder gate changes. Bundled native assets must match canonical frontend bytes.
+
+The design takes interaction lessons from [DaisyDisk's compact disk overview](https://daisydiskapp.com/guide/4/en/DisksOverview/) and [NeoFinder's catalogue library](https://www.cdfinder.de/guide/1/1.1/neofinder_overview.html). Their screenshots/assets/code are not included. This viewer has no live volume capacity or connection evidence, so those indicators are deliberately absent.
+
+Local source validation passes 665 Jest tests, 47 catalogue DOM checks, 12 persistence DOM checks, 16 ingress checks, 18 protocol checks, exact eight-asset/two-example parity and 22 parser cases/4,102 UTF-8 samples. The 12 browser journeys include two new shelf cases for keyboard scope changes, duplicate labels, retained selections, all 32 records, narrow layout and enlarged text. They are authored, not yet executed at this checkpoint. The ordinary local Chromium attempt failed at the environment's socket restriction; hosted owned-fixture browser/native runs and original-pixel review remain required. No new signed host, panel, grant or user-drive experiment is included.

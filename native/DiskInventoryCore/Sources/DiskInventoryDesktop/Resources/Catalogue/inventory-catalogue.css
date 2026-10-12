@@ -52,71 +52,153 @@
 .empty-disks i:nth-child(3) {
   transform: rotate(8deg);
 }
+.shelf-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.5rem;
+  margin-top: 1rem;
+}
+.shelf-toolbar p {
+  flex: 1 1 260px;
+}
 .source-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  gap: 1rem;
-  margin: 1.2rem 0 2.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0 2rem;
+  max-height: 28rem;
+  overflow: auto;
+  padding: 4px;
+  scroll-padding: 4px;
 }
 .source-card {
-  padding: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #fffefa;
   min-width: 0;
 }
+.source-card.is-current {
+  border-color: #39755c;
+  box-shadow: inset 0 3px #39755c;
+  background: #f0f5e9;
+}
+.source-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.source-heading > div {
+  min-width: 0;
+}
+.source-heading .eyebrow {
+  margin-bottom: 0.2rem;
+  font-size: 0.65rem;
+}
 .source-card h3 {
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   overflow-wrap: anywhere;
 }
-.source-card .source-icon {
-  width: 34px;
-  height: 42px;
+.source-icon {
+  width: 28px;
+  height: 36px;
+  flex: 0 0 28px;
   border: 2px solid #647d6c;
   border-radius: 6px;
-  display: block;
-  background: #e7eedf;
-  margin-bottom: 0.8rem;
+  background: linear-gradient(#e7eedf 75%, #c7d6bd 75%);
 }
-.source-card .source-date {
+.source-date {
   overflow-wrap: anywhere;
   color: #54645b;
   font-size: 0.78rem;
-  margin: 0.5rem 0;
+  margin: 0.65rem 0;
 }
-.source-card .source-stat {
+.source-stat {
   overflow-wrap: anywhere;
-  font-size: 1.6rem;
-  font-weight: 670;
-  letter-spacing: -0.04em;
+  font-size: 0.9rem;
+  font-weight: 650;
 }
-.source-card .source-actions {
+.source-card .coverage-label {
+  align-self: start;
+}
+.source-selection {
+  margin-top: 0.65rem;
+}
+.source-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.35rem;
+  padding-top: 0.7rem;
+  margin-top: auto;
+}
+.source-actions button {
+  flex: 1 1 auto;
+}
+:is(.source-actions, .shelf-toolbar) button[aria-pressed="true"] {
+  background: #244e3b;
+  color: #fff;
+  border-color: #244e3b;
+}
+.location-focus {
+  padding: 1.2rem;
+  border: 1px solid var(--line);
+  background: #fffefa;
+  border-radius: 10px;
+  margin-bottom: 1.6rem;
+  overflow-wrap: anywhere;
+}
+.location-focus h2 {
+  margin: 0.4rem 0 0.7rem;
+}
+.focus-stat {
+  font-size: 1.2rem;
+  font-weight: 650;
+  margin-bottom: 0.5rem;
+}
+.breakdown-heading {
+  font-size: 0.86rem;
   margin-top: 1rem;
 }
-.source-card .group-list {
+.group-list {
   list-style: none;
   padding: 0;
-  margin: 1rem 0 0;
+  margin: 0.7rem 0;
 }
-.source-card .group-list li {
+.group-list li {
   display: flex;
   justify-content: space-between;
-  gap: 0.6rem;
-  font-size: 0.8rem;
+  gap: 0.8rem;
+  font-size: 0.85rem;
   margin: 0.4rem 0;
 }
-.source-card .group-list li span:first-child {
+.group-list li span:first-child {
   overflow-wrap: anywhere;
   min-width: 0;
 }
-.source-card .group-list li span:last-child {
+.group-list li span:last-child {
   flex: 0 1 45%;
   min-width: 0;
   text-align: right;
   overflow-wrap: anywhere;
+}
+.location-evidence {
+  font-size: 0.8rem;
+  color: #54645b;
+  margin-top: 0.8rem;
+}
+.location-evidence summary {
+  min-height: 44px;
+  padding: 0.7rem 0;
+  cursor: pointer;
+}
+.location-evidence p {
+  margin-bottom: 0.5rem;
+}
+.search-heading {
+  font-size: 1.15rem;
 }
 .composition {
   display: flex;
@@ -295,9 +377,6 @@
     grid-template-columns: 1fr;
     gap: 1.3rem;
   }
-  .project-selection {
-    order: -1;
-  }
   .catalogue-shell {
     padding: 1.5rem 1rem;
   }
@@ -342,7 +421,7 @@
 }
 
 .comparison-section {
-  margin: 0 0 2.5rem;
+  margin: 2rem 0 2.5rem;
   padding: 1.5rem;
   background: #f4f6ef;
   border: 1px solid var(--line);
