@@ -1,6 +1,15 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 04:20
+Last updated: 2026-10-12 05:14
+
+## Responsive owned observation: source-reviewed checkpoint
+
+- An internal one-use worker runs an already-admitted observer away from the main actor. Cancellation is a locked request consumed by the worker; it does not close borrowed descriptors or interrupt syscalls. Terminal publication follows retirement and has an explicit cancel-versus-success ordering. A rejected second caller cannot cancel the admitted run.
+- Progress uses one bounded, monotonic latest-count slot. The test-owned provider samples it on the main actor, joins its delivery task before returning and passes data-only updates through the existing session generation fence. The ordinary application still uses fixed bundled examples and does not link the observer or selection adapter.
+- The strengthened owned native journey is authored to cancel with a genuine AppKit event during an actual held observation, then retry and add. The saved-library journey is authored to save two fresh observations, verify their source folders are gone, reopen their metadata and type a genuine native search with exact path/size/record pairing and retained partial status. These are development fixtures, not evidence of physical drive reconnection, content identity or backup protection.
+- Independent source review resolved unreachable progress holds, a search-key target oracle, rejected-caller cancellation, retained late-success session coverage and explicit Sendable formation of worker callbacks. All 217 baseline XCTest identities remain, with sixteen added methods for 233 authored methods. The five pure Python isolation-rule tests pass locally. The graph command is blocked by missing xcrun; no changed Swift method or screenshot has executed at this source checkpoint.
+- Required next evidence is pinned hosted compilation and all 233 native methods plus six differential and six parser cases, genuine active-work cancellation and offline saved-metadata search, and review of all mandatory original captures including changed 73 and 96. Earlier passes/images remain attributed to their named source. Source admission, no-follow/filesystem limits, storage protocols, native workflow, capture guards and the real-folder control remain unchanged. See [the ownership and verification contract](native/DiskInventoryCore/OWNED-ASYNC-OBSERVATION.md).
+
 
 ## Catalogue clarity: independently reviewed execution
 
@@ -872,4 +881,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 04:20
+Last updated: 2026-10-12 05:14

@@ -6,14 +6,29 @@ struct LibraryChoice: Equatable, Sendable {
     let detail: String
 }
 
+struct LibraryPreparationProgress: Equatable, Sendable {
+    let inspectedEntries: Int
+    init?(inspectedEntries: Int) {
+        guard (0...2_000).contains(inspectedEntries) else { return nil }
+        self.inspectedEntries = inspectedEntries
+    }
+}
+
 // Data provider, never a serialised filesystem capability. The application ships
 // only fixed bundled examples. Owned-directory providers exist in tests only.
 @MainActor
 protocol LibrarySource: AnyObject {
     var choices: [LibraryChoice] { get }
     var scopeDescription: String { get }
-    func prepare(_ choice: LibraryChoice) async throws -> Data
+    func prepare(_ choice: LibraryChoice, progress: @escaping @MainActor (LibraryPreparationProgress) -> Void) async throws -> Data
     func cancel()
+}
+
+@MainActor
+extension LibrarySource {
+    func prepare(_ choice: LibraryChoice) async throws -> Data {
+        try await prepare(choice, progress: { _ in })
+    }
 }
 
 @MainActor
@@ -23,7 +38,7 @@ final class BundledLibraryExamples: LibrarySource {
         LibraryChoice(id: "archive", title: "Archive collection", detail: "A partial recorded example with limits that remain visible."),
     ]
     let scopeDescription = "Built-in example data only. No folder or drive will be read. Recorded dates and contents belong to examples, not your current storage."
-    func prepare(_ choice: LibraryChoice) async throws -> Data {
+    func prepare(_ choice: LibraryChoice, progress: @escaping @MainActor (LibraryPreparationProgress) -> Void) async throws -> Data {
         guard choices.contains(choice), let root = Bundle.module.resourceURL else { throw CataloguePreviewHost.Failure.unavailable }
         try Task.checkCancellation()
         // The identifier comes from the fixed allowlist, never text/JSON/arguments.
@@ -49,12 +64,16 @@ final class LibrarySession {
     private(set) var choice: LibraryChoice?
     private(set) var message = "Development preview. Explore example records; real-folder reading is not connected."
     private(set) var hasTemporaryRecords = false
+    private(set) var inspectedEntries: Int?
     var changed: (() -> Void)?
     private var generation = UUID()
     private var work: Task<Void, Never>?
 
     init(host: CataloguePreviewHost, source: any LibrarySource) { self.host = host; self.source = source }
-    private func show(_ next: State, _ text: String) { state = next; message = text; ownerChanged?(); changed?() }
+    private func show(_ next: State, _ text: String) {
+        if next != .preparing { inspectedEntries = nil }
+        state = next; message = text; ownerChanged?(); changed?()
+    }
     func choose() {
         guard state == .ready, host.state == .ready, admitted(.choose) else { return }
         choice = nil
@@ -68,12 +87,18 @@ final class LibrarySession {
     func prepare() {
         guard state == .scope, let selected = choice, source.choices.contains(selected), admitted(.prepare) else { return }
         let token = generation
+        inspectedEntries = nil
         show(.preparing, "Preparing the selected example. Nothing has been added yet.")
         work = Task { @MainActor [weak self] in
             guard let self else { return }
             guard generation == token, state == .preparing, !Task.isCancelled else { finishStopped(); return }
             do {
-                let bytes = try await source.prepare(selected)
+                let bytes = try await source.prepare(selected, progress: { [weak self] update in
+                    guard let self, generation == token, state == .preparing else { return }
+                    guard inspectedEntries == nil || update.inspectedEntries >= inspectedEntries! else { return }
+                    inspectedEntries = update.inspectedEntries
+                    show(.preparing, "Inspecting the selected example: \(update.inspectedEntries) entries checked. Nothing has been added yet.")
+                })
                 guard generation == token, state == .preparing, !Task.isCancelled else { finishStopped(); return }
                 _ = try await host.stage(bytes)
                 // A close/cancel may retire this generation while WebKit replies.

@@ -8,8 +8,9 @@ extension LibraryApplicationTests {
     func testNativeApplicationStorageMissingSaveContentionReopenAndCancelViews() async throws {
         let fixture = try OwnedStorageFixture(), opener = OwnedApplicationParentOpener(fixture)
         let screens = try LibraryApplicationScreens(.applicationData); defer { screens.close() }
+        let observedSource = OwnedLibrarySource()
         let first = try await OwnedPreviewHarness.open(storageMode: .applicationData)
-        let window = try LibraryWindowController(session: LibrarySession(host: first.host, source: BundledLibraryExamples()), provider: ApplicationLibraryFactory(opener: opener))
+        let window = try LibraryWindowController(session: LibrarySession(host: first.host, source: observedSource), provider: ApplicationLibraryFactory(opener: opener))
         defer { window.discardAndClose(); first.close() }
         try first.useApplicationWindow(window.window); window.show()
         XCTAssertTrue(window.saveButton.isEnabled); XCTAssertTrue(window.openButton.isEnabled); XCTAssertEqual(opener.calls, 0)
@@ -25,11 +26,15 @@ extension LibraryApplicationTests {
             try await first.key("K", code: 40); try await first.click("catalogue-confirm")
             try await clickNative("library-done", using: first); try await ready(window.session, .ready)
         }
+        XCTAssertEqual(observedSource.calls, 2)
+        XCTAssertEqual(observedSource.completedSourceRoots.count, 2)
+        XCTAssertTrue(observedSource.completedSourceRoots.allSatisfy { !FileManager.default.fileExists(atPath: $0) })
         try await clickNative("library-save", using: first); try await settle(window.interaction)
         XCTAssertEqual(window.interaction.saveOutcome, .currentSaved)
         try await screens.native("94-application-library-saved.png", view: window.chrome)
+        let unopenedSource = OwnedLibrarySource()
         let next = try await OwnedPreviewHarness.open(storageMode: .applicationData)
-        let reopened = try LibraryWindowController(session: LibrarySession(host: next.host, source: BundledLibraryExamples()), provider: ApplicationLibraryFactory(opener: opener))
+        let reopened = try LibraryWindowController(session: LibrarySession(host: next.host, source: unopenedSource), provider: ApplicationLibraryFactory(opener: opener))
         defer { reopened.discardAndClose(); next.close() }
         try next.useApplicationWindow(reopened.window); reopened.show()
         try await clickNative("library-save", using: next); try await settle(reopened.interaction)
@@ -64,6 +69,26 @@ extension LibraryApplicationTests {
         try await clickNative("library-version-1", using: next); try await settle(reopened.interaction)
         try await clickNative("library-replace", using: next); try await settle(reopened.interaction)
         let count = try await next.script("return String(document.querySelectorAll('.source-card').length);"); XCTAssertEqual(count, "2")
+        // Both real owned source folders have already been retired and removed.
+        // Searching this reopened history must not invoke either source again.
+        try await next.click("catalogue-search")
+        let searchKeys: [(String, UInt16)] = [("D", 2), ("e", 14), ("s", 1), ("i", 34), ("g", 5), ("n", 45)]
+        for (letter, code) in searchKeys {
+            try await next.key(letter, code: code, expectedTarget: "catalogue-search")
+        }
+        try await next.wait("return String(document.querySelectorAll('#catalogue-results > *').length);", equals: "2")
+        try await next.wait("return document.getElementById('catalogue-search').value;", equals: "Design")
+        let resultRows = try await next.script("return JSON.stringify([...document.querySelectorAll('#catalogue-results > *')].map(r => ({path:r.querySelector('strong').textContent,kind:r.querySelector('.entry-kind').textContent,record:r.querySelector('[id^=result-source-]').textContent})));")
+        let rows = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(resultRows.utf8)) as? [[String: String]])
+        XCTAssertEqual(rows.count, 2)
+        guard rows.count == 2 else { throw CataloguePreviewHost.Failure.invalidPayload }
+        XCTAssertEqual(rows.map { $0["path"] }, ["Projects/Design.txt", "Projects/Design.txt"])
+        XCTAssertEqual(rows.map { $0["kind"] }, ["File · 600 B listed", "File · 700 B listed"])
+        XCTAssertTrue(rows[0]["record"]?.hasPrefix("Record 1:") == true)
+        XCTAssertTrue(rows[1]["record"]?.hasPrefix("Record 2:") == true)
+        let partial = try await next.script("return document.querySelectorAll('.source-card')[1].textContent;")
+        XCTAssertTrue(partial.contains("Partial folder record · gaps remain"))
+        XCTAssertEqual(observedSource.calls, 2); XCTAssertEqual(unopenedSource.calls, 0)
         try await screens.web("96-application-reopened-records.png", harness: next)
         let cancelledFixture = try OwnedStorageFixture(), cancelledOpener = OwnedApplicationParentOpener(cancelledFixture)
         let provider = HeldApplicationProvider(ApplicationLibraryFactory(opener: cancelledOpener))

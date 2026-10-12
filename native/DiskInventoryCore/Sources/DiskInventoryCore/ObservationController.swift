@@ -2,7 +2,7 @@ import Foundation
 import Darwin
 
 enum SourceAdmission: Equatable { case ownedFixture, unknown, unsupported }
-enum ObservationState: String { case observed, partial, cancelled, revoked, rootChanged = "root_changed", unsupported, failed }
+enum ObservationState: String, Sendable { case observed, partial, cancelled, revoked, rootChanged = "root_changed", unsupported, failed }
 enum ControllerState: Equatable { case ready, observing, stopping, spent, revoked }
 enum ControllerBoundary: Equatable { case beforeProjection, afterProjection, beforeAdmission }
 
