@@ -1,6 +1,17 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 17:18
+Last updated: 2026-10-12 18:47
+
+## One-run build-only activation candidate
+
+- PR35 is integrated at main `de0feafd72ee270d6aaa53a824cb94ea4cc03e28`, tree `a7c24300fb2a98ec4e0b899a75d1a9c7567cb09b`. All six actual-main workflows pass: [native](https://github.com/krahd/disk_organiser/actions/runs/38284321586/job/114928922361) retains 233 exact baseline identities plus six differential/six parser cases, and [catalogue](https://github.com/krahd/disk_organiser/actions/runs/38284321613/job/114928922806) passes thirteen browser journeys. Those runs did not execute the new build-only driver.
+- This activation candidate prepares one expressly authorised temporary build/sign/inspect attempt: only the profile's literal Boolean changes operationally, and the exact reviewed manual workflow is copied to its designated active path while retaining the inert comparison anchor. All fourteen operational module bytes, nineteen host inputs, source pins and native command tuples are unchanged. Both default controller gates remain false; the ordinary real-folder control and Stage C stay closed. The profile's original descriptive string is retained byte-for-byte for its reviewed normalised hash; the explicit Boolean is the activation state.
+- The unchanged manual-only workflow binds the supplied exact reviewed main commit, checkout/workflow/run identity and first attempt. Attempt 1 rejects a rerun of the same run; it does not prevent a second distinct manual dispatch. The single-run limit is the authorised operator instruction followed by deactivation, not a durable global one-shot mechanism. Its 31 fixed tool calls, 720-second work plus 180-second finalisation budgets, twenty-minute job, fixed macOS15 ARM64/Xcode16.4/SDK15.5/cached Python3.12.10 requirements and fourteen-day record retention remain unchanged. It builds and ad-hoc signs temporary owned test bundles with the exact two sandbox/read-only-selection entitlements, without launching them, presenting a panel, accepting a grant or changing OS security settings. Missing tools or failed identity/evidence checks refuse without fallback.
+- The initial two-path activation exposed five test-fixture failures because disabled test inputs were derived from the checkout's current flag. Two test-only files now explicitly model the disabled state and its normalised bytes; all original assertions and all 299 method identities remain. The final 299 memory/mock methods and nineteen source checks pass. Operational helpers, signature/parser policy and filesystem/process ownership are unchanged. These checks are not an actual build, signing or runtime result.
+- Independent review of the first activation candidate found one residual test-oracle gap: the direct-driver disabled test inherited True and passed on an invalid-dispatch refusal. This separate successor explicitly patches False and requires the exact disabled refusal, retaining both no-creation assertions. All 299 memory/mock identities still pass; an isolated four-case preflight mutation check now fails the test when its disabled guard is removed, in either initial profile state. No operational helper changes. The first activation freeze and failed review remain preserved.
+- Exact activation review is required before publication; final-head ordinary checks are required before integration. A single manual dispatch must then be attributed to the exact approved main commit; no run has been started. The installed connector currently lacks workflow dispatch and the inspected cloud browser is signed out, so an authenticated supported dispatch route is still required. After the one attempt, restore the disabled profile and remove only the active workflow copy through a reviewed reversible source change, retaining the inert template and evidence. No broader recurring execution, Stage C, user computer or user-drive authority is introduced.
+
+The disabled checkpoints below retain their historical source and execution attribution.
 
 ## Disabled Stage B driver: reviewed public checkpoint and ordinary CI
 
@@ -964,4 +975,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 17:18
+Last updated: 2026-10-12 18:47
