@@ -68,6 +68,60 @@ budget oracle. Python consumes it here; a future Swift consumer and differential
 negative-parser corpus remain unimplemented. These results cannot be counted as
 native or prior-candidate coverage.
 
+## Additional configuration-pair claim checkpoint
+
+`Tools/configuration_pair.py` adds a pure consistency check between two supplied
+byte pairs. Each pair retains opaque raw configuration bytes and a strict,
+versioned resolved JSON claim. A candidate must match a separately supplied
+expected pair byte for byte. Whitespace, object order, ordered arrays and exact
+Unicode are retained; nothing is canonicalised away. The operation returns no
+permit. Both expected and candidate inputs remain caller-supplied claims.
+
+The local schema binds source/fixture identity claims, configuration enablement,
+toolchain/destination, all three product paths/identifiers/inventory digests,
+arguments, both environments, enabled/skipped test identities and instrumentation.
+Unknown fields and unsupported versions refuse. It is a complete comparison of
+this local record, **not the complete Xcode format**. Raw configuration stays
+opaque: even matching pairs do not prove the JSON describes the raw bytes, any
+file exists, a signature is valid, a runner will launch, or access was approved.
+A real format-specific parser and independently admitted expected identity remain
+required. Build/configuration roots and the driver working directory/environment
+are not represented; these and observed product identity must be bound before
+any operational use. This record is not a fully resolved launch-context seal.
+Tests deliberately use non-plist bytes to keep that limitation visible.
+
+Bounds are 1 MiB raw bytes, 64 KiB resolved JSON, the existing 16-level nesting
+limit, 128 arguments/test identities/environment entries per collection,
+1 KiB product paths/destination, 256-byte names/keys/toolchain text and 4 KiB
+argument/environment values. Text is strict UTF-8 without ASCII C0/DEL control
+characters; Unicode C1 characters remain admitted and are compared exactly.
+Empty argument/environment values are supported. Product paths are exact
+relative claims, never opened. These conservative limits are not an assertion
+that every real Xcode configuration is supported.
+
+Local execution passes **54 memory-only methods: the unchanged 32 methods and
+19 containment cases, plus 22 new configuration-pair methods**. Every mutation
+comparison has an admitted positive baseline; changed candidates first pass
+schema checks so malformed input cannot mask the equality oracle. Coverage
+includes all product fields, both environment keys/values, raw-only and paired
+changes, fixture/source/toolchain claims, test selection, argument/test order,
+instrumentation, strict types and paired byte/collection limits. No new file
+reads, workflow, native target, dependency or operational CLI are introduced.
+The module's command entry refuses with exit 2. Independent source review is a
+publication gate; none of these results is native execution.
+
+### Concrete bridge to a usable folder workflow
+
+After this guard, the missing bridge is still an exact reviewed parser/observer,
+bounded descriptor ownership and a quarantined native host. A separately
+approved owned-runner experiment must prove the same selected-file read is
+actually allowed during the transient grant and denied before/after retirement,
+while preserving immutable product/configuration identity. Only subsequent
+independent source/native/pixel acceptance could justify wiring the ordinary
+app's disabled folder control into a read-only scope/progress/cancel/snapshot
+flow. Existing library Save/Open then retains that snapshot for offline search.
+This source checkpoint activates none of those steps and adds no new sample UI.
+
 ## Retained defect lessons and missing work
 
 1. Root rows and descendants must use the same representation. This checkpoint
@@ -75,7 +129,8 @@ native or prior-candidate coverage.
    still needs the future controller.
 2. Freeze and verification must bind the **complete** approved raw test
    configuration and resolved paths/environment, not just the method name.
-   Configuration sealing and signature inspection are not implemented here.
+   Pair consistency is implemented above; raw-to-resolved parser congruence,
+   observed configuration sealing and signature inspection are not implemented.
 3. Future reads must acquire nonblocking, no-follow regular descriptors and
    admit type, identity and size before bounded reads/enumeration. This module
    admits only already-supplied bytes; it is not a safe file-reading API.
