@@ -1,6 +1,15 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 18:47
+Last updated: 2026-10-12 21:34
+
+## Connector-only build-trigger transport candidate
+
+- PR36 is merged at `61e434e03d38ad976f09e37d8b91c5d77bab8305`, tree `1d0f57416e82514b1d470642d24881aad19787d4`. All six actual-main ordinary workflows pass. The [native run](https://github.com/krahd/disk_organiser/actions/runs/38297265896/job/114971253525) retains all 233 distinct methods once, plus six differential and six parser cases; the [catalogue run](https://github.com/krahd/disk_organiser/actions/runs/38297265891/job/114971253826) passes thirteen browser journeys. No new pixels or build-only execution are claimed from those checks.
+- Fresh connector inspection confirms repository operations work, but no first-run workflow-dispatch/general POST operation is exposed. This source candidate replaces the manual trigger with GitHub's documented `create` event, admitted only for the literal reserved branch `validation/owned-build-once-20261012`. The [transport contract](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/CONNECTOR-TRANSPORT.md) records exact commit attribution, independent connector-request cross-check, one trigger and subsequent deactivation. The branch has not been created and the experiment has not run.
+- The job, bootstrap and driver require actual create-event/ref identity; they do not relabel the event as manual dispatch or main. Checkout/workflow/event commits must match. The independent approved SHA is retained in the future exact connector request; the workflow's event-derived SHA is only a consistency check. The original manual anchor stays byte-identical. A separately retained create-event anchor must match the active copy. Only two operational helper bodies change, for transport admission; all nineteen host inputs, the other twelve operational helpers, native command tuples, budgets, output and owner-retirement policies remain exact.
+- Local validation passes 310 distinct memory/mock methods, retaining all 299 previous identities, plus nineteen structural checks. The eleven new methods cover reserved/non-reserved publication events, malformed and missing identity, tags/manual/push rejection, real pre-import/owner refusal, exact anchor and source-pin closure. The initial local test run had one test-oracle failure because its shell substring included the following upload step, and five duplicate imported-test executions. The corrected test bounds the actual run block and imports the fixture module rather than its TestCase class; the initial log is retained. No assertion or production guard was weakened.
+- Independent review of the first transport freeze found that its source model incorrectly treated GitHub's case-insensitive string equality as case-sensitive. The successor corrects only the test model and documentation, adds positive scheduler-case-match/strict-bootstrap-refusal regressions, and retains all operational/workflow bytes. A case-variant reserved name can allocate a macOS runner and run checkout/startup, but the unchanged exact-case bootstrap refuses before operational owners or build tools. The model covers ASCII fixtures and does not claim complete GitHub/Unicode semantics; no exact-case preallocation guard is claimed. The failed review/freeze remains preserved.
+- Source review, ordinary exact-head/actual-main CI and root's frozen connector-payload cross-check remain required before the one creation. The source predicate model is not GitHub execution. Keep the reserved branch after use; do not recreate it or rerun a failed attempt. Stage C, the default controller gates and ordinary real-folder access stay closed. No browser authentication, user-drive access or security-setting change is introduced. Prior checkpoints below retain their original scope and historical claims.
 
 ## One-run build-only activation candidate
 
@@ -975,4 +984,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 18:47
+Last updated: 2026-10-12 21:34

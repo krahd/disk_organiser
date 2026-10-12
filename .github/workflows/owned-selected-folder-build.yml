@@ -1,18 +1,19 @@
 name: Owned selected folder build only
 
 on:
-  workflow_dispatch:
-    inputs:
-      expected_driver_sha:
-        description: Exact reviewed main commit for this one authorised attempt
-        required: true
-        type: string
+  create:
 
 permissions:
   contents: read
 
 jobs:
   owned-build-only:
+    if: >-
+      ${{ github.event_name == 'create' &&
+          github.repository == 'krahd/disk_organiser' &&
+          github.event.ref_type == 'branch' &&
+          github.event.ref == 'validation/owned-build-once-20261012' &&
+          github.ref == 'refs/heads/validation/owned-build-once-20261012' }}
     runs-on: macos-15
     timeout-minutes: 20
     steps:
@@ -29,7 +30,9 @@ jobs:
         id: build
         timeout-minutes: 16
         env:
-          EXPECTED_DRIVER_SHA: ${{ inputs.expected_driver_sha }}
+          EXPECTED_DRIVER_SHA: ${{ github.sha }}
+          CREATED_REF: ${{ github.event.ref }}
+          CREATED_REF_TYPE: ${{ github.event.ref_type }}
         shell: bash
         run: |
           set -euo pipefail
@@ -38,13 +41,14 @@ jobs:
           terminal="$(/usr/bin/env -i \
             PATH=/usr/bin:/bin:/usr/sbin:/sbin LANG=C LC_ALL=C \
             EXPECTED_DRIVER_SHA="$EXPECTED_DRIVER_SHA" \
+            CREATED_REF="$CREATED_REF" CREATED_REF_TYPE="$CREATED_REF_TYPE" \
             GITHUB_EVENT_NAME="$GITHUB_EVENT_NAME" GITHUB_REPOSITORY="$GITHUB_REPOSITORY" \
             GITHUB_REF="$GITHUB_REF" GITHUB_SHA="$GITHUB_SHA" \
             CHECKED_OUT_SHA="$checked_out_sha" GITHUB_WORKFLOW_SHA="$GITHUB_WORKFLOW_SHA" \
             GITHUB_RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" GITHUB_WORKFLOW_REF="$GITHUB_WORKFLOW_REF" \
             GITHUB_WORKSPACE="$GITHUB_WORKSPACE" GITHUB_RUN_ID="$GITHUB_RUN_ID" \
             ImageOS="$ImageOS" ImageVersion="$ImageVersion" \
-            /Users/runner/hostedtoolcache/Python/3.12.10/arm64/bin/python3 -I -S -B native/DiskInventoryCore/Validation/SelectedFolderFeasibility/Tools/stage_b_bootstrap.py b7993cdf1acb86dfb938ae3b5001f95f423561f769f23a078a6f15d7741faccd)"
+            /Users/runner/hostedtoolcache/Python/3.12.10/arm64/bin/python3 -I -S -B native/DiskInventoryCore/Validation/SelectedFolderFeasibility/Tools/stage_b_bootstrap.py 3101dc3f674dc3df015ad73795027d675893208755d07fc213ffd448db980d2a)"
           result=$?
           set -e
           printf '%s\n' "$terminal"

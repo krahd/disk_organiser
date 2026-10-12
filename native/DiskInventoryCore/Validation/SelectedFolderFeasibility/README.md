@@ -318,3 +318,21 @@ Boolean and copies the exact template into the active workflow directory while
 retaining the inert comparison anchor. This
 source candidate does neither. Real panel/grant and production integration are
 separate decisions after actual feasibility evidence.
+
+
+## Connector-only build trigger successor
+
+The disabled-source and manual-activation sections above are historical checkpoints.
+PR36 integrated the build-only activation, but no build attempt was started.
+The current [connector transport contract](StageB/CONNECTOR-TRANSPORT.md) replaces
+only how the one authorised experiment is started. It uses creation of one exact
+reserved branch at a reviewed commit; normal source publication and main merges
+do not run the experiment. The original manual template remains unchanged for
+attribution; the new create-event anchor is separately retained and byte-bound.
+The profile is enabled for that specific transport while both default controller
+gates and Stage C remain closed. The current result is source/memory validation
+only. Actual build/signature/parser acceptance still requires the one recorded run.
+
+The scheduler filter ignores case, so a case-variant reserved name may allocate
+a runner and run checkout/startup. The unchanged strict bootstrap then refuses
+before operational owners or build tools. Exact-case preallocation is not claimed.

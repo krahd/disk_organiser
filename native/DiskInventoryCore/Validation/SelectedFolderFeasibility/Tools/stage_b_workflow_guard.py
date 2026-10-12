@@ -35,9 +35,9 @@ def validate(files, baseline, template, enabled):
     # The template is reviewed as a complete byte sequence. Its parsed semantic
     # restrictions are tested separately; activation cannot swap steps/callers.
     if enabled and files[WORKFLOW] != template:
-        raise AssertionError('active manual workflow differs from reviewed template')
+        raise AssertionError('active build-only workflow differs from reviewed template')
     if not enabled and WORKFLOW in files:
-        raise AssertionError('disabled manual workflow present')
+        raise AssertionError('disabled build-only workflow present')
     return True
 
 
@@ -52,4 +52,4 @@ def check(repo, enabled):
         relative = str(path.relative_to(repo))
         if path.is_file() and ordinary_native_source(relative):
             files[relative] = path.read_bytes()
-    return validate(files, baseline, (probe/'StageB/owned-selected-folder-build.yml.inert').read_bytes(), enabled)
+    return validate(files, baseline, (probe/'StageB/owned-selected-folder-build.create.yml.inert').read_bytes(), enabled)

@@ -66,7 +66,7 @@ class FirstFailureExportTests(unittest.TestCase):
 
     def testNoReportOwnerStillRetainsOriginalErrnoAndMessage(self):
         identity = {'GITHUB_REPOSITORY': profile.REPOSITORY, 'GITHUB_REF': profile.REF,
-            'GITHUB_EVENT_NAME': 'workflow_dispatch', 'GITHUB_RUN_ATTEMPT': '1',
+            'GITHUB_EVENT_NAME': 'create', 'CREATED_REF_TYPE': 'branch', 'CREATED_REF': profile.REF.removeprefix('refs/heads/'), 'GITHUB_RUN_ATTEMPT': '1',
             'GITHUB_RUN_ID': '123', 'GITHUB_SHA': 'a'*40}
         admission = Mock(); output = StringIO()
         with patch.object(profile, 'BUILD_ONLY_ENABLED', True), \
