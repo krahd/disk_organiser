@@ -21,7 +21,8 @@ from test_experiment_controller import model
 
 class AdmissionTests(unittest.TestCase):
     def testDisabledOrForgedAdmissionCannotCreate(self):
-        with patch.object(ec.ob.OwnedBuild, 'create') as create:
+        with patch.object(profile, 'BUILD_ONLY_ENABLED', False), \
+             patch.object(ec.ob.OwnedBuild, 'create') as create:
             with self.assertRaises(pc.Refusal): ba._issue(0)
             for value in (object(), {}, 'approved', True):
                 with self.assertRaises(pc.Refusal): ec.Experiment.prepare('a'*40, {}, admission=value)
@@ -119,6 +120,8 @@ class AdmissionTests(unittest.TestCase):
 class BootstrapTests(unittest.TestCase):
     def profile(self):
         raw=(Path(__file__).parent/'stage_b_profile.py').read_bytes()
+        # This fixture exercises both states, regardless of the checked-out flag.
+        raw=raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
         return raw,hashlib.sha256(raw).hexdigest()
 
     def testOnlyLiteralFlagNormalisationIsPermitted(self):
@@ -234,8 +237,10 @@ class SourceReadTests(unittest.TestCase):
 
 class DriverTests(unittest.TestCase):
     def testDisabledDriverDoesNoOutputOrCreation(self):
-        with patch.object(driver.sr.Report,'create') as report,patch.object(driver.ec.Experiment,'prepare') as prepare:
-            with self.assertRaises(pc.Refusal):driver.run({}, {},started_at=0)
+        with patch.object(profile,'BUILD_ONLY_ENABLED',False), \
+             patch.object(driver.sr.Report,'create') as report,patch.object(driver.ec.Experiment,'prepare') as prepare:
+            with self.assertRaisesRegex(pc.Refusal,'^build-only profile disabled$'):
+                driver.run({}, {},started_at=0)
             report.assert_not_called();prepare.assert_not_called()
 
     def run_model(self, failures=()):

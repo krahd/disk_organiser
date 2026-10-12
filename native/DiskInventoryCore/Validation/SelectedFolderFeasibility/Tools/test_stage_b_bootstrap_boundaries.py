@@ -33,7 +33,7 @@ class BootstrapBoundaryTests(unittest.TestCase):
             fixture.doCleanups()
 
     def startup(self, *, moved=False, changed=False, expired=False):
-        raw = (Path(__file__).parent/'stage_b_profile.py').read_bytes()
+        raw, _ = dt.BootstrapTests().profile()
         enabled = raw.replace(b'BUILD_ONLY_ENABLED = False', b'BUILD_ONLY_ENABLED = True')
         workflow = (Path(__file__).parents[1]/'StageB/owned-selected-folder-build.yml.inert').read_bytes()
         environment, _ = dt.BootstrapTests().identity()
