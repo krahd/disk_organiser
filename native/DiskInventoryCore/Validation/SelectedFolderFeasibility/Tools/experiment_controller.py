@@ -19,6 +19,7 @@ import owned_build_observation as ob
 import probe_contract as pc
 import xctestrun_binding as xb
 import runner_expectations as rx
+import stage_b_admission as ba
 
 TOTAL_LOG_BYTES = 32 * 1024 * 1024
 SOURCE_LIMIT = 2 * 1024 * 1024
@@ -90,13 +91,15 @@ def inspection_digest(inspection):
     return _sha(_json(['owned-probe-inspection-v1', _canonical(inspection)]))
 
 
-def _write_bound_configuration(workspace, binding):
+def _write_bound_configuration(workspace, binding, *, check=None):
     """One new fixed leaf, never overwrite the emitted configuration."""
     pc.require(type(binding) is rx.Derivation and binding.derived_name == rx.DERIVED_NAME,
                'fixed derived configuration')
+    ob._check(check)
+    options = ob._check_options(check)
     data = binding.derived.raw
-    rx.verify(binding, workspace.read_configuration(binding.original_name), data, dict(binding.expectations))
-    with ob._Descriptors() as ledger:
+    rx.verify(binding, workspace.read_configuration(binding.original_name, **options), data, dict(binding.expectations))
+    with ob._Descriptors(check=check) as ledger:
         parent = workspace._products(ledger)
         fd = ledger.acquire(lambda: os.open(rx.DERIVED_NAME, os.O_WRONLY | os.O_CREAT | os.O_EXCL |
                                             os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC, 0o600, dir_fd=parent))
@@ -105,22 +108,28 @@ def _write_bound_configuration(workspace, binding):
                    stat.S_IMODE(initial.st_mode) == 0o600 and initial.st_size == 0, 'fresh bound configuration')
         offset = 0
         for _ in range(4096):
+            ob._check(check)
             if offset == len(data):
                 break
             try:
                 amount = os.write(fd, data[offset:])
             except InterruptedError:
                 continue
+            ob._check(check)
             pc.require(amount > 0, 'bound configuration write progress'); offset += amount
         pc.require(offset == len(data), 'bound configuration write budget')
+        ob._check(check)
         os.fsync(fd)
+        ob._check(check)
         final = os.fstat(fd)
         named = os.stat(rx.DERIVED_NAME, dir_fd=parent, follow_symlinks=False)
         pc.require((initial.st_dev, initial.st_ino) == (final.st_dev, final.st_ino) == (named.st_dev, named.st_ino) and
                    stat.S_ISREG(final.st_mode) and final.st_uid == initial.st_uid and final.st_nlink == 1 and
                    stat.S_IMODE(final.st_mode) == 0o600 and final.st_size == len(data), 'bound configuration changed')
-    rx.verify(binding, workspace.read_configuration(binding.original_name),
-              workspace.read_configuration(rx.DERIVED_NAME), dict(binding.expectations))
+    ob._check(check)
+    rx.verify(binding, workspace.read_configuration(binding.original_name, **options),
+              workspace.read_configuration(rx.DERIVED_NAME, **options), dict(binding.expectations))
+    ob._check(check)
 
 
 def _relative(path):
@@ -143,17 +152,22 @@ def _source_files(files):
     return tuple(sorted((p, _sha(b)) for p, b in files.items()))
 
 
-def _write_inputs(workspace, files):
+def _write_inputs(workspace, files, *, cancelled=lambda: False, check=None):
     """Exclusive writes only beneath the retained fresh root; no overwrite."""
+    ob._check(check)
     workspace._admit()
-    with ob._Descriptors() as ledger:
+    ob._check(check)
+    with ob._Descriptors(check=check) as ledger:
         os.mkdir('Source', 0o700, dir_fd=workspace._descriptor)
         source = ledger.acquire(lambda: os.open('Source', os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC,
                                                 dir_fd=workspace._descriptor))
         made = {()}
         for path, data in sorted(files.items()):
+            ob._check(check)
+            pc.require(not cancelled(), 'source write cancelled')
             parts = _relative(path); parent = source
             for index, part in enumerate(parts[:-1]):
+                ob._check(check)
                 key = tuple(parts[:index + 1])
                 if key not in made:
                     os.mkdir(part, 0o700, dir_fd=parent); made.add(key)
@@ -163,25 +177,36 @@ def _write_inputs(workspace, files):
                                                 os.O_NONBLOCK | os.O_CLOEXEC, 0o600, dir_fd=parent))
             used = 0
             for _ in range(4096):
+                ob._check(check)
                 if used == len(data):
                     break
+                pc.require(not cancelled(), 'source write cancelled')
                 try:
                     count = os.write(fd, data[used:])
                 except InterruptedError:
                     continue
+                ob._check(check)
                 pc.require(count > 0, 'source write progress'); used += count
             pc.require(used == len(data), 'source write-attempt budget')
+            ob._check(check)
             os.fsync(fd)
         for name in ('Home', 'Temp'):
+            ob._check(check)
             os.mkdir(name, 0o700, dir_fd=workspace._descriptor)
+        ob._check(check)
 
 
-def _verify_inputs(workspace, expected):
+def _verify_inputs(workspace, expected, *, retain=False, check=None):
+    ob._check(check)
     workspace._admit()
+    ob._check(check)
+    retained = {}
     for path, digest in expected:
-        with ob._Descriptors() as ledger:
+        ob._check(check)
+        with ob._Descriptors(check=check) as ledger:
             parent = workspace._descriptor
             for part in ['Source'] + _relative(path)[:-1]:
+                ob._check(check)
                 parent = ledger.acquire(lambda: os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC,
                                                         dir_fd=parent))
             fd = ledger.acquire(lambda: os.open(_relative(path)[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC,
@@ -191,17 +216,34 @@ def _verify_inputs(workspace, expected):
                        0 < before.st_size <= 262144, 'source observation shape')
             data = bytearray()
             for _ in range(4096):
+                ob._check(check)
                 try:
                     part = os.read(fd, min(65536, before.st_size + 1 - len(data)))
                 except InterruptedError:
                     continue
+                ob._check(check)
                 if not part:
                     break
                 data.extend(part)
                 pc.require(len(data) <= before.st_size, 'source observation grew')
             pc.require(len(data) == before.st_size and _sha(data) == digest and
                        ob._stamp(before) == ob._stamp(os.fstat(fd)), 'source input changed')
+            if retain:
+                retained[path] = bytes(data)
+    ob._check(check)
     workspace._admit()
+    ob._check(check)
+    return retained if retain else None
+
+
+class PreparationFailure(pc.Refusal):
+    def __init__(self, original, dispositions, cleanup_failures=()):
+        self.original = original
+        self.dispositions = dispositions
+        self.cleanup_failures = tuple(cleanup_failures[:256])
+        self.omitted_cleanup_failure_count = max(0, len(cleanup_failures) - 256)
+        self.failures = tuple(json.dumps(row, sort_keys=True) for row in self.cleanup_failures)
+        super().__init__('preparation failed:' + type(original).__name__)
 
 
 class Experiment:
@@ -214,50 +256,95 @@ class Experiment:
         self._active_cancel = lambda: False
         self.failure_evidence = {}
         self._owner_thread = threading.get_ident()
+        self._build_admission = None
+        self.close_outcomes = {}
         self.environment = {'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'DEVELOPER_DIR': no.DEVELOPER,
                             'HOME': workspace.path + '/Home', 'TMPDIR': workspace.path + '/Temp',
                             'LANG': 'en_US.UTF-8', 'LC_ALL': 'en_US.UTF-8'}
 
     @classmethod
-    def prepare(cls, source_commit, reviewed_files):
-        pc.require(_stage_b_approved(), 'Stage B closed')  # Before any filesystem/tool operation.
+    def prepare(cls, source_commit, reviewed_files, *, admission=None):
+        pc.require((admission is None and _stage_b_approved()) or type(admission) is ba.Admission,
+                   'Stage B closed')  # Before any filesystem/tool operation.
         pc.require(type(source_commit) is str and re.fullmatch(r'[0-9a-f]{40}', source_commit), 'source commit')
         source_rows = _source_files(reviewed_files)
-        pc.require(source_commit == REVIEWED_SOURCE_COMMIT and
-                   _sha(_json(list(source_rows))) == REVIEWED_SOURCE_MANIFEST_SHA256,
-                   'separately reviewed source identity required')
+        if admission is None:
+            pc.require(source_commit == REVIEWED_SOURCE_COMMIT and
+                       _sha(_json(list(source_rows))) == REVIEWED_SOURCE_MANIFEST_SHA256,
+                       'separately reviewed source identity required')
+        else:
+            admission.consume(source_commit, source_rows)
         workspace = fixture = None
+        check = None if admission is None else admission.work_check
+        options = ob._check_options(check)
         try:
-            workspace = ob.OwnedBuild.create(); workspace.create_products_directory()
-            capture_identity = workspace.create_captures_directory()
-            fixture = fi.create_owned_fixture()
+            ob._check(check)
+            workspace = ob.OwnedBuild.create(**options)
+            workspace.create_products_directory(**options)
+            capture_identity = workspace.create_captures_directory(**options)
+            ob._check(check)
+            fixture = fi.create_owned_fixture(**options)
+            ob._check(check)
             generated = fi.render_claimed_inputs(fixture.claim, source_commit, workspace.products_path + '/' + no.EXECUTABLES[0], capture_identity)
+            ob._check(check)
             files = dict(reviewed_files); files.update(generated)
-            _write_inputs(workspace, files)
-            return cls(_CONTROLLER_KEY, workspace, fixture, source_commit, source_rows,
-                       tuple(sorted((p, _sha(b)) for p, b in generated.items())),
-                       tuple(sorted((p, _sha(b)) for p, b in files.items())))
-        except BaseException:
+            _write_inputs(workspace, files, **options)
+            ob._check(check)
+            result = cls(_CONTROLLER_KEY, workspace, fixture, source_commit, source_rows,
+                         tuple(sorted((p, _sha(b)) for p, b in generated.items())),
+                         tuple(sorted((p, _sha(b)) for p, b in files.items())))
+            if admission is not None:
+                admission.attach(result)
+                result._build_admission = admission
+            return result
+        except BaseException as original:
             errors = []
-            for owner in (fixture, workspace):
+            cleanup_failures = []
+            dispositions = {}
+            for label, owner in (('fixture', fixture), ('workspace', workspace)):
                 if owner is not None:
                     try:
                         owner.close()
+                        dispositions[label] = 'closed'
                     except BaseException as error:
                         errors.append(type(error).__name__)
+                        cleanup_failures.append(dict(owner=label, **ob._error_record(error)))
+                        cleanup_failures.extend(getattr(error, 'cleanup_failures', ()))
+                        dispositions[label] = 'unproved:' + type(error).__name__
+                else:
+                    dispositions[label] = 'not-acquired'
+            if admission is not None:
+                try:
+                    admission.retire()
+                except BaseException as error:
+                    dispositions['admission'] = 'unproved:' + type(error).__name__
+                    cleanup_failures.append(dict(owner='admission', **ob._error_record(error)))
+                raise PreparationFailure(original, dispositions, cleanup_failures) from original
             if errors:
-                raise pc.Refusal('preparation retirement unproved:' + ','.join(errors))
+                raise ob.RetirementFailure('preparation retirement unproved:' + ','.join(errors),
+                                           original, cleanup_failures) from original
             raise
+
+    def _work_options(self):
+        return ob._check_options(None if self._build_admission is None else self._build_admission.work_check)
+
+    def _finalisation_check(self):
+        if self._build_admission is not None:
+            pc.require(self._build_admission.guard.remaining_finalisation() > 0, 'failure disposition deadline')
 
     def _tool(self, arguments, *, timeout, max_output=bp.MAX_OUTPUT, cancelled=None):
         remaining = TOTAL_LOG_BYTES - sum(len(x.stdout) + len(x.stderr) for x in self.trace)
         pc.require(remaining > 0 and len(self.trace) < 64, 'experiment tool budget')
+        if self._build_admission is not None:
+            timeout = self._build_admission.before_tool(self, arguments, timeout)
         try:
             result = bp.run(arguments, cwd=self.workspace.path, environment=self.environment,
                             timeout=timeout, max_output=min(remaining, max_output),
                             cancelled=self._active_cancel if cancelled is None else cancelled)
         except bp.ProcessFailure as error:
             self.trace.append(error.result)
+            if self._build_admission is not None:
+                self._build_admission.stop()
             raise
         self.trace.append(result)
         return result
@@ -278,11 +365,18 @@ class Experiment:
 
     def inspect_b(self, *, cancelled=lambda: False):
         pc.require(threading.get_ident() == self._owner_thread, "single experiment owner thread")
-        pc.require(_stage_b_approved() and self.state == 'prepared', 'Stage B unavailable or consumed')
+        pc.require(self.state == 'prepared', 'Stage B unavailable or consumed')
+        if self._build_admission is None:
+            pc.require(_stage_b_approved(), 'Stage B unavailable or consumed')
+        else:
+            self._build_admission.begin(self)
         self.state = 'preparing'
         self._active_cancel = cancelled
         try:
-            self.fixture.verify(); _verify_inputs(self.workspace, self.input_rows)
+            options = self._work_options()
+            self.fixture.verify(**options); _verify_inputs(self.workspace, self.input_rows, **options)
+            if self._build_admission is not None:
+                no.collect_toolchain(self._tool)
             root = self.workspace.path
             build = (no.XCODE, 'build-for-testing', '-project', root + '/Source/Probe.xcodeproj',
                      '-scheme', 'OwnedFolderProbe', '-configuration', 'Debug', '-destination', 'platform=macOS',
@@ -301,22 +395,36 @@ class Experiment:
             inspection = self._observe(binding.derived_name, binding)
             inspection = replace(inspection, preparation_log_digests=tuple(
                 _sha(_json(list(item.arguments)) + b'\0' + item.stdout + b'\0' + item.stderr) for item in self.trace))
+            if self._build_admission is not None:
+                self._build_admission.complete(self)
             self.inspection = inspection; self.state = 'inspected'; self._active_cancel = lambda: False
             return inspection
         except BaseException as error:
             self.state = 'failed'; self.failure = type(error).__name__; self._active_cancel = lambda: False
+            if self._build_admission is not None:
+                self._build_admission.stop()
             self._record_b_failure(error)
             raise
 
     def _configuration_name(self):
+        check = self._work_options().get("check")
+        ob._check(check)
         names = []
-        with ob._Descriptors() as ledger:
+        with ob._Descriptors(check=check) as ledger:
             fd = self.workspace._products(ledger)
-            with os.scandir(fd) as entries:
-                for index, entry in enumerate(entries):
+            with ob._scan_entries(fd, check=check) as entries:
+                entries = iter(entries)
+                for index in range(65):
+                    ob._check(check)
+                    try:
+                        entry = next(entries)
+                    except StopIteration:
+                        break
+                    ob._check(check)
                     pc.require(index < 64, 'configuration enumeration budget')
                     if entry.name.endswith('.xctestrun'):
                         names.append(entry.name)
+        ob._check(check)
         pc.require(len(names) == 1, 'one observed xctestrun required')
         return names[0]
 
@@ -328,10 +436,12 @@ class Experiment:
                          _sha(self.fixture.claim), fixture['runID'], fixture['caseID'])))
 
     def _prepare_runner_binding(self, original_name):
+        options = self._work_options()
+        ob._check(options.get('check'))
         case = pc.decode_claim(self.fixture.claim, pc.FIXTURE_BYTES)['caseID']
         observed = no.collect(self._tool, self.workspace.products_path, case)
-        binding = rx.derive(original_name, self.workspace.read_configuration(original_name), self._expectations(observed))
-        _write_bound_configuration(self.workspace, binding)
+        binding = rx.derive(original_name, self.workspace.read_configuration(original_name, **options), self._expectations(observed))
+        _write_bound_configuration(self.workspace, binding, **options)
         return binding
 
     def _record_b_failure(self, error):
@@ -342,12 +452,14 @@ class Experiment:
         self.failure_evidence['tool_results'] = tuple(self.trace)
         if isinstance(error, bp.ProcessFailure) and not any(item is error.result for item in self.trace):
             self.failure_evidence['untraced_failure_result'] = error.result
-        checks = (('fixture', lambda: self.fixture.verify()),
-                  ('source', lambda: _verify_inputs(self.workspace, self.input_rows)),
-                  ('partial_products', lambda: self.workspace.inventory()),
-                  ('partial_captures', lambda: self.workspace.inventory(captures=True)))
+        options = ob._check_options(None if self._build_admission is None else self._finalisation_check)
+        checks = (('fixture', lambda: self.fixture.verify(**options)),
+                  ('source', lambda: _verify_inputs(self.workspace, self.input_rows, **options)),
+                  ('partial_products', lambda: self.workspace.inventory(**options)),
+                  ('partial_captures', lambda: self.workspace.inventory(captures=True, **options)))
         for label, check in checks:
             try:
+                ob._check(options.get('check'))
                 result = check()
                 self.failure_evidence[label] = result if label.startswith('partial_') else 'unchanged'
             except BaseException as failure:
@@ -357,12 +469,13 @@ class Experiment:
     def _observe(self, configuration_name, binding):
         pc.require(type(binding) is rx.Derivation and configuration_name == binding.derived_name,
                    'fixed bound runtime configuration')
-        self.fixture.verify(); _verify_inputs(self.workspace, self.input_rows)
+        options = self._work_options()
+        self.fixture.verify(**options); _verify_inputs(self.workspace, self.input_rows, **options)
         case = pc.decode_claim(self.fixture.claim, pc.FIXTURE_BYTES)['caseID']
         observed = no.collect(self._tool, self.workspace.products_path, case)
         context = self._context(observed, configuration_name)
-        frozen = ob.freeze(self.workspace, configuration_name, no.PRODUCTS, context)
-        rx.verify(binding, self.workspace.read_configuration(binding.original_name), frozen.raw_configuration,
+        frozen = ob.freeze(self.workspace, configuration_name, no.PRODUCTS, context, **options)
+        rx.verify(binding, self.workspace.read_configuration(binding.original_name, **options), frozen.raw_configuration,
                   self._expectations(observed))
         rows = {json.loads(row)['path']: json.loads(row) for row in frozen.inventory}
         for path in no.EXECUTABLES:
@@ -371,7 +484,7 @@ class Experiment:
         resource = no.PRODUCTS[0] + '/Contents/Resources/fixture.json'
         pc.require(resource in rows and rows[resource]['kind'] == 'file' and
                    rows[resource]['sha256'] == _sha(self.fixture.claim), 'observed fixture resource mismatch')
-        self.fixture.verify(); _verify_inputs(self.workspace, self.input_rows)
+        self.fixture.verify(**options); _verify_inputs(self.workspace, self.input_rows, **options)
         return Inspection(frozen, observed, _sha(self.fixture.claim), self.source_commit, self.source_rows,
                           self.generated_rows, configuration_name, context, (), binding)
 
@@ -444,11 +557,20 @@ class Experiment:
         pc.require(threading.get_ident() == self._owner_thread, 'single experiment owner thread')
         pc.require(self.state not in ('running', 'preparing'), 'cannot retire borrowed experiment capability')
         errors = []
-        for owner in (self.fixture, self.workspace):
+        for label, owner in (('fixture', self.fixture), ('workspace', self.workspace)):
             try:
                 owner.close()
+                self.close_outcomes[label] = 'closed'
             except BaseException as error:
                 errors.append(type(error).__name__)
+                self.close_outcomes[label] = 'unproved:' + type(error).__name__
+        if self._build_admission is not None:
+            try:
+                self._build_admission.retire()
+                self.close_outcomes['admission'] = 'retired'
+            except BaseException as error:
+                errors.append(type(error).__name__)
+                self.close_outcomes['admission'] = 'unproved:' + type(error).__name__
         self.state = 'closed'
         pc.require(not errors, 'experiment capability retirement unproved')
         # Owned files remain for review; this API never recursively deletes them.

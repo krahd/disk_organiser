@@ -263,3 +263,58 @@ and [CodeDirectory hash display](https://developer.apple.com/documentation/techn
 forms. Their exact output-format assumptions, runner identifiers and the actual
 Xcode configuration still require inspection on the pinned toolchain. No
 non-Apple CLI example is treated as proof of runtime compatibility.
+
+
+## Disabled Stage B source candidate
+
+The [reviewed build-only plan](StageB/STAGE-B-PLAN.md) has a source implementation.
+The [implementation addendum](StageB/IMPLEMENTATION-ADDENDUM.md) records the first
+source-review repairs and explicitly supersedes the historical move instruction.
+`Tools/stage_b_profile.py` remains false; the template is
+`StageB/owned-selected-folder-build.yml.inert`, outside active workflows. Default
+controller calls and Stage C stay closed. No new host build/sign/launch has run.
+
+The fixed bootstrap binds all nineteen unchanged host inputs, the complete Python
+import closure and dispatch/checkout identities before owned-root creation. The
+single-use admission retains one owner thread. The exact 31 native command tuples
+are a version preflight, one build, three ad-hoc signatures and two observation
+rounds. The driver work budget is 720 seconds; 180 seconds are reserved for
+independent evidence and retirement. Actual compiler, signature and emitted
+xctestrun compatibility remain unknown.
+
+A separate report owner writes at most 64 MiB/96 regular files, preserves raw
+bytes and closes after source owners. The manifest excludes itself; its identity
+is emitted only after report close. The data-only upload verifier reopens that
+retired report for read-only identity/hash validation, never a source/build owner.
+The inert template writes only a validated single path to GitHub's standard
+step-output file. It cannot treat output or JSON as a grant or resume Stage C.
+Upload or finalisation failure prevents acceptance. Fourteen-day Actions retention
+is not permanent archival.
+
+The proposed runner is macOS15 ARM64 with the preinstalled pinned toolchain; the
+fixed CPython cache must already exist. No installation, global xcode-select,
+licence acceptance, credentials, permission repair or security-setting change is
+included. The pinned checkout action disables credential persistence and global
+safe-directory modification. Its [exact metadata](https://github.com/actions/checkout/blob/11d5960a326750d5838078e36cf38b85af677262/action.yml)
+and the [pinned upload metadata](https://github.com/actions/upload-artifact/blob/ea165f8d65b6e75b540449e92b4886f43607fa02/action.yml)
+were inspected; this is not a claim of new platform execution or an exhaustive
+third-party dependency audit.
+
+Source/memory checks (no operational owner or native process):
+
+```sh
+python -B -m unittest discover -s native/DiskInventoryCore/Validation/SelectedFolderFeasibility/Tools -p 'test_*.py' -v
+python -B native/DiskInventoryCore/Validation/SelectedFolderFeasibility/Tools/check_source_isolation.py
+```
+
+The first source candidate passed 254 methods and nineteen source checks, then
+independent review found six bounded repair groups. The successor preserves that
+freeze and repairs failure/cleanup attribution, propagated deadlines, the native
+source closure, sanitised startup and retained-anchor activation semantics. Its
+final method count and independent recheck are recorded in STATUS.md. All 233 existing native source identities are unchanged. Exact
+source review and a reversible checkpoint precede the owner's proposed one-run
+build-only question. Only an explicitly reviewed activation changes the profile's
+Boolean and copies the exact template into the active workflow directory while
+retaining the inert comparison anchor. This
+source candidate does neither. Real panel/grant and production integration are
+separate decisions after actual feasibility evidence.

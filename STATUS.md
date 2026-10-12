@@ -1,6 +1,57 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 08:39
+Last updated: 2026-10-12 17:18
+
+## Disabled Stage B driver: reviewed public checkpoint and ordinary CI
+
+- [PR35](https://github.com/krahd/disk_organiser/pull/35) source `59c48630b7607409fc171d6155eaace30f1cf7ce`, tree `4c536b52176992d258efb186a8614ccd092ce0a3`, has all twelve existing push/PR workflows green. Independent closeout verifies all 31 changed/new blobs and 387 preserved blobs, including modes. The publication delta from the cleared source candidate is STATUS-only; all thirty other paths remain exact. Earlier failed source-review checkpoints below retain their original attribution.
+- Both [native push](https://github.com/krahd/disk_organiser/actions/runs/38281893805/job/114920893308) and [native PR](https://github.com/krahd/disk_organiser/actions/runs/38281961512/job/114921116156) logs retain all 233 actual-main method identities, each started and passed exactly once, plus six differential and six parser cases. Push tests the named source; PR tests merge checkout `32999455d288f9c003a053c06714732ed2ba46be`, whose tree is identical. Existing selection, preview and owned-capability probe compilation succeeds; these are not the new feasibility host.
+- Xcode16.4/16F6 and SDK15.5 assertions pass; Swift6.1.2 is observed output. The filesystem refuses the attempted invalid-UTF8 name with errno92, so native projection of such a name remains unexercised; synthetic rejection stays unconditional. This log observation does not establish a filesystem type.
+- Both [catalogue push](https://github.com/krahd/disk_organiser/actions/runs/38281894017/job/114920894304) and [catalogue PR](https://github.com/krahd/disk_organiser/actions/runs/38281961321/job/114921115519) pass thirteen browser journeys. Four fresh connector-decoded logs match the retained UTF-8 bytes exactly, including BOM. No new pixel inspection or durable image archive is claimed; unchanged UI retains its earlier source-specific visual evidence.
+- The 299 memory/mock methods, nineteen source checks and five inert refusals below remain separate local and independent source-review evidence. Ordinary CI does not run those new methods or establish Stage B. The profile/default gates remain false and no active build-only workflow exists. Actual new-host compilation, ad-hoc signing, vendor schema compatibility, process retirement and packet export remain unrun; activation requires its separately reviewed delta and one-run owner approval. Stage C, panels/grants, production folder admission and user-drive access remain closed.
+
+The sections below preserve the earlier candidate chronology and source-specific results.
+
+## Disabled driver: final bounded closure/capacity repair candidate
+
+- Independent review of the 295-method successor verified the original evidence, cleanup, deadline, clean-environment and retained-anchor repairs, then found two remaining source issues: function-local imports of `disk_model_analysis` and `disk_model_schema` were missing from the declared native closure, and a post-entry time check reused capacity admission, rejecting an inventory at the exact maximum. The first two freezes and their failed review dispositions remain preserved.
+- This candidate pins both nested modules and their inspected local dependencies, with all AST import nodes and known literal local JS requires checked against the explicit pin set. There are now 124 known source/data pins. Time and next-entry admission checks are separate: the unchanged inclusive 20,000-row ceiling is retained, with exact-limit, one-over and root-only mocked tests. No deadline, descriptor cleanup, native tuple, host source, entitlement or product gate changes.
+- Actual local validation passes 299 distinct memory/mock methods exactly once, retaining all 295/254/151 predecessor identities, plus nineteen source-isolation checks. Four new regressions cover the nested closure and paired capacity boundary. All 233 existing native identities and nineteen host inputs remain byte-identical. No new host/native/process/panel execution or active workflow is introduced. Independent exact-source review clears this disabled candidate and separately confirms the real 20,000-row mocked boundary: exactly the limit succeeds and one extra entry refuses before its file opens, with each descriptor retired once. This is source clearance only; a reversible source checkpoint and its ordinary CI do not establish the later separately approved Stage B execution.
+
+The earlier candidate sections below retain their source-specific review states.
+
+## Disabled build-only driver: source-review repair successor
+
+- The first disabled implementation passed 254 memory/mock methods but independent review found six bounded defects: first-failure evidence was omitted, nested cleanup could mask the initiating error, cooperative filesystem work could overrun its attempt deadline, source guards missed similarly named native paths and a known helper, startup inherited ambient environment, and the planned template move would remove its required comparison anchor. That original freeze remains a failed source-review checkpoint; it never executed or reached GitHub.
+- This separate successor preserves the nineteen host files and all 233 existing native source identities. It exports first and later observations separately, keeps original errno/message and bounded independent cleanup failures, propagates the unchanged 720/900-second budget through existing owner/bootstrap loops, and retires owners even after expiry. Raw process bytes have indexed metadata rather than duplicate payloads. No traversal or native command tuple is replaced.
+- The source guard now uses the exact quarantine subtree and pins 122 known paths: nine workflow YAMLs, the ordinary native package/resources, its explicit repository helper/import closure and the inert template. It does not claim to infer every transitive caller in unrelated workflows. Both fixed Python startups use explicit clean-environment allowlists. The [implementation addendum](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/IMPLEMENTATION-ADDENDUM.md) supersedes only the historical activation instruction: a later separately approved activation must copy the exact template while retaining its inert comparison anchor. Nothing is activated here.
+- Actual local validation passes 295 distinct memory/mock methods exactly once, retaining all 254 previous and all 151 baseline identities; 41 repair regressions are added. Nineteen structural source checks pass. New tests exercise real source/fixture/descriptor algorithms with mocked syscalls, original ENOSPC plus independent close failures, in-loop work/finalisation expiry, first-versus-later evidence, no-packet diagnostics, native-helper/lookalike mutations, clean environments and copy/retained-anchor admission. No real operational root, compiler, signature, new host, panel or OS grant is exercised.
+- Exact successor source review remains pending. The profile and both controller gates remain false, the active workflow is absent, and Stage C and the ordinary real-folder control remain closed. Main `19a2c5f6` and its green 233+6+6/native and thirteen-browser evidence below are unchanged historical baseline. Source checkpoint/CI cannot stand in for separately approved actual Stage B evidence; upload/retirement/runner failure still prevents acceptance.
+
+The following first-candidate section retains its pre-review source-specific claims and pending state; the six defects and repaired successor above supersede it.
+
+## Stage B build-only driver: initial disabled source candidate
+
+- [PR34](https://github.com/krahd/disk_organiser/pull/34) is merged at actual main `19a2c5f6955d3732ab5cfc205a962a7f64eff1bb`, tree `d6684ce473ed84b3debe4ab908c0da26548b9289`. All six actual-main workflows pass: [native](https://github.com/krahd/disk_organiser/actions/runs/38269480363) retains 233 methods plus six differential/six parser cases; [catalogue](https://github.com/krahd/disk_organiser/actions/runs/38269480285) passes thirteen browser journeys. Those workflows do not build or execute the isolated selected-folder host.
+- The independently reviewed [Stage B plan](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/STAGE-B-PLAN.md) now has a disabled implementation candidate: fixed nineteen-file host source, complete Python byte binding before operational imports, one-use/thread-owned B admission, an exact 31-command build/sign/inspect sequence, 720-second work/180-second finalisation budgets, and separate bounded report ownership. Default controller calls still refuse; the build profile is false and C remains literal false.
+- The manual workflow exists only as `.yml.inert` under the isolated validation directory. No active workflow, ordinary app, native target, entitlement template, host Swift file or user-folder control changes. The future compatible profile is macOS15 ARM64, preinstalled Xcode16.4/16F6, SDK15.5 and cached Python3.12.10; missing or changed tools refuse rather than install or fall back.
+- Local source validation passes 254 memory/mock methods: all 151 baseline methods plus 103 new command/admission/startup/receipt/upload/workflow regressions. All real filesystem/process operations in these new tests are mocked. Nineteen source checks pass, all 233 existing native source identities and nineteen host-source hashes remain unchanged. The three isolated UI cases remain uncompiled/unrun. The earlier eleven independent Stage A counterexamples are historical reviewer evidence, not newly rerun methods.
+- The separate report owner preserves raw bytes, independent first/secondary failure dispositions and source-owner closes; its manifest excludes itself and terminal identity is emitted only after report close. A read-only upload verifier binds the exact retired report and payload hashes. Missing/partial output, close uncertainty, failed upload or interrupted runner cannot count as acceptance. Historical B data cannot recreate a live owner or resume C. Artifacts would retain the existing fourteen-day limit; no new image or durable evidence archive is produced.
+- Exact-source independent review is pending. Only after source clearance and a reversible source checkpoint is the proposed one-run owner question appropriate. Build/signing/new-host execution, a real panel or OS scope, sandbox ancestor compatibility, production folder admission and user-drive access remain separate unexecuted gates. This candidate has not run a native compiler, signing tool, host or panel.
+
+The following is the disabled source relationship, not an executed workflow:
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="170" viewBox="0 0 1120 170" role="img" aria-labelledby="stage-b-title stage-b-desc">
+  <title id="stage-b-title">Disabled build-only source boundary</title>
+  <desc id="stage-b-desc">A disabled profile would admit one owned test build and a historical data packet. No workflow is active and Stage C remains closed.</desc>
+  <defs><marker id="stage-b-arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#475569"/></marker></defs>
+  <rect x="20" y="25" width="300" height="65" rx="8" fill="#f1f5f9" stroke="#475569"/>
+  <rect x="410" y="25" width="300" height="65" rx="8" fill="#f1f5f9" stroke="#475569"/>
+  <rect x="800" y="25" width="300" height="65" rx="8" fill="#f1f5f9" stroke="#475569"/>
+  <path d="M325 58 H395" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#stage-b-arrow)"/>
+  <path d="M715 58 H785" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#stage-b-arrow)"/>
+  <g fill="#0f172a" font-family="sans-serif" font-size="19" text-anchor="middle"><text x="170" y="64">Disabled profile</text><text x="560" y="64">One owned test build</text><text x="950" y="64">Historical data packet</text><text x="560" y="135" font-size="17">No active workflow. Stage C remains closed.</text></g>
+</svg>
 
 ## Selected-folder feasibility: repaired quarantined source checkpoint
 
@@ -913,4 +964,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 08:39
+Last updated: 2026-10-12 17:18

@@ -15,7 +15,8 @@ import tempfile
 import uuid
 
 import probe_contract as pc
-from owned_build_observation import _Descriptors, _stamp
+from owned_build_observation import (_Descriptors, _stamp, _check, _check_options,
+                                     _error_record, RetirementFailure)
 
 
 _FIXTURE_KEY = object()
@@ -34,10 +35,12 @@ class PreparedFixture:
         descriptor, self._descriptor = self._descriptor, -1
         try:
             os.close(descriptor)
-        except OSError as error:
-            raise pc.Refusal("ambiguous fixture-root retirement") from error
+        except BaseException as error:
+            raise RetirementFailure("ambiguous fixture-root retirement", None,
+                                    [dict(_error_record(error), descriptor=descriptor)]) from error
 
-    def verify(self):
+    def verify(self, *, check=None):
+        _check(check)
         pc.require(not self._closed, "retired fixture capability")
         value = pc.decode_claim(self.claim, pc.FIXTURE_BYTES)
         expected = value["objects"]
@@ -49,9 +52,10 @@ class PreparedFixture:
                 pc.require(metadata.st_nlink == 1 and metadata.st_size == row["size"] == 32, "fixture bytes/alias shape")
         match(os.fstat(self._descriptor), expected["parent"], True)
         match(os.stat(self.parent, follow_symlinks=False), expected["parent"], True)
-        with _Descriptors() as ledger:
+        with _Descriptors(check=check) as ledger:
             for directory, leaf, key, data in [("selected", "probe.bin", "selectedFile", pc.SELECTED),
                                                 ("outside", "sentinel.bin", "siblingFile", pc.SIBLING)]:
+                _check(check)
                 root = ledger.acquire(lambda: os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC,
                                                        dir_fd=self._descriptor))
                 metadata = os.fstat(root)
@@ -70,18 +74,22 @@ class PreparedFixture:
                 before = os.fstat(fd); match(before, expected[key])
                 content = bytearray()
                 for _ in range(64):
+                    _check(check)
                     try:
                         block = os.read(fd, 33 - len(content))
                     except InterruptedError:
                         continue
+                    _check(check)
                     if not block:
                         break
                     content.extend(block)
                     pc.require(len(content) <= 32, "fixture grew")
                 pc.require(bytes(content) == data and _stamp(before) == _stamp(os.fstat(fd)), "fixture content changed")
                 pc.require(_stamp(metadata) == _stamp(os.fstat(root)), "fixture child changed")
+            _check(check)
             match(os.fstat(self._descriptor), expected["parent"], True)
             match(os.stat(self.parent, follow_symlinks=False), expected["parent"], True)
+        _check(check)
         return hashlib.sha256(self.claim).hexdigest()
 
     def __del__(self):
@@ -92,18 +100,20 @@ class PreparedFixture:
                 pass  # Abandonment cleanup is not acceptance evidence.
 
 
-def create_owned_fixture():
+def create_owned_fixture(*, check=None):
     pc.require(sys.platform == "darwin", "native fixture preparation requires macOS")
+    _check(check)
     parent = tempfile.mkdtemp(prefix="disk-selection-owned-", dir="/private/tmp")
     # No automatic deletion or permission repair on any failure. The caller
     # must preserve/report this fresh owned preparation rather than retrying it.
-    with _Descriptors() as ledger:
+    with _Descriptors(check=check) as ledger:
         root = ledger.acquire(lambda: os.open(parent, os.O_RDONLY | os.O_DIRECTORY |
                                               os.O_NOFOLLOW | os.O_CLOEXEC))
         initial = os.fstat(root)
         pc.require(stat.S_IMODE(initial.st_mode) == 0o700 and initial.st_uid == os.getuid(),
                    "created private fixture root")
         for directory in ("selected", "outside"):
+            _check(check)
             os.mkdir(directory, 0o700, dir_fd=root)
         selected = ledger.acquire(lambda: os.open("selected", os.O_RDONLY | os.O_DIRECTORY |
                                                   os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=root))
@@ -112,24 +122,31 @@ def create_owned_fixture():
         descriptors = {}
         for key, directory, name, data in [("selectedFile", selected, "probe.bin", pc.SELECTED),
                                            ("siblingFile", outside, "sentinel.bin", pc.SIBLING)]:
+            _check(check)
             fd = ledger.acquire(lambda: os.open(name, os.O_RDWR | os.O_CREAT | os.O_EXCL |
                                                 os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC,
                                                 0o600, dir_fd=directory))
             written, attempts = 0, 0
             while written < len(data):
+                _check(check)
                 attempts += 1
                 pc.require(attempts <= 64, "fixture write-attempt budget")
                 try:
                     count = os.write(fd, data[written:])
                 except InterruptedError:
                     continue
+                _check(check)
                 pc.require(count > 0, "fixture write made no progress")
                 written += count
+            _check(check)
             os.fsync(fd)
+            _check(check)
             pc.require(os.pread(fd, 33, 0) == data, "same-descriptor fixture bytes")
+            _check(check)
             descriptors[key] = fd
         objects = {}
         for key, fd in {"parent": root, "selected": selected, **descriptors}.items():
+            _check(check)
             value = os.fstat(fd)
             pc.require(value.st_uid == initial.st_uid and value.st_gid == initial.st_gid and
                        value.st_dev == initial.st_dev, "fixture filesystem and owner")
@@ -147,18 +164,26 @@ def create_owned_fixture():
                  "objects": objects, "selectedBytesHex": pc.SELECTED.hex(),
                  "siblingBytesHex": pc.SIBLING.hex()}
         raw = json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
+        _check(check)
         pc.parse_fixture_claim(raw)
+        _check(check)
     # All source descriptors have retired before any build or possible launch.
     # Reacquire only this just-created root inside the creation operation. The
     # retained owner has no from-path/JSON constructor; CLOEXEC and close_fds
     # keep this capability out of the future host and test runner.
+    _check(check)
     descriptor = os.open(parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
     owner = PreparedFixture(_FIXTURE_KEY, parent, raw, descriptor)
     try:
-        owner.verify()
+        owner.verify(**_check_options(check))
+        _check(check)
         return owner
-    except BaseException:
-        owner.close()
+    except BaseException as original:
+        try:
+            owner.close()
+        except RetirementFailure as cleanup:
+            raise RetirementFailure("ambiguous fixture creation retirement", original,
+                                    cleanup.cleanup_failures, cleanup.omitted_cleanup_failure_count) from original
         raise
 
 
