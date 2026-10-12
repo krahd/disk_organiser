@@ -1,6 +1,12 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 02:25
+Last updated: 2026-10-12 02:30
+
+## Saved-location shelf: measured pagination repair
+
+- Diagnostic source `50917dc7adb513ac122d1f6db232fbafdf7ee3c9`, owned browser job `114638165656`, identifies the sole overflowing rectangle: `next-results`, left 258.234375px, right 396.828125px, width 138.59375px in a 320px viewport. The no-wrap, non-shrinking button row exceeded the page width at 200% root text; the 77px gate correctly failed.
+- The repair allows the existing pagination flex row to wrap. Buttons keep their full labels, no-wrap/non-shrinking safeguards and minimum targets; no overflow is hidden or clipped. Canonical/native CSS parity is retained.
+- The enlarged-text journey retains the strict <=1px overflow gate and adds 110 owned entries in record 1, genuine Next pointer/Previous keyboard paging, positive parent containment/44px geometry and an original pager capture. Twelve journeys remain authored. Native execution, repaired browser outcome and original-pixel acceptance remain pending; earlier failed checkpoints are preserved below.
 
 ## Saved-location shelf: first hosted diagnostic
 
@@ -820,4 +826,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 02:25
+Last updated: 2026-10-12 02:30

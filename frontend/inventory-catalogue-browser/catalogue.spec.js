@@ -669,7 +669,20 @@ test("saved shelf exposes every record at narrow width and enlarged text", async
   snapshot.entries = [snapshot.entries[0]];
   let catalogue = C.empty();
   const label = "外付け · Saved archive <img onerror=alert(1)> · a very long location label";
-  for (let n = 0; n < 32; n++) catalogue = C.add(catalogue, snapshot, label);
+  const pagedSnapshot = {
+    ...snapshot,
+    entries: [
+      snapshot.entries[0],
+      ...Array.from({ length: 110 }, (_, n) => ({
+        path: `owned-${n}.txt`,
+        kind: "file",
+        status: "observed",
+        logical_bytes: "1",
+      })),
+    ],
+  };
+  for (let n = 0; n < 32; n++)
+    catalogue = C.add(catalogue, n === 0 ? pagedSnapshot : snapshot, label);
   await page.setViewportSize({ width: 320, height: 900 });
   await open(page);
   await page.locator("#inventory-file").setInputFiles({
@@ -704,4 +717,31 @@ test("saved shelf exposes every record at narrow width and enlarged text", async
   await expect(
     page.getByRole("button", { name: `Browse record 1: ${label}`, exact: true })
   ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#result-page")).toContainText("Page 1 of 3");
+  await page.locator("#next-results").click();
+  await expect(page.locator("#result-page")).toContainText("Page 2 of 3");
+  await page.locator("#previous-results").focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#result-page")).toContainText("Page 1 of 3");
+  await page.locator("#next-results").scrollIntoViewIfNeeded();
+  const pager = await page.locator("#next-results").evaluate((next) => {
+    const parent = next.parentElement.getBoundingClientRect();
+    return [...next.parentElement.querySelectorAll("button")].map((button) => {
+      const r = button.getBoundingClientRect();
+      return {
+        left: r.left - parent.left,
+        right: parent.right - r.right,
+        width: r.width,
+        height: r.height,
+      };
+    });
+  });
+  for (const rect of pager) {
+    expect(rect.left).toBeGreaterThanOrEqual(-1);
+    expect(rect.right).toBeGreaterThanOrEqual(-1);
+    expect(rect.width).toBeGreaterThanOrEqual(44);
+    expect(rect.height).toBeGreaterThanOrEqual(44);
+  }
+  await geometry(page);
+  await shot(page, info, "50-shelf-enlarged-pagination.png", { fullPage: false });
 });
