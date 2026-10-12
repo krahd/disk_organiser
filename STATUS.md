@@ -1,6 +1,16 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-11 03:07
+Last updated: 2026-10-12 01:34
+
+## Owned-folder feasibility: local configuration-pair consistency
+
+- A separate small source tranche builds on the recovered six-file checkpoint `8e62c9d9fd68b15f1fcbfb18420d49f69e80595a`. The new memory-only helper retains bounded opaque raw configuration bytes and a strict resolved JSON claim, then requires exact pair equality against a separately supplied expected record. All source/fixture/product/path/environment/argument/test-selection/instrumentation claims are included; unknown fields refuse.
+- This is consistency between supplied claims, not an Xcode parser, observed configuration seal, signature check, approved launch or access permit. In particular, matching raw and JSON bytes do not prove they describe each other. Build/configuration roots and driver working directory/environment are not represented, so this local record is not a resolved launch-context seal. Both inputs remain untrusted. No file reader, command builder, process, workflow, native target or ordinary product change is introduced.
+- Locally, 54 memory-only methods pass: the prior 32 methods and 19 containment cases remain unchanged, with 22 new paired mutation/boundary methods. Source parsing and both inert command-entry refusals pass. Independent source review is a publication gate; no native-host or folder experiment runs in this tranche.
+- The reviewed recovery branch itself retains all six successful existing push workflows. Its [native run 38107674618](https://github.com/krahd/disk_organiser/actions/runs/38107674618) records the unchanged 217 XCTest methods plus six differential and six parser cases. Those results do not execute either new Python contract or establish a new pixel claim.
+- The concrete remaining bridge is a format-specific parser/observer, bounded owned descriptors and an isolated native host, followed by separately approved owned-fixture build/sign/panel validation. The app's real-folder button and production selection gate remain closed. See the [contract scope and remaining user workflow](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/README.md#additional-configuration-pair-claim-checkpoint).
+
+The previous reconstruction entry below is retained as its earlier source checkpoint.
 
 ## Owned-folder feasibility: small reconstructed source checkpoint
 
@@ -817,4 +827,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-11 03:07
+Last updated: 2026-10-12 01:34
