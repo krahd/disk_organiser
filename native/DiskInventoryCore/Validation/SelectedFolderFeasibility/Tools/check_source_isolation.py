@@ -38,8 +38,11 @@ ui = (HERE / 'UITests/SelectionProbeUITests.swift').read_text()
 require(re.findall(r'func (test\w+)\(', ui) == ['testSelectedReadSucceedsOnlyDuringScope', 'testGenuinePanelCancellationRetiresWithoutSelection', 'testActiveReadCancelRetiresBeforeRetry'], "exact three authored UI identities")
 package = (PACKAGE / 'Package.swift').read_text()
 require('SelectedFolderFeasibility' not in package and 'OwnedFolderProbe' not in package, "no SwiftPM probe target")
-workflows = list((REPO / '.github/workflows').glob('*.yml'))
-require(bool(workflows) and all('SelectedFolderFeasibility' not in p.read_text() and 'OwnedFolderProbe' not in p.read_text() for p in workflows), "no workflow probe invocation")
+import stage_b_workflow_guard as workflow_guard
+profile_tree = ast.parse((HERE / 'Tools/stage_b_profile.py').read_bytes())
+profile_flag = next(ast.literal_eval(node.value) for node in profile_tree.body if isinstance(node, ast.Assign)
+                    and any(isinstance(target, ast.Name) and target.id == 'BUILD_ONLY_ENABLED' for target in node.targets))
+require(workflow_guard.check(REPO, profile_flag), 'exact disabled/manual-only workflow and ordinary entrypoint pins')
 identity = (HERE / 'Host/HostIdentity.swift').read_text()
 require('SecCodeGetStatus' not in identity and 'SecCodeCheckValidity' in identity and 'runningValidityChecked' in identity,
         "public running-validity observation without private status API")

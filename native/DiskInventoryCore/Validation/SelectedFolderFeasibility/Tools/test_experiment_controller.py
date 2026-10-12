@@ -33,7 +33,7 @@ def model():
     original=observed_example()
     binding=rx.derive('Owned.xctestrun',original,subject._expectations(observations))
     raw=binding.derived.raw
-    workspace.read_configuration.side_effect=lambda name:original if name=='Owned.xctestrun' else raw
+    workspace.read_configuration.side_effect=lambda name, *, check=None:original if name=='Owned.xctestrun' else raw
     rows=[{'path':p,'kind':'directory'} for p in no.PRODUCTS]
     rows += [{'path':p,'kind':'file','size':1,'sha256':'a'*64} for p in no.EXECUTABLES]
     rows.append({'path':no.PRODUCTS[0]+'/Contents/Resources/fixture.json','kind':'file','size':len(claim),'sha256':ec._sha(claim)})

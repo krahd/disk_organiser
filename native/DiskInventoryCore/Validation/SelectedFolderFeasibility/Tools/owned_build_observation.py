@@ -5,6 +5,7 @@ There is no reopen-from-JSON/path factory, build/sign command or launch command.
 Only files produced inside that owned capability can be inventoried/read.
 """
 from dataclasses import dataclass
+from contextlib import contextmanager
 import hashlib
 import json
 import os
@@ -25,14 +26,65 @@ def _stamp(value):
             value.st_size, value.st_nlink, value.st_mtime_ns, value.st_ctime_ns)
 
 
+def _check(check):
+    if check is not None:
+        check()
+
+
+def _check_options(check):
+    # Omit the seam entirely on the unchanged closed/default path.
+    return {} if check is None else {"check": check}
+
+
+def _error_record(error):
+    return {"kind": type(error).__name__[:128], "message": str(error)[:512],
+            "errno": error.errno if isinstance(error, OSError) and type(error.errno) is int else None}
+
+
+class RetirementFailure(pc.Refusal):
+    """Bounded independent cleanup evidence without losing the active error."""
+    def __init__(self, message, original, failures, omitted=0):
+        self.original = original
+        self.cleanup_failures = tuple(failures[:256])
+        self.omitted_cleanup_failure_count = omitted + max(0, len(failures) - 256)
+        records = ([dict(operation=_error_record(original))] if original is not None else [])
+        records.extend(dict(cleanup=record) for record in self.cleanup_failures)
+        self.failures = tuple(json.dumps(row, sort_keys=True) for row in records)
+        super().__init__(message)
+
+
+@contextmanager
+def _scan_entries(descriptor, *, check=None):
+    _check(check)
+    entries = os.scandir(descriptor)
+    original = None
+    try:
+        _check(check)
+        yield entries
+    except BaseException as error:
+        original = error
+        raise
+    finally:
+        try:
+            entries.close()
+        except BaseException as cleanup:
+            raise RetirementFailure("ambiguous enumeration retirement", original,
+                                    [_error_record(cleanup)]) from (original or cleanup)
+
+
 class _Descriptors:
-    def __init__(self):
+    def __init__(self, *, check=None):
         self.owned = []
         self.failure = None
+        self.failures = []
+        self.omitted_failures = 0
+        self.check = check
 
     def acquire(self, callback):
+        _check(self.check)
         descriptor = callback()
         self.owned.append(descriptor)
+        _check(self.check)
         return descriptor
 
     def retire(self, descriptor):
@@ -40,20 +92,26 @@ class _Descriptors:
         self.owned.remove(descriptor)
         try:
             os.close(descriptor)
-        except OSError as error:
+        except BaseException as error:
             self.failure = self.failure or error
+            if len(self.failures) < 256:
+                self.failures.append(dict(_error_record(error), descriptor=descriptor))
+            else:
+                self.omitted_failures += 1
 
-    def finish(self):
+    def finish(self, original=None):
+        # Retirement is independent of the expired work/finalisation budget.
         for descriptor in tuple(reversed(self.owned)):
             self.retire(descriptor)
         if self.failure is not None:
-            raise pc.Refusal("ambiguous descriptor retirement") from self.failure
+            raise RetirementFailure("ambiguous descriptor retirement", original,
+                                    self.failures, self.omitted_failures) from (original or self.failure)
 
     def __enter__(self):
         return self
 
-    def __exit__(self, *_):
-        self.finish()  # Cleanup failure cannot be counted as a read-denial pass.
+    def __exit__(self, kind, error, traceback):
+        self.finish(error)  # Cleanup cannot replace the first operation failure.
 
 
 class OwnedBuild:
@@ -66,17 +124,25 @@ class OwnedBuild:
         self._captures_identity = None
 
     @classmethod
-    def create(cls):
+    def create(cls, *, check=None):
         pc.require(sys.platform == "darwin", "owned native build requires macOS")
+        _check(check)
         path = tempfile.mkdtemp(prefix="disk-selection-build-", dir="/private/tmp")
+        _check(check)
         descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
         try:
+            _check(check)
             value = os.fstat(descriptor)
             pc.require(stat.S_ISDIR(value.st_mode) and stat.S_IMODE(value.st_mode) == 0o700 and
                        value.st_uid == os.getuid(), "private created build root")
+            _check(check)
             return cls(_KEY, path, descriptor, (value.st_dev, value.st_ino))
-        except BaseException:
-            os.close(descriptor)
+        except BaseException as original:
+            try:
+                os.close(descriptor)
+            except BaseException as cleanup:
+                raise RetirementFailure("ambiguous root creation retirement", original,
+                                        [dict(_error_record(cleanup), descriptor=descriptor)]) from original
             raise
 
     def close(self):
@@ -86,15 +152,20 @@ class OwnedBuild:
         descriptor, self._descriptor = self._descriptor, -1
         try:
             os.close(descriptor)
-        except OSError as error:
-            raise pc.Refusal("ambiguous root retirement") from error
+        except BaseException as error:
+            raise RetirementFailure("ambiguous root retirement", None,
+                                    [dict(_error_record(error), descriptor=descriptor)]) from error
 
     def __enter__(self):
         self._admit()
         return self
 
-    def __exit__(self, *_):
-        self.close()
+    def __exit__(self, kind, original, traceback):
+        try:
+            self.close()
+        except RetirementFailure as cleanup:
+            raise RetirementFailure(str(cleanup), original, cleanup.cleanup_failures,
+                                    cleanup.omitted_cleanup_failure_count) from (original or cleanup)
 
     def __del__(self):
         # Best-effort abandonment cleanup cannot supply acceptance evidence.
@@ -120,10 +191,14 @@ class OwnedBuild:
         self._admit()
         return self.path + "/Products"
 
-    def create_products_directory(self):
+    def create_products_directory(self, *, check=None):
+        _check(check)
         self._admit()
+        _check(check)
         os.mkdir("Products", 0o700, dir_fd=self._descriptor)
+        _check(check)
         value = os.stat("Products", dir_fd=self._descriptor, follow_symlinks=False)
+        _check(check)
         self._products_identity = (value.st_dev, value.st_ino)
 
     def _products(self, ledger):
@@ -138,11 +213,12 @@ class OwnedBuild:
                    "product directory replaced")
         return descriptor
 
-    def read_configuration(self, relative):
+    def read_configuration(self, relative, *, check=None):
+        _check(check)
         pc.require(type(relative) is str and relative.endswith(".xctestrun") and
                    "/" not in relative and "\\" not in relative and relative not in (".", "..") and
                    0 < len(pc.utf8(relative)) <= 255, "single configuration leaf")
-        with _Descriptors() as ledger:
+        with _Descriptors(check=check) as ledger:
             parent = self._products(ledger)
             fd = ledger.acquire(lambda: os.open(relative, os.O_RDONLY | os.O_NOFOLLOW |
                                                 os.O_NONBLOCK | os.O_CLOEXEC, dir_fd=parent))
@@ -152,24 +228,32 @@ class OwnedBuild:
                        "configuration type or byte budget")
             data, attempts = bytearray(), 0
             while len(data) <= value.st_size:
+                _check(check)
                 attempts += 1
                 pc.require(attempts <= 4096, "configuration read-attempt budget")
                 try:
                     chunk = os.read(fd, min(65536, value.st_size + 1 - len(data)))
                 except InterruptedError:
                     continue
+                _check(check)
                 if not chunk:
                     break
                 data.extend(chunk)
             pc.require(len(data) == value.st_size and _stamp(value) == _stamp(os.fstat(fd)),
                        "configuration changed while read")
+            _check(check)
             self._admit()
+            _check(check)
             return bytes(data)
 
-    def create_captures_directory(self):
+    def create_captures_directory(self, *, check=None):
+        _check(check)
         self._admit()
+        _check(check)
         os.mkdir("Captures", 0o700, dir_fd=self._descriptor)
+        _check(check)
         value = os.stat("Captures", dir_fd=self._descriptor, follow_symlinks=False)
+        _check(check)
         pc.require(stat.S_ISDIR(value.st_mode) and stat.S_IMODE(value.st_mode) == 0o700 and value.st_uid == os.getuid(),
                    "private capture directory")
         self._captures_identity = (value.st_dev, value.st_ino)
@@ -200,30 +284,42 @@ class OwnedBuild:
         pc.require(identity == self._results_identity, "result directory replaced")
         return fd
 
-    def inventory(self, *, results=False, captures=False):
+    def inventory(self, *, results=False, captures=False, check=None):
+        _check(check)
         pc.require(type(results) is bool and type(captures) is bool and not (results and captures), "fixed result selector")
         rows, total, deadline = [], 0, time.monotonic() + 30
-        with _Descriptors() as ledger:
+        with _Descriptors(check=check) as ledger:
             root = self._result_directory(ledger) if results else self._capture_directory(ledger) if captures else self._products(ledger)
             root_metadata = os.fstat(root)
 
             def budget():
+                _check(check)
                 pc.require(time.monotonic() <= deadline, "product observation time budget")
+
+            def entry_budget():
+                budget()
                 pc.require(len(rows) < pc.MAX_ENTRIES, "product entry budget")
 
             def walk(fd, prefix, depth):
                 nonlocal total
+                budget()
                 pc.require(depth <= 64, "product depth budget")
                 initial = os.fstat(fd)
                 pc.require(initial.st_dev == root_metadata.st_dev and initial.st_uid == os.getuid(),
                            "product filesystem or owner")
-                budget()
+                entry_budget()
                 rows.append({"path": prefix or ".", "kind": "directory", "mode": initial.st_mode,
                              "uid": initial.st_uid, "gid": initial.st_gid})
                 # Streaming enumeration; no unbounded listdir/rglob before the cap.
-                with os.scandir(fd) as entries:
-                    for entry in entries:
+                with _scan_entries(fd, check=check) as entries:
+                    entries = iter(entries)
+                    while True:
                         budget()
+                        try:
+                            entry = next(entries)
+                        except StopIteration:
+                            break
+                        entry_budget()
                         name = entry.name
                         pc.require(type(name) is str and 0 < len(pc.utf8(name)) <= 255 and
                                    name not in (".", "..") and "/" not in name and "\\" not in name,
@@ -262,6 +358,7 @@ class OwnedBuild:
                                     data = os.read(child, min(65536, observed.st_size + 1 - count))
                                 except InterruptedError:
                                     continue
+                                budget()
                                 if not data:
                                     break
                                 count += len(data); digest.update(data)
@@ -271,13 +368,18 @@ class OwnedBuild:
                             rows.append(dict(common, kind="file", size=count, sha256=digest.hexdigest()))
                         else:
                             raise pc.Refusal("special product refused before open")
+                budget()
                 pc.require(_stamp(initial) == _stamp(os.fstat(fd)), "product directory changed during listing")
 
             walk(root, "", 0)
+            _check(check)
             self._admit()
+            _check(check)
         # Reuse the reviewed root/descendant and component-wise link contract.
         # There is no filesystem link resolution or second traversal algorithm.
+        _check(check)
         pc.validate_inventory_claim(rows)
+        _check(check)
         return tuple(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
                      for row in sorted(rows, key=lambda row: row["path"].encode("utf-8")))
 
@@ -291,10 +393,12 @@ class FrozenBuild:
     driver_context: bytes
 
 
-def freeze(workspace, configuration_name, expected_products, driver_context):
+def freeze(workspace, configuration_name, expected_products, driver_context, *, check=None):
+    _check(check)
+    options = _check_options(check)
     pc.require(type(workspace) is OwnedBuild, "owned build capability required")
     context = bind_driver_context(workspace, configuration_name, driver_context)
-    raw = workspace.read_configuration(configuration_name)
+    raw = workspace.read_configuration(configuration_name, **options)
     parsed = xb.parse(raw)
     context_value = pc.decode_claim(context, 65536)
     target = json.loads(parsed.complete_tree)["TestConfigurations"][0]["TestTargets"][0]
@@ -304,18 +408,19 @@ def freeze(workspace, configuration_name, expected_products, driver_context):
                                     "Debug/SelectionProbeUITests-Runner.app/Contents/PlugIns/SelectionProbeUITests.xctest"),
                "fixed experiment products")
     xb.bind(parsed, raw, expected_products)
-    inventory = workspace.inventory()
+    inventory = workspace.inventory(**options)
     rows = {json.loads(row)["path"]: json.loads(row) for row in inventory}
     pc.require(all(path in rows and rows[path]["kind"] == "directory" for path in expected_products),
                "missing observed product")
     # The same raw file is re-read after inventory; changed configuration refuses.
-    pc.require(workspace.read_configuration(configuration_name) == raw, "configuration changed during freeze")
+    pc.require(workspace.read_configuration(configuration_name, **options) == raw, "configuration changed during freeze")
+    _check(check)
     return FrozenBuild(raw, parsed, inventory, expected_products, context)
 
 
-def verify_unchanged(workspace, expected, configuration_name, driver_context):
+def verify_unchanged(workspace, expected, configuration_name, driver_context, *, check=None):
     pc.require(type(workspace) is OwnedBuild and type(expected) is FrozenBuild, "retained owned freeze required")
-    candidate = freeze(workspace, configuration_name, expected.products, driver_context)
+    candidate = freeze(workspace, configuration_name, expected.products, driver_context, **_check_options(check))
     pc.require(candidate == expected, "observed build changed")
     # No launch permit is returned. Observed signatures, exact driver context,
     # fixture sealing and the separately approved runtime are still required.

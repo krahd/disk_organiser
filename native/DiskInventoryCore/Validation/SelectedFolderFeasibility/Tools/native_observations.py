@@ -67,7 +67,7 @@ def parse_signature(metadata, entitlements, *, expected_identifier, expected_exe
     return fields['CDHash'], tuple(sorted(parsed.items()))
 
 
-def collect(tool, products_root, case_id):
+def collect_toolchain(tool):
     # tool() is the controller's bounded direct-child owner, not a JSON loader.
     xcode = tool((XCODE, '-version'), timeout=20, max_output=65536)
     sdk = tool(('/usr/bin/xcrun', '--sdk', 'macosx', '--show-sdk-version'), timeout=20, max_output=65536)
@@ -77,6 +77,11 @@ def collect(tool, products_root, case_id):
     pc.require(re.fullmatch(r'Apple Swift version 6\.1\.2(?: \([^\n]+\))?\nTarget: [A-Za-z0-9_.-]+\n?',
                            _text(swift.stdout)), 'observed Swift mismatch')
     toolchain = tuple(sorted({'xcodeVersion': '16.4', 'xcodeBuild': '16F6', 'sdkVersion': '15.5', 'swiftVersion': '6.1.2'}.items()))
+    return toolchain, tuple(_digest(x) for x in (xcode, sdk, swift))
+
+
+def collect(tool, products_root, case_id):
+    toolchain, toolchain_digests = collect_toolchain(tool)
     base = pc.BUNDLE_PREFIX + case_id
     identifiers = (base, base + '.ui-tests.xctrunner', base + '.ui-tests')
     signatures = []
@@ -90,7 +95,7 @@ def collect(tool, products_root, case_id):
                                         expected_entitlements=ENTITLEMENTS if index == 0 else {})
         signatures.append(Signature(identifier, products_root + '/' + executable, digest, values,
                                     tuple(_digest(x) for x in (valid, metadata, entitlements))))
-    return Observations(toolchain, tuple(signatures), tuple(_digest(x) for x in (xcode, sdk, swift)))
+    return Observations(toolchain, tuple(signatures), toolchain_digests)
 
 
 if __name__ == '__main__':
