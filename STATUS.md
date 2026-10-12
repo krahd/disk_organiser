@@ -1,6 +1,17 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 03:44
+Last updated: 2026-10-12 04:20
+
+## Catalogue clarity: independently reviewed execution
+
+- Source `3cb622a2937a7527cdb98930e7d0e4da625fb29a`, tree `1d9506f7a780f56fe2247e5b2cbd03ddcd203cd0`, passes all twelve push/PR workflows. The distinct PR checkout `d7ad16c9fbd8ac9e7f96f9784bbba6968dfae7f2` has that exact tree. Eleven successor paths and all 338 other parent blobs match the frozen source review; across PR31, twelve paths change and 337 other main blobs remain exact.
+- Both native [push](https://github.com/krahd/disk_organiser/actions/runs/38201624382) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38201627561) pass all 217 distinct XCTest methods exactly once, retaining the baseline, plus six differential/six parser cases and 78 true native hit/visible-centre pairs per lane. Both catalogue [push](https://github.com/krahd/disk_organiser/actions/runs/38201624355) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38201627516) pass thirteen actual browser journeys. The added journey exercises the contextual/source disclosures with keyboard focus while a narrow file query and selection remain intact.
+- Independent fresh source/log/archive/original-pixel review accepts the scoped refinement. All 68 distinct image contents across 110 lane PNGs were opened; 42 duplicates match by exact bytes. The 320px/200% search pager has complete stacked controls and a readable description; rows prioritise path, numbered source and listed size. Partial/gap/refusal states remain visible; connection, capacity and backup are not inferred. Root separately inspected browser originals 50–53. This is development-preview acceptance, not arbitrary-device or commercial-readiness validation.
+- All twelve provider archive digests and all extracted members, including manifests, verify. Current browser manifests are byte-exact; the older 8a6 extracted-manifest newline issue remains documented only for that checkpoint. Native screenshots remain named/scrolled regions; 87 is scrolled and 96 shows the reopened header/context/count. Tall browser 26/30 originals are viewer-scaled to 6,000px without changing stored bytes. APFS refused the invalid-UTF8-name fixture with errno 92; synthetic rejection is unconditional. Actions retention is fourteen days; no durable image archive is claimed.
+- The recovery source `8e62c9d9fd68b15f1fcbfb18420d49f69e80595a` has a separate independent 32-method memory-contract review, including the 19-case corpus, and all twelve existing push/PR workflows pass. The configuration child `10b77d170e19478fd6bb5411d512b94115912444` separately passes 54 memory methods (32 retained plus 22 new), independently reviewed with admitted mutation and negative-control checks. A fresh 54-method rerun preserves every reviewed helper byte. Existing CI does not run those new Python methods; its native counts do not stand in for them. The helpers remain inert claims, with no Xcode parser, observed signature/launch seal or access authority.
+- This combined documentation preserves every earlier shelf, recovery and configuration status section. The exact tested catalogue/runtime assets and reviewed helper blobs remain unchanged. New combined-tree CI is required before integration; the source runs and originals above are not relabelled as later-head evidence. The real-folder control, observer admission and production dependency graph remain closed. The next proposed functional slice is responsive, cancellable owned observation with progress and offline Save/Open validation; it does not activate a user-folder entry point.
+
+The following sections retain their source-specific historical pending/failure states. They do not supersede this exact-source closeout.
 
 ## Catalogue clarity: scoped usability successor
 
@@ -35,6 +46,26 @@ Last updated: 2026-10-12 03:44
 - Primary search/selection now precedes optional comparison. Exact original source/date details, partial/root-only uncertainty and native persistence fences remain. This changes presentation and owned tests only; all source, schema, storage and real-folder gates are unchanged.
 - Local checks pass: 665 Jest, 47 catalogue DOM, 12 native persistence DOM, 16 ingress, 18 protocol, eight bundled assets/two examples and 22 parser cases/4,102 UTF-8 samples. Formatting passes. Twelve browser journeys are authored, including two new shelf cases; actual browser/native execution and independent original-pixel acceptance remain pending. Local Chromium failed at its socket restriction, without a security workaround.
 - This tranche starts from accepted main `57078cd37e112fe611c2f3bb36ebc63a017863e2`. Recovery PR30 and the separate memory-only configuration-pair branch remain separate checkpoints; this UI does not reconstruct or activate the missing signed host. [Workflow and limits](docs/INVENTORY-CATALOGUE.md#compact-saved-location-shelf-source-checkpoint).
+
+## Owned-folder feasibility: local configuration-pair consistency
+
+- A separate small source tranche builds on the recovered six-file checkpoint `8e62c9d9fd68b15f1fcbfb18420d49f69e80595a`. The new memory-only helper retains bounded opaque raw configuration bytes and a strict resolved JSON claim, then requires exact pair equality against a separately supplied expected record. All source/fixture/product/path/environment/argument/test-selection/instrumentation claims are included; unknown fields refuse.
+- This is consistency between supplied claims, not an Xcode parser, observed configuration seal, signature check, approved launch or access permit. In particular, matching raw and JSON bytes do not prove they describe each other. Build/configuration roots and driver working directory/environment are not represented, so this local record is not a resolved launch-context seal. Both inputs remain untrusted. No file reader, command builder, process, workflow, native target or ordinary product change is introduced.
+- Locally, 54 memory-only methods pass: the prior 32 methods and 19 containment cases remain unchanged, with 22 new paired mutation/boundary methods. Source parsing and both inert command-entry refusals pass. Independent source review is a publication gate; no native-host or folder experiment runs in this tranche.
+- The reviewed recovery branch itself retains all six successful existing push workflows. Its [native run 38107674618](https://github.com/krahd/disk_organiser/actions/runs/38107674618) records the unchanged 217 XCTest methods plus six differential and six parser cases. Those results do not execute either new Python contract or establish a new pixel claim.
+- The concrete remaining bridge is a format-specific parser/observer, bounded owned descriptors and an isolated native host, followed by separately approved owned-fixture build/sign/panel validation. The app's real-folder button and production selection gate remain closed. See the [contract scope and remaining user workflow](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/README.md#additional-configuration-pair-claim-checkpoint).
+
+The previous reconstruction entry below is retained as its earlier source checkpoint.
+
+## Owned-folder feasibility: small reconstructed source checkpoint
+
+- Main `57078cd37e112fe611c2f3bb36ebc63a017863e2` remains intact, with all six workflows successful. Its [owned native run 38054978952](https://github.com/krahd/disk_organiser/actions/runs/38054978952) records the existing 217 XCTest methods plus six differential and six parser cases. These are prior main results, not execution of this reconstruction.
+- The unpublished next host candidate and its local review files became unavailable after the workspace changed. Exact recovery was not possible. This [new, smaller source checkpoint](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/README.md) reconstructs only pure fixture/inventory claim validation and the portable containment corpus. It has a new source identity and needs fresh independent review; no old host/test acceptance is inherited.
+- The module performs no filesystem, native, signing, panel, grant, process or network operation. Byte/nesting limits precede JSON decoding; exact schema validation follows decoding; complete inventory/root/parent checks and component-wise bounded link resolution reject escaping and invalid intermediates. Parsed imported claims are never source authority, observed files, physical-drive identities or backup verification.
+- Locally, 32 memory-only methods pass, including 19 corpus cases. Python source parses and the operational entry refuses. The first author run exposed a recursion-limit assumption, corrected with an explicit nesting guard and boundary regression. No native or actual folder probe ran. The prior candidate's larger tests and Swift consumer have not been recovered.
+- Missing configuration/signature sealing, descriptor ownership/ACL controls, same-object access evidence, native host/UI source and parser parity are explicit future gates. Ordinary app, closed selection gate, observer, package, workflows and all prior history are unchanged. New host build/sign/panel execution remains unapproved; real-folder controls stay unavailable.
+
+The following PR29 sections retain their historical source/closeout checkpoints; merged-main success is confirmed above.
 
 ## Synchronous selection cancellation: executed owned regression
 
@@ -841,4 +872,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 03:44
+Last updated: 2026-10-12 04:20

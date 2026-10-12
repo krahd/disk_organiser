@@ -207,3 +207,43 @@ requires full-width, nonoverlapping stacked pager children and an unsplit final
 heading word. Hosted successor browser/native execution, independent review and
 new original pixels remain required; the previous source's evidence is not
 relabelled as a pass for this UI. No runtime authority or product gate changes.
+
+## Clarity successor: exact executed acceptance
+
+Source `3cb622a2937a7527cdb98930e7d0e4da625fb29a` closes the presentation-only
+successor above. Its twelve push/PR workflows pass. Both native lanes retain
+all 217 distinct XCTest identities and six differential/six parser cases,
+with 78 true native hit/visible-centre pairs per lane. Both catalogue lanes
+pass thirteen browser journeys. See the [native PR run](https://github.com/krahd/disk_organiser/actions/runs/38201627561)
+and [catalogue PR run](https://github.com/krahd/disk_organiser/actions/runs/38201627516).
+The PR checkout `d7ad16c9fbd8ac9e7f96f9784bbba6968dfae7f2` is a distinct merge
+commit with the same tree `1d9506f7a780f56fe2247e5b2cbd03ddcd203cd0`.
+
+Independent fresh source/log/archive review and direct inspection of all 68
+distinct original image contents across 110 lane PNGs find no scoped blocker.
+Browser 50 shows the full-width Previous/description/Next stack at 320px with
+200% root text. The description and shorter heading are readable; the test
+preserves genuine pointer/keyboard paging, <=1px overflow, positive full-width
+nonoverlap bounds and >=44px targets. This is not a 300% claim. The comparison
+pager shares the CSS and is visible in browser 44/native 64, but has no new
+comparison-specific full-width geometric oracle.
+
+Originals 51–53 show the visible saved-snapshot context, clearer file row and
+keyboard-expanded provenance with the query/selection retained. Partial badges,
+gap/error counts, unsupported/refused rows and exact source details remain.
+Root separately inspected those originals and 50. The new journey exercises
+both disclosures; not every expanded state has a separate screenshot.
+
+Every provider archive and extracted member, including the current inner
+manifests, verifies byte-for-byte. Browser 26/30 exceed the viewer's 6,000px
+height limit, while the stored originals are unchanged. Native captures remain
+named chrome/sheet/WebKit regions: 87 is scrolled and 96 shows the reopened
+header/context/two-record count, not a full-window composite. The APFS
+invalid-name fixture refusal and unconditional synthetic rejection remain
+distinct. Fourteen-day Actions retention remains; no durable screenshot
+archive, screen-reader, real user-drive, OS permission or release acceptance
+is established.
+
+The later documentation/integration preserves these runtime and asset bytes.
+Exact combined-tree checks remain necessary; the cited runs and original
+pixels belong to this source, not a later commit.
