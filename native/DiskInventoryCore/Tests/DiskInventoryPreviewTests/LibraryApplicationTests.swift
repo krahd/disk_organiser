@@ -22,6 +22,9 @@ final class OwnedSourceProgressGate: @unchecked Sendable {
     private var expired = false
     var entered: Bool { lock.lock(); defer { lock.unlock() }; return didEnter }
     var timedOut: Bool { lock.lock(); defer { lock.unlock() }; return expired }
+    var observation: (entered: Bool, timedOut: Bool) {
+        lock.lock(); defer { lock.unlock() }; return (didEnter, expired)
+    }
     func hold() {
         lock.lock()
         guard !didEnter else { lock.unlock(); return }
@@ -111,9 +114,22 @@ final class LateSuccessfulLibrarySource: LibrarySource {
 @MainActor
 final class LibraryApplicationTests: XCTestCase {
     private var controlEventNumber = 1000
-    func ready(_ session: LibrarySession, _ state: LibrarySession.State, seconds: TimeInterval = 5) async throws {
+    enum CancelObservationPhase: String {
+        case beforeHelper, beforePosting, afterSettling, beforeReadyAssertion
+    }
+    // Four fixed observations for one Cancel in the first owned-pointer test.
+    // Primitive fixture state only; no additional wait, pump or action dispatch.
+    func observeCancel(_ phase: CancelObservationPhase, session: LibrarySession,
+                       source: OwnedLibrarySource, gate: OwnedSourceProgressGate) {
+        let held = gate.observation
+        let inspected = session.inspectedEntries.map(String.init) ?? "null"
+        print("OWNED_CANCEL_DIAGNOSTIC phase=\(phase.rawValue) state=\(session.state) sourceCancellations=\(source.cancellations) gateEntered=\(held.entered) gateTimedOut=\(held.timedOut) workerPresent=\(source.job != nil) inspectedEntries=\(inspected)")
+    }
+    func ready(_ session: LibrarySession, _ state: LibrarySession.State, seconds: TimeInterval = 5,
+               beforeAssertion: (() -> Void)? = nil) async throws {
         let deadline = Date().addingTimeInterval(seconds)
         while session.state != state && Date() < deadline { try await Task.sleep(for: .milliseconds(20)) }
+        beforeAssertion?()
         XCTAssertEqual(session.state, state)
         guard session.state == state else { throw CataloguePreviewHost.Failure.expired }
     }
@@ -137,7 +153,8 @@ final class LibraryApplicationTests: XCTestCase {
     }
     // AppKit controls use a tracking loop. Queue both events before dispatching
     // down so that the control can consume its corresponding native mouse-up.
-    func clickNative(_ id: String, using h: OwnedPreviewHarness) async throws {
+    func clickNative(_ id: String, using h: OwnedPreviewHarness,
+                     observeCancel: ((CancelObservationPhase) -> Void)? = nil) async throws {
         let deadline = Date().addingTimeInterval(3)
         var selectedWindow: NSWindow?
         var selectedControl: NSButton?
@@ -170,6 +187,7 @@ final class LibraryApplicationTests: XCTestCase {
         print("OWNED_APP_HIT id=\(id) frame=\(control.frame) bounds=\(control.bounds) visible=\(localVisible) windowPoint=\(point) ownHit=\(ownHit) centreVisible=\(localVisible.contains(centre))")
         guard ownHit, localVisible.contains(centre) else { throw CataloguePreviewHost.Failure.unavailable }
         print("OWNED_APP_CONTROL id=\(id) active=\(NSApp.isActive) key=\(window.isKeyWindow) enabled=\(control.isEnabled) point=\(point)")
+        observeCancel?(.beforePosting)
         for (offset, type) in [NSEvent.EventType.leftMouseDown, .leftMouseUp].enumerated() {
             controlEventNumber += 1
             let event = try XCTUnwrap(NSEvent.mouseEvent(with: type, location: point, modifierFlags: [],
@@ -179,6 +197,7 @@ final class LibraryApplicationTests: XCTestCase {
             NSApp.postEvent(event, atStart: false)
         }
         h.pumpApplicationEvents(); try await Task.sleep(for: .milliseconds(30)); h.pumpApplicationEvents()
+        observeCancel?(.afterSettling)
     }
 
     func testActualLibraryWindowNativeSelectionScopeAddAndCancel() async throws {
@@ -208,8 +227,12 @@ final class LibraryApplicationTests: XCTestCase {
         try await screens.native("73-native-progress-controls.png", view: window.chrome)
         // Genuine AppKit pointer cancellation while the worker is inside an
         // actual owned observation; the main actor must remain responsive.
-        try await clickNative("library-cancel", using: h)
-        try await ready(window.session, .ready)
+        let observe: (CancelObservationPhase) -> Void = { phase in
+            self.observeCancel(phase, session: window.session, source: source, gate: gate)
+        }
+        observe(.beforeHelper)
+        try await clickNative("library-cancel", using: h, observeCancel: observe)
+        try await ready(window.session, .ready, beforeAssertion: { observe(.beforeReadyAssertion) })
         XCTAssertFalse(gate.timedOut); XCTAssertNil(source.job); XCTAssertNil(window.session.inspectedEntries)
         try await h.wait("return String(document.querySelectorAll('.source-card').length);", equals: "0")
         source.workerSeams = .init(); source.afterWorkerCancel = nil

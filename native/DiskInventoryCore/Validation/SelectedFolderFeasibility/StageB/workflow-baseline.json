@@ -85,7 +85,7 @@
   "native/DiskInventoryCore/Tests/DiskInventoryPreviewTests/ApplicationLibraryUITests.swift": "328a7d7dc792a90d0382de854dfe88d3edc52a695066aa96aa0a6923ee26f830",
   "native/DiskInventoryCore/Tests/DiskInventoryPreviewTests/CatalogueCodecTests.swift": "183eccd1e4ee20ff1d4f3362991d764f8c251fbc351de52528ea42f72a8bd0cc",
   "native/DiskInventoryCore/Tests/DiskInventoryPreviewTests/LibraryApplicationScreens.swift": "5e3f2dbe888b797a9a05e059231e1f578806e181d76cf7a0a7dfb05fd15d2504",
-  "native/DiskInventoryCore/Tests/DiskInventoryPreviewTests/LibraryApplicationTests.swift": "15ee2624941a22ca338b4d37c9441b6f9d51b09391dc2829412ec59f9f0b9df1",
+  "native/DiskInventoryCore/Tests/DiskInventoryPreviewTests/LibraryApplicationTests.swift": "6869747d7ce6cdb99f9ccd488b7780ed1d2a1527a182013933811882154ca1ef",
   "native/DiskInventoryCore/Tests/DiskInventoryPreviewTests/LibraryBridgeValuesTests.swift": "a04de19e3b8f83a819cfbea73de93451d05b125e6d368d2264f89bbf839fbf83",
   "native/DiskInventoryCore/Tests/DiskInventoryPreviewTests/LibraryInteractionTests.swift": "168389ab998890b6ebf13e596c257ba02b0b287e0818a7a8a38dc7c8ec69ebb4",
   "native/DiskInventoryCore/Tests/DiskInventoryPreviewTests/LibraryLifecycleTests.swift": "570d872293aa6fcdff96514e5fff4ed0a7da55b4fd6541c46cf2b292e2e3fc52",

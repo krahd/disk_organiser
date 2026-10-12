@@ -57,6 +57,41 @@ def startup_environment(environment):
     return result
 
 
+
+def interpreter_identity(profile):
+    """Bounded observed facts, not authentication of loaded interpreter bytes.
+
+    The versioned framework launcher removes the documented cache alias. Its
+    reported path is still an exact admission check, never resolved or relaxed.
+    No filesystem/process operation or operational project import occurs here.
+    """
+    executable = sys.executable
+    implementation = sys.implementation.name
+    platform = sys.platform
+    machine = os.uname().machine
+    require(isinstance(sys.version_info, tuple) and 3 <= len(sys.version_info) <= 5,
+            'interpreter version shape')
+    version = tuple(sys.version_info[:3])
+    flags = {name: getattr(sys.flags, name) for name in
+             ('isolated', 'no_site', 'dont_write_bytecode')}
+    strings = ((executable, 256), (implementation, 16), (platform, 16), (machine, 16))
+    require(all(type(value) is str and 0 < len(value) <= limit and value.isascii() and
+                '\0' not in value for value, limit in strings), 'interpreter fact string bounds')
+    require(profile['PYTHON'] == '/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12' and
+            executable == profile['PYTHON'], 'fixed framework interpreter')
+    require(len(version) == 3 and all(type(value) is int and 0 <= value <= 65535 for value in version)
+            and version == (3, 12, 10), 'fixed interpreter version')
+    require(implementation == 'cpython', 'fixed interpreter implementation')
+    require(all(type(value) is int and value == 1 for value in flags.values()),
+            'isolated no-bytecode interpreter facts')
+    require(platform == 'darwin' and machine == 'arm64', 'fixed native runner')
+    # Exact seven-key schema: bounded ASCII strings, three integers and three
+    # fixed integer flags. The existing identity.json envelope remains 64 KiB.
+    return {'schema': 1, 'executable': executable, 'version': list(version),
+            'implementation': implementation, 'flags': flags,
+            'platform': platform, 'machine': machine}
+
+
 def _stamp(value):
     return (value.st_dev, value.st_ino, value.st_mode, value.st_uid, value.st_gid,
             value.st_nlink, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
@@ -230,12 +265,12 @@ def main(expected_profile_hash):
     raw = read(RELATIVE + '/Tools/stage_b_profile.py', 32768)
     profile = decode_profile(raw, expected_profile_hash)
     require(profile['BUILD_ONLY_ENABLED'] is True, 'build-only profile disabled')
-    require(sys.version_info[:3] == (3, 12, 10) and sys.executable == profile['PYTHON'], 'fixed cached interpreter')
-    require(sys.platform == 'darwin' and os.uname().machine == 'arm64', 'fixed native runner')
+    interpreter = interpreter_identity(profile)
     environment = startup_environment(os.environ)
     identity = verify_dispatch(environment, read(profile['WORKFLOW'], 32768),
                                read(profile['TEMPLATE'], 32768), profile)
     source, host = admit_sources(profile, read)
+    identity['interpreter'] = interpreter
     identity['profile_sha256'] = hashlib.sha256(raw).hexdigest()
     identity['profile_normalised_sha256'] = expected_profile_hash
     identity['module_rows'] = profile['MODULE_ROWS']
