@@ -1,6 +1,7 @@
 import XCTest
 import AppKit
 import Foundation
+@testable import DiskInventoryCore
 @testable import DiskInventoryDesktop
 
 @MainActor

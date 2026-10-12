@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 05:14
+Last updated: 2026-10-12 05:34
+
+## Hosted compile checkpoint and test-import repair
+
+- Source `c35d0bf754027aa3e31f747b8659a32d9be96598` passes the actual isolated-target, development-app and owned-probe compilation steps in both native lanes. XCTest compilation then fails at `LibraryLifecycleTests.swift:187`: the internal `ObservationJob.Seams` initializer is unavailable because that file imports only the desktop module.
+- The repair adds the existing core module as a testable import in that test file. The test target already depends on it; no product dependency, access level, assertion, worker/runtime behaviour or workflow changes. All 233 authored method identities remain.
+- Original [push](https://github.com/krahd/disk_organiser/actions/runs/38208324024) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38208349269) failures are retained. No XCTest method ran in those lanes; downstream six differential/six parser checks and original-capture acceptance remain unrun for this source. The repaired exact head must compile and complete every existing gate before acceptance.
+
 
 ## Responsive owned observation: source-reviewed checkpoint
 
@@ -881,4 +888,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 05:14
+Last updated: 2026-10-12 05:34

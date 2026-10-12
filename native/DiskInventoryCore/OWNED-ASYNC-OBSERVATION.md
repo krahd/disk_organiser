@@ -53,6 +53,16 @@ The active native Cancel button keeps its genuine event/hit-test path. Saving
 remains subject to the existing session/interaction fence; progress cannot
 stage a snapshot or write a saved catalogue.
 
+## Hosted compiler checkpoint
+
+The first hosted source c35d0bf7 compiled the isolated selection target,
+development entry point and owned process probe. XCTest compilation failed in
+both lanes because LibraryLifecycleTests used an internal core seam initializer
+without importing that module testably. Adding that test-file import preserves
+the existing target graph, access levels and all 233 method identities. No
+XCTest method or changed original capture ran; downstream six-plus-six checks
+were skipped. Exact repaired native execution and pixels are still required.
+
 ## Authored verification, not executed acceptance
 
 The repaired source retains all 217 baseline XCTest identities and adds sixteen,
@@ -88,9 +98,10 @@ Core callback admission closes before the final root guard. A late job request
 still suppresses terminal bytes, but may not prevent that guard or projection
 from running. No interruptible-syscall or hard cancellation deadline is claimed.
 
-Only the five pure Python isolation-rule tests have run locally for this
-checkpoint. The actual graph command cannot run here because xcrun is absent;
-no Swift compile or native method has executed for these changed bytes. Frozen
+At the initial local checkpoint, only the five pure Python isolation-rule
+tests ran. The local graph command remains blocked by absent xcrun. The hosted
+compile failure above supersedes the original unrun compiler status; no native
+method has executed. Frozen
 independent source review, hosted macOS compilation and all233+6+6 gates,
 existing browser/asset gates, exact original-pixel review and final-main
 verification are still required. CI wiring and limits are unchanged. Prior
