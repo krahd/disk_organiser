@@ -1,6 +1,12 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 02:07
+Last updated: 2026-10-12 02:25
+
+## Saved-location shelf: first hosted diagnostic
+
+- Draft PR31 source `a0d7c088fe2bc38e1561e35147f477b5c22252f7` passes 11 of 12 browser journeys in both push and PR runs. The new 320px viewport with 200% root text exposes 77px horizontal overflow. Normal narrow layout and keyboard browsing of record 32 pass. This is a real unresolved layout gate, not visual acceptance.
+- Both Linux/Windows catalogue contract lanes and the other four non-native workflows pass. The two native workflows are still queued at this checkpoint. Original screenshot/failure archives were retrieved and their GitHub SHA-256 digests verified; no image was altered or durably archived.
+- A test-only diagnostic adds bounded element geometry to the unchanged horizontal-overflow assertion. It does not change runtime CSS, controls, thresholds, interaction actions or workflow. The next hosted result must identify the offending layout before a source repair is claimed.
 
 ## Saved-location shelf: source checkpoint
 
@@ -814,4 +820,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 02:07
+Last updated: 2026-10-12 02:25

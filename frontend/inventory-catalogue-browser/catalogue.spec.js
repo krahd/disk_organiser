@@ -45,11 +45,33 @@ async function singleLineControl(control) {
   expect(lines).toBe(1);
 }
 async function geometry(page) {
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
-    )
-  ).toBeLessThanOrEqual(1);
+  const horizontal = await page.evaluate(() => {
+    const viewport = document.documentElement.clientWidth;
+    return {
+      overflow: document.documentElement.scrollWidth - viewport,
+      viewport,
+      offenders: [...document.body.querySelectorAll("*")]
+        .filter((n) => n.getClientRects().length && n.getBoundingClientRect().right > viewport + 1)
+        .map((n) => {
+          const rect = n.getBoundingClientRect(),
+            style = getComputedStyle(n);
+          return {
+            tag: n.tagName,
+            id: n.id,
+            class: String(n.className).slice(0, 100),
+            left: rect.left,
+            right: rect.right,
+            width: rect.width,
+            overflowX: style.overflowX,
+            whiteSpace: style.whiteSpace,
+            parent: n.parentElement?.id || n.parentElement?.className || "",
+          };
+        })
+        .sort((a, b) => b.right - a.right)
+        .slice(0, 24),
+    };
+  });
+  expect(horizontal.overflow, JSON.stringify(horizontal)).toBeLessThanOrEqual(1);
   const buttons = await page.locator("button:visible").evaluateAll((nodes) =>
     nodes.map((n) => ({
       h: n.getBoundingClientRect().height,
