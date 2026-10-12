@@ -1,6 +1,21 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 02:30
+Last updated: 2026-10-12 03:44
+
+## Catalogue clarity: scoped usability successor
+
+- One contextual saved-snapshot notice carries unverified dates/details and unknown connection/backup state. File rows prioritise path, numbered record and listed size; repeated per-row historical dates move to the existing record context and expandable source details. Original raw dates/labels, partial records, unsupported rows, exclusions and recorded errors remain available, with gap/error summaries visible outside the collapsed details.
+- At narrow widths both search and comparison pagers use full-width vertical controls and a full-width description. The project heading is shortened to “Group your files”. No fonts are reduced; pager labels and description remain complete, with no clipped overflow. Canonical/native asset parity and all data, storage, source and native capability gates are unchanged.
+- Local validation passes 665 Jest, 50 catalogue DOM checks, 12 persistence DOM, 16 ingress, 18 protocol, eight-asset/two-example parity and 22 parser cases/4,102 UTF-8 samples. Thirteen browser journeys are authored/listed, preserving the prior twelve and adding real keyboard expansion of contextual/provenance details while a narrow file selection remains intact. The 200% pager test now requires every child to fill the row width and stack in DOM order, retaining the <=1px overflow, 44px button and real pointer/keyboard paging assertions.
+- This successor has not yet had frozen-source independent review or hosted browser/native/pixel execution. The accepted evidence immediately below belongs only to `8a6b7244`, not these changed UI bytes. No local browser restriction was bypassed and no new native experiment is introduced.
+
+## Saved-location shelf: exact-head executed closeout
+
+- Source `8a6b724485d35723a6371e338019c9a44017ca3e`, tree `519e36e503473d1a4171be0cf18ab6ace80e57c0`, passes all twelve push/PR workflows. Main stays `57078cd37e112fe611c2f3bb36ebc63a017863e2`; PR31 is draft and unmerged at this checkpoint. Twelve changed paths and 337 other preserved blobs reconcile. PR checkout `cca25310992297e8f9540806c209310b5118f1e9` is a distinct commit with that same tree.
+- Both native [push](https://github.com/krahd/disk_organiser/actions/runs/38196200524) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38196203329) retain all 217 distinct XCTest methods, plus six differential/six parser cases and 78 strict true native hit/visible-centre pairs per lane. Both catalogue [push](https://github.com/krahd/disk_organiser/actions/runs/38196200497) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38196203320) pass twelve browser journeys. Prior 11/12 failures below remain failed checkpoints.
+- Independent source/log/original-pixel closeout verifies all 63 distinct image contents across 104 lane PNGs. The 200% pagination repair contains both buttons; awkward description/heading composition and repetitive warnings remain known usability issues addressed only by the separately tested successor above. Native images are named chrome/sheet/WebKit regions, not full-window composites; browser49 and native87 are scrolled portions, native96 shows the reopened header/count. Tall26/30 browser originals are viewer-scaled to 6,000px while stored PNG bytes remain unchanged.
+- All native/archive/image digests verify. Two extracted browser manifest copies have one appended newline; their parsed contents match, but only the retained inner-ZIP manifests are exact bytes. The PNG originals are exact. The filesystem refusal of an invalid-UTF8 fixture name remains explicit; no successful native creation is claimed. Actions retention is fourteen days, and no durable screenshot archive is claimed.
+- No actual user-folder, ordinary default-storage-path, panel/grant, signing, screen-reader, arbitrary-device or commercial-readiness claim follows. Detailed scope is in [the catalogue guide](docs/INVENTORY-CATALOGUE.md#shelf-executed-closeout-and-clarity-successor). Recovery PR30 and the configuration-pair checkpoint remain separate.
 
 ## Saved-location shelf: measured pagination repair
 
@@ -826,4 +841,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 02:30
+Last updated: 2026-10-12 03:44

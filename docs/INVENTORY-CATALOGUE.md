@@ -154,3 +154,56 @@ The catalogue now presents a compact shelf of saved folder records, with a singl
 The design takes interaction lessons from [DaisyDisk's compact disk overview](https://daisydiskapp.com/guide/4/en/DisksOverview/) and [NeoFinder's catalogue library](https://www.cdfinder.de/guide/1/1.1/neofinder_overview.html). Their screenshots/assets/code are not included. This viewer has no live volume capacity or connection evidence, so those indicators are deliberately absent.
 
 Local source validation passes 665 Jest tests, 47 catalogue DOM checks, 12 persistence DOM checks, 16 ingress checks, 18 protocol checks, exact eight-asset/two-example parity and 22 parser cases/4,102 UTF-8 samples. The 12 browser journeys include two new shelf cases for keyboard scope changes, duplicate labels, retained selections, all 32 records, narrow layout and enlarged text. They are authored, not yet executed at this checkpoint. The ordinary local Chromium attempt failed at the environment's socket restriction; hosted owned-fixture browser/native runs and original-pixel review remain required. No new signed host, panel, grant or user-drive experiment is included.
+
+
+## Shelf executed closeout and clarity successor
+
+The source-only shelf checkpoint above was subsequently executed as source
+`8a6b724485d35723a6371e338019c9a44017ca3e`. All twelve push/PR workflows pass.
+The [native PR lane](https://github.com/krahd/disk_organiser/actions/runs/38196203329)
+and its push counterpart each retain all 217 XCTest identities plus six
+independent-fixture differential and six parser cases. Both catalogue browser
+lanes pass twelve journeys. The PR merge checkout is a distinct commit with the
+exact same source tree, not the source-head commit itself.
+
+Independent review verifies the source successors, fresh raw logs, archive
+hashes and all 63 distinct image contents across both native/browser lanes.
+The earlier 77px overflow is repaired without hiding overflow, shrinking text
+or weakening geometry. However, the description next to the enlarged pager and
+the following heading still compose awkwardly. That bounded containment pass
+is not professional large-text acceptance. Warning density also remains a
+separate usability concern. Named/scrolled capture limits, viewer scaling of
+the tallest originals, the APFS invalid-name refusal and fourteen-day Actions
+retention remain explicit. Two local browser manifest copies contain an extra
+newline; the original inner-ZIP manifest bytes and all PNG originals verify.
+No durable image archive, user-drive, permission or release claim follows.
+
+The next presentation-only successor makes those concerns concrete:
+
+- A single contextual notice identifies saved snapshots, unverified dates and
+  details, and unknown current connection/backup status. **About these records**
+  expands the selected-folder, physical-identity, listed-size and missing-result
+  limits. The comparison action retains its own necessary content/backup caution.
+- Cards and the focused record retain **Last recorded** dates with unchanged
+  recorded offsets. The existing **Source and limits** and **Show details**
+  paths retain exact raw dates, original labels and source provenance. Dates
+  are no longer repeated on every file row.
+- Rows keep the exact path, numbered source label, kind and listed size primary.
+  Unsupported or uncertain status and planning refusal stay visible. Partial
+  records still warn of gaps. The focused record shows nonzero errors, skipped
+  items and uncertain items before the expandable details; exact exclusion
+  reasons and stop reason remain in the details.
+- Narrow search/comparison pagers stack in their DOM order, with both controls
+  and the description using the full width. **Group your files** avoids the
+  previous long heading. Text size, content, 44px targets and strict overflow
+  checks remain intact.
+
+Local checks for this successor pass 665 Jest, 50 catalogue DOM, 12 persistence
+DOM, 16 ingress, 18 protocol, asset/example parity and 22 parser/4,102 UTF-8
+cases. Thirteen browser journeys are authored and listed, with all prior twelve
+retained. The new journey exercises keyboard expansion of both detail controls
+and keeps a narrow file task's query and selection. Strengthened 200% geometry
+requires full-width, nonoverlapping stacked pager children and an unsplit final
+heading word. Hosted successor browser/native execution, independent review and
+new original pixels remain required; the previous source's evidence is not
+relabelled as a pass for this UI. No runtime authority or product gate changes.

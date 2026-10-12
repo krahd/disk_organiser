@@ -109,7 +109,7 @@ if (require.main === module) (async () => {
   await add();
   assert.equal(cards().length, 1);
   assert.match(text(), /6.0 MiB/);
-  assert.match(text(), /physical drives unverified/);
+  assert.match(d.getElementById("snapshot-context").textContent, /Labels do not identify physical drives/);
   checks.push("owned snapshot creates a source-scoped logical-size card");
   submit();
   assert.equal(cards().length, 1);
@@ -117,7 +117,7 @@ if (require.main === module) (async () => {
   await add(partial);
   assert.equal(cards().length, 2);
   assert.match(text(), /Partial folder record/);
-  assert.match(text(), /Protection unknown/);
+  assert.match(d.getElementById("snapshot-context").textContent, /connection and backup status unknown/);
   checks.push("multiple historical locations preserve partial and unknown protection states");
   d.querySelectorAll(".source-actions button")[1].click();
   d.getElementById("catalogue-name").value = "Archive shelf <img src=x onerror=alert(1)>";
@@ -140,8 +140,10 @@ if (require.main === module) (async () => {
   search.dispatchEvent(new dom.window.Event("input"));
   assert.equal(d.querySelectorAll(".catalogue-entry").length, 1);
   assert.match(d.querySelector(".catalogue-entry").textContent, /archive folder/);
-  assert.match(d.querySelector(".catalogue-entry").textContent, /Historical source date/);
-  checks.push("offline search names the recorded location and observation date");
+  assert.match(d.querySelector(".catalogue-entry").textContent, /File · 9.0 MiB listed/);
+  assert.match(d.getElementById("source-details").textContent, /Original claimed date/);
+  assert.equal(d.querySelector(".catalogue-entry time"), null);
+  checks.push("offline search names the recorded location and listed size, with observation dates retained in source details");
   search.value = "Missing-unrecorded-name";
   search.dispatchEvent(new dom.window.Event("input"));
   assert.match(text(), /No recorded matches/);
@@ -362,7 +364,9 @@ if (require.main === module) (async () => {
   const dateNode = rd.querySelector(".source-date time");
   assert.equal(dateNode.textContent, "31 Dec 2026, 23:59 UTC-03:30");
   assert.equal(dateNode.dateTime, raw);
-  assert.equal(rd.querySelector(".catalogue-entry time").textContent, dateNode.textContent);
+  rd.querySelector("[data-location]").click();
+  assert.equal(rd.querySelector(".location-focus time").textContent, dateNode.textContent);
+  assert.equal(rd.querySelector(".location-focus time").dateTime, raw);
   readable.click("catalogue-details");
   assert.match(
     rd.getElementById("source-details").textContent,
@@ -564,6 +568,42 @@ if (require.main === module) (async () => {
   assert.equal(fullShelf.d.querySelectorAll('[data-location][aria-pressed="true"]').length, 1);
   assert.deepEqual(fullShelf.errors, []); fullShelf.dom.window.close();
   checks.push("all 32 allowed records remain individually browsable with no omitted shelf or filter entries");
+  const clarity = await launch(), qd = clarity.d;
+  await clarity.add(example); await clarity.add(partial);
+  qd.querySelector("[data-location]").click();
+  assert.equal(qd.querySelector(".record-warning"), null);
+  clarity.click("all-locations");
+  const context = qd.getElementById("snapshot-context");
+  assert.equal(qd.querySelectorAll("#snapshot-context").length, 1);
+  assert.match(context.querySelector("strong").textContent, /connection and backup status unknown/);
+  assert.match(context.querySelector("p").textContent, /Dates and details.*have not been verified/);
+  assert.equal(context.querySelector("details").open, false);
+  assert.match(context.querySelector("details").textContent, /not\s+disk capacity/);
+  assert.match(context.querySelector("details").textContent, /Missing results do not\s+prove/);
+  assert.equal(qd.querySelectorAll(".unknown-protection").length, 0);
+  assert.match(qd.querySelector(".source-date").textContent, /Last recorded:/);
+  assert.equal(qd.querySelectorAll(".catalogue-entry time").length, 0);
+  checks.push("one contextual notice preserves unverified dates, connection, backup and expandable capacity/absence limits");
+  const unavailable = [...qd.querySelectorAll(".catalogue-entry")].find(n => n.textContent.includes("External link"));
+  assert.match(unavailable.textContent, /symlink · unsupported/);
+  assert.match(unavailable.textContent, /Unavailable for planning/);
+  assert.equal(unavailable.querySelector("input").disabled, true);
+  qd.querySelectorAll("[data-location]")[1].click();
+  assert.match(qd.getElementById("location-focus-body").textContent, /partial folder record/);
+  assert.match(qd.querySelector(".record-warning").textContent, /1 skipped item/);
+  assert.match(qd.querySelector(".location-evidence").textContent, /Exclusion: symlink_not_followed \(1\)/);
+  assert.match(qd.querySelector(".location-evidence").textContent, /Raw claimed date:/);
+  checks.push("partial and unsupported rows stay explicit while precise exclusions and raw provenance remain expandable");
+  const errorSnapshot = JSON.parse(partial); errorSnapshot.gaps.error_count = "2";
+  errorSnapshot.gaps.exclusions.push({reason: "scope_depth_limit", count: "2"});
+  const withErrors = await launch(), ed = withErrors.d;
+  await withErrors.add(JSON.stringify(errorSnapshot)); ed.querySelector("[data-location]").click();
+  assert.match(ed.querySelector(".record-warning").textContent, /^2 recorded errors · 3 skipped items · 1 uncertain item$/);
+  assert.equal(ed.querySelector(".location-evidence").open, false);
+  assert.match(ed.querySelector(".project-selection h2").textContent, /^Group your files$/);
+  assert.deepEqual(withErrors.errors, []); withErrors.dom.window.close();
+  assert.deepEqual(clarity.errors, []); clarity.dom.window.close();
+  checks.push("recorded errors remain visible outside collapsed provenance and the project heading stays concise");
   console.log(
     `PASS: ${checks.length} catalogue DOM checks\n` + checks.map((x) => "  " + x).join("\n")
   );

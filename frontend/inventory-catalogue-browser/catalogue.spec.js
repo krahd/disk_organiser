@@ -98,13 +98,19 @@ test("multi-location overview, offline search, source-preserving plan and catalo
   await add(page, first, "Working drive · creative folder");
   await add(page, second, "Archive drive · saved projects");
   await expect(page.locator(".source-card")).toHaveCount(2);
-  await expect(page.locator("#catalogue-count")).toContainText("physical drives unverified");
+  await expect(page.locator("#snapshot-context")).toContainText(
+    "connection and backup status unknown"
+  );
   await expect(page.locator(".source-card").last()).toContainText("Partial folder record");
   await shot(page, info, "21-catalogue-overview.png");
   await page.getByLabel("Search recorded names and paths", { exact: true }).fill("Film.mov");
   await expect(page.locator(".catalogue-entry")).toHaveCount(1);
   await expect(page.locator(".catalogue-entry")).toContainText("Archive drive");
-  await expect(page.locator(".catalogue-entry")).toContainText("Historical source date");
+  await expect(page.locator(".catalogue-entry")).toContainText("File · 9.0 MiB listed");
+  await expect(page.locator(".source-date time").last()).toHaveAttribute(
+    "datetime",
+    JSON.parse(fs.readFileSync(second, "utf8")).source.observed_at
+  );
   await shot(page, info, "22-catalogue-offline-search.png");
   await page
     .getByRole("checkbox", {
@@ -726,13 +732,17 @@ test("saved shelf exposes every record at narrow width and enlarged text", async
   await page.locator("#next-results").scrollIntoViewIfNeeded();
   const pager = await page.locator("#next-results").evaluate((next) => {
     const parent = next.parentElement.getBoundingClientRect();
-    return [...next.parentElement.querySelectorAll("button")].map((button) => {
-      const r = button.getBoundingClientRect();
+    return [...next.parentElement.children].map((node) => {
+      const r = node.getBoundingClientRect();
       return {
         left: r.left - parent.left,
         right: parent.right - r.right,
         width: r.width,
         height: r.height,
+        top: r.top,
+        bottom: r.bottom,
+        parentWidth: parent.width,
+        tag: node.tagName,
       };
     });
   });
@@ -740,8 +750,78 @@ test("saved shelf exposes every record at narrow width and enlarged text", async
     expect(rect.left).toBeGreaterThanOrEqual(-1);
     expect(rect.right).toBeGreaterThanOrEqual(-1);
     expect(rect.width).toBeGreaterThanOrEqual(44);
-    expect(rect.height).toBeGreaterThanOrEqual(44);
+    expect(rect.height).toBeGreaterThan(0);
+    expect(Math.abs(rect.width - rect.parentWidth)).toBeLessThanOrEqual(1);
+    if (rect.tag === "BUTTON") expect(rect.height).toBeGreaterThanOrEqual(44);
   }
+  expect(pager[0].bottom).toBeLessThanOrEqual(pager[1].top);
+  expect(pager[1].bottom).toBeLessThanOrEqual(pager[2].top);
   await geometry(page);
   await shot(page, info, "50-shelf-enlarged-pagination.png", { fullPage: false });
+  const heading = page.locator(".project-selection h2");
+  await expect(heading).toHaveText("Group your files");
+  const wordLines = await heading.evaluate((h) => {
+    const range = document.createRange();
+    const start = h.firstChild.textContent.indexOf("files");
+    range.setStart(h.firstChild, start);
+    range.setEnd(h.firstChild, start + 5);
+    return [...range.getClientRects()].map((r) => ({ width: r.width, height: r.height }));
+  });
+  expect(wordLines).toHaveLength(1);
+  expect(wordLines[0].width).toBeGreaterThan(0);
+  expect(wordLines[0].height).toBeGreaterThan(0);
+});
+
+test("contextual history and expandable provenance keep the narrow file task clear", async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page);
+  await add(page, first, "Projects");
+  await add(page, second, "Archive");
+  const notice = page.locator("#snapshot-context");
+  await expect(notice.locator("strong")).toHaveText(
+    "Saved snapshots · connection and backup status unknown"
+  );
+  await expect(notice.locator("p").first()).toContainText(
+    "Dates and details come from saved records and have not been verified"
+  );
+  await expect(notice.locator("details")).not.toHaveAttribute("open", "");
+  await shot(page, info, "51-clear-snapshot-context.png", { fullPage: false });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Browse record 2: Archive", exact: true }).click();
+  await page.getByLabel("Search recorded names and paths", { exact: true }).fill("Film.mov");
+  const row = page.locator(".catalogue-entry");
+  await expect(row.locator("strong")).toHaveText("Exports/Film.mov");
+  await expect(row).toContainText("Record 2: Archive");
+  await expect(row).toContainText("File · 9.0 MiB listed");
+  await expect(row.locator("time")).toHaveCount(0);
+  await row.getByRole("checkbox").check();
+  await expect(page.locator("#selection-count")).toHaveText("1 file selected");
+  await page.locator("#catalogue-results").scrollIntoViewIfNeeded();
+  await geometry(page);
+  await shot(page, info, "52-clear-narrow-file-task.png", { fullPage: false });
+  const provenance = page.locator(".location-evidence");
+  await provenance.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(provenance).toHaveAttribute("open", "");
+  await expect(provenance).toContainText("Raw claimed date:");
+  await expect(provenance).toContainText("Imported source claims are not authenticated");
+  await expect(provenance).toContainText("Exclusion: symlink_not_followed (1)");
+  await expect(page.locator(".record-warning")).toContainText("1 skipped item");
+  await expect(page.getByLabel("Search recorded names and paths", { exact: true })).toHaveValue(
+    "Film.mov"
+  );
+  await expect(page.locator("#selection-count")).toHaveText("1 file selected");
+  await provenance.locator("summary").focus();
+  await shot(page, info, "53-expandable-source-detail.png", { fullPage: false });
+  await page.keyboard.press("Enter");
+  await expect(provenance).not.toHaveAttribute("open", "");
+  await notice.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(notice.locator("details")).toHaveAttribute("open", "");
+  await expect(notice).toContainText("not disk capacity");
+  await expect(notice).toContainText("Missing results do not prove");
+  await expect(page.locator("#selection-count")).toHaveText("1 file selected");
+  await geometry(page);
 });

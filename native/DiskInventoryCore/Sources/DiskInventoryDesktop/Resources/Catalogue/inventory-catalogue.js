@@ -374,7 +374,7 @@
       header.append(icon, heading);
       card.append(
         header,
-        observationDate("p", "Recorded (claimed): ", s.source.observed_at, "source-date"),
+        observationDate("p", "Last recorded: ", s.source.observed_at, "source-date"),
         el("p", `${bytes(sum.bytes)} listed · ${count(sum.files, "file path")}`, "source-stat"),
         el(
           "span",
@@ -422,7 +422,7 @@
     const s = record.snapshot,
       sum = C.summary(s);
     body.append(
-      observationDate("p", "Snapshot date (claimed): ", s.source.observed_at, "source-date"),
+      observationDate("p", "Last recorded: ", s.source.observed_at, "source-date"),
       el(
         "p",
         `${bytes(sum.bytes)} in listed file sizes · ${count(sum.files, "file path")}`,
@@ -432,10 +432,24 @@
         "p",
         s.source.coverage === "partial"
           ? "This is a partial folder record. Gaps can hide files, even when other entries were recorded."
-          : "Folder listing completed within its recorded policy. Live storage has not been checked.",
+          : "Folder listing completed.",
         "small"
       )
     );
+    // Admission bounds error_count to 2,000 and each of at most 32 exclusions to 10,000.
+    const errors = Number(s.gaps.error_count),
+      skipped = s.gaps.exclusions.reduce((total, gap) => total + Number(gap.count), 0);
+    if (errors || skipped || sum.uncertain)
+      body.append(
+        el(
+          "p",
+          `${count(errors, "recorded error")} · ${count(skipped, "skipped item")} · ${count(
+            sum.uncertain,
+            "uncertain item"
+          )}`,
+          "record-warning"
+        )
+      );
     const groups = [...sum.groups].sort((a, b) =>
         a.bytes === b.bytes ? a.path.localeCompare(b.path) : a.bytes > b.bytes ? -1 : 1
       ),
@@ -476,6 +490,8 @@
       el("summary", "Source and limits"),
       el("p", `Original source label: ${s.source.label}`),
       el("p", `Raw claimed date: ${s.source.observed_at}`),
+      el("p", `Stop reason: ${s.gaps.stop_reason || "none recorded"}.`),
+      ...s.gaps.exclusions.map((gap) => el("p", `Exclusion: ${gap.reason} (${gap.count})`)),
       el(
         "p",
         `${count(
@@ -542,10 +558,7 @@
     });
     const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
     page = Math.min(page, pages - 1);
-    $("result-count").textContent = `${count(
-      rows.length,
-      "matching record"
-    )}. Historical entries only; missing results do not prove absence.`;
+    $("result-count").textContent = `${count(rows.length, "matching record")}.`;
     $("catalogue-results").replaceChildren();
     rows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).forEach(({ record, entry }, index) => {
       const row = el("label", undefined, "catalogue-entry"),
@@ -564,16 +577,10 @@
         sourceName,
         el(
           "small",
-          `${entry.kind} · ${entry.status}${
-            entry.kind === "file" ? ` · ${bytes(entry.logical_bytes)} logical` : ""
-          }`,
+          `${entry.kind === "directory" ? "Folder" : entry.kind === "file" ? "File" : entry.kind}${
+            entry.status === "observed" ? "" : ` · ${entry.status}`
+          }${entry.kind === "file" ? ` · ${bytes(entry.logical_bytes)} listed` : ""}`,
           "entry-kind"
-        ),
-        observationDate(
-          "small",
-          "Historical source date: ",
-          record.snapshot.source.observed_at,
-          "muted"
         )
       );
       if (!C.selectable(entry))
@@ -859,10 +866,7 @@
     $("empty-catalogue").hidden = loaded;
     $("loaded-catalogue").hidden = !loaded;
     $("save-catalogue").disabled = embedded || !loaded;
-    $("catalogue-count").textContent = `${count(
-      catalogue.records.length,
-      "snapshot record"
-    )} · physical drives unverified`;
+    $("catalogue-count").textContent = `${count(catalogue.records.length, "snapshot record")}`;
     const prior = $("catalogue-filter").value;
     $("catalogue-filter").replaceChildren(new Option("All saved locations", ""));
     catalogue.records.forEach((r) =>

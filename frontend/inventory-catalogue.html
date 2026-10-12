@@ -38,17 +38,19 @@
         <div>
           <p class="eyebrow">YOUR STORED PICTURE</p>
           <h1>Where did you keep it?</h1>
-          <p>
-            Keep a picture of your labelled locations. Find recorded files even when the storage is
-            unplugged, then choose what belongs together.
-          </p>
+          <p>Find files across your saved locations, then choose what belongs together.</p>
         </div>
-        <aside class="boundary-card">
-          <strong>Historical records · current presence unknown</strong>
-          <p>
-            Each snapshot covers one selected folder. Labels are yours; physical drive identity,
-            whole-drive space and backup protection are unknown.
-          </p>
+        <aside id="snapshot-context" class="boundary-card">
+          <strong>Saved snapshots · connection and backup status unknown</strong>
+          <p>Dates and details come from saved records and have not been verified.</p>
+          <details class="snapshot-context-details">
+            <summary>About these records</summary>
+            <p>
+              Each snapshot covers one selected folder. Listed sizes describe recorded files, not
+              disk capacity. Labels do not identify physical drives. Missing results do not prove
+              that files are absent from live storage.
+            </p>
+          </details>
         </aside>
       </section>
       <section id="empty-catalogue" class="empty-catalogue">
@@ -69,16 +71,12 @@
           <p id="catalogue-count" class="muted"></p>
         </div>
         <p class="muted">
-          Saved snapshots remain searchable offline. Reconnect the location named on a result to
-          check it in your own tools; this page cannot detect a connection.
+          Browse a location, or search all your saved records below. They remain searchable offline.
         </p>
         <div class="shelf-toolbar">
           <button id="all-locations" class="secondary-button" type="button" aria-pressed="true">
             All saved locations
           </button>
-          <p class="small muted">
-            Saved folder snapshots · connection unknown · listed sizes are not disk capacity
-          </p>
         </div>
         <div id="source-cards" class="source-grid" aria-label="Saved location records"></div>
         <section class="catalogue-work">
@@ -116,7 +114,7 @@
           </div>
           <aside class="project-selection">
             <p class="eyebrow">YOUR NEXT DECISION</p>
-            <h2>What belongs together?</h2>
+            <h2>Group your files</h2>
             <p>
               Choose files or folders across recorded locations. Choose a folder or its contents,
               not both.
@@ -134,13 +132,6 @@
               <a href="manual-workspace.html" target="_blank" rel="noopener">manual workspace</a>,
               open that plan to choose intended homes and backup targets.
             </p>
-            <div class="unknown-protection">
-              <strong>Protection unknown</strong>
-              <p>
-                Catalogue entries are not verified backups. No provider is connected and no deal is
-                offered here.
-              </p>
-            </div>
           </aside>
         </section>
         <section class="comparison-section" aria-labelledby="comparison-heading">
