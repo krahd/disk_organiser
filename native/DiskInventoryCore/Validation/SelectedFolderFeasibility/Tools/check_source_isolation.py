@@ -42,7 +42,7 @@ import stage_b_workflow_guard as workflow_guard
 profile_tree = ast.parse((HERE / 'Tools/stage_b_profile.py').read_bytes())
 profile_flag = next(ast.literal_eval(node.value) for node in profile_tree.body if isinstance(node, ast.Assign)
                     and any(isinstance(target, ast.Name) and target.id == 'BUILD_ONLY_ENABLED' for target in node.targets))
-require(workflow_guard.check(REPO, profile_flag), 'exact disabled/manual-only workflow and ordinary entrypoint pins')
+require(workflow_guard.check(REPO, profile_flag), 'exact disabled/reserved-create workflow and ordinary entrypoint pins')
 identity = (HERE / 'Host/HostIdentity.swift').read_text()
 require('SecCodeGetStatus' not in identity and 'SecCodeCheckValidity' in identity and 'runningValidityChecked' in identity,
         "public running-validity observation without private status API")

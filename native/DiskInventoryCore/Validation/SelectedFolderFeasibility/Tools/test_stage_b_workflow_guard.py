@@ -95,7 +95,7 @@ class WorkflowTests(unittest.TestCase):
                 with self.subTest(enabled=enabled,path=path):
                     files,base,template=self.model()
                     files[guard.QUARANTINE+'StageB/workflow-baseline.json']=json.dumps(base).encode()
-                    files[guard.QUARANTINE+'StageB/owned-selected-folder-build.yml.inert']=template
+                    files[guard.QUARANTINE+'StageB/owned-selected-folder-build.create.yml.inert']=template
                     files[guard.QUARANTINE+'Sources/Host.swift']=b'isolated host'
                     if enabled:files[guard.WORKFLOW]=template
                     self.assertTrue(guard.check(MemoryPath(files),enabled))
@@ -116,7 +116,7 @@ class WorkflowTests(unittest.TestCase):
                     files.update({path:(repo/path).read_bytes() for path in paths})
                     base.update({path:actual[path] for path in paths})
                     files[guard.QUARANTINE+'StageB/workflow-baseline.json']=json.dumps(base).encode()
-                    files[guard.QUARANTINE+'StageB/owned-selected-folder-build.yml.inert']=template
+                    files[guard.QUARANTINE+'StageB/owned-selected-folder-build.create.yml.inert']=template
                     if enabled:files[guard.WORKFLOW]=template
                     self.assertTrue(guard.check(MemoryPath(files),enabled))
                     files[changed]+=b'\nchanged ordinary caller'

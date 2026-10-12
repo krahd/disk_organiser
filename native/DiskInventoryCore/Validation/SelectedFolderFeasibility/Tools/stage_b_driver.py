@@ -88,7 +88,9 @@ def run(identity, host_files, *, started_at):
     pc.require(type(started_at) in (int, float) and math.isfinite(started_at), 'driver clock')
     pc.require(type(identity) is dict and type(host_files) is dict, 'verified startup data')
     pc.require(identity.get('GITHUB_REPOSITORY') == profile.REPOSITORY and
-               identity.get('GITHUB_REF') == profile.REF and identity.get('GITHUB_EVENT_NAME') == 'workflow_dispatch' and
+               identity.get('GITHUB_REF') == profile.REF and identity.get('GITHUB_EVENT_NAME') == 'create' and
+               identity.get('CREATED_REF_TYPE') == 'branch' and
+               identity.get('CREATED_REF') == profile.REF.removeprefix('refs/heads/') and
                identity.get('GITHUB_RUN_ATTEMPT') == '1', 'driver dispatch identity')
     # Bootstrap supplied immutable source bytes, verified before project imports.
     pc.require(ec._source_files(host_files) == profile.HOST_ROWS, 'driver host source rows')

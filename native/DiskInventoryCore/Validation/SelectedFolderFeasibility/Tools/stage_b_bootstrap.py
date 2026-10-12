@@ -27,6 +27,7 @@ PROFILE_FIELDS = {'BUILD_ONLY_ENABLED', 'HOST_SOURCE_COMMIT', 'HOST_ROWS_SHA256'
 STARTUP_FIXED = {'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C', 'LC_ALL': 'C'}
 STARTUP_IDENTITY = frozenset({
     'EXPECTED_DRIVER_SHA', 'GITHUB_EVENT_NAME', 'GITHUB_REPOSITORY', 'GITHUB_REF',
+    'CREATED_REF', 'CREATED_REF_TYPE',
     'GITHUB_SHA', 'CHECKED_OUT_SHA', 'GITHUB_WORKFLOW_SHA', 'GITHUB_RUN_ATTEMPT',
     'GITHUB_WORKFLOW_REF', 'GITHUB_WORKSPACE', 'GITHUB_RUN_ID', 'ImageOS', 'ImageVersion'})
 STARTUP_KEYS = STARTUP_IDENTITY | STARTUP_FIXED.keys()
@@ -144,8 +145,9 @@ def decode_profile(raw, expected_normalised_sha256):
 def verify_dispatch(environment, workflow, template, profile):
     require(type(environment) is dict and workflow == template and 0 < len(workflow) <= 32768, 'exact workflow bytes')
     expected = environment.get('EXPECTED_DRIVER_SHA', '')
-    require(re.fullmatch(r'[0-9a-f]{40}', expected), 'expected driver SHA')
-    required = {'GITHUB_EVENT_NAME': 'workflow_dispatch', 'GITHUB_REPOSITORY': profile['REPOSITORY'],
+    require(type(expected) is str and re.fullmatch(r'[0-9a-f]{40}', expected), 'expected driver SHA')
+    required = {'GITHUB_EVENT_NAME': 'create', 'GITHUB_REPOSITORY': profile['REPOSITORY'],
+                'CREATED_REF_TYPE': 'branch', 'CREATED_REF': profile['REF'].removeprefix('refs/heads/'),
                 'GITHUB_REF': profile['REF'], 'GITHUB_SHA': expected, 'CHECKED_OUT_SHA': expected,
                 'GITHUB_WORKFLOW_SHA': expected, 'GITHUB_RUN_ATTEMPT': '1',
                 'GITHUB_WORKFLOW_REF': profile['REPOSITORY'] + '/' + profile['WORKFLOW'] + '@' + profile['REF'],

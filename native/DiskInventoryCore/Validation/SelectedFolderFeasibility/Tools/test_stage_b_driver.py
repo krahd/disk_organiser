@@ -141,7 +141,7 @@ class BootstrapTests(unittest.TestCase):
     def identity(self):
         p=vars(profile);sha='a'*40
         env={'EXPECTED_DRIVER_SHA':sha,'GITHUB_SHA':sha,'CHECKED_OUT_SHA':sha,'GITHUB_WORKFLOW_SHA':sha,
-             'GITHUB_EVENT_NAME':'workflow_dispatch','GITHUB_REPOSITORY':profile.REPOSITORY,'GITHUB_REF':profile.REF,
+             'GITHUB_EVENT_NAME':'create','CREATED_REF_TYPE':'branch','CREATED_REF':profile.REF.removeprefix('refs/heads/'),'GITHUB_REPOSITORY':profile.REPOSITORY,'GITHUB_REF':profile.REF,
              'GITHUB_RUN_ATTEMPT':'1','GITHUB_RUN_ID':'123','GITHUB_WORKSPACE':boot.CHECKOUT,
              'GITHUB_WORKFLOW_REF':profile.REPOSITORY+'/'+profile.WORKFLOW+'@'+profile.REF}
         return env,p
@@ -253,7 +253,7 @@ class DriverTests(unittest.TestCase):
             return SimpleNamespace(path='/private/tmp/disk-selection-report-abc',manifest_sha256='c'*64,manifest_bytes=32,
                 root_device=1,root_inode=2,outcome=payload['outcome'])
         report.finalise.side_effect=finalise
-        admission=Mock();identity={'GITHUB_REPOSITORY':profile.REPOSITORY,'GITHUB_REF':profile.REF,'GITHUB_EVENT_NAME':'workflow_dispatch',
+        admission=Mock();identity={'GITHUB_REPOSITORY':profile.REPOSITORY,'GITHUB_REF':profile.REF,'GITHUB_EVENT_NAME':'create','CREATED_REF_TYPE':'branch','CREATED_REF':profile.REF.removeprefix('refs/heads/'),
             'GITHUB_RUN_ATTEMPT':'1','GITHUB_RUN_ID':'123','GITHUB_SHA':'a'*40}
         capture=SimpleNamespace(captures=(),failures=())
         with ExitStack() as stack:
