@@ -1,5 +1,17 @@
 # One build-only attempt through the GitHub connector
 
+## Terminal state: attempt consumed, workflow deactivated
+
+The [single create-event attempt 38315666563](https://github.com/krahd/disk_organiser/actions/runs/38315666563)
+ran from exact main `ba901b91d4f0d00cb0fbe8b954b16dcb50154e76`. It refused at
+the pinned interpreter identity check before operational owners, build or signing.
+There is no report packet; the artifact step failed for its missing input path.
+The profile is now False and the active workflow is removed. Both inactive anchors
+and `validation/owned-build-once-20261012` remain unchanged. The procedure below is
+retained as the historical reviewed contract, not an instruction to trigger again.
+STATUS.md records the original log identity and remaining compatibility gap.
+
+
 This is the reviewed-transport successor to the historical manual workflow. It
 does not expand the experiment. The currently exposed connector supports branch
 creation and repository integration but has no workflow-dispatch operation.
