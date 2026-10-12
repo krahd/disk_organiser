@@ -236,7 +236,7 @@ final class OwnedPreviewHarness {
             XCTAssertEqual(try XCTUnwrap(event["y"] as? Double), y, accuracy: 1)
         }
     }
-    func key(_ characters: String, code: UInt16) async throws {
+    func key(_ characters: String, code: UInt16, expectedTarget: String = "catalogue-name") async throws {
         try await prepareInteraction()
         try await startEventTrace()
         for type in [NSEvent.EventType.keyDown, .keyUp] {
@@ -251,7 +251,12 @@ final class OwnedPreviewHarness {
         let trace = try await script("return JSON.stringify(window.__ownedEventTrace);")
         print("OWNED_KEY_TRACE events=\(trace)")
         let rows = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(trace.utf8)) as? [[String: Any]])
-        XCTAssertTrue(rows.contains { $0["type"] as? String == "keydown" && $0["id"] as? String == "catalogue-name" && $0["trusted"] as? Bool == true })
+        XCTAssertTrue(rows.contains { $0["type"] as? String == "keydown" && $0["id"] as? String == expectedTarget && $0["trusted"] as? Bool == true })
+        // Escape may legitimately dismiss its focused dialog before keyup. The
+        // search journey keeps focus and requires both trusted event targets.
+        if expectedTarget == "catalogue-search" {
+            XCTAssertTrue(rows.contains { $0["type"] as? String == "keyup" && $0["id"] as? String == expectedTarget && $0["trusted"] as? Bool == true })
+        }
     }
     func snapshot() async throws -> Data {
         try await prepareInteraction()

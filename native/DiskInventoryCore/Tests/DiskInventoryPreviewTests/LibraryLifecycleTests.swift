@@ -1,6 +1,7 @@
 import XCTest
 import AppKit
 import Foundation
+@testable import DiskInventoryCore
 @testable import DiskInventoryDesktop
 
 @MainActor
@@ -153,4 +154,49 @@ extension LibraryApplicationTests {
         XCTAssertTrue(window.completeStartup()); XCTAssertTrue(window.exploreButton.isEnabled)
         window.discardAndClose(); XCTAssertFalse(window.completeStartup())
     }
+    func testProgressValueBoundsDoNotCreateCompletionClaims() {
+        XCTAssertNotNil(LibraryPreparationProgress(inspectedEntries: 0))
+        XCTAssertNotNil(LibraryPreparationProgress(inspectedEntries: 2_000))
+        XCTAssertNil(LibraryPreparationProgress(inspectedEntries: -1))
+        XCTAssertNil(LibraryPreparationProgress(inspectedEntries: 2_001))
+    }
+    func testLateProgressCannotReviveCancelledOrNewerGeneration() async throws {
+        let source = OwnedLibrarySource(); source.hold = true
+        let (h, window) = try await open(source); defer { source.release(); window.discardAndClose(); h.close() }
+        let session = window.session
+        session.choose(); session.select(source.choices[0]); session.prepare()
+        for _ in 0..<100 where source.continuation == nil { try await Task.sleep(for: .milliseconds(10)) }
+        let old = try XCTUnwrap(source.latestProgressCallback)
+        old(try XCTUnwrap(LibraryPreparationProgress(inspectedEntries: 2)))
+        XCTAssertEqual(session.inspectedEntries, 2)
+        session.cancel(); let stoppingMessage = session.message
+        old(try XCTUnwrap(LibraryPreparationProgress(inspectedEntries: 2_000)))
+        XCTAssertEqual(session.state, .stopping); XCTAssertNil(session.inspectedEntries); XCTAssertEqual(session.message, stoppingMessage)
+        source.release(); try await ready(session, .ready)
+        source.hold = false
+        session.choose(); session.select(source.choices[1]); session.prepare()
+        old(try XCTUnwrap(LibraryPreparationProgress(inspectedEntries: 1_999)))
+        XCTAssertNil(session.inspectedEntries)
+        try await ready(session, .reviewing)
+        session.finishReview(); try await ready(session, .ready)
+        old(try XCTUnwrap(LibraryPreparationProgress(inspectedEntries: 2_000)))
+        XCTAssertNil(session.inspectedEntries); XCTAssertEqual(session.state, .ready)
+    }
+
+    func testCloseFromActiveProgressRetiresWorkerAndDropsLateUpdates() async throws {
+        let source = OwnedLibrarySource(); let gate = OwnedSourceProgressGate(); defer { gate.release() }
+        source.workerSeams = .init(afterProgress: { count in if count == 3 { gate.hold() } })
+        source.afterWorkerCancel = { gate.release() }
+        let (h, window) = try await open(source); defer { window.discardAndClose(); h.close() }
+        let session = window.session
+        session.changed = { if session.inspectedEntries == 3 { window.discardAndClose() } }
+        session.choose(); session.select(source.choices[0]); session.prepare()
+        for _ in 0..<150 where session.state != .closed || source.job != nil { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertTrue(gate.entered); XCTAssertFalse(gate.timedOut)
+        XCTAssertEqual(session.state, .closed); XCTAssertNil(source.job); XCTAssertEqual(h.host.state, .closed)
+        XCTAssertNil(session.inspectedEntries); XCTAssertFalse(session.hasTemporaryRecords)
+        source.latestProgressCallback?(try XCTUnwrap(LibraryPreparationProgress(inspectedEntries: 2_000)))
+        XCTAssertNil(session.inspectedEntries); XCTAssertEqual(session.state, .closed)
+    }
+
 }

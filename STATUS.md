@@ -1,6 +1,33 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 04:20
+Last updated: 2026-10-12 06:07
+
+## Responsive owned observation: independently reviewed execution
+
+- Source `49ef9aa88183161047bc951b087e611c7918fe33`, tree `35c1e170b260cc5f7bf6ab3ce0af4ccb187e014e`, passes all twelve push/PR workflows. The actual PR checkout `9b7a38d9d3295d5ca8191309514826e9e809f8c9` is a distinct commit with that exact tree. Ten changed paths and all 349 other baseline blobs match; the earlier zero-test compiler failure below remains a failed checkpoint.
+- Both native [push](https://github.com/krahd/disk_organiser/actions/runs/38208661231) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38208664712) pass 233 distinct XCTest identities once each, retaining all 217 actual baseline identities, plus six native/Python differential cases and six parser/catalogue roundtrips. Pinned toolchain, asset/codec parity, isolated selection graph/target, app and owned-probe compilation pass. Both browser lanes pass thirteen journeys; both Windows backend logs report 607 passed / 102 skipped without identifying skip reasons.
+- Independent exact-source/raw-log/archive/original-pixel review accepts this owned-fixture result. Active observation runs off-main, actual native Cancel and retry work, late success/progress remain fenced, and saved records can be searched after the test source folders are removed. Each lane has 82 strict native hit/control pairs and 48 successful DOM/native geometry records. This proves the bounded test-owned workflow, not real user-volume access or a hard cancellation deadline.
+- All ten native ZIPs and their extracted members verify. All 33 distinct original contents across 52 PNGs were independently opened. Capture 73 shows the actual three-entry count and native Cancel. Capture 96 now shows a scrolled search viewport with two separate `Projects/Design.txt` records and 600/700 listed bytes; its partial badge is asserted above that viewport, not visible in the image. Root separately inspected 73/96. The unchanged capture helper preserves named-region/viewport limits, original dimensions and pixels; no full-window or commercial-readiness claim follows.
+- Both native logs record filesystem refusal of the invalid-UTF8 name with errno 92; synthetic rejection is unconditional. Cancellation is cooperative and may suppress bytes after final guard/projection. Initial owned fixture/lease setup remains on the main actor. Actions artifacts expire after fourteen days; no durable image archive is claimed. The separate memory-only configuration checks are not part of the native test count.
+- Integration of PR30, PR32 and PR31 previously completed at main `b7d3747d74327a3fa7db661c7afcba0fd669a8ff`, with all six actual-main workflows green, 217 native methods plus six/six cases, and thirteen browser journeys. This documentation successor still requires its exact checks, guarded integration and actual merged-main verification. Runtime/test/assets/limits and the ordinary app's closed real-folder gate are unchanged. [Ownership and evidence limits](native/DiskInventoryCore/OWNED-ASYNC-OBSERVATION.md#executed-owned-fixture-closeout).
+
+The following pending and failed checkpoints retain their original source-specific meaning.
+
+## Hosted compile checkpoint and test-import repair
+
+- Source `c35d0bf754027aa3e31f747b8659a32d9be96598` passes the actual isolated-target, development-app and owned-probe compilation steps in both native lanes. XCTest compilation then fails at `LibraryLifecycleTests.swift:187`: the internal `ObservationJob.Seams` initializer is unavailable because that file imports only the desktop module.
+- The repair adds the existing core module as a testable import in that test file. The test target already depends on it; no product dependency, access level, assertion, worker/runtime behaviour or workflow changes. All 233 authored method identities remain.
+- Original [push](https://github.com/krahd/disk_organiser/actions/runs/38208324024) and [PR](https://github.com/krahd/disk_organiser/actions/runs/38208349269) failures are retained. No XCTest method ran in those lanes; downstream six differential/six parser checks and original-capture acceptance remain unrun for this source. The repaired exact head must compile and complete every existing gate before acceptance.
+
+
+## Responsive owned observation: source-reviewed checkpoint
+
+- An internal one-use worker runs an already-admitted observer away from the main actor. Cancellation is a locked request consumed by the worker; it does not close borrowed descriptors or interrupt syscalls. Terminal publication follows retirement and has an explicit cancel-versus-success ordering. A rejected second caller cannot cancel the admitted run.
+- Progress uses one bounded, monotonic latest-count slot. The test-owned provider samples it on the main actor, joins its delivery task before returning and passes data-only updates through the existing session generation fence. The ordinary application still uses fixed bundled examples and does not link the observer or selection adapter.
+- The strengthened owned native journey is authored to cancel with a genuine AppKit event during an actual held observation, then retry and add. The saved-library journey is authored to save two fresh observations, verify their source folders are gone, reopen their metadata and type a genuine native search with exact path/size/record pairing and retained partial status. These are development fixtures, not evidence of physical drive reconnection, content identity or backup protection.
+- Independent source review resolved unreachable progress holds, a search-key target oracle, rejected-caller cancellation, retained late-success session coverage and explicit Sendable formation of worker callbacks. All 217 baseline XCTest identities remain, with sixteen added methods for 233 authored methods. The five pure Python isolation-rule tests pass locally. The graph command is blocked by missing xcrun; no changed Swift method or screenshot has executed at this source checkpoint.
+- Required next evidence is pinned hosted compilation and all 233 native methods plus six differential and six parser cases, genuine active-work cancellation and offline saved-metadata search, and review of all mandatory original captures including changed 73 and 96. Earlier passes/images remain attributed to their named source. Source admission, no-follow/filesystem limits, storage protocols, native workflow, capture guards and the real-folder control remain unchanged. See [the ownership and verification contract](native/DiskInventoryCore/OWNED-ASYNC-OBSERVATION.md).
+
 
 ## Catalogue clarity: independently reviewed execution
 
@@ -872,4 +899,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 04:20
+Last updated: 2026-10-12 06:07
