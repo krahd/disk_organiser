@@ -1,5 +1,5 @@
 """Reviewed explicit-self host pins for immutable nine; final execution gate remains."""
-BUILD_ONLY_ENABLED = True
+BUILD_ONLY_ENABLED = False
 EXPECTED_RUN_NUMBER = 9
 HOST_SOURCE_COMMIT = 'b567f3468ae6f5383e5e857b58448c5042ca2836'
 HOST_ROWS_SHA256 = '97e6c7d10b6d98eeb70902a51cd3327bcf470e66f20b75db6825af659b999047'
