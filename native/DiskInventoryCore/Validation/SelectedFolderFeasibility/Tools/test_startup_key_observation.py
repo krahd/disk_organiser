@@ -244,8 +244,14 @@ class StartupOnlyObservationTests(unittest.TestCase):
         def chunks(s):
             tree=ast.parse(s);return {getattr(n,'name',None):ast.get_source_segment(s,n) for n in tree.body if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
         aa,bb=chunks(a),chunks(b)
-        for name in ['Refusal','require','startup_key_diagnostic','interpreter_identity','_stamp','read_source','decode_profile','system_version']:
+        for name in ['Refusal','require','startup_key_diagnostic','interpreter_identity','_stamp','read_source','system_version']:
             self.assertEqual(aa[name],bb[name],name)
+        # The consumed entry retains its original decoder and whole-file pin.
+        # The current decoder deliberately adds the bounded counter field.
+        self.assertEqual(hashlib.sha256(b.encode()).hexdigest(),
+                         '7e3f577e43b58053b26a1665176b7da7675e559695bcb160a67fb08976e4887d')
+        self.assertEqual(hashlib.sha256(bb['decode_profile'].encode()).hexdigest(), '711838b57ad3d6602ad8ca0c2e9a763928f7e1aba035d9674ba7a5f392f17541')
+        self.assertNotEqual(aa['decode_profile'],bb['decode_profile'])
         imports=lambda s:[ast.get_source_segment(s,n) for n in ast.parse(s).body if isinstance(n,(ast.Import,ast.ImportFrom))]
         self.assertEqual(imports(a),imports(b))
         self.assertEqual(probe.STARTUP_KEYS,boot.STARTUP_KEYS)
@@ -293,14 +299,18 @@ class StartupOnlyObservationTests(unittest.TestCase):
         # The consumed diagnostic keeps its original pin and refuses this new
         # profile. Its executed evidence is never relabelled as current runtime.
         self.assertNotEqual(raw,historical)
-        with self.assertRaisesRegex(probe.Refusal,'profile hash mismatch'):
+        with self.assertRaisesRegex(probe.Refusal,'profile fields'):
             probe.decode_profile(raw,probe.PROFILE_HASH)
         values={n.targets[0].id:ast.literal_eval(n.value) for n in ast.parse(raw).body if isinstance(n,ast.Assign)}
-        self.assertIs(values['BUILD_ONLY_ENABLED'],False)
-        self.assertEqual(values['REF'],'refs/heads/validation/owned-build-framework-20261012')
-        self.assertFalse((ROOT/'.github/workflows/owned-selected-folder-build.yml').exists())
+        self.assertIs(type(values['BUILD_ONLY_ENABLED']),bool)
+        self.assertEqual(values['REF'],'refs/heads/validation/owned-build-encoding-once-20261013')
+        if values['BUILD_ONLY_ENABLED']:
+            self.assertEqual((ROOT/values['WORKFLOW']).read_bytes(),(ROOT/values['TEMPLATE']).read_bytes())
+        else:
+            self.assertFalse((ROOT/values['WORKFLOW']).exists())
+        self.assertFalse((ROOT/probe.WORKFLOW).exists())
         self.assertNotEqual(probe.REF,values['REF'])
-        self.assertEqual(len(list((HERE.parent/'StageB').glob('owned-selected-folder-build*.yml.inert'))),5)
+        self.assertEqual(len(list((HERE.parent/'StageB').glob('owned-selected-folder-build*.yml.inert'))),7)
 
 
 if __name__=='__main__':unittest.main()

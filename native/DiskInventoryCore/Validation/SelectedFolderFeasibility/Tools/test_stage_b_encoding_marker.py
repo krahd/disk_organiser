@@ -113,7 +113,8 @@ class EncodingMarkerTests(unittest.TestCase):
 
     def main_context(self, changes=None, *, optional=True):
         stack = ExitStack(); self.addCleanup(stack.close)
-        raw = (HERE/'stage_b_profile.py').read_bytes()
+        raw, _ = dt.BootstrapTests().profile()
+        raw = raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
         enabled = raw.replace(b'BUILD_ONLY_ENABLED = False\n', b'BUILD_ONLY_ENABLED = True\n', 1)
         values, _ = dt.BootstrapTests().identity()
         values.update(boot.STARTUP_FIXED); values.update(ImageOS='macos15', ImageVersion='20260907.0337.1')
@@ -143,7 +144,7 @@ class EncodingMarkerTests(unittest.TestCase):
         for change in changes:
             with self.subTest(change=change):
                 env, reads, dispatch, admit, load, digest = self.main_context(change)
-                with self.assertRaises(boot.Refusal): boot.main(digest)
+                with self.assertRaises(boot.Refusal): boot.main(digest, '17')
                 self.assertEqual(env.iterations,0); self.assertEqual(env.reads,[])
                 initial_flag_refusal = 'flags' in change and any(
                     not getattr(change['flags'], name) for name in it.EXPECTED['flags'])
@@ -154,7 +155,7 @@ class EncodingMarkerTests(unittest.TestCase):
     def testMockedMainKeepsOptionalValueOutOfDispatchAndIdentityReport(self):
         env, reads, dispatch, admit, load, digest = self.main_context()
         before = dict(env.data)
-        self.assertEqual(boot.main(digest),2)
+        self.assertEqual(boot.main(digest, '17'),2)
         self.assertEqual(env.data,before); self.assertEqual(env.iterations,1)
         self.assertEqual(len(dispatch.call_args.args[0]),18)
         self.assertNotIn(MARKER,dispatch.call_args.args[0]); self.assertNotIn(MARKER,env.reads)
@@ -204,13 +205,23 @@ class EncodingMarkerTests(unittest.TestCase):
         self.assertEqual(observation.PROFILE_HASH,'9185bcf82855edff5a5e8eef9c63f67a6cd307aa9b8a7db4d35fde4a88dfab42')
 
     def testNewAnchorOnlyRepinsProfileAndKeepsBothWorkflowsAbsent(self):
+        # Retain the historical method identity while explicitly checking both
+        # repository states. The source guard separately rejects any other state.
         repo=HERE.parents[4]; folder=HERE.parent/'StageB'
-        old=(folder/'owned-selected-folder-build.environment-diagnostic.yml.inert').read_bytes()
+        old=(folder/'owned-selected-folder-build.encoding-marker.yml.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(old).hexdigest(), '86d0f8ce0f81021bf3e6d70c2e499cf576e598a4851ddff782e0f57192ad836d')
+        predecessor=(folder/'owned-selected-folder-build.encoding-attempt.yml.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(predecessor).hexdigest(), '443941896ee98159062a767719ffb020ba257ec966d732eefd8c8f08fb4f65c9')
         new=(repo/profile.TEMPLATE).read_bytes();raw=(HERE/'stage_b_profile.py').read_bytes()
-        self.assertEqual(new,old.replace(observation.PROFILE_HASH.encode(),hashlib.sha256(raw).hexdigest().encode()))
-        self.assertIs(profile.BUILD_ONLY_ENABLED,False)
-        self.assertEqual(profile.REF,'refs/heads/validation/owned-build-framework-20261012')
-        self.assertFalse((repo/profile.WORKFLOW).exists());self.assertFalse((repo/observation.WORKFLOW).exists())
+        normal=raw.replace(b'BUILD_ONLY_ENABLED = True\n',b'BUILD_ONLY_ENABLED = False\n',1)
+        self.assertIn(hashlib.sha256(normal).hexdigest().encode(),new)
+        self.assertIs(type(profile.BUILD_ONLY_ENABLED),bool)
+        self.assertEqual(profile.REF,'refs/heads/validation/owned-build-encoding-once-20261013')
+        if profile.BUILD_ONLY_ENABLED:
+            self.assertEqual((repo/profile.WORKFLOW).read_bytes(),new)
+        else:
+            self.assertFalse((repo/profile.WORKFLOW).exists())
+        self.assertFalse((repo/observation.WORKFLOW).exists())
         self.assertEqual(hashlib.sha256((HERE/'stage_b_bootstrap.py').read_bytes()).hexdigest(),dict(profile.MODULE_ROWS)['stage_b_bootstrap.py'])
         historical=(folder/'startup-key-observation.profile.inert').read_bytes()
         self.assertEqual(hashlib.sha256(historical).hexdigest(),observation.PROFILE_HASH)

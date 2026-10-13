@@ -90,7 +90,7 @@ class InterpreterIdentityTests(unittest.TestCase):
         environment, _ = dt.BootstrapTests().identity()
         environment.update(boot.STARTUP_FIXED)
         environment.update(ImageOS='macos15', ImageVersion='20260907.0337.1')
-        template = (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.encoding-marker.yml.inert').read_bytes()
+        template = (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.run-number.yml.inert').read_bytes()
         def read(name, limit, **kwargs):
             if name == boot.RELATIVE + '/Tools/stage_b_profile.py': return enabled
             if name in (profile.WORKFLOW, profile.TEMPLATE): return template
@@ -103,14 +103,14 @@ class InterpreterIdentityTests(unittest.TestCase):
              patch.object(boot, 'load_modules') as load:
             load.return_value.run.return_value = 2
             if succeeds:
-                self.assertEqual(boot.main(digest), 2)
+                self.assertEqual(boot.main(digest, '17'), 2)
                 identity = load.return_value.run.call_args.args[0]
                 self.assertEqual(identity['interpreter'], EXPECTED)
                 self.assertLessEqual(len(json.dumps(identity).encode()), 65536)
                 self.assertEqual(reads.call_count, 3); dispatch.assert_called_once(); admitted.assert_called_once()
                 load.assert_called_once(); load.return_value.run.assert_called_once()
             else:
-                with self.assertRaises(boot.Refusal): boot.main(digest)
+                with self.assertRaises(boot.Refusal): boot.main(digest, '17')
                 # Only the fixed profile can be read before rejection. No
                 # workflow/source admission, operational import or owner exists.
                 self.assertEqual(reads.call_count, 1)
@@ -144,9 +144,9 @@ class InterpreterIdentityTests(unittest.TestCase):
         # Retain the historical method identity while checking the exact
         # currently reviewed state. Both states have independent paired oracles.
         self.assertIs(type(profile.BUILD_ONLY_ENABLED), bool)
-        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.encoding-marker.yml.inert'))
+        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.run-number.yml.inert'))
         self.assertEqual(profile.PYTHON, PYTHON)
-        self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-framework-20261012')
+        self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-encoding-once-20261013')
         repo = Path(__file__).parents[5]
         active = repo / profile.WORKFLOW
         if profile.BUILD_ONLY_ENABLED:
