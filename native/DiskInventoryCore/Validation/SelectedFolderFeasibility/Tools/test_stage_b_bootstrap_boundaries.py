@@ -35,7 +35,7 @@ class BootstrapBoundaryTests(unittest.TestCase):
     def startup(self, *, moved=False, changed=False, expired=False):
         raw, _ = dt.BootstrapTests().profile()
         enabled = raw.replace(b'BUILD_ONLY_ENABLED = False', b'BUILD_ONLY_ENABLED = True')
-        workflow = (Path(__file__).parents[1]/'StageB/owned-selected-folder-build.run-number.yml.inert').read_bytes()
+        workflow = (Path(__file__).parents[1]/'StageB/owned-selected-folder-build.run-seven.yml.inert').read_bytes()
         environment, _ = dt.BootstrapTests().identity()
         environment.update(boot.STARTUP_FIXED)
         environment.update(ImageOS='macos15', ImageVersion='20260907.0337.1')

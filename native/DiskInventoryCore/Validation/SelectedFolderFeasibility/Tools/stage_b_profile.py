@@ -1,11 +1,11 @@
-"""Disabled source pins; run counter unconfigured and no workflow active."""
-BUILD_ONLY_ENABLED = False
-EXPECTED_RUN_NUMBER = 0
+"""Reviewed source pins for immutable run seven; execution needs final crosscheck."""
+BUILD_ONLY_ENABLED = True
+EXPECTED_RUN_NUMBER = 7
 HOST_SOURCE_COMMIT = '19a2c5f6955d3732ab5cfc205a962a7f64eff1bb'
 HOST_ROWS_SHA256 = '7646f4915c190357a4d916420ebcf6a6d7e442ba9264e14f4306c39e1dbc0466'
 HOST_ROWS = (('Generated/ProbeBuild.xcconfig', 'd586dc3f05fe4a91764ec898cb209b45b0765313f5f5d304233841fb2f9f2003'), ('Generated/ProbeSeal.swift', 'd3eefc9d936cf5a947b676b98e9a4793451211eab25086832ca2bb4406da517a'), ('Generated/fixture.json', '9ddc05f1c9b40fec5572d7ddb9f10e2efe50d21f05fb982c9c619f8600dad227'), ('Host/FixtureDefinition.swift', '1b48760c68a55f8bbb2e32c8f23a6598d426851fa46a0a8d08ad1d90a41c958c'), ('Host/HostIdentity.swift', '719d29190b29df689031b31514628308429f054776a6f70aee584770b0446ee2'), ('Host/Info.plist', '24115fc8b0a0cf015fc8791ef1dcebac65447dc6e7a254899c73e82bf1581d2c'), ('Host/ProbeController.swift', '891bc69043799b537c9cee8aefbf68f76c88bf0d028a9de6750c54f250194351'), ('Host/ProbeDescriptors.swift', 'd948b0bbb6421211321b7c7afe4af4f2eb734505d168fe8989dfb9bc978d69c8'), ('Host/ProbeMatrix.swift', 'ecd3a7978f6f293dfaf05b780e73cdd657fa93ab813732c92d94c1c1fa3d01b2'), ('Host/ProbePolicy.swift', 'cce156676ffd5586ba1e122ba51150f3799e9cacd9238c1a37aed071273f39c9'), ('Host/ProbeWork.swift', 'ccf8ae0031b74a8a66df265ebc49931c0f3a3a3ac4bfa167968debec14374401'), ('Host/host.entitlements.inert.plist', '476a55c835e39b5334f09ecec40b574c0c959137d5d5e6273050cfa24870280d'), ('Host/main.swift', 'd71461afd227cf1fbcc4a3c054dcd87380ec4fddf3eef91011bfc387ea6505a2'), ('Probe.xcodeproj/project.pbxproj', 'f2fd8dd1cb16af05622c8e0f9d850fbeff72cf52544b27f4c15ac5529af91d63'), ('Probe.xcodeproj/xcshareddata/xcschemes/OwnedFolderProbe.xcscheme', '012c6fe55e3d296dd9cd7261228c2e6a8ab61fb2c58e01e2f3f25a28b6550f2f'), ('UITests/FixtureProof.swift', '48d5106cf7f8ba30d37b52f77dde8b0c9f4d7af766a2394d0ecd88608ab97814'), ('UITests/OriginalCapture.swift', '816ae5668df7507bdda4cc296b89990b887b9d973f302e71f799edd3653b7a23'), ('UITests/RunnerExpectation.swift', '945b5890b42bad29feab764fdc9bee61f5224cea1b47e2f7f97e00fbad6ab26c'), ('UITests/SelectionProbeUITests.swift', '68efd59235788b79855358437a0e7c0ffdd63f7e7169a40fb10dceacfafd420f'))
 WORKFLOW = '.github/workflows/owned-selected-folder-build.yml'
-TEMPLATE = 'native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/owned-selected-folder-build.run-number.yml.inert'
+TEMPLATE = 'native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/owned-selected-folder-build.run-seven.yml.inert'
 REPOSITORY = 'krahd/disk_organiser'
 REF = 'refs/heads/validation/owned-build-encoding-once-20261013'
 PYTHON = '/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12'

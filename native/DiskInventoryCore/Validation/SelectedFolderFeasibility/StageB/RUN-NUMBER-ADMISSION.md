@@ -39,3 +39,7 @@ The existing twenty-minute job, 720-second work/180-second finalisation reserve,
 All 400 memory/mock methods pass, retaining 375 and adding 25 counter cases. These cover exact profile bounds/hash binding, unconfigured refusal, duplicate ordering, no fallback after failure, rerun/source/ref mutations, admission ordering, quoted transport and scheduler-versus-bootstrap semantics. Nineteen structural checks and six no-argument entry refusals also pass. All 233 native method sources remain unchanged. No native or operational workflow ran for this successor.
 
 Independent frozen-source review precedes publication. A later positive literal/activation needs separate source closure, ordinary CI and final trigger crosscheck. The current candidate intentionally cannot execute the experiment.
+
+## Later conditional source selection
+
+The sections above describe the disabled PR47 checkpoint. The [immutable run-seven candidate](RUN-SEVEN-ACTIVATION.md) records the later independently gated source selection, its already-existing inactive-branch publication route and unchanged no-reservation/stop conditions. It does not relabel the earlier tests or grant execution from source authoring.

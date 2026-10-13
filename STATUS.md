@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 14:42
+Last updated: 2026-10-13 15:16
+
+## Conditional immutable run-seven source candidate
+
+- [PR47](https://github.com/krahd/disk_organiser/pull/47) merged the independently reviewed disabled guard at `2785f83d567aef7584857def5a1d37b9c8427f8f`, tree `04e5788f0fe31f134474ceda8c93ea7d4c94115c`. All twelve source/PR and six actual-main ordinary workflows passed on first attempts. The [actual-main native job](https://github.com/krahd/disk_organiser/actions/runs/38418430904/job/115368967167) retains 233 distinct methods, six differential/six parser cases, 82 true hit/centre pairs and four Cancel phases; the [catalogue job](https://github.com/krahd/disk_organiser/actions/runs/38418431003/job/115368967473) passes thirteen journeys. No experimental build or new pixel acceptance is inferred.
+- This separate [activation candidate](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/RUN-SEVEN-ACTIVATION.md) fixes literal seven once in the profile and numeric job condition, enables the Boolean and copies a newly pinned comparison anchor to the designated workflow. All fourteen operational helper bodies, nineteen host inputs, eight previous anchors and strict runtime gates remain exact. The fresh eight-record history shows visible build numbers 1–6 at the same ID/path; it is neither a reservation nor proof against invisible history or future identity changes.
+- Publication is proposed only by guarded fast-forward of the already-existing inactive review branch, never by creating an active source branch. Independent frozen-source review, ordinary source/main checks and final identity/history/exact-payload crosscheck precede any operational call. Known consumption, missing/delayed history, changed identity or uncertainty stops the procedure. No repinning after an attempt, fallback to another duplicate, rerun or marker recreation is allowed. Runtime numeric-ID authentication is not claimed.
+- All 402 local memory/mock methods pass, retaining 400 and adding exact predecessor-delta and seven-only/rerun tests. Nineteen structural checks and six default refusals pass; all 233 native method sources remain unchanged. Historical disabled-zero and enabled-zero refusal cases remain explicit alongside the selected literal's Boolean-state checks. These are source results, not a new build/sign/app/panel/grant or drive execution. The original twenty-minute/31-command owned-root limits, ambient-marker influence risk, consumed-marker history and closed Stage C remain.
 
 ## Disabled single-counter admission successor
 
@@ -1068,4 +1075,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 14:42
+Last updated: 2026-10-13 15:16
