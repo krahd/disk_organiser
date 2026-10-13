@@ -33,7 +33,7 @@ class DirectoryStreamSourceTests(unittest.TestCase):
                 self.assertFalse(declaration_only(changed))
 
     def testCorrectedHostRowsBindTheReviewedHostOnlyObject(self):
-        self.assertEqual(profile.HOST_SOURCE_COMMIT, '93db00f686daf5acac064beadf3115cad7a36605')
+        self.assertEqual(profile.HOST_SOURCE_COMMIT, 'b567f3468ae6f5383e5e857b58448c5042ca2836')
         self.assertEqual(len(profile.HOST_ROWS), 19)
         rows = tuple((name, hashlib.sha256((HERE/name).read_bytes()).hexdigest())
                      for name, _ in profile.HOST_ROWS)

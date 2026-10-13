@@ -178,3 +178,11 @@ pending at this source checkpoint. The explicit-self correction must be a
 separate reviewed inactive change, without a new operational attempt inferred
 from cleanup. Historical evidence and the ambient encoding-marker residual risk
 remain unchanged.
+
+
+## Later inactive source correction
+
+The separately reviewed [explicit-self repair](EXPLICIT-SELF-REPAIR.md) preserves
+this failed run as historical evidence. It adds explicit member qualification
+without changing capture ownership. Its current compiler effectiveness remains
+unmeasured; consumed eight does not authorise a retry.
