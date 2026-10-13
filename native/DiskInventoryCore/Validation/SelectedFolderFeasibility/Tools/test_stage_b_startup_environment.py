@@ -218,7 +218,7 @@ class StartupEnvironmentTests(unittest.TestCase):
         self.assertNotIn('startup_environment', ast.unparse(handler))
 
     def shell(self):
-        raw=(Path(__file__).parents[1]/'StageB/owned-selected-folder-build.run-nine.yml.inert').read_text()
+        raw=(Path(__file__).parents[1]/'StageB/owned-selected-folder-build.xctest-hooks.yml.inert').read_text()
         run=raw.split('        run: |\n',1)[1].split('      - name:',1)[0]
         return '\n'.join(line[10:] for line in run.splitlines())
 

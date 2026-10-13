@@ -159,3 +159,11 @@ local memory/mock methods, nineteen structural checks and six default refusals
 pass; all 233 ordinary native method sources remain exact. Independent review and
 ordinary successor/main CI remain required. Historical evidence, ambient marker
 risk and later runtime gates remain unchanged; no new attempt is included.
+
+
+## Later inactive source correction
+
+The separately reviewed [XCTest hook correction](XCTEST-HOOK-REPAIR.md) selects
+MainActor async throwing setup/teardown while preserving both bodies and all UI
+test cases. This run remains failed historical evidence. New-hook compilation
+is unmeasured; consumed nine does not authorise a retry.
