@@ -31,6 +31,9 @@ STARTUP_IDENTITY = frozenset({
     'GITHUB_SHA', 'CHECKED_OUT_SHA', 'GITHUB_WORKFLOW_SHA', 'GITHUB_RUN_ATTEMPT',
     'GITHUB_WORKFLOW_REF', 'GITHUB_WORKSPACE', 'GITHUB_RUN_ID', 'ImageOS', 'ImageVersion'})
 STARTUP_KEYS = STARTUP_IDENTITY | STARTUP_FIXED.keys()
+# Presence only: these names are observations, never admitted exceptions.
+STARTUP_KNOWN_SYSTEM_KEYS = ('LC_CTYPE', '__PYVENV_LAUNCHER__', '__CF_USER_TEXT_ENCODING', '_')
+STARTUP_DIAGNOSTIC_COUNT_CAP = 256
 
 
 class Refusal(Exception):
@@ -42,13 +45,52 @@ def require(value, message):
         raise Refusal(message)
 
 
+def startup_key_diagnostic(observed_keys):
+    """Finite data-only mismatch summary; never inspect or retain any values.
+
+    Missing names come only from the fixed expected set. Unknown names are not
+    emitted, hashed or retained. Membership work is over fixed sets; counts
+    saturate explicitly. This does not admit any additional environment key.
+    """
+    require(type(observed_keys) is set, 'startup key observation type')
+    missing = sorted(STARTUP_KEYS - observed_keys)
+    known = {name: name in observed_keys for name in STARTUP_KNOWN_SYSTEM_KEYS}
+    unexpected = len(observed_keys) - (len(STARTUP_KEYS) - len(missing))
+    unknown = unexpected - sum(known.values())
+    cap = STARTUP_DIAGNOSTIC_COUNT_CAP
+    return {'schema': 1, 'missing_expected': missing,
+            'unexpected_count': min(unexpected, cap),
+            'unexpected_count_capped': unexpected > cap,
+            'known_system_presence': known,
+            'unknown_count': min(unknown, cap),
+            'unknown_count_capped': unknown > cap}
+
+
+class StartupEnvironmentRefusal(Refusal):
+    def __init__(self, observed_keys):
+        super().__init__('startup environment keys')
+        # Only the detached fixed-schema primitive summary survives the raise.
+        self.key_diagnostic = startup_key_diagnostic(observed_keys)
+
+
+def startup_refusal_record(error):
+    record = {'kind': type(error).__name__, 'message': str(error)[:512],
+              'platform': sys.platform, 'python': list(sys.version_info[:3]),
+              'executable': sys.executable[:512]}
+    if type(error) is StartupEnvironmentRefusal:
+        record['environment_keys'] = error.key_diagnostic
+    return record
+
+
 def startup_environment(environment):
     """Validate the env -i contract; copy only its explicit non-secret keys.
 
     Unexpected inherited keys refuse before operational project imports. Values
     are bounded here; dispatch and runner-image checks establish their identity.
     """
-    require(set(environment) == STARTUP_KEYS, 'startup environment keys')
+    observed_keys = set(environment)
+    if observed_keys != STARTUP_KEYS:
+        raise StartupEnvironmentRefusal(observed_keys)
     result = {name: environment[name] for name in STARTUP_KEYS}
     require(all(type(value) is str and 0 < len(value) <= 4096 and '\0' not in value
                 for value in result.values()), 'startup environment values')
@@ -292,9 +334,7 @@ if __name__ == '__main__':
     try:
         result = main(sys.argv[1])
     except BaseException as error:
-        print('OWNED_BUILD_STARTUP_REFUSED ' + json.dumps({
-            'kind': type(error).__name__, 'message': str(error)[:512],
-            'platform': sys.platform, 'python': list(sys.version_info[:3]),
-            'executable': sys.executable[:512]}, sort_keys=True, separators=(',', ':')))
+        print('OWNED_BUILD_STARTUP_REFUSED ' + json.dumps(
+            startup_refusal_record(error), sort_keys=True, separators=(',', ':')))
         raise SystemExit(2)
     raise SystemExit(result)
