@@ -130,7 +130,8 @@ class BootstrapTests(unittest.TestCase):
         raw,digest=self.profile()
         self.assertFalse(boot.decode_profile(raw,digest)['BUILD_ONLY_ENABLED'])
         self.assertTrue(boot.decode_profile(raw.replace(b'BUILD_ONLY_ENABLED = False',b'BUILD_ONLY_ENABLED = True'),digest)['BUILD_ONLY_ENABLED'])
-        for changed in (raw+b'X = 1\n',raw.replace(b'19a2c5f6',b'29a2c5f6'),raw+b'import os\n',raw.replace(b'= False',b'= 1',1)):
+        for changed in (raw+b'X = 1\n',raw.replace(profile.HOST_SOURCE_COMMIT.encode(), ('0' if profile.HOST_SOURCE_COMMIT[0] != '0' else '1').encode()+profile.HOST_SOURCE_COMMIT[1:].encode(), 1),raw+b'import os\n',raw.replace(b'= False',b'= 1',1)):
+            self.assertNotEqual(changed, raw)
             with self.assertRaises((boot.Refusal,ValueError)):boot.decode_profile(changed,digest)
 
     def testDisabledStartupDoesNotReadOtherFilesOrImportOwners(self):

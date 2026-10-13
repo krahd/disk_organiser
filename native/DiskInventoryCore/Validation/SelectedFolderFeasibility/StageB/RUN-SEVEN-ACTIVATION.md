@@ -95,3 +95,11 @@ belongs to its exact older source, not to the compiler-failed experiment or this
 cleanup. A pointer-type correction must be a separate reviewed inactive source
 change; the consumed counter 7 cannot authorise another run. Historical evidence,
 ambient optional-marker influence and all later runtime gates remain explicit.
+
+
+## Subsequent inactive source correction
+
+[The directory-stream type repair](DIR-STREAM-TYPE-REPAIR.md) separately corrects
+the observed storage type and binds a new host-source object. The compiler
+failure above remains attributed to its original source; consumed seven stays
+disabled and is not reused. No corrected-host compilation is claimed.

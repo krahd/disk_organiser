@@ -51,7 +51,7 @@ struct ProbeObject: Equatable, Sendable {
 // permanently and do not stop retirement of the remaining owned descriptors.
 final class ProbeDescriptors {
     private var owned: [Int32] = []
-    private var streams: [OpaquePointer] = []
+    private var streams: [UnsafeMutablePointer<DIR>] = []
     private var cleanupFailure: (String, Int32)?
 
     func acquire(_ operation: String, _ open: () -> Int32) throws -> Int32 {
