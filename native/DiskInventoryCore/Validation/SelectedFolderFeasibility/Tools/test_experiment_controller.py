@@ -35,6 +35,7 @@ def model():
     raw=binding.derived.raw
     workspace.read_configuration.side_effect=lambda name, *, check=None:original if name=='Owned.xctestrun' else raw
     rows=[{'path':p,'kind':'directory'} for p in no.PRODUCTS]
+    rows.append({'path':no.PRODUCTS[0]+'/Contents/MacOS','kind':'directory'})
     rows += [{'path':p,'kind':'file','size':1,'sha256':'a'*64} for p in no.EXECUTABLES]
     rows.append({'path':no.PRODUCTS[0]+'/Contents/Resources/fixture.json','kind':'file','size':len(claim),'sha256':ec._sha(claim)})
     frozen=ob.FrozenBuild(raw,xb.parse(raw),tuple(ec._json(x).decode() for x in rows),no.PRODUCTS,context)
@@ -224,25 +225,26 @@ class ControllerOwnerTests(unittest.TestCase):
     def testBuildInspectionRunsOnlyFixedBuildAndOwnedSigningCommands(self):
         self.subject.state='prepared'
         def recorded(args,**kwargs):
-            value=bp.ProcessResult(args,b'synthetic build observation',b'',0,True,False,'',True)
+            value=observed_tool(args) if args[0] == no.OTOOL else bp.ProcessResult(args,b'synthetic build observation',b'',0,True,False,'',True)
             self.subject.trace.append(value);return value
-        with patch.object(ec,'_stage_b_approved',return_value=True),patch.object(ec,'_verify_inputs'), \
+        with patch.object(no,'inspector_identity',return_value=(0,)*8),patch.object(ec,'_stage_b_approved',return_value=True),patch.object(ec,'_verify_inputs'), \
              patch.object(self.subject,'_configuration_name',return_value='Owned.xctestrun'), \
              patch.object(self.subject,'_prepare_runner_binding',return_value=self.inspection.runner_binding), \
              patch.object(self.subject,'_observe',return_value=self.inspection),patch.object(self.subject,'_tool',side_effect=recorded) as tool:
             inspection=self.subject.inspect_b()
         calls=[x.args[0] for x in tool.call_args_list]
-        self.assertEqual(len(calls),4);self.assertEqual(calls[0][:2],(no.XCODE,'build-for-testing'))
+        self.assertEqual(len(calls),5);self.assertEqual(calls[0][:2],(no.XCODE,'build-for-testing'))
         self.assertIn('CODE_SIGNING_ALLOWED=NO',calls[0])
         self.assertFalse(any('test-without-building' in x for x in calls))
-        self.assertEqual([x[-1] for x in calls[1:]],[ROOT+'/'+no.PRODUCTS[i] for i in (2,1,0)])
+        self.assertEqual([x[-1] for x in calls[1:4]],[ROOT+'/'+no.PRODUCTS[i] for i in (2,1,0)])
         self.assertTrue(all('--entitlements' not in x for x in calls[1:3]));self.assertIn('--entitlements',calls[3])
-        self.assertEqual(len(inspection.preparation_log_digests),4);self.assertEqual(self.subject.state,'inspected')
+        self.assertEqual(calls[4],(no.OTOOL,'-arch','all','-L',ROOT+'/'+no.EXECUTABLES[0]))
+        self.assertEqual(len(inspection.preparation_log_digests),5);self.assertEqual(self.subject.state,'inspected')
 
     def testBuildFailureDoesNotProceedToSigningOrRuntime(self):
         self.subject.state='prepared'
         failure=bp.ProcessFailure(bp.ProcessResult((no.XCODE,'build-for-testing'),b'compiler failure',b'',65,True,False,'tool-exit',True))
-        with patch.object(ec,'_stage_b_approved',return_value=True),patch.object(ec,'_verify_inputs'), \
+        with patch.object(no,'inspector_identity',return_value=(0,)*8),patch.object(ec,'_stage_b_approved',return_value=True),patch.object(ec,'_verify_inputs'), \
              patch.object(self.subject,'_tool',side_effect=failure) as tool:
             with self.assertRaises(bp.ProcessFailure):self.subject.inspect_b()
         self.assertEqual(tool.call_count,1);self.assertEqual(self.subject.state,'failed');self.assertFalse(self.subject._active_cancel())

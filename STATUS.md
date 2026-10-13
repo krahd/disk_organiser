@@ -1,6 +1,14 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 20:38
+Last updated: 2026-10-13 21:03
+
+## Inactive architecture-complete direct-dependency source
+
+- [PR59](https://github.com/krahd/disk_organiser/pull/59) merged the one-setting layout correction at `1c9f7c08433c3ebe0185f32fb81814ef7bbbb808`, tree `f70d0f309bcf61d2a230f3ce6bcbfae0c248dd0d`. All twelve source/PR and six actual-main ordinary workflows passed first attempt. Each native lane retains 233+6+6, 82 true hit pairs and four Cancel phases; each browser lane passes thirteen journeys. Earlier ordinary UI delivery flakiness remains unresolved. No new original-pixel review or corrected-host build is claimed.
+- The [inactive fixed dependency inspector](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/STATIC-DEPENDENCIES.md) adds one exact otool-classic invocation for the owned host executable, requiring both arm64/x86_64 sections and complete canonical system dependency records including libSystem. Debug/preview, relative and unapproved dependency paths refuse. A separate existing-owned-inventory check requires exactly one regular executable in the host MacOS directory. No signing target, entitlement, app launch or broad traversal is added.
+- The ceiling changes from 31 to 32 fixed commands, retaining all original commands and the 720+180-second/twenty-minute envelope. The new slot is twenty seconds/64 KiB, with strict parsing, before/after fixed tool identity and fail-closed ownership retirement. Actual tool availability/output remains unmeasured. Direct names and layout cannot prove full transitive closure, dyld resolution, loadability or sandbox/grant behaviour; conservative legitimate-dependency refusals and trusted-toolchain replacement risk remain explicit.
+- All 438 local memory/mock tests retain the prior 420; nineteen structural checks and six default refusals pass, with all 233 native source identities unchanged. Four helper bodies change; nineteen host inputs, ten other helpers, sixteen historical anchors and standalone diagnostic bytes stay exact. Historical profile/copy tests keep their original evidence, and current pins bind a new inert anchor. Independent final source review and ordinary successor CI remain pending at this checkpoint.
+- False, consumed ten/the same ref, both experimental workflows absent and all seven marker refs remain. No next counter, operational activation/run, app/UI/panel/grant/user drive or Stage C occurs here. Existing ambient-marker and artifact-retention limitations remain; the original run-ten signing failure is preserved.
 
 ## Inactive host Debug layout correction after run-ten cleanup
 
@@ -1203,4 +1211,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 20:38
+Last updated: 2026-10-13 21:03

@@ -67,7 +67,7 @@ class PreparationFailureTests(unittest.TestCase):
                 result=bp.ProcessResult(args,b'partial bytes',b'diagnostic',65 if index==fail_at else 0,True,False,'tool-exit' if index==fail_at else '',True)
                 if index==fail_at:raise bp.ProcessFailure(result)
                 return result
-            with patch.object(ec,'_stage_b_approved',return_value=True),patch.object(ec,'_verify_inputs') as source, \
+            with patch.object(no,'inspector_identity',return_value=(0,)*8),patch.object(ec,'_stage_b_approved',return_value=True),patch.object(ec,'_verify_inputs') as source, \
                  patch.object(ec.bp,'run',side_effect=run),patch.object(subject,'_prepare_runner_binding') as binding:
                 with self.assertRaises(bp.ProcessFailure) as failure:subject.inspect_b()
             self.assertEqual(len(calls),fail_at+1);binding.assert_not_called()
@@ -82,7 +82,7 @@ class PreparationFailureTests(unittest.TestCase):
     def testFailureOfOneEvidenceAttemptDoesNotSkipTheRest(self):
         subject,_,_=model();subject.state='prepared';subject.fixture.verify.side_effect=pc.Refusal('fixture changed')
         subject.workspace.inventory.side_effect=[FileNotFoundError('missing'),('captures retained',)]
-        with patch.object(ec,'_stage_b_approved',return_value=True),patch.object(ec,'_verify_inputs',side_effect=pc.Refusal('source changed')) as source,patch.object(subject,'_tool') as tool:
+        with patch.object(no,'inspector_identity',return_value=(0,)*8),patch.object(ec,'_stage_b_approved',return_value=True),patch.object(ec,'_verify_inputs',side_effect=pc.Refusal('source changed')) as source,patch.object(subject,'_tool') as tool:
             with self.assertRaisesRegex(pc.Refusal,'fixture changed'):subject.inspect_b()
         tool.assert_not_called();source.assert_called_once()
         self.assertEqual(subject.failure_evidence['fixture'],'unproved:Refusal')
@@ -94,7 +94,7 @@ class PreparationFailureTests(unittest.TestCase):
     def testUnprovedProcessRetirementIsRetainedWithoutInventingCleanup(self):
         subject,_,_=model();subject.state='prepared'
         failed=bp.ProcessResult((no.XCODE,'build-for-testing'),b'partial',b'',-1,False,True,'retirement-unproved',False)
-        with patch.object(ec,'_stage_b_approved',return_value=True),patch.object(ec,'_verify_inputs'),patch.object(ec.bp,'run',side_effect=bp.ProcessFailure(failed)):
+        with patch.object(no,'inspector_identity',return_value=(0,)*8),patch.object(ec,'_stage_b_approved',return_value=True),patch.object(ec,'_verify_inputs'),patch.object(ec.bp,'run',side_effect=bp.ProcessFailure(failed)):
             with self.assertRaises(bp.ProcessFailure):subject.inspect_b()
         self.assertIs(subject.failure_evidence['tool_results'][0],failed)
         self.assertFalse(subject.failure_evidence['tool_results'][0].direct_child_reaped)

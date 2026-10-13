@@ -19,7 +19,7 @@ VERSION_COMMANDS = (
 WORK_SECONDS = 720
 TOTAL_SECONDS = 900
 RETIREMENT_SECONDS = 9
-COMMAND_COUNT = 31
+COMMAND_COUNT = 32
 
 
 def _finite(value):
@@ -52,7 +52,10 @@ def _commands(root, products):
     ))
     signing = ((sign + (tests,), 30), (sign + (runner,), 30),
                (sign + ('--entitlements', root + '/Source/Host/host.entitlements.inert.plist', host), 30))
-    return versions + ((build, 600),) + signing + (versions + signatures) * 2
+    inspector = (('/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/'
+                  'XcodeDefault.xctoolchain/usr/bin/otool-classic', '-arch', 'all', '-L',
+                  host + '/Contents/MacOS/OwnedFolderProbe'), 20)
+    return versions + ((build, 600),) + signing + (inspector,) + (versions + signatures) * 2
 
 
 class CommandGuard:

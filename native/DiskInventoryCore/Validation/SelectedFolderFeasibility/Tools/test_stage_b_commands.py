@@ -32,8 +32,10 @@ OBSERVATIONS = VERSIONS + tuple(command for bundle in (HOST, RUNNER, TESTS) for 
     ('/usr/bin/codesign', '--display', '--entitlements', '-', '--xml', bundle),
 ))
 COMMANDS = VERSIONS + (BUILD, SIGN + (TESTS,), SIGN + (RUNNER,),
-                      SIGN + ('--entitlements', ROOT + '/Source/Host/host.entitlements.inert.plist', HOST)) + OBSERVATIONS * 2
-CEILINGS = (20,) * 3 + (600,) + (30,) * 3 + (20,) * 24
+                      SIGN + ('--entitlements', ROOT + '/Source/Host/host.entitlements.inert.plist', HOST),
+                      ('/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/otool-classic',
+                       '-arch', 'all', '-L', HOST + '/Contents/MacOS/OwnedFolderProbe')) + OBSERVATIONS * 2
+CEILINGS = (20,) * 3 + (600,) + (30,) * 3 + (20,) + (20,) * 24
 
 
 class Clock:
@@ -55,20 +57,21 @@ class StageBCommandTests(unittest.TestCase):
 
     def assertStopped(self, guard, count):
         with self.assertRaises(pc.Refusal):
-            guard.check(COMMANDS[min(count, 30)], 20)
+            guard.check(COMMANDS[min(count, 31)], 20)
         with self.assertRaises(pc.Refusal):
             guard.complete()
         self.assertEqual(guard.count, count)
 
     def testAllThirtyOneExactCommandsConsumeOnce(self):
+        # Historical method name retained; test the full 32-command successor.
         guard, _ = self.guard()
-        self.assertEqual(len(COMMANDS), 31)
-        self.assertEqual(sc.COMMAND_COUNT, 31)
+        self.assertEqual(len(COMMANDS), 32)
+        self.assertEqual(sc.COMMAND_COUNT, 32)
         for index, command in enumerate(COMMANDS):
             self.assertEqual(guard.check(command, CEILINGS[index]), CEILINGS[index])
             self.assertEqual(guard.count, index + 1)
         guard.complete()
-        self.assertStopped(guard, 31)
+        self.assertStopped(guard, 32)
         self.assertEqual(guard.remaining_work(), 0)
         self.assertEqual(guard.remaining_finalisation(), 900)
 
@@ -118,7 +121,7 @@ class StageBCommandTests(unittest.TestCase):
                     self.assertStopped(guard, index)
 
     def testEveryImmediateRepeatRefuses(self):
-        for consumed in range(1, 32):
+        for consumed in range(1, 33):
             guard, _ = self.guard(consumed)
             with self.assertRaises(pc.Refusal):
                 guard.check(COMMANDS[consumed - 1], CEILINGS[consumed - 1])
@@ -129,7 +132,7 @@ class StageBCommandTests(unittest.TestCase):
                      ('/usr/bin/open', HOST), (HOST + '/Contents/MacOS/OwnedFolderProbe',),
                      ('/bin/sh', '-c', 'true'), ('/usr/bin/xcrun', 'simctl', 'launch'),
                      ('/usr/bin/codesign', '--force', '--deep', '--sign', '-', HOST))
-        for index in range(31):
+        for index in range(32):
             for command in forbidden:
                 with self.subTest(index=index, command=command):
                     guard, _ = self.guard(index)
@@ -150,14 +153,14 @@ class StageBCommandTests(unittest.TestCase):
             self.assertStopped(guard, 0)
 
     def testEveryPrematureCompletionConsumesGuard(self):
-        for count in range(31):
+        for count in range(32):
             guard, _ = self.guard(count)
             with self.assertRaises(pc.Refusal):
                 guard.complete()
             self.assertStopped(guard, count)
 
     def testStopAfterAnyDownstreamFailurePreservesFinalisation(self):
-        for count in range(32):
+        for count in range(33):
             guard, clock = self.guard(count)
             guard.stop()
             guard.stop()
@@ -180,7 +183,7 @@ class StageBCommandTests(unittest.TestCase):
             self.assertStopped(guard, 0)
 
     def testNineSecondAllowanceBeforeEveryCommand(self):
-        for index in range(31):
+        for index in range(32):
             for elapsed, expected in ((0, CEILINGS[index]), (700, 11), (710, 1), (710.5, 0.5)):
                 with self.subTest(index=index, elapsed=elapsed):
                     guard, clock = self.guard(index)
@@ -189,7 +192,7 @@ class StageBCommandTests(unittest.TestCase):
                     self.assertEqual(guard.count, index + 1)
 
     def testExhaustionBeforeEveryCommandStopsAdmission(self):
-        for index in range(31):
+        for index in range(32):
             for elapsed in (711, 719, 720, 721, 899, 900, 901):
                 with self.subTest(index=index, elapsed=elapsed):
                     guard, clock = self.guard(index)
@@ -221,16 +224,16 @@ class StageBCommandTests(unittest.TestCase):
 
     def testCompleteChecksDeadlineAndClockAfterFinalCommand(self):
         for elapsed in (711, 719.5):
-            guard, clock = self.guard(31)
+            guard, clock = self.guard(32)
             clock.now = 100 + elapsed
             guard.complete()
             self.assertEqual(guard.remaining_finalisation(), 900 - elapsed)
         for value in (820, 1000, float('nan'), 99):
-            guard, clock = self.guard(31)
+            guard, clock = self.guard(32)
             clock.now = value
             with self.assertRaises(pc.Refusal):
                 guard.complete()
-            self.assertStopped(guard, 31)
+            self.assertStopped(guard, 32)
 
     def testInvalidStartAndClockRefuseConstruction(self):
         for started in (None, '100', True, float('nan'), float('inf'), -float('inf'), 10 ** 1000):
@@ -243,7 +246,7 @@ class StageBCommandTests(unittest.TestCase):
         for method in ('check', 'remaining_work', 'remaining_finalisation', 'complete'):
             for value in (None, '101', True, float('nan'), float('inf'), -float('inf'), 99, 10 ** 1000):
                 with self.subTest(method=method, value=value):
-                    guard, clock = self.guard(31 if method == 'complete' else 0)
+                    guard, clock = self.guard(32 if method == 'complete' else 0)
                     clock.now = value
                     with self.assertRaises(pc.Refusal):
                         if method == 'check':
@@ -251,7 +254,7 @@ class StageBCommandTests(unittest.TestCase):
                         else:
                             getattr(guard, method)()
                     clock.now = 101
-                    self.assertStopped(guard, 31 if method == 'complete' else 0)
+                    self.assertStopped(guard, 32 if method == 'complete' else 0)
                     with self.assertRaises(pc.Refusal):
                         guard.remaining_finalisation()
 
@@ -313,7 +316,7 @@ class StageBCommandTests(unittest.TestCase):
             expected = tuple(argument.replace(ROOT, other) for argument in command)
             guard.check(expected, CEILINGS[index])
         guard.complete()
-        self.assertEqual(guard.count, 31)
+        self.assertEqual(guard.count, 32)
 
 
 if __name__ == '__main__':

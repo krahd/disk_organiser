@@ -1,0 +1,21 @@
+{
+  "kind": "synthetic assembly from primary formatter grammar; not runner output",
+  "fixture_sha256": "97fc8a1993e384cb493cd287e392722ebd7d65667740eb5759c4f44167c04ec0",
+  "sources": [
+    {
+      "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/otool/main.c",
+      "bytes": 147653,
+      "sha256": "71c33f45431e7ede37659f2a3ca01c662eead70d0bbbb898b362784d6c6dadd8"
+    },
+    {
+      "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/otool/ofile_print.c",
+      "bytes": 282914,
+      "sha256": "09dbb9d3051e18ac1409a77cf61777c5b80675f85ac37c4bc8b4128de29f4602"
+    },
+    {
+      "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/tests/test-cases/otool-classic-L/Makefile",
+      "bytes": 1213,
+      "sha256": "3a2c8d146c239c4f335808cd622ac968bac4b32e4a9e85dac89ebe5600c522e3"
+    }
+  ]
+}

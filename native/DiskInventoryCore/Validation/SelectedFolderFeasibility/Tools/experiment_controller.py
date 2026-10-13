@@ -377,6 +377,7 @@ class Experiment:
             self.fixture.verify(**options); _verify_inputs(self.workspace, self.input_rows, **options)
             if self._build_admission is not None:
                 no.collect_toolchain(self._tool)
+            inspector = no.inspector_identity()
             root = self.workspace.path
             build = (no.XCODE, 'build-for-testing', '-project', root + '/Source/Probe.xcodeproj',
                      '-scheme', 'OwnedFolderProbe', '-configuration', 'Debug', '-destination', 'platform=macOS',
@@ -390,6 +391,7 @@ class Experiment:
                 if index == 0:
                     command += ('--entitlements', root + '/Source/Host/host.entitlements.inert.plist')
                 self._tool(command + (self.workspace.products_path + '/' + no.PRODUCTS[index],), timeout=30, max_output=65536)
+            no.inspect_host_dependencies(self._tool, self.workspace.products_path, inspector)
             configuration = self._configuration_name()
             binding = self._prepare_runner_binding(configuration)
             inspection = self._observe(binding.derived_name, binding)
@@ -478,6 +480,7 @@ class Experiment:
         rx.verify(binding, self.workspace.read_configuration(binding.original_name, **options), frozen.raw_configuration,
                   self._expectations(observed))
         rows = {json.loads(row)['path']: json.loads(row) for row in frozen.inventory}
+        no.require_monolithic_host_inventory(rows)
         for path in no.EXECUTABLES:
             pc.require(path in rows and rows[path]['kind'] == 'file' and rows[path]['size'] > 0,
                        'observed executable row required')
