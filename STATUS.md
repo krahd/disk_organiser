@@ -1,6 +1,14 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 23:27
+Last updated: 2026-10-12 23:51
+
+## Local candidate for one fresh framework-launcher build-only decision
+
+- [PR39](https://github.com/krahd/disk_organiser/pull/39) merged at `e25b08a3464bc8a6a0c10df2a13182054a6e14cb`, tree `ae372051a2d591cf9300df38984cc375ebe3a15e`. All twelve source and six actual-main ordinary workflows passed on first attempts. The [main native job](https://github.com/krahd/disk_organiser/actions/runs/38323436936/job/115056538338) retains 233 distinct methods once, six differential/six parser cases, 82 successful hit/centre pairs and four actual Cancel diagnostic phases. The [main catalogue job](https://github.com/krahd/disk_organiser/actions/runs/38323436930/job/115056538420) passes thirteen browser journeys. These ordinary runs did not invoke the fixed framework launcher or quarantined feasibility host.
+- This local, unpublished activation candidate changes only the profile Boolean, copies the exact reviewed framework anchor to its designated workflow path, adapts the source-state test oracle and adds this factual status section. All fourteen operational helper bodies, nineteen host inputs, three inactive anchors, native command tuples and source pins stay byte-identical. The prior failed attempt and consumed marker remain closed. No GitHub activation, new reserved branch or build-only run is authorised or performed by preparing these files.
+- The historically named inactive-anchor test retains both original anchor hash assertions and its path/ref checks. It now asserts the actual Boolean state, requiring absent active bytes when False and exact template equality when True. A separate paired byte-map regression positively admits both valid states and rejects a disabled active copy, enabled missing/changed copy and non-Boolean flags. All 321 previous memory/mock identities remain, with one added method; 322 methods, nineteen structural checks and five no-argument refusals pass locally. Swift/native successor execution is unrun.
+- Any later publication or execution needs a fresh explicit one-attempt decision and source review. It must use one literal `validation/owned-build-framework-20261012` creation at a separately verified activated main, with absence/no-prior-attempt guards and read-only reconciliation of uncertainty. That ref remains provisional; no SHA for the future trigger is invented. The 720-second work plus 180-second retirement budget, twenty-minute job, 31 fixed build/sign/inspect calls, two exact temporary app entitlements and artifact bounds remain unchanged. A failed or uncertain attempt never authorises another.
+- The predicted direct launcher's reported identity still requires actual fail-closed observation. There is no alternate interpreter, resolver, installer or permission fallback. No host/app launch, panel, grant, persistent access, user computer/drives, OS security change or Stage C is included. Both default controller gates and the ordinary real-folder entry remain closed. After a separately authorised terminal attempt, the minimal reviewed deactivation must restore False and remove only the active copy while preserving evidence and the consumed marker.
 
 ## Owned Cancel: bounded failure observations
 
@@ -1008,4 +1016,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 23:27
+Last updated: 2026-10-12 23:51
