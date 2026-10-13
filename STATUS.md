@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 07:51
+Last updated: 2026-10-13 14:04
+
+## Reserved encoding-marker build-only candidate
+
+- [PR45](https://github.com/krahd/disk_organiser/pull/45) merged the independently reviewed inactive repair at `d7f8c3677a628c41946c3b55fad8e389fdaeca4d`, tree `b5e337cf3fdac8095c6355968e1bd6f30c07237b`. All twelve source/PR and six actual-main ordinary workflows passed first attempt. The [main native job](https://github.com/krahd/disk_organiser/actions/runs/38408708286/job/115335048424) retains 233 methods, six differential/six parser cases, 82 hit/centre pairs and four Cancel phases; the [catalogue job](https://github.com/krahd/disk_organiser/actions/runs/38408708640/job/115335052163) passes thirteen journeys. No new pixel inspection or operational build effectiveness is inferred.
+- This [single build-only candidate](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/ENCODING-BUILD-ATTEMPT.md) selects the new literal `validation/owned-build-encoding-once-20261013` ref, a copied inert comparison anchor and exact active workflow bytes. The profile's Boolean is True in this candidate. All fourteen operational helper bodies, nineteen host inputs, six earlier anchors and ordinary entrypoint pins remain unchanged. The standalone diagnostic keeps its historical profile pin and rejects the new profile; its consumed evidence is not relabelled.
+- Local verification passes 375 memory/mock methods, retaining all 374 earlier identities and adding the three-consumed-ref refusal test, nineteen source checks and six default refusals. Current-anchor assertions are updated explicitly while paired False/absent and True/exact oracles remain strict. All 233 native method sources are unchanged. Independent source review and exact successor ordinary CI/main verification are required before the frozen one-call payload receives its final crosscheck.
+- No new operational attempt has occurred at this checkpoint. The existing twenty-minute/31-command owned-root build-sign-inspect envelope stays exact, including the 720+180-second internal budget, verified-packet limits and terminal retirement. There is no app launch, UI test execution, picker, grant or drive access. The ambient encoding-marker/value risk remains disclosed; no generic exception or safety guarantee is added. Preserve every consumed marker and deactivate after the one terminal result. Stage C remains closed.
 
 ## Disabled fixed encoding-marker source repair
 
@@ -1054,4 +1061,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 07:51
+Last updated: 2026-10-13 14:04

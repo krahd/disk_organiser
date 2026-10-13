@@ -13,7 +13,7 @@ import stage_b_profile as profile
 import test_stage_b_driver as dt
 
 
-BRANCH = 'validation/owned-build-framework-20261012'
+BRANCH = 'validation/owned-build-encoding-once-20261013'
 FIELDS = (
     ('github.event_name', 'create'),
     ('github.repository', 'krahd/disk_organiser'),
@@ -58,7 +58,7 @@ def condition(raw):
 
 class CreateTransportTests(unittest.TestCase):
     def raw(self):
-        return (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.encoding-marker.yml.inert').read_text()
+        return (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.encoding-attempt.yml.inert').read_text()
 
     def testOnlyReservedBranchCreationAdmitsJobPredicate(self):
         admits = condition(self.raw()); event = dict(FIELDS)
@@ -91,13 +91,13 @@ class CreateTransportTests(unittest.TestCase):
             with self.subTest(key=key):
                 self.assertTrue(admits({**event, key: value.swapcase()}))
                 self.startup({identity_keys[key]: value.swapcase()})
-        variant = 'Validation/owned-build-framework-20261012'
+        variant = 'Validation/owned-build-encoding-once-20261013'
         self.assertTrue(admits({**event, 'github.event.ref': variant, 'github.ref': 'refs/heads/' + variant}))
         self.startup({'CREATED_REF': variant, 'GITHUB_REF': 'refs/heads/' + variant,
                       'GITHUB_WORKFLOW_REF': profile.REPOSITORY + '/' + profile.WORKFLOW + '@refs/heads/' + variant})
         # Do not imply the local model proves GitHub's Unicode folding semantics.
         with self.assertRaisesRegex(AssertionError, 'ASCII fixtures'):
-            admits({**event, 'github.event.ref': 'Välidation/owned-build-framework-20261012'})
+            admits({**event, 'github.event.ref': 'Välidation/owned-build-encoding-once-20261013'})
 
     def testMissingGuardClauseOrDisjunctionCannotSatisfyWorkflowOracle(self):
         raw = self.raw()
@@ -123,7 +123,7 @@ class CreateTransportTests(unittest.TestCase):
     def testOriginalManualAnchorRemainsExactHistoricalBytes(self):
         old = (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.yml.inert').read_bytes()
         self.assertEqual(hashlib.sha256(old).hexdigest(), '75ade725601f8375028f5842060cafdcdbb8e6bc8caae7c40881027e1a13749a')
-        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.encoding-marker.yml.inert'))
+        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.encoding-attempt.yml.inert'))
         self.assertEqual(profile.REF, 'refs/heads/' + BRANCH)
 
     def testNewAnchorBindsEveryHelperAndHostByteWithNormalisedProfile(self):
@@ -205,6 +205,17 @@ class CreateTransportTests(unittest.TestCase):
                 with self.assertRaisesRegex(driver.pc.Refusal, 'driver dispatch identity'):
                     driver.run({**identity, key: value}, {}, started_at=0)
                 sources.assert_not_called(); admission.assert_not_called(); report.assert_not_called()
+
+    def testEveryConsumedMarkerRefusesBeforeOperationalAdmission(self):
+        for previous in ('validation/owned-build-once-20261012',
+                         'validation/owned-build-framework-20261012',
+                         'validation/startup-keys-once-20261013'):
+            with self.subTest(previous=previous):
+                self.assertNotEqual(previous,BRANCH)
+                self.assertFalse(condition(self.raw())({**dict(FIELDS),
+                    'github.event.ref':previous,'github.ref':'refs/heads/'+previous}))
+                self.startup({'CREATED_REF':previous,'GITHUB_REF':'refs/heads/'+previous,
+                    'GITHUB_WORKFLOW_REF':profile.REPOSITORY+'/'+profile.WORKFLOW+'@refs/heads/'+previous})
 
 
 if __name__ == '__main__': unittest.main()

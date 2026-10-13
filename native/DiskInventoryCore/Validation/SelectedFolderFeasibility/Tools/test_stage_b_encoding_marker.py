@@ -114,6 +114,7 @@ class EncodingMarkerTests(unittest.TestCase):
     def main_context(self, changes=None, *, optional=True):
         stack = ExitStack(); self.addCleanup(stack.close)
         raw = (HERE/'stage_b_profile.py').read_bytes()
+        raw = raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
         enabled = raw.replace(b'BUILD_ONLY_ENABLED = False\n', b'BUILD_ONLY_ENABLED = True\n', 1)
         values, _ = dt.BootstrapTests().identity()
         values.update(boot.STARTUP_FIXED); values.update(ImageOS='macos15', ImageVersion='20260907.0337.1')
@@ -204,13 +205,23 @@ class EncodingMarkerTests(unittest.TestCase):
         self.assertEqual(observation.PROFILE_HASH,'9185bcf82855edff5a5e8eef9c63f67a6cd307aa9b8a7db4d35fde4a88dfab42')
 
     def testNewAnchorOnlyRepinsProfileAndKeepsBothWorkflowsAbsent(self):
+        # Retain the historical method identity while explicitly checking both
+        # repository states. The source guard separately rejects any other state.
         repo=HERE.parents[4]; folder=HERE.parent/'StageB'
-        old=(folder/'owned-selected-folder-build.environment-diagnostic.yml.inert').read_bytes()
+        old=(folder/'owned-selected-folder-build.encoding-marker.yml.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(old).hexdigest(), '86d0f8ce0f81021bf3e6d70c2e499cf576e598a4851ddff782e0f57192ad836d')
         new=(repo/profile.TEMPLATE).read_bytes();raw=(HERE/'stage_b_profile.py').read_bytes()
-        self.assertEqual(new,old.replace(observation.PROFILE_HASH.encode(),hashlib.sha256(raw).hexdigest().encode()))
-        self.assertIs(profile.BUILD_ONLY_ENABLED,False)
-        self.assertEqual(profile.REF,'refs/heads/validation/owned-build-framework-20261012')
-        self.assertFalse((repo/profile.WORKFLOW).exists());self.assertFalse((repo/observation.WORKFLOW).exists())
+        normal=raw.replace(b'BUILD_ONLY_ENABLED = True\n',b'BUILD_ONLY_ENABLED = False\n',1)
+        expected=old.replace(b'7d30c972aaafcba0754290ef9c7a11d93f753d40784dd44d677533c6adbc9085',hashlib.sha256(normal).hexdigest().encode())
+        expected=expected.replace(b'owned-build-framework-20261012',b'owned-build-encoding-once-20261013')
+        self.assertEqual(new,expected)
+        self.assertIs(type(profile.BUILD_ONLY_ENABLED),bool)
+        self.assertEqual(profile.REF,'refs/heads/validation/owned-build-encoding-once-20261013')
+        if profile.BUILD_ONLY_ENABLED:
+            self.assertEqual((repo/profile.WORKFLOW).read_bytes(),new)
+        else:
+            self.assertFalse((repo/profile.WORKFLOW).exists())
+        self.assertFalse((repo/observation.WORKFLOW).exists())
         self.assertEqual(hashlib.sha256((HERE/'stage_b_bootstrap.py').read_bytes()).hexdigest(),dict(profile.MODULE_ROWS)['stage_b_bootstrap.py'])
         historical=(folder/'startup-key-observation.profile.inert').read_bytes()
         self.assertEqual(hashlib.sha256(historical).hexdigest(),observation.PROFILE_HASH)
