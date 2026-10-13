@@ -55,7 +55,10 @@ class XCTestHookSourceTests(unittest.TestCase):
                 self.assertFalse(signature_only(changed))
 
     def testInactiveRowsAndHashOnlyAnchorPreserveConsumedNine(self):
-        raw = (HERE/'Tools/stage_b_profile.py').read_bytes()
+        # Preserve the exact inactive hook checkpoint as historical source.
+        raw = (HERE/'StageB/xctest-hooks.profile.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(),
+                         'aad1352d03542cd8dbe75aa551427c59681cfa0670768f515f821c40bbe8f06b')
         previous = (HERE/'StageB/run-nine.profile.inert').read_bytes()
         self.assertEqual(hashlib.sha256(previous).hexdigest(), OLD_PROFILE_SHA)
         old = {n.targets[0].id: ast.literal_eval(n.value) for n in ast.parse(previous).body
@@ -83,11 +86,15 @@ class XCTestHookSourceTests(unittest.TestCase):
         self.assertEqual(previous_anchor.count(OLD_PROFILE_SHA.encode()), 1)
         self.assertEqual(actual, previous_anchor.replace(OLD_PROFILE_SHA.encode(),
                          hashlib.sha256(normal).hexdigest().encode()))
-        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 9)
-        self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-explicit-self-once-20261013')
+        self.assertEqual(current['EXPECTED_RUN_NUMBER'], 9)
+        self.assertEqual(current['REF'], 'refs/heads/validation/owned-build-explicit-self-once-20261013')
         repo = HERE.parents[3]
-        self.assertIs(profile.BUILD_ONLY_ENABLED, False)
-        self.assertFalse((repo/profile.WORKFLOW).exists())
+        self.assertIs(current['BUILD_ONLY_ENABLED'], False)
+        self.assertIs(type(profile.BUILD_ONLY_ENABLED), bool)
+        if profile.BUILD_ONLY_ENABLED:
+            self.assertEqual((repo/profile.WORKFLOW).read_bytes(), (repo/profile.TEMPLATE).read_bytes())
+        else:
+            self.assertFalse((repo/profile.WORKFLOW).exists())
         self.assertFalse((repo/'.github/workflows/owned-startup-key-observation.yml').exists())
 
 

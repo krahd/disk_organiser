@@ -1,6 +1,14 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 19:18
+Last updated: 2026-10-13 19:43
+
+## Immutable-ten XCTest hook build-only source
+
+- [PR56](https://github.com/krahd/disk_organiser/pull/56) merged the reviewed inactive hook correction at `6b1bbe703271fca7526092e63c268d0f6af930a0`, tree `595d94b1a52cec628e70e28fc648fb89a1cb623d`. All twelve source/PR and six actual-main ordinary workflows passed first attempt. Each native lane verifies 233+6+6, 82 true hit pairs and four Cancel phases; each browser lane passes thirteen journeys. Earlier ordinary UI delivery flakiness remains unresolved. No new original-pixel review is claimed, and these checks do not compile the quarantined UI target.
+- The [immutable-ten source contract](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/RUN-TEN-ACTIVATION.md) binds one reviewed literal ten and new `validation/owned-build-xctest-hooks-once-20261013` ref after complete eleven-record history with stable build counters 1–9. This is a conditional source decision, not a counter reservation. Missing, changed, delayed or uncertain history stops; trusted no-reset/rename/recreation continuity is required. Runtime workflow-ID authentication is not claimed, and historical duplicate events 5/6 remain unexplained. No trigger occurred during authoring.
+- The new inert anchor and identical active copy change only ref, counter condition and complete normalised profile pin. All fourteen helper bodies, nineteen host inputs, fourteen old anchors, historical profiles, all six consumed markers and the `9eed307659fead2eb5e2824e0d6964277d48c6e6` host object remain exact. New async-hook compilation is still unmeasured. Current Apple API evidence supports the source repair; prior run-nine full compilation failed despite positive universal host construction. Bodies, tests and fixed blocking waits remain unchanged.
+- All 417 memory/mock tests retain the prior 415; nineteen structural checks, six default refusals and all 233 ordinary native source identities pass/preserve. Ten-specific paired source/copy/duplicate-order oracles preserve strict admission and before-owner refusal; old hook reversal/mutation tests stay byte-exact, and its copy oracle binds an exact inert predecessor profile. Independent final source review and ordinary successor CI remain pending at this checkpoint.
+- Publication must fast-forward the existing inactive source branch with exact guards, then pass source/PR and actual-main checks. Root must review the later exact trigger payload, followed by fresh complete history, literal nonconsumption, source/pin/ref/visibility/marker guards. One call only; uncertainty allows read-only reconciliation, never retry or repin. The same twenty-minute/31-command temporary build/ad-hoc-sign/static-inspection envelope remains; no app, UI test, panel, grant, user drive, persistent access or Stage C. Terminal independent deactivation, marker retention and ordinary cleanup verification remain required; ambient-marker and artifact-retention limits are unchanged.
 
 ## Inactive XCTest hook correction after run-nine cleanup
 
@@ -1180,4 +1188,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 19:18
+Last updated: 2026-10-13 19:43

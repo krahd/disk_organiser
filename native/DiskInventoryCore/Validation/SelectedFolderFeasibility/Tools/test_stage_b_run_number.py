@@ -160,7 +160,7 @@ class RunNumberTests(unittest.TestCase):
 
     def testConsumedRefsStillRefuseWithMatchingCounter(self):
         for ref in ('owned-build-once-20261012', 'owned-build-framework-20261012', 'startup-keys-once-20261013', 'owned-build-encoding-once-20261013',
-                     'owned-build-dir-stream-once-20261013'):
+                     'owned-build-dir-stream-once-20261013', 'owned-build-explicit-self-once-20261013'):
             ref = 'refs/heads/validation/'+ref
             _, error, load, admit, _, _, _ = self.main(environment={
                 'GITHUB_REF': ref, 'CREATED_REF': ref.removeprefix('refs/heads/'),
@@ -257,7 +257,7 @@ class RunNumberTests(unittest.TestCase):
         # the later reviewed positive literal's two repository Boolean states.
         self.assertIs(type(profile.BUILD_ONLY_ENABLED), bool)
         self.assertIs(type(profile.EXPECTED_RUN_NUMBER), int)
-        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 9)
+        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 10)
         if profile.BUILD_ONLY_ENABLED:
             self.assertEqual((ROOT/profile.WORKFLOW).read_bytes(), (ROOT/profile.TEMPLATE).read_bytes())
         else:
@@ -371,8 +371,8 @@ class RunNumberTests(unittest.TestCase):
         actual = (HERE.parent/'StageB/owned-selected-folder-build.run-nine.yml.inert').read_bytes()
         self.assertEqual(actual, expected)
         self.assertEqual(hashlib.sha256(actual).hexdigest(), 'a9f0f0cf01fa9f5d66cbc5c9884855620af9eda6528d40c930e7a822db00abac')
-        self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-explicit-self-once-20261013')
-        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 9)
+        self.assertIn(b'refs/heads/validation/owned-build-explicit-self-once-20261013', actual)
+        self.assertIn(b'github.run_number == 9', actual)
         for enabled in (False, True):
             changed = normal.replace(b'BUILD_ONLY_ENABLED = False\n', b'BUILD_ONLY_ENABLED = True\n', 1) if enabled else normal
             parsed = boot.decode_profile(changed, hashlib.sha256(normal).hexdigest())
@@ -380,7 +380,9 @@ class RunNumberTests(unittest.TestCase):
             self.assertEqual(parsed['EXPECTED_RUN_NUMBER'], 9)
 
     def testFrozenNineOnlyFirstAttemptAdmitsAcrossDuplicateOrders(self):
-        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 9)
+        # Historical number-nine admission is still exercised in memory.
+        raw, digest = self.profile(9)
+        self.assertEqual(boot.decode_profile(raw, digest)['EXPECTED_RUN_NUMBER'], 9)
         for order in (('8','9','10'), ('10','9','8'), ('9','8','10')):
             admitted = []
             for actual in order:
@@ -396,6 +398,42 @@ class RunNumberTests(unittest.TestCase):
             _, error, load, admit, _, _, _ = self.main(actual, number=9)
             self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
         _, error, load, admit, _, _, _ = self.main('9', number=9, environment={'GITHUB_RUN_ATTEMPT':'2'})
+        self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
+
+    def testRunTenCopyChangesOnlyRefCounterAndNormalisedProfilePin(self):
+        prior = (HERE.parent/'StageB/owned-selected-folder-build.xctest-hooks.yml.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(prior).hexdigest(), 'ef888e0c482e7f07b7271ffc7a74c98deedf664ff73eb54ff4061a5fca925d7d')
+        raw = (HERE/'stage_b_profile.py').read_bytes()
+        normal = raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
+        expected = prior.replace(b'aad1352d03542cd8dbe75aa551427c59681cfa0670768f515f821c40bbe8f06b', hashlib.sha256(normal).hexdigest().encode())
+        expected = expected.replace(b'validation/owned-build-explicit-self-once-20261013', b'validation/owned-build-xctest-hooks-once-20261013')
+        expected = expected.replace(b'github.run_number == 9', b'github.run_number == 10')
+        self.assertEqual((ROOT/profile.TEMPLATE).read_bytes(), expected)
+        self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-xctest-hooks-once-20261013')
+        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 10)
+        for enabled in (False, True):
+            changed = normal.replace(b'BUILD_ONLY_ENABLED = False\n', b'BUILD_ONLY_ENABLED = True\n', 1) if enabled else normal
+            parsed = boot.decode_profile(changed, hashlib.sha256(normal).hexdigest())
+            self.assertIs(parsed['BUILD_ONLY_ENABLED'], enabled)
+            self.assertEqual(parsed['EXPECTED_RUN_NUMBER'], 10)
+
+    def testFrozenTenOnlyFirstAttemptAdmitsAcrossDuplicateOrders(self):
+        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 10)
+        for order in (('9','10','11'), ('11','10','9'), ('10','9','11')):
+            admitted = []
+            for actual in order:
+                result, error, load, admit, _, _, _ = self.main(actual, number=10)
+                if actual == '10':
+                    self.assertIsNone(error); self.assertEqual(result, 2)
+                    self.assertEqual(load.return_value.run.call_args.args[0]['run_number'], 10)
+                    admitted.append(actual)
+                else:
+                    self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
+            self.assertEqual(admitted, ['10'])
+        for actual in ('010','10.0','10\n','１０',9,10,True,None):
+            _, error, load, admit, _, _, _ = self.main(actual, number=10)
+            self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
+        _, error, load, admit, _, _, _ = self.main('10', number=10, environment={'GITHUB_RUN_ATTEMPT':'2'})
         self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
 
 

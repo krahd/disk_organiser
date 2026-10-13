@@ -15,7 +15,7 @@ import stage_b_profile as profile
 import test_stage_b_driver as dt
 
 
-BRANCH = 'validation/owned-build-explicit-self-once-20261013'
+BRANCH = 'validation/owned-build-xctest-hooks-once-20261013'
 FIELDS = (
     ('github.event_name', 'create'),
     ('github.repository', 'krahd/disk_organiser'),
@@ -86,7 +86,7 @@ def event_fixture():
 
 class CreateTransportTests(unittest.TestCase):
     def raw(self):
-        return (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.xctest-hooks.yml.inert').read_text()
+        return (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.run-ten.yml.inert').read_text()
 
     def testOnlyReservedBranchCreationAdmitsJobPredicate(self):
         admits = condition(self.raw()); event = event_fixture()
@@ -119,13 +119,13 @@ class CreateTransportTests(unittest.TestCase):
             with self.subTest(key=key):
                 self.assertTrue(admits({**event, key: value.swapcase()}))
                 self.startup({identity_keys[key]: value.swapcase()})
-        variant = 'Validation/owned-build-explicit-self-once-20261013'
+        variant = 'Validation/owned-build-xctest-hooks-once-20261013'
         self.assertTrue(admits({**event, 'github.event.ref': variant, 'github.ref': 'refs/heads/' + variant}))
         self.startup({'CREATED_REF': variant, 'GITHUB_REF': 'refs/heads/' + variant,
                       'GITHUB_WORKFLOW_REF': profile.REPOSITORY + '/' + profile.WORKFLOW + '@refs/heads/' + variant})
         # Do not imply the local model proves GitHub's Unicode folding semantics.
         with self.assertRaisesRegex(AssertionError, 'ASCII fixtures'):
-            admits({**event, 'github.event.ref': 'Välidation/owned-build-explicit-self-once-20261013'})
+            admits({**event, 'github.event.ref': 'Välidation/owned-build-xctest-hooks-once-20261013'})
 
     def testMissingGuardClauseOrDisjunctionCannotSatisfyWorkflowOracle(self):
         raw = self.raw()
@@ -151,7 +151,7 @@ class CreateTransportTests(unittest.TestCase):
     def testOriginalManualAnchorRemainsExactHistoricalBytes(self):
         old = (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.yml.inert').read_bytes()
         self.assertEqual(hashlib.sha256(old).hexdigest(), '75ade725601f8375028f5842060cafdcdbb8e6bc8caae7c40881027e1a13749a')
-        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.xctest-hooks.yml.inert'))
+        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.run-ten.yml.inert'))
         self.assertEqual(profile.REF, 'refs/heads/' + BRANCH)
 
     def testNewAnchorBindsEveryHelperAndHostByteWithNormalisedProfile(self):
@@ -239,7 +239,8 @@ class CreateTransportTests(unittest.TestCase):
                          'validation/owned-build-framework-20261012',
                          'validation/startup-keys-once-20261013',
                          'validation/owned-build-encoding-once-20261013',
-                         'validation/owned-build-dir-stream-once-20261013'):
+                         'validation/owned-build-dir-stream-once-20261013',
+                         'validation/owned-build-explicit-self-once-20261013'):
             with self.subTest(previous=previous):
                 self.assertNotEqual(previous,BRANCH)
                 self.assertFalse(condition(self.raw())({**event_fixture(),
