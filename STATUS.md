@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 16:17
+Last updated: 2026-10-13 16:48
+
+## Conditional corrected-host immutable-eight candidate
+
+- [PR50](https://github.com/krahd/disk_organiser/pull/50) merged the reviewed inactive type correction at `8986c606119580d84bb81a7bcc9a9088d65aa4b5`, tree `7f841b78b08f06ef8ba75d1cc57cf6f21a2b6581`. All twelve source/PR and six actual-main ordinary workflows passed first attempt. The [main native job](https://github.com/krahd/disk_organiser/actions/runs/38431483719/job/115414501955) retains 233 methods, six differential/six parser cases, 82 true hit/centre pairs and four Cancel phases; the [catalogue job](https://github.com/krahd/disk_organiser/actions/runs/38431483749/job/115414501929) passes thirteen journeys. These checks do not compile the corrected experimental host; no new pixel acceptance is claimed.
+- The [separate activation candidate](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/RUN-EIGHT-ACTIVATION.md) fixes immutable eight and a new literal DIR-stream ref after independent history/plan review. The profile enables its Boolean and selects a new inert anchor; the active workflow is an exact copy. All fourteen operational helpers, nineteen host inputs bound to `93db00f6`, ten prior anchors and strict runtime gates remain exact. Fresh authoring history contains nine records with visible build counters 1–7 at the same ID/path. Eight is not reserved; incomplete history, identity uncertainty or consumption stops, without repinning after an attempted call.
+- Publication is proposed only by guarded fast-forward of the existing inactive source branch. Independent source review, ordinary exact-head/main CI and root's final actual-main/ref/counter/payload crosscheck remain required. No new operational call or active branch creation occurred during authoring. All four consumed markers remain; run-seven failure evidence is unchanged. Counter/ref/profile changes do not supply any permission for app/UI/panel/grant or drive execution.
+- All 407 local memory/mock methods pass, retaining 405 and adding exact predecessor-delta/paired-state and eight-only first-attempt duplicate-order oracles. Nineteen structural checks and six default refusals pass; all 233 native method sources remain exact. Historical counter-zero/run-seven/inactive-DIR anchor tests now explicitly retain their old bytes; both consumed-ref tests include the fourth marker. The twenty-minute/31-command owned-root bounds and terminal deactivation obligation remain unchanged. Actual corrected-host build/signature effectiveness and Stage C remain open; ambient encoding-marker influence remains disclosed.
 
 ## Inactive directory-stream type correction
 
@@ -1089,4 +1096,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 16:17
+Last updated: 2026-10-13 16:48

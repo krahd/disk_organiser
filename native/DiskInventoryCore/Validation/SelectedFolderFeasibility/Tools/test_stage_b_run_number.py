@@ -159,7 +159,7 @@ class RunNumberTests(unittest.TestCase):
             self.assertNotIn('counter', events)
 
     def testConsumedRefsStillRefuseWithMatchingCounter(self):
-        for ref in ('owned-build-once-20261012', 'owned-build-framework-20261012', 'startup-keys-once-20261013'):
+        for ref in ('owned-build-once-20261012', 'owned-build-framework-20261012', 'startup-keys-once-20261013', 'owned-build-encoding-once-20261013'):
             ref = 'refs/heads/validation/'+ref
             _, error, load, admit, _, _, _ = self.main(environment={
                 'GITHUB_REF': ref, 'CREATED_REF': ref.removeprefix('refs/heads/'),
@@ -256,7 +256,7 @@ class RunNumberTests(unittest.TestCase):
         # the later reviewed positive literal's two repository Boolean states.
         self.assertIs(type(profile.BUILD_ONLY_ENABLED), bool)
         self.assertIs(type(profile.EXPECTED_RUN_NUMBER), int)
-        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 7)
+        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 8)
         if profile.BUILD_ONLY_ENABLED:
             self.assertEqual((ROOT/profile.WORKFLOW).read_bytes(), (ROOT/profile.TEMPLATE).read_bytes())
         else:
@@ -269,18 +269,20 @@ class RunNumberTests(unittest.TestCase):
         load.assert_not_called()
 
     def testNewAnchorHasOnlyHashCounterClauseAndQuotedTransportDelta(self):
+        # Keep the original counter-zero transport oracle bound to its source.
         prior = (HERE.parent/'StageB/owned-selected-folder-build.encoding-attempt.yml.inert').read_text()
-        raw = (HERE/'stage_b_profile.py').read_bytes()
-        normal = raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
-        digest = hashlib.sha256(normal).hexdigest()
+        digest = '17ac4693ee3d23517f9744244b4bb7dc6fbee7322c51495d65be008464c849c1'
+        original_ref = 'refs/heads/validation/owned-build-encoding-once-20261013'
         expected = prior.replace('5ec43dbf0be0bdadba84219393bbd367540d04d229d950584c63e34dee8c4f0f', digest)
-        expected = expected.replace("github.ref == '"+profile.REF+"' }}",
-            "github.ref == '"+profile.REF+"' &&\n          github.run_attempt == 1 &&\n          github.run_number == "+str(profile.EXPECTED_RUN_NUMBER)+" }}")
+        expected = expected.replace("github.ref == '"+original_ref+"' }}",
+            "github.ref == '"+original_ref+"' &&\n          github.run_attempt == 1 &&\n          github.run_number == 0 }}")
         expected = expected.replace('          EXPECTED_DRIVER_SHA: ${{ github.sha }}',
             '          EXPECTED_DRIVER_SHA: ${{ github.sha }}\n          ACTUAL_RUN_NUMBER: ${{ github.run_number }}')
         expected = expected.replace('stage_b_bootstrap.py '+digest+')"',
             'stage_b_bootstrap.py '+digest+' "$ACTUAL_RUN_NUMBER")"')
-        self.assertEqual((ROOT/profile.TEMPLATE).read_text(), expected)
+        actual = (HERE.parent/'StageB/owned-selected-folder-build.run-number.yml.inert').read_text()
+        self.assertEqual(actual, expected)
+        self.assertEqual(hashlib.sha256(actual.encode()).hexdigest(), '23597f48cad17482be7900241e1611438b0e89a9c96bf38ac7addfbcc56486cb')
 
     def testSevenHistoricalAnchorsAndConsumedDiagnosticKeepExactBytes(self):
         raw = (HERE/'startup_key_observation.py').read_bytes()
@@ -303,7 +305,7 @@ class RunNumberTests(unittest.TestCase):
         actual = (HERE.parent/'StageB/owned-selected-folder-build.run-seven.yml.inert').read_bytes()
         self.assertEqual(actual, expected)
         self.assertEqual(hashlib.sha256(actual).hexdigest(), '30ba204fc1a3a11e17b6abed7483b3f2b1ff992661449af01b486bc9c46a774e')
-        self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-encoding-once-20261013')
+        self.assertIn(b'refs/heads/validation/owned-build-encoding-once-20261013', actual)
 
     def testFrozenSevenIsOnlyAdmittedCounterAndRerunStillRefuses(self):
         for counter in ('1','2','3','4','5','6','7','8','9','1000000000'):
@@ -314,6 +316,43 @@ class RunNumberTests(unittest.TestCase):
             else:
                 self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
         _, error, load, admit, _, _, _ = self.main('7', number=7, environment={'GITHUB_RUN_ATTEMPT':'2'})
+        self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
+
+    def testRunEightCopyChangesOnlyRefCounterAndNormalisedProfilePin(self):
+        prior = (HERE.parent/'StageB/owned-selected-folder-build.dir-stream.yml.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(prior).hexdigest(), '7537b0519aa801b59bfc50f73d3df6cd8d1960cf25b2b13900c1c8de7eb04425')
+        raw = (HERE/'stage_b_profile.py').read_bytes()
+        normal = raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
+        expected = prior.replace(b'2f2249cae3fd1a31c437c17fa7113cef1ee4e575e59f5dadcbcad940ec966f6a', hashlib.sha256(normal).hexdigest().encode())
+        expected = expected.replace(b'validation/owned-build-encoding-once-20261013', b'validation/owned-build-dir-stream-once-20261013')
+        expected = expected.replace(b'github.run_number == 7', b'github.run_number == 8')
+        self.assertEqual((ROOT/profile.TEMPLATE).read_bytes(), expected)
+        self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-dir-stream-once-20261013')
+        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 8)
+        # Retain paired source states; this does not issue an admission/owner.
+        for enabled in (False, True):
+            changed = normal.replace(b'BUILD_ONLY_ENABLED = False\n', b'BUILD_ONLY_ENABLED = True\n', 1) if enabled else normal
+            parsed = boot.decode_profile(changed, hashlib.sha256(normal).hexdigest())
+            self.assertIs(parsed['BUILD_ONLY_ENABLED'], enabled)
+            self.assertEqual(parsed['EXPECTED_RUN_NUMBER'], 8)
+
+    def testFrozenEightOnlyFirstAttemptAdmitsAcrossDuplicateOrders(self):
+        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 8)
+        for order in (('7','8','9'), ('9','8','7'), ('8','7','9')):
+            admitted = []
+            for actual in order:
+                result, error, load, admit, _, _, _ = self.main(actual, number=8)
+                if actual == '8':
+                    self.assertIsNone(error); self.assertEqual(result, 2)
+                    self.assertEqual(load.return_value.run.call_args.args[0]['run_number'], 8)
+                    admitted.append(actual)
+                else:
+                    self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
+            self.assertEqual(admitted, ['8'])
+        for actual in ('08','8.0','8\n','８',7,8,True,None):
+            _, error, load, admit, _, _, _ = self.main(actual, number=8)
+            self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
+        _, error, load, admit, _, _, _ = self.main('8', number=8, environment={'GITHUB_RUN_ATTEMPT':'2'})
         self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
 
 

@@ -78,3 +78,11 @@ Actual compiler effectiveness and subsequent build/signature stages remain open.
 Any later attempt requires a separately reviewed source/identity/history/counter
 and exact-payload decision; consumed 7 cannot be reused. Ambient encoding-marker
 influence remains a disclosed residual risk.
+
+
+## Subsequent conditional build candidate
+
+[The separate immutable-eight candidate](RUN-EIGHT-ACTIVATION.md) keeps the
+corrected host bytes exact and proposes a new ref/counter under the existing
+build-only envelope. This inactive-repair checkpoint and its source-only limits
+remain historical; no corrected-host compilation is inferred.
