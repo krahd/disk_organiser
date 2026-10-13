@@ -119,3 +119,10 @@ and a final exact-payload crosscheck. App/UI launch, panels, grants, user drives
 persistent access and Stage C remain closed. Ambient optional-marker influence
 and evidence-retention limitations remain disclosed; no harmlessness guarantee
 or permanent artifact archive is implied.
+
+## Later conditional build source
+
+The immutable-nine source activation is described in
+[RUN-NINE-ACTIVATION.md](RUN-NINE-ACTIVATION.md). It retains every corrected host
+byte and all previous evidence, requires fresh operational guards and root's
+exact payload check, and does not claim compilation of this repair.
