@@ -202,3 +202,11 @@ command would require its exact allowlist/profile/budget review; no immediate
 operational retry is authorised. A future attempt or Stage C remains separately
 reviewed. Full signed-build acceptance, real-folder usability and runtime grant
 compatibility are still open.
+
+
+## Later inactive source correction
+
+The separately reviewed [host Debug layout correction](DEBUG-LAYOUT-REPAIR.md)
+opts this single target out of the debug/preview-library layout. This run remains
+failed historical signing evidence. The new layout and its direct dependencies
+are unmeasured; consumed ten does not authorise a retry.

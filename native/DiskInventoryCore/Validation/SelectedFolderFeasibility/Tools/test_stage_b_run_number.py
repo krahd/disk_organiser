@@ -403,12 +403,15 @@ class RunNumberTests(unittest.TestCase):
     def testRunTenCopyChangesOnlyRefCounterAndNormalisedProfilePin(self):
         prior = (HERE.parent/'StageB/owned-selected-folder-build.xctest-hooks.yml.inert').read_bytes()
         self.assertEqual(hashlib.sha256(prior).hexdigest(), 'ef888e0c482e7f07b7271ffc7a74c98deedf664ff73eb54ff4061a5fca925d7d')
-        raw = (HERE/'stage_b_profile.py').read_bytes()
+        raw = (HERE.parent/'StageB/run-ten.profile.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), 'd477601dc29b780da3bc3fb6fd4a1c366fac61196c88407263aa1fc66d89e9fb')
         normal = raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
         expected = prior.replace(b'aad1352d03542cd8dbe75aa551427c59681cfa0670768f515f821c40bbe8f06b', hashlib.sha256(normal).hexdigest().encode())
         expected = expected.replace(b'validation/owned-build-explicit-self-once-20261013', b'validation/owned-build-xctest-hooks-once-20261013')
         expected = expected.replace(b'github.run_number == 9', b'github.run_number == 10')
-        self.assertEqual((ROOT/profile.TEMPLATE).read_bytes(), expected)
+        actual = (HERE.parent/'StageB/owned-selected-folder-build.run-ten.yml.inert').read_bytes()
+        self.assertEqual(actual, expected)
+        self.assertEqual(hashlib.sha256(actual).hexdigest(), '6da698f7606c79f48413e578b8b3bd84f1d6df54a732fa2e34d9015778d12218')
         self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-xctest-hooks-once-20261013')
         self.assertEqual(profile.EXPECTED_RUN_NUMBER, 10)
         for enabled in (False, True):

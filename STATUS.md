@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 20:10
+Last updated: 2026-10-13 20:38
+
+## Inactive host Debug layout correction after run-ten cleanup
+
+- [PR58](https://github.com/krahd/disk_organiser/pull/58) merged terminal deactivation at `f339177c7a9d56134d43bef0e3d9c0b9e109bd74`, tree `e8076a7e065fbf815e6c2b4bb81e144c30ab9f03`. All twelve source/PR and six actual-main ordinary workflows passed first attempt. Each native lane retained 233+6+6, 82 true hit pairs and four Cancel phases; each browser lane passed thirteen journeys. Earlier UI delivery flakiness is unresolved and no new original-pixel review is claimed.
+- The [inactive Debug layout correction](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/DEBUG-LAYOUT-REPAIR.md) inserts only `ENABLE_DEBUG_DYLIB = NO` into the isolated host target's Debug configuration. Project-wide, Release, UI-test, optimisation, architecture, Swift source, entitlement and security settings remain unchanged. The original run-ten evidence proves a full unsigned universal build followed by host signing refusal at OwnedFolderProbe.debug.dylib; it does not prove this new layout or full signed-product acceptance.
+- The reviewed [host-only object](https://github.com/krahd/disk_organiser/commit/33c3e70daa2a3f89896e8d2141e01aff577592bb) is parented by inactive main and verifies all nineteen remote host rows. No branch moved to it; the final source commit retains it as parent. Fourteen operational helpers, eighteen other host inputs and fifteen older inert anchors stay exact. Historical run-ten/hook copy oracles retain their exact older evidence while current row assertions bind the new source.
+- False, consumed ten, its same ref, both experimental workflows absent and all seven marker refs are preserved. All 420 local memory/mock methods retain the prior 417; nineteen structural checks and six default refusals pass, with 233 native test sources unchanged. Final composition review and ordinary successor CI are pending. The 31-command/time envelope is unchanged; a separate static-inspection proposal must prove the later host's architecture-complete direct dependencies before acceptance. No new build, sign, operational trigger, app/UI/panel/grant/drive access or Stage C occurs here.
 
 ## Consumed run-ten unsigned-build success and host-signing failure
 
@@ -1196,4 +1203,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 20:10
+Last updated: 2026-10-13 20:38

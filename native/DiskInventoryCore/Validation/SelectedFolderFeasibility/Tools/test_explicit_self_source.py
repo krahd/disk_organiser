@@ -69,7 +69,7 @@ class ExplicitSelfSourceTests(unittest.TestCase):
         historical = historical.replace(b'Reviewed explicit-self host pins for immutable nine; final execution gate remains.', b'Inactive explicit-self host pins; consumed eight remains disabled.')
         self.assertEqual(hashlib.sha256(historical).hexdigest(),
                          'cab0811251d93ba65f19a34453f35df04bff9a2b93fd26772bacb2722c61817c')
-        self.assertEqual(profile.HOST_SOURCE_COMMIT, '9eed307659fead2eb5e2824e0d6964277d48c6e6')
+        self.assertEqual(profile.HOST_SOURCE_COMMIT, '33c3e70daa2a3f89896e8d2141e01aff577592bb')
         rows = tuple((name, hashlib.sha256((HERE/name).read_bytes()).hexdigest())
                      for name, _ in profile.HOST_ROWS)
         self.assertEqual(len(rows), 19)
