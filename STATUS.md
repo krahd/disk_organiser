@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 05:57
+Last updated: 2026-10-13 07:07
+
+## Startup-only observation completed; diagnostic workflow removed
+
+- [PR43](https://github.com/krahd/disk_organiser/pull/43) merged the reviewed standalone observation at `3389aa6d7d9dbd007e7d3c9987a82308e7c434fc`, exact tree `f7476711d739009ddb9386a337d8f448dffb6eb6`. All twelve ordinary source/PR workflows and six actual-main workflows passed first attempt. Both source native lanes and the [actual-main native job](https://github.com/krahd/disk_organiser/actions/runs/38356495220/job/115160508568) retain 233 distinct methods, six differential/six parser cases, 82 true hit/centre pairs and four Cancel observations. The [main catalogue job](https://github.com/krahd/disk_organiser/actions/runs/38356495474/job/115160509538) passes thirteen journeys. The separate source-branch create event correctly skipped the diagnostic job because it was not the reserved ref.
+- The one [startup-only attempt](https://github.com/krahd/disk_organiser/actions/runs/38359714196/job/115170769056) on the reserved marker completed with the designed `keys_mismatch` exit 2. Its sole 324-byte prefixed record reports no expected omissions, exactly one unexpected key, `__CF_USER_TEXT_ENCODING` present, the other three fixed names absent and unknown count zero. No values were logged; both counts are uncapped. The [executed contract](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/STARTUP-ONLY-OBSERVATION.md#executed-one-shot-result-and-terminal-deactivation) retains exact log identity and observation limits. GitHub failure here is the expected mismatch outcome, not a passing build. Zero artefacts; no build/sign, operational driver, application, picker or grant execution.
+- This establishes the fixed key's presence in this controlled launch only. It does not prove the historical build attempt's exact cause or authorise an environment exception. The dedicated diagnostic workflow is now removed; its entry and inert template, existing build profile False, absent build workflow, fourteen operational helpers, nineteen host inputs, four build anchors and ordinary baseline pins remain unchanged.
+- All 363 memory/mock methods, nineteen structural checks and six default refusals pass locally for this deactivation candidate. One test recognises the two explicit repository states: active workflow bytes must equal the unchanged template when present; terminal absence is allowed. Its remaining template/hash/env/argv/bounds assertions and every earlier method identity are retained. Exact-successor ordinary CI is still pending at this source checkpoint. The consumed diagnostic marker and both earlier build markers remain; no rerun or next build is included.
 
 ## Single startup-key observation candidate
 
@@ -1040,4 +1047,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 05:57
+Last updated: 2026-10-13 07:07

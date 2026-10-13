@@ -264,8 +264,11 @@ class StartupOnlyObservationTests(unittest.TestCase):
         self.assertNotRegex(s,r'os\.environ\s*\[')
 
     def testWorkflowCopiesExactAndHasOnlyCheckoutAndOneObservation(self):
-        workflow=(ROOT/probe.WORKFLOW).read_text();template=(ROOT/probe.TEMPLATE).read_text()
-        self.assertEqual(workflow,template)
+        template=(ROOT/probe.TEMPLATE).read_text();active=ROOT/probe.WORKFLOW
+        # Both reviewed repository states are intentional: exact active bytes
+        # before the one shot, or absent after terminal deactivation.
+        if active.exists():self.assertEqual(active.read_text(),template)
+        workflow=template
         self.assertEqual(workflow.count('      - '),2)
         self.assertIn('timeout-minutes: 5',workflow);self.assertEqual(workflow.count('timeout-minutes: 1'),2)
         self.assertIn('runs-on: macos-15',workflow)
