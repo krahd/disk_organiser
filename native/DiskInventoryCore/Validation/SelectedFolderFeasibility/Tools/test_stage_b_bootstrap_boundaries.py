@@ -35,7 +35,7 @@ class BootstrapBoundaryTests(unittest.TestCase):
     def startup(self, *, moved=False, changed=False, expired=False):
         raw, _ = dt.BootstrapTests().profile()
         enabled = raw.replace(b'BUILD_ONLY_ENABLED = False', b'BUILD_ONLY_ENABLED = True')
-        workflow = (Path(__file__).parents[1]/'StageB/owned-selected-folder-build.encoding-marker.yml.inert').read_bytes()
+        workflow = (Path(__file__).parents[1]/'StageB/owned-selected-folder-build.run-number.yml.inert').read_bytes()
         environment, _ = dt.BootstrapTests().identity()
         environment.update(boot.STARTUP_FIXED)
         environment.update(ImageOS='macos15', ImageVersion='20260907.0337.1')
@@ -68,13 +68,13 @@ class BootstrapBoundaryTests(unittest.TestCase):
             load.return_value.run.return_value = 2  # no operational driver executes
             if moved:
                 with self.assertRaisesRegex(FileNotFoundError, 'retained anchor missing'):
-                    boot.main(hashlib.sha256(raw).hexdigest())
+                    boot.main(hashlib.sha256(raw).hexdigest(), '17')
                 load.assert_not_called()
             elif changed or expired:
-                with self.assertRaises(boot.Refusal): boot.main(hashlib.sha256(raw).hexdigest())
+                with self.assertRaises(boot.Refusal): boot.main(hashlib.sha256(raw).hexdigest(), '17')
                 load.assert_not_called()
             else:
-                self.assertEqual(boot.main(hashlib.sha256(raw).hexdigest()), 2)
+                self.assertEqual(boot.main(hashlib.sha256(raw).hexdigest(), '17'), 2)
                 load.assert_called_once(); load.return_value.run.assert_called_once()
                 self.assertTrue(callable(load.call_args.kwargs['check']))
         return paths

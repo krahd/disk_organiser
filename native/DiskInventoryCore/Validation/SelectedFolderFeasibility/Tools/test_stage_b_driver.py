@@ -122,6 +122,7 @@ class BootstrapTests(unittest.TestCase):
         raw=(Path(__file__).parent/'stage_b_profile.py').read_bytes()
         # This fixture exercises both states, regardless of the checked-out flag.
         raw=raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
+        raw=raw.replace(b'EXPECTED_RUN_NUMBER = 0\n', b'EXPECTED_RUN_NUMBER = 17\n', 1)
         return raw,hashlib.sha256(raw).hexdigest()
 
     def testOnlyLiteralFlagNormalisationIsPermitted(self):
@@ -135,7 +136,7 @@ class BootstrapTests(unittest.TestCase):
         raw,digest=self.profile()
         with patch.object(boot,'read_source',return_value=raw) as read,patch.object(boot,'load_modules') as load, \
              patch.object(boot.sys,'flags',SimpleNamespace(isolated=1,no_site=1,dont_write_bytecode=1)):
-            with self.assertRaisesRegex(boot.Refusal,'disabled'):boot.main(digest)
+            with self.assertRaisesRegex(boot.Refusal,'disabled'):boot.main(digest, '17')
         self.assertEqual(read.call_count,1);load.assert_not_called()
 
     def identity(self):

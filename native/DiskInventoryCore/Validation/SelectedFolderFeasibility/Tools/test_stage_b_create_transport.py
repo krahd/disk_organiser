@@ -1,6 +1,8 @@
 """Memory-only create-event admission; no workflow or native tool is run."""
 from contextlib import ExitStack
 import hashlib
+import json
+import math
 from pathlib import Path
 import re
 from types import SimpleNamespace
@@ -13,7 +15,7 @@ import stage_b_profile as profile
 import test_stage_b_driver as dt
 
 
-BRANCH = 'validation/owned-build-framework-20261012'
+BRANCH = 'validation/owned-build-encoding-once-20261013'
 FIELDS = (
     ('github.event_name', 'create'),
     ('github.repository', 'krahd/disk_organiser'),
@@ -23,8 +25,12 @@ FIELDS = (
 )
 
 
-def condition(raw):
-    """Read only the literal equality/conjunction grammar used by this job."""
+def condition(raw, expected_number=None):
+    """Model this fixed grammar, including GitHub loose numeric equality.
+
+    This is a source oracle for scalar fixture values, not an Actions emulator.
+    """
+    if expected_number is None: expected_number = profile.EXPECTED_RUN_NUMBER
     start = '  owned-build-only:\n    if: >-\n'
     if raw.count(start) != 1:
         raise AssertionError('one job guard')
@@ -33,8 +39,11 @@ def condition(raw):
     if not expression.startswith('${{ ') or not expression.endswith(' }}'):
         raise AssertionError('guard expression')
     clauses = expression[4:-3].split(' && ')
+    numeric = [('github.run_attempt', 1), ('github.run_number', expected_number)]
+    if clauses[-2:] != [key + ' == ' + str(value) for key, value in numeric]:
+        raise AssertionError('exact numeric counter/attempt clauses')
     pairs = []
-    for clause in clauses:
+    for clause in clauses[:-2]:
         match = re.fullmatch(r"(github\.[a-z_.]+) == '([A-Za-z0-9_./-]+)'", clause)
         if not match:
             raise AssertionError('literal equality only')
@@ -52,18 +61,37 @@ def condition(raw):
                 raise AssertionError('scheduler model is limited to ASCII fixtures')
             if value.lower() != expected.lower():
                 return False
-        return True
+        return all(loose_number(event.get(key)) == expected for key, expected in numeric)
     return admits
+
+
+def loose_number(value):
+    # Official Actions coercion: null/false -> 0, true -> 1, empty -> 0;
+    # strings use JSON number syntax; arrays/objects or invalid numbers -> NaN.
+    if value is None: return 0
+    if type(value) is bool: return int(value)
+    if type(value) in (int, float): return value
+    if type(value) is str:
+        if not value.strip(): return 0
+        try: parsed = json.loads(value)
+        except (ValueError, TypeError): return math.nan
+        if type(parsed) in (int, float): return parsed
+    return math.nan
+
+
+def event_fixture():
+    return {**dict(FIELDS), 'github.run_attempt': 1,
+            'github.run_number': profile.EXPECTED_RUN_NUMBER}
 
 
 class CreateTransportTests(unittest.TestCase):
     def raw(self):
-        return (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.encoding-marker.yml.inert').read_text()
+        return (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.run-number.yml.inert').read_text()
 
     def testOnlyReservedBranchCreationAdmitsJobPredicate(self):
-        admits = condition(self.raw()); event = dict(FIELDS)
+        admits = condition(self.raw()); event = event_fixture()
         self.assertTrue(admits(event))
-        for key in event:
+        for key, _ in FIELDS:
             for value in ('', 'different', None, 1, event[key] + '/suffix'):
                 with self.subTest(key=key, value=value):
                     self.assertFalse(admits({**event, key: value}))
@@ -71,7 +99,7 @@ class CreateTransportTests(unittest.TestCase):
             self.assertFalse(admits(missing))
 
     def testSourcePublicationMainMergesTagsAndOldManualEventCannotAdmitJob(self):
-        admits = condition(self.raw()); base = dict(FIELDS)
+        admits = condition(self.raw()); base = event_fixture()
         for name in ('main', 'native/review-create-transport', BRANCH + '-other'):
             self.assertFalse(admits({**base, 'github.event.ref': name, 'github.ref': 'refs/heads/' + name}))
         self.assertFalse(admits({**base, 'github.event.ref_type': 'tag', 'github.ref': 'refs/tags/' + BRANCH}))
@@ -79,7 +107,7 @@ class CreateTransportTests(unittest.TestCase):
             self.assertFalse(admits({**base, 'github.event_name': event}))
 
     def testCaseVariantSchedulerMatchStillRefusesBeforeOperationalAdmission(self):
-        admits = condition(self.raw()); event = dict(FIELDS)
+        admits = condition(self.raw()); event = event_fixture()
         identity_keys = {
             'github.event_name': 'GITHUB_EVENT_NAME',
             'github.repository': 'GITHUB_REPOSITORY',
@@ -91,13 +119,13 @@ class CreateTransportTests(unittest.TestCase):
             with self.subTest(key=key):
                 self.assertTrue(admits({**event, key: value.swapcase()}))
                 self.startup({identity_keys[key]: value.swapcase()})
-        variant = 'Validation/owned-build-framework-20261012'
+        variant = 'Validation/owned-build-encoding-once-20261013'
         self.assertTrue(admits({**event, 'github.event.ref': variant, 'github.ref': 'refs/heads/' + variant}))
         self.startup({'CREATED_REF': variant, 'GITHUB_REF': 'refs/heads/' + variant,
                       'GITHUB_WORKFLOW_REF': profile.REPOSITORY + '/' + profile.WORKFLOW + '@refs/heads/' + variant})
         # Do not imply the local model proves GitHub's Unicode folding semantics.
         with self.assertRaisesRegex(AssertionError, 'ASCII fixtures'):
-            admits({**event, 'github.event.ref': 'Välidation/owned-build-framework-20261012'})
+            admits({**event, 'github.event.ref': 'Välidation/owned-build-encoding-once-20261013'})
 
     def testMissingGuardClauseOrDisjunctionCannotSatisfyWorkflowOracle(self):
         raw = self.raw()
@@ -123,7 +151,7 @@ class CreateTransportTests(unittest.TestCase):
     def testOriginalManualAnchorRemainsExactHistoricalBytes(self):
         old = (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.yml.inert').read_bytes()
         self.assertEqual(hashlib.sha256(old).hexdigest(), '75ade725601f8375028f5842060cafdcdbb8e6bc8caae7c40881027e1a13749a')
-        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.encoding-marker.yml.inert'))
+        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.run-number.yml.inert'))
         self.assertEqual(profile.REF, 'refs/heads/' + BRANCH)
 
     def testNewAnchorBindsEveryHelperAndHostByteWithNormalisedProfile(self):
@@ -165,10 +193,10 @@ class CreateTransportTests(unittest.TestCase):
             load = stack.enter_context(patch.object(boot, 'load_modules'))
             load.return_value.run.return_value = 2
             if changes:
-                with self.assertRaises(boot.Refusal): boot.main(digest)
+                with self.assertRaises(boot.Refusal): boot.main(digest, '17')
                 admit.assert_not_called(); load.assert_not_called()
             else:
-                self.assertEqual(boot.main(digest), 2)
+                self.assertEqual(boot.main(digest, '17'), 2)
                 admit.assert_called_once(); load.assert_called_once()
                 self.assertEqual(load.return_value.run.call_args.args[0]['GITHUB_EVENT_NAME'], 'create')
 
@@ -205,6 +233,17 @@ class CreateTransportTests(unittest.TestCase):
                 with self.assertRaisesRegex(driver.pc.Refusal, 'driver dispatch identity'):
                     driver.run({**identity, key: value}, {}, started_at=0)
                 sources.assert_not_called(); admission.assert_not_called(); report.assert_not_called()
+
+    def testEveryConsumedMarkerRefusesBeforeOperationalAdmission(self):
+        for previous in ('validation/owned-build-once-20261012',
+                         'validation/owned-build-framework-20261012',
+                         'validation/startup-keys-once-20261013'):
+            with self.subTest(previous=previous):
+                self.assertNotEqual(previous,BRANCH)
+                self.assertFalse(condition(self.raw())({**event_fixture(),
+                    'github.event.ref':previous,'github.ref':'refs/heads/'+previous}))
+                self.startup({'CREATED_REF':previous,'GITHUB_REF':'refs/heads/'+previous,
+                    'GITHUB_WORKFLOW_REF':profile.REPOSITORY+'/'+profile.WORKFLOW+'@refs/heads/'+previous})
 
 
 if __name__ == '__main__': unittest.main()

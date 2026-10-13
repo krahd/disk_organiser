@@ -23,7 +23,8 @@ MODULES = ('probe_contract', 'xctestrun_binding', 'runner_expectations',
            'native_observations', 'stage_b_commands', 'stage_b_admission',
            'experiment_controller', 'stage_b_receipt', 'stage_b_upload', 'stage_b_driver')
 PROFILE_FIELDS = {'BUILD_ONLY_ENABLED', 'HOST_SOURCE_COMMIT', 'HOST_ROWS_SHA256', 'HOST_ROWS',
-                  'WORKFLOW', 'TEMPLATE', 'REPOSITORY', 'REF', 'PYTHON', 'MODULE_ROWS'}
+                  'WORKFLOW', 'TEMPLATE', 'REPOSITORY', 'REF', 'PYTHON', 'MODULE_ROWS',
+                  'EXPECTED_RUN_NUMBER'}
 STARTUP_FIXED = {'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C', 'LC_ALL': 'C'}
 STARTUP_IDENTITY = frozenset({
     'EXPECTED_DRIVER_SHA', 'GITHUB_EVENT_NAME', 'GITHUB_REPOSITORY', 'GITHUB_REF',
@@ -219,7 +220,29 @@ def decode_profile(raw, expected_normalised_sha256):
     require(type(values['HOST_ROWS']) is tuple and len(values['HOST_ROWS']) == 19 and
             type(values['MODULE_ROWS']) is tuple and len(values['MODULE_ROWS']) == len(MODULES) + 1,
             'fixed source row counts')
+    number = values['EXPECTED_RUN_NUMBER']
+    # Zero is an unconfigured source-only sentinel, never an admissible run.
+    require(type(number) is int and 0 <= number <= 1_000_000_000 and
+            (number > 0 or values['BUILD_ONLY_ENABLED'] is False), 'profile run number')
     return values
+
+
+def parse_run_number(actual):
+    # Deliberately stricter than GitHub's loose numeric expression equality.
+    require(type(actual) is str and 1 <= len(actual) <= 10 and
+            re.fullmatch(r'[1-9][0-9]{0,9}', actual) is not None, 'run number spelling')
+    number = int(actual)
+    require(number <= 1_000_000_000, 'run number bound')
+    return number
+
+
+def verify_run_number(actual, profile):
+    expected = profile['EXPECTED_RUN_NUMBER']
+    require(type(expected) is int and 1 <= expected <= 1_000_000_000,
+            'unconfigured run number')
+    number = parse_run_number(actual)
+    require(number == expected, 'run number mismatch')
+    return number
 
 
 def verify_dispatch(environment, workflow, template, profile):
@@ -294,7 +317,7 @@ def load_modules(profile, source, *, check=None):
     return sys.modules['stage_b_driver']
 
 
-def main(expected_profile_hash):
+def main(expected_profile_hash, actual_run_number):
     started_at = time.monotonic()
     require(math.isfinite(started_at), 'startup clock')
     last_clock = started_at
@@ -314,6 +337,9 @@ def main(expected_profile_hash):
     environment = startup_environment(os.environ)
     identity = verify_dispatch(environment, read(profile['WORKFLOW'], 32768),
                                read(profile['TEMPLATE'], 32768), profile)
+    # Exact dispatch/workflow/source identity precedes this immutable counter.
+    # Both checks precede operational source imports and every build owner.
+    identity['run_number'] = verify_run_number(actual_run_number, profile)
     source, host = admit_sources(profile, read)
     identity['interpreter'] = interpreter
     identity['profile_sha256'] = hashlib.sha256(raw).hexdigest()
@@ -331,11 +357,11 @@ def main(expected_profile_hash):
 
 
 if __name__ == '__main__':
-    # The single hash argument is literal in the reviewed template, never user input.
-    if len(sys.argv) != 2 or not re.fullmatch(r'[0-9a-f]{64}', sys.argv[1]):
+    # The hash is literal; the counter is one quoted Actions-context argument.
+    if len(sys.argv) != 3 or not re.fullmatch(r'[0-9a-f]{64}', sys.argv[1]):
         raise SystemExit(2)
     try:
-        result = main(sys.argv[1])
+        result = main(sys.argv[1], sys.argv[2])
     except BaseException as error:
         print('OWNED_BUILD_STARTUP_REFUSED ' + json.dumps(
             startup_refusal_record(error), sort_keys=True, separators=(',', ':')))

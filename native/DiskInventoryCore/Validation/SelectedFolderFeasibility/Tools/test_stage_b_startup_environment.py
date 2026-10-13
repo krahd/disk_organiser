@@ -79,7 +79,7 @@ class StartupEnvironmentTests(unittest.TestCase):
              patch.object(boot.os,'uname',return_value=SimpleNamespace(machine='arm64')), \
              patch.object(boot.os,'environ',environment):
             with self.assertRaisesRegex(boot.Refusal,'startup environment keys') as caught:
-                boot.main('a'*64)
+                boot.main('a'*64, '17')
             self.assertEqual(caught.exception.key_diagnostic['unknown_count'], 1)
         self.assertEqual(read.call_count,1);dispatch.assert_not_called();admit.assert_not_called();load.assert_not_called()
 
@@ -218,7 +218,7 @@ class StartupEnvironmentTests(unittest.TestCase):
         self.assertNotIn('startup_environment', ast.unparse(handler))
 
     def shell(self):
-        raw=(Path(__file__).parents[1]/'StageB/owned-selected-folder-build.encoding-marker.yml.inert').read_text()
+        raw=(Path(__file__).parents[1]/'StageB/owned-selected-folder-build.run-number.yml.inert').read_text()
         run=raw.split('        run: |\n',1)[1].split('      - name:',1)[0]
         return '\n'.join(line[10:] for line in run.splitlines())
 
@@ -243,7 +243,9 @@ class StartupEnvironmentTests(unittest.TestCase):
         expected['CHECKED_OUT_SHA']='$checked_out_sha';expected.update(FIXED)
         self.assertEqual(environment,expected)
         self.assertEqual(command[:5],[PYTHON,'-I','-S','-B',TOOLS+'stage_b_bootstrap.py'])
-        self.assertEqual(len(command),6);self.assertRegex(command[-1],r'^[0-9a-f]{64}$')
+        self.assertEqual(len(command),7);self.assertRegex(command[-2],r'^[0-9a-f]{64}$')
+        self.assertEqual(command[-1],'$ACTUAL_RUN_NUMBER')
+        self.assertIn(' "$ACTUAL_RUN_NUMBER"',raw)
         for key,value in expected.items():
             if value.startswith('$'):self.assertIn(key+'="'+value+'"',raw)
         raw,environment,command=self.launch(shell,'report_path')
