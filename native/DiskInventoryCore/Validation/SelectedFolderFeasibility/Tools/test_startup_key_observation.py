@@ -303,14 +303,14 @@ class StartupOnlyObservationTests(unittest.TestCase):
             probe.decode_profile(raw,probe.PROFILE_HASH)
         values={n.targets[0].id:ast.literal_eval(n.value) for n in ast.parse(raw).body if isinstance(n,ast.Assign)}
         self.assertIs(type(values['BUILD_ONLY_ENABLED']),bool)
-        self.assertEqual(values['REF'],'refs/heads/validation/owned-build-xctest-hooks-once-20261013')
+        self.assertEqual(values['REF'],'refs/heads/validation/owned-build-static-dependencies-once-20261013')
         if values['BUILD_ONLY_ENABLED']:
             self.assertEqual((ROOT/values['WORKFLOW']).read_bytes(),(ROOT/values['TEMPLATE']).read_bytes())
         else:
             self.assertFalse((ROOT/values['WORKFLOW']).exists())
         self.assertFalse((ROOT/probe.WORKFLOW).exists())
         self.assertNotEqual(probe.REF,values['REF'])
-        self.assertEqual(len(list((HERE.parent/'StageB').glob('owned-selected-folder-build*.yml.inert'))),16)
+        self.assertEqual(len(list((HERE.parent/'StageB').glob('owned-selected-folder-build*.yml.inert'))),17)
 
 
 if __name__=='__main__':unittest.main()

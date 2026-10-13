@@ -216,7 +216,7 @@ class EncodingMarkerTests(unittest.TestCase):
         normal=raw.replace(b'BUILD_ONLY_ENABLED = True\n',b'BUILD_ONLY_ENABLED = False\n',1)
         self.assertIn(hashlib.sha256(normal).hexdigest().encode(),new)
         self.assertIs(type(profile.BUILD_ONLY_ENABLED),bool)
-        self.assertEqual(profile.REF,'refs/heads/validation/owned-build-xctest-hooks-once-20261013')
+        self.assertEqual(profile.REF,'refs/heads/validation/owned-build-static-dependencies-once-20261013')
         if profile.BUILD_ONLY_ENABLED:
             self.assertEqual((repo/profile.WORKFLOW).read_bytes(),new)
         else:

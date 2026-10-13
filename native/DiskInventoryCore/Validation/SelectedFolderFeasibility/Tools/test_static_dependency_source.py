@@ -20,7 +20,11 @@ class StaticDependencySourceTests(unittest.TestCase):
     def testHistoricalProfileAndOnlyFourNewModulePins(self):
         old=(HERE/'StageB/debug-layout.profile.inert').read_bytes()
         self.assertEqual(sha(old),'f4857f38dbb1e3182c76dc94302e4d8e2d78b26b6c8259b213c4d78351de3e86')
-        prior=values(old);raw=(HERE/'Tools/stage_b_profile.py').read_bytes();current=values(raw)
+        prior=values(old)
+        # Preserve exact inactive inspector composition as historical evidence.
+        raw=(HERE/'StageB/static-dependencies.profile.inert').read_bytes()
+        self.assertEqual(sha(raw),'23d7f29b67f48c99fae6fbdd67d24dc775fe1a2163c72131a10e66e492c7f37b')
+        current=values(raw)
         self.assertEqual(set(current),set(prior))
         for key in current:
             if key not in ('MODULE_ROWS','TEMPLATE','BUILD_ONLY_ENABLED'):
@@ -36,12 +40,18 @@ class StaticDependencySourceTests(unittest.TestCase):
         previous=(ROOT/prior['TEMPLATE']).read_bytes()
         normal=raw.replace(b'BUILD_ONLY_ENABLED = True\n',b'BUILD_ONLY_ENABLED = False\n',1)
         self.assertEqual(template,previous.replace(sha(old).encode(),sha(normal).encode()))
+        self.assertEqual(current['EXPECTED_RUN_NUMBER'],10)
+        self.assertIs(current['BUILD_ONLY_ENABLED'],False)
+        live=values((HERE/'Tools/stage_b_profile.py').read_bytes())
+        self.assertEqual(live['MODULE_ROWS'],current['MODULE_ROWS'])
+        self.assertEqual(live['HOST_ROWS'],current['HOST_ROWS'])
+        self.assertEqual(live['HOST_SOURCE_COMMIT'],current['HOST_SOURCE_COMMIT'])
+        current=live;template=(ROOT/current['TEMPLATE']).read_bytes()
         self.assertIs(type(current['BUILD_ONLY_ENABLED']),bool)
         if current['BUILD_ONLY_ENABLED']:
             self.assertEqual((ROOT/current['WORKFLOW']).read_bytes(),template)
         else:self.assertFalse((ROOT/current['WORKFLOW']).exists())
         self.assertFalse((ROOT/'.github/workflows/owned-startup-key-observation.yml').exists())
-        self.assertEqual(current['EXPECTED_RUN_NUMBER'],10)
 
     def testOriginalThirtyOneCommandBodiesAndLimitsRemainExact(self):
         raw=(HERE/'Tools/stage_b_commands.py').read_bytes()
