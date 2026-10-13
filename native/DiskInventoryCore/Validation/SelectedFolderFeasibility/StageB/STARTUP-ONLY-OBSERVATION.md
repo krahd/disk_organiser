@@ -36,3 +36,15 @@ Before the single connector trigger: verify actual-main ordinary CI, exact head/
 ## Validation state
 
 The candidate has 363 passing memory/mock methods retaining all 331 earlier identities, nineteen structural checks, five existing default refusals, plus the new entry's fixed no-argument refusal. Shared helper/source parity, privacy/count limits, late mutation, dispatch failure, workflow closure and terminal output branches are checked without executing the macOS diagnostic. All 233 native method identities and existing runtime/UI source are unchanged. Exact successor ordinary CI and the one real startup observation remain pending.
+
+## Executed one-shot result and terminal deactivation
+
+The single [create-event run 38359714196](https://github.com/krahd/disk_organiser/actions/runs/38359714196), job 115170769056, attempt 1, ran the exact merged main `3389aa6d7d9dbd007e7d3c9987a82308e7c434fc`. The one application record reported `keys_mismatch`: no expected omissions; exactly one unexpected key; `__CF_USER_TEXT_ENCODING` present; `LC_CTYPE`, `__PYVENV_LAUNCHER__` and `_` absent; unknown count zero; neither count capped. The full prefixed record including newline is 324 bytes. No environment value or arbitrary name was logged.
+
+The observation exited 2 by design, so GitHub reports failure. This is a successfully obtained negative observation, not build or application acceptance. Source ordering and that terminal record establish that fixed CLI/source/profile/interpreter/system gates completed before the actual key capture. No build, signing, operational import, host, panel or grant path exists in the entry. No artefacts were uploaded.
+
+The retained decoded job log is 13,526 UTF-8 bytes including its initial BOM, SHA-256 `4c1ff2b5b87629e16c1182f2044b0819a9771350c190f90ae19035e5c94671ec`. Actions identifies image `20260907.0337.1`. The controlled launch's sole observed extra key is established; the previous build-only run's exact process history and cause are not proved. The added source/template/system checks and False gate remain disclosed differences. No key value, allowlist exception or further execution permission is inferred.
+
+The active diagnostic workflow is removed after this terminal result. Its inert template and entry remain exact; the build profile remains False and the build workflow absent. The source-template test now recognises both explicit reviewed repository states, still rejecting altered bytes whenever the active path exists; all template syntax, argument, hash and bounds assertions remain. All 363 memory/mock methods and nineteen structural checks pass locally, with all earlier identities retained. Ordinary exact-successor CI remains pending at this deactivation checkpoint.
+
+Keep the consumed diagnostic marker `validation/startup-keys-once-20261013` at `3389aa6d7d9dbd007e7d3c9987a82308e7c434fc`, and both previous build markers unchanged. No rerun, replacement marker or build follows from this observation.
