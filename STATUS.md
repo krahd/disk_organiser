@@ -1,6 +1,15 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-12 23:51
+Last updated: 2026-10-13 00:52
+
+## Framework build-only attempt: environment refusal and deactivation
+
+- The reviewed activation in [PR40](https://github.com/krahd/disk_organiser/pull/40) is integrated at `9f189aa0dbf4f4823881ff3ad267dc83c3d02c98`, tree `fe7fa353c3c372f4a6f504a4667708a6d1436150`. All twelve source push/PR ordinary workflows passed on their first attempts. All six actual-main workflows are now successful, with the native workflow requiring one authorised ordinary retry. Its original job `115069784588` passed 232 of 233 methods: a selected-result checkbox recorded only `mousedown`, rather than the required complete event sequence, before the Close/lost-ack actions. Unchanged-source [retry job115071820331](https://github.com/krahd/disk_organiser/actions/runs/38327602027/job/115071820331) passed all 233 distinct methods once, six differential/six parser cases and 82 strict hit/centre pairs. No timing or product fix is claimed; the initial failure remains unexplained and its log/captures are preserved. These ordinary checks did not execute the isolated build-only host.
+- The separately approved connector request created `validation/owned-build-framework-20261012` exactly once at that main SHA. The remote marker and [create-event run38328990361](https://github.com/krahd/disk_organiser/actions/runs/38328990361), attempt 1, agree. The prior consumed marker `validation/owned-build-once-20261012` remains at `ba901b91d4f0d00cb0fbe8b954b16dcb50154e76`. Source-publication run `38327024351` was skipped and was not the new build attempt.
+- Actual [job115074157764](https://github.com/krahd/disk_organiser/actions/runs/38328990361/job/115074157764) checked out exact `9f189aa0` and reported executable `/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12`, Python 3.12.10 and platform `darwin`. It then exited 2 with `OWNED_BUILD_STARTUP_REFUSED`, kind `Refusal`, message `startup environment keys`. The exact checked-out bootstrap places that check after its full interpreter-identity gate and before dispatch/workflow validation, operational module admission and owner creation. The earlier interpreter gate therefore passed in this execution; the log does not print its complete seven-key facts object or authenticate loaded interpreter bytes. Missing/unexpected environment names and their cause are not recorded, so no particular environment-key diagnosis is established.
+- No `OWNED_BUILD_TERMINAL`, verified report path or artifact was produced; the upload step subsequently failed because its required path was absent. The original connector-decoded UTF-8 job log, including BOM, is 14,642 bytes, SHA-256 `bfdf80e66fef38a8419b722aef420962b1b9f0030e832d627daaf0d8b63473b0`, and the retained local bytes round-trip exactly. No operational source/report owner, native build/sign/inspect call, host launch, panel or grant was reached. No owner-retirement execution or new pixel acceptance is claimed.
+- This minimal successor restores `BUILD_ONLY_ENABLED = False` and removes only the active workflow copy. All fourteen operational helper bodies, nineteen host inputs, three historical inactive anchors, command tuples, source pins, ordinary workflow/runtime files, 233 native identities and both consumed remote markers remain unchanged. The reconstructed local source closure passes 322 memory/mock methods, nineteen structural checks and five named default-entry refusals. These checks do not supply the missing build-only evidence; fresh independent review and ordinary successor CI are still required.
+- This fresh attempt is consumed. There is no rerun, replacement marker, automatic retry or relaxed environment admission. Any further diagnostic/compatibility source change needs its own review, and any further build-only attempt requires a new explicit decision. Both default controller gates, the ordinary real-folder control and Stage C remain closed. The source-specific history below is preserved apart from the mandatory matching status timestamps.
 
 ## Local candidate for one fresh framework-launcher build-only decision
 
@@ -1016,4 +1025,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-12 23:51
+Last updated: 2026-10-13 00:52
