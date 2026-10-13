@@ -1,6 +1,14 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 19:43
+Last updated: 2026-10-13 20:10
+
+## Consumed run-ten unsigned-build success and host-signing failure
+
+- [PR57](https://github.com/krahd/disk_organiser/pull/57) merged immutable ten at `7b93e2c6950b7504ce3ba5f3250897560a401261`, tree `3688bec3f70685ddd46f4105c58f96277acf71e6`. All twelve source/PR and six actual-main ordinary workflows passed first attempt: 233+6+6, 82 true hit pairs, four Cancel phases and thirteen browser journeys per relevant lane. Earlier ordinary UI delivery flakiness remains unresolved; no new original-pixel review is claimed.
+- One cleared connector call created the preserved hook marker. [Run 38459886396](https://github.com/krahd/disk_organiser/actions/runs/38459886396), workflow ID 382488090/number ten/attempt one, passed admission and toolchain checks. Full unsigned build-for-testing returned zero, with both host and UI bundle compiling/linking for arm64/x86_64 and universal construction. The async XCTest hook repair is therefore compiler-validated in this invocation, without any UI-test or app execution.
+- Two explicit ad-hoc signing commands returned zero for the test bundle and runner. Host signing then returned one, reporting unsigned `OwnedFolderProbe.debug.dylib` inside the host app. No later static verification or complete signed-product acceptance occurred. The [terminal evidence record](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/RUN-TEN-ACTIVATION.md#terminal-result-and-deactivation-2026-10-13) retains exact logs, all 26 hashed packet members, fourteen tool streams, product inventory and the fourteen-day artifact expiry. All seven direct children/groups retired, source admission retired and fixture/workspace handles closed with no recorded cleanup failure; this is not proof of all-product deletion.
+- Terminal cleanup keeps False, consumed ten/the same ref, all seven marker refs, fifteen inert anchors, fourteen helper bodies and nineteen host inputs exact, and removes the active workflow. Both experimental workflows are absent. All 417 memory/mock tests, nineteen structural checks and six default refusals pass; all 233 ordinary native method sources remain unchanged. Independent cleanup review and ordinary successor CI are pending at this checkpoint.
+- No app/UI launch, panel, grant, user drive or Stage C ran. Ten cannot be retried or repinned. A later exact signing-layout/source correction must be independently reviewed, without blanket deep signing or arbitrary discovered signing targets. Full signed-build acceptance and runtime folder-grant compatibility remain open; ambient-marker and retention limits remain.
 
 ## Immutable-ten XCTest hook build-only source
 
@@ -1188,4 +1196,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 19:43
+Last updated: 2026-10-13 20:10

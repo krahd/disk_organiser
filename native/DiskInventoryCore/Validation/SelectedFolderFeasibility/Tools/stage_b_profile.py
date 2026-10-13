@@ -1,5 +1,5 @@
 """Reviewed asynchronous XCTest hook pins for immutable ten; final execution gate remains."""
-BUILD_ONLY_ENABLED = True
+BUILD_ONLY_ENABLED = False
 EXPECTED_RUN_NUMBER = 10
 HOST_SOURCE_COMMIT = '9eed307659fead2eb5e2824e0d6964277d48c6e6'
 HOST_ROWS_SHA256 = '53ce9d38d3ede095cc190140ac69991b4df3f5c024a940ef6985457ff992318c'
