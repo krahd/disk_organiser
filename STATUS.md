@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 01:31
+Last updated: 2026-10-13 05:57
+
+## Single startup-key observation candidate
+
+- [PR42](https://github.com/krahd/disk_organiser/pull/42) merged the reviewed disabled diagnostic at `3eabc67d5604cd57669c716a49febd9e069d5d1d`, exact tree `48e17da693b307f5ad5f1c960a113a605b6e5aec`. All twelve source and six actual-main ordinary workflows passed first attempt. The [actual-main native job](https://github.com/krahd/disk_organiser/actions/runs/38335518111/job/115094589189) retains all 233 distinct methods once, six differential/six parser cases, 82 hit/centre pairs and four Cancel phases; the [catalogue job](https://github.com/krahd/disk_organiser/actions/runs/38335518058/job/115094589405) passes thirteen browser journeys. No new image inspection or startup-diagnostic execution is inferred from ordinary CI.
+- This separate [startup-only observation](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/STARTUP-ONLY-OBSERVATION.md) is a single five-minute job with one bounded fixed-Python invocation. It observes actual post-startup `os.environ` keys once, without reconstructing/filtering them or first rejecting strict key equality. Its output is limited to fixed expected-name omissions, four fixed presence booleans and capped counts, or a fixed inconclusive enum. Unknown names and all values are excluded. Both matching and mismatching branches terminate with no operational import, build/sign, host/picker, grant or drive operation.
+- All 331 prior memory/mock methods are retained; 32 new methods cover the standalone entry, late-mutation/privacy/output/terminal cases and the narrow source-workflow guard. All 363 pass locally, alongside nineteen source checks and five existing default refusals. The new no-argument entry emits only its fixed inconclusive record and exits 2. Existing build profile, fourteen operational helper bodies, nineteen host inputs, four historical anchors and ordinary helper/workflow pins stay exact. The guard admits only the exact additional diagnostic workflow while build enabled is False, and forbids simultaneous build activation.
+- The proposed new reserved marker is `validation/startup-keys-once-20261013`; both consumed build markers are preserved. Independent source review, exact ordinary CI/main verification and the final frozen trigger-payload check precede the one authorised observation. The diagnostic workflow is removed after its terminal result. No new execution has occurred at this source checkpoint; the previous environment mismatch's cause remains unknown, and an unknown-key count might not identify the offender.
 
 ## Disabled startup environment-key diagnostic
 
@@ -1033,4 +1040,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 01:31
+Last updated: 2026-10-13 05:57
