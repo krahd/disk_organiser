@@ -1,6 +1,39 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 18:26
+Last updated: 2026-10-13 18:55
+
+## Consumed run-nine actor-isolation result and terminal cleanup
+
+- [PR54](https://github.com/krahd/disk_organiser/pull/54) merged the reviewed
+  immutable-nine source at `05f3e0e6bcca610fed6857da3910449e8ef97d12`, tree
+  `1e0b1d8f1257b6eae63e97ea6641bd99360b661b`. All twelve source/PR and six
+  actual-main ordinary workflows passed first attempt: 233 + 6 + 6, 82 native
+  hit pairs, four Cancel phases and thirteen browser journeys. Earlier ordinary
+  pointer-event failures remain unresolved; no new pixel review is claimed.
+- One reviewed connector call created the preserved explicit-self marker.
+  [Run 38449777601](https://github.com/krahd/disk_organiser/actions/runs/38449777601),
+  workflow ID 382488090/number 9/attempt 1, passed admission and three toolchain
+  commands, then unsigned build-for-testing failed with return 65. The log records
+  arm64/x86_64 host compile/link and universal binary construction, with the binary
+  present in the recorded product inventory. The previous DIR/explicit-self errors
+  are absent. The full build still failed with 31 main-actor isolation errors in
+  synchronous setup/teardown of `UITests/SelectionProbeUITests.swift`. No later
+  explicit signing/static-inspection command or app/UI/panel/grant/user-drive/
+  Stage C launch occurred. The actor repair requires separate inactive review.
+- The verified artifact contains exact original logs/tool streams and all twenty
+  manifest member hashes. Four children were recorded reaped, groups retired,
+  fixture unchanged, admission retired and fixture/workspace handles closed with
+  no recorded cleanup failure; this does not claim all products were deleted.
+  Archive expiry is 2026-10-27T18:49:58Z. See the exact links, lengths and digests in
+  `native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/RUN-NINE-ACTIVATION.md`.
+  Complete observed history has eleven records and one new event, without a
+  guarantee against delayed delivery.
+- This four-path terminal cleanup sets False and removes the active workflow,
+  retaining immutable 9, six consumed markers, thirteen anchors, fourteen helpers
+  and nineteen host inputs. Both experimental workflows are absent. All 412 local
+  memory/mock methods, nineteen source checks and six default refusals pass;
+  all 233 ordinary native sources remain exact. Independent review and new ordinary
+  CI remain pending. No compiler fix, retry, repin or new attempt is bundled.
 
 ## Immutable-nine explicit-self build-only source proposal
 
@@ -1140,4 +1173,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 18:26
+Last updated: 2026-10-13 18:55

@@ -91,3 +91,71 @@ All 233 native method identities remain unchanged. Nineteen source-isolation che
 and six default refusals also pass. These checks do not compile, sign or run the
 host. Actual successor CI, activation publication and any operational call are
 pending their separate gates at this source freeze.
+
+
+## Terminal result and deactivation (2026-10-13)
+
+[PR54](https://github.com/krahd/disk_organiser/pull/54) merged normally at
+`05f3e0e6bcca610fed6857da3910449e8ef97d12`, tree
+`1e0b1d8f1257b6eae63e97ea6641bd99360b661b`. All twelve source/PR and six
+actual-main ordinary workflows passed first attempt. Original native logs retain
+233 distinct methods, six differential/six parser cases, 82 true hit pairs and
+four Cancel observations; browser companions pass thirteen journeys. This does
+not compile the quarantined host or diagnose the earlier ordinary UI event
+failure. No new pixel acceptance is claimed.
+
+Following final payload review and fresh exact guards, one connector call created
+`validation/owned-build-explicit-self-once-20261013` at that main. Its preserved
+marker and [run 38449777601](https://github.com/krahd/disk_organiser/actions/runs/38449777601)
+match workflow ID 382488090, number 9, attempt 1. The complete observed create history
+contains eleven records and one new event. That does not guarantee against delayed
+delivery. Nine is consumed; no retry, repin, rerun, later duplicate fallback or
+marker recreation is authorised by the outcome.
+
+Startup/runtime/optional-marker/counter/source admission passed. The identity
+record reports CPython 3.12.10 at the fixed framework path, arm64/macOS 15.7.9,
+Xcode 16.4/16F6, SDK 15.5 and Swift 6.1.2. Three toolchain commands succeeded, then
+unsigned build-for-testing returned 65. The compiler stdout now records host
+compilation/link steps for arm64 and x86_64, universal host binary construction,
+and the product inventory records that binary. The previous DIR and explicit-self
+diagnostics are absent from this log. These positive host observations do not
+establish a successful complete build or signed product.
+
+The newly measured failure is 31 main-actor isolation diagnostics in
+`UITests/SelectionProbeUITests.swift`, at its synchronous setup/teardown code
+(lines 16–54). The whole build-for-testing command failed. No later explicit
+ad-hoc signing/static-inspection command ran. No app, UI test, panel, selected
+source grant, user drive or Stage C was launched. A future actor-isolation repair
+is a separate inactive source review, not bundled into this cleanup.
+
+The verified-data upload succeeded. All four tool records report direct children
+reaped and owned groups retired. Fixture hash remains unchanged; admission is
+retired and fixture/workspace handles closed, with no recorded cleanup failure.
+These observations do not establish deletion of every temporary product. A
+partial app bundle and generated xctestrun are not whole-build acceptance.
+
+Exact original evidence:
+
+- [Job 115477389176](https://github.com/krahd/disk_organiser/actions/runs/38449777601/job/115477389176):
+  16,304-byte connector-decoded log, SHA256
+  `a4eb315f15cea6494cd2a0e82fcb0ee2c6cf1e3a4ca7b8f0091ff33e8cdcc916`.
+- [Artifact 11839523789](https://github.com/krahd/disk_organiser/actions/runs/38449777601/artifacts/11839523789):
+  175,567-byte ZIP, SHA256
+  `6e109031b8e94ebcd914529be6f0e759c854ccc7fb6a27db6422ad67ca1bc151`.
+  Reported expiry 2026-10-27T18:49:58Z; this is not permanent archival.
+- Manifest: 2,368 bytes, SHA256
+  `4e20d93d0fa137f4de4ee33568d9fffec85ae00723612ba31c5c71370a067612`.
+  All twenty named member lengths/hashes match; the twenty-first ZIP member is
+  the manifest. All eight tool streams match their tool-record hashes.
+- Compiler stdout: 138,243 bytes, SHA256
+  `1d7b7b07f14ba93994f14e6e235454ffeda3940528a4bbf73ce8377d37ed3d5a`.
+  Compiler stderr: 1,316 bytes, SHA256
+  `035edb4b396c8e29dc92fcf7eaee50c20b40f0bad460b0a512c4280a1ba3a01e`.
+
+This four-path cleanup sets False and removes the active build workflow, retaining
+immutable 9, all six consumed markers, thirteen inert anchors, fourteen helper
+bodies and nineteen host inputs. Both experimental workflows are absent. All 412
+local memory/mock methods, nineteen structural checks and six default refusals
+pass; all 233 ordinary native method sources remain exact. Independent review and
+ordinary successor/main CI remain required. Historical evidence, ambient marker
+risk and later runtime gates remain unchanged; no new attempt is included.
