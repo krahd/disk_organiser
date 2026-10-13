@@ -69,12 +69,12 @@ class XCTestHookSourceTests(unittest.TestCase):
         for key in current:
             if key not in ('HOST_SOURCE_COMMIT', 'HOST_ROWS_SHA256', 'HOST_ROWS', 'TEMPLATE'):
                 self.assertEqual(current[key], old[key], key)
-        self.assertEqual(profile.HOST_SOURCE_COMMIT, '9eed307659fead2eb5e2824e0d6964277d48c6e6')
+        self.assertEqual(profile.HOST_SOURCE_COMMIT, '33c3e70daa2a3f89896e8d2141e01aff577592bb')
         rows = tuple((name, hashlib.sha256((HERE/name).read_bytes()).hexdigest())
                      for name, _ in profile.HOST_ROWS)
         self.assertEqual(len(rows), 19)
         self.assertEqual(rows, profile.HOST_ROWS)
-        self.assertEqual([name for (name, h), (_, prior) in zip(rows, old['HOST_ROWS']) if h != prior],
+        self.assertEqual([name for (name, h), (_, prior) in zip(current['HOST_ROWS'], old['HOST_ROWS']) if h != prior],
                          ['UITests/SelectionProbeUITests.swift'])
         self.assertEqual(hashlib.sha256(json.dumps(list(rows), sort_keys=True,
                          separators=(',', ':')).encode()).hexdigest(), profile.HOST_ROWS_SHA256)
