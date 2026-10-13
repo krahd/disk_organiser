@@ -1,6 +1,14 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 00:52
+Last updated: 2026-10-13 01:31
+
+## Disabled startup environment-key diagnostic
+
+- [PR41](https://github.com/krahd/disk_organiser/pull/41) merged the reviewed deactivation at `c46ce4c132dfcb347b260433236b77f16bf6fc9e`, tree `4cfe6353b4267994d3428c55820412dde4650de7`. All twelve source and six actual-main ordinary workflows passed on first attempts. Both source native lanes and the [main native job](https://github.com/krahd/disk_organiser/actions/runs/38331474381/job/115081938416) retain 233 distinct methods once, six differential/six parser cases, 82 successful native hit/centre pairs and four Cancel diagnostic phases. The [main catalogue job](https://github.com/krahd/disk_organiser/actions/runs/38331474397/job/115081938583) passes thirteen browser journeys. These ordinary checks do not provide the failed build-only run's missing environment facts or new pixel acceptance.
+- This disabled source candidate adds a bounded data-only summary to the existing strict environment-key refusal. It reports omitted names only from the fixed expected set, capped unexpected/unknown counts and Boolean presence for four fixed system/launcher names. No arbitrary unknown name or environment value is emitted, hashed or retained. Every missing/extra key still refuses before dispatch, workflow reads, operational imports or owners; all value/fixed-setting checks remain unchanged. The [diagnostic contract](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/STARTUP-KEY-DIAGNOSTIC.md) defines its exact schema, 256-count saturation and tested 2,048-byte complete-notice bound.
+- All 322 prior memory/mock identities remain; nine added methods cover fixed omissions/presence, unknown-name/value privacy, forbidden value reads, count overflow, detached data, exact exception-type gating, JSON bounds and CLI wiring. All 331 memory/mock methods and nineteen source checks pass locally; five named no-argument entry points still refuse. All 233 native identities, the thirteen other operational helper bodies, nineteen host inputs, native command tuples and ordinary runtime files remain unchanged. No new native or diagnostic runtime execution is claimed.
+- The three historical inactive anchors remain byte-identical. A fourth inert diagnostic anchor changes only the normalised profile hash relative to the framework anchor and retains the already-consumed framework ref. The profile remains False, no active workflow exists and no new reserved branch or attempt is proposed. Both default controller gates, the ordinary real-folder control and Stage C remain closed. Independent source review and ordinary successor CI are still required before acceptance; another execution requires a separate explicit decision.
+- Primary-source inspection identifies possible platform mechanisms but does not identify the observed mismatch. CPython's source removes its launcher variable and bypasses ordinary locale coercion with nonempty LC_ALL; Apple's historical CoreFoundation source contains an environment-setting path but is not evidence of the current runner's executed implementation. The failed run recorded no differing names. There is no exception, relaxed allowlist or retry in this tranche. Earlier consumed-attempt and intermittent ordinary UI failure records below are preserved.
 
 ## Framework build-only attempt: environment refusal and deactivation
 
@@ -1025,4 +1033,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 00:52
+Last updated: 2026-10-13 01:31

@@ -52,4 +52,4 @@ def check(repo, enabled):
         relative = str(path.relative_to(repo))
         if path.is_file() and ordinary_native_source(relative):
             files[relative] = path.read_bytes()
-    return validate(files, baseline, (probe/'StageB/owned-selected-folder-build.framework.yml.inert').read_bytes(), enabled)
+    return validate(files, baseline, (probe/'StageB/owned-selected-folder-build.environment-diagnostic.yml.inert').read_bytes(), enabled)

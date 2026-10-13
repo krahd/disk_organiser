@@ -90,7 +90,7 @@ class InterpreterIdentityTests(unittest.TestCase):
         environment, _ = dt.BootstrapTests().identity()
         environment.update(boot.STARTUP_FIXED)
         environment.update(ImageOS='macos15', ImageVersion='20260907.0337.1')
-        template = (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.framework.yml.inert').read_bytes()
+        template = (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.environment-diagnostic.yml.inert').read_bytes()
         def read(name, limit, **kwargs):
             if name == boot.RELATIVE + '/Tools/stage_b_profile.py': return enabled
             if name in (profile.WORKFLOW, profile.TEMPLATE): return template
@@ -137,13 +137,14 @@ class InterpreterIdentityTests(unittest.TestCase):
         folder = Path(__file__).parents[1] / 'StageB'
         expected = {
             'owned-selected-folder-build.yml.inert': '75ade725601f8375028f5842060cafdcdbb8e6bc8caae7c40881027e1a13749a',
-            'owned-selected-folder-build.create.yml.inert': '87f1bfbea213a008890e6c3fee04c7bd2ae9590e59d2f37f2ace9b174c2e02d6'}
+            'owned-selected-folder-build.create.yml.inert': '87f1bfbea213a008890e6c3fee04c7bd2ae9590e59d2f37f2ace9b174c2e02d6',
+            'owned-selected-folder-build.framework.yml.inert': '84f4225638c054a43f2fffb82062abb4ca8da49c287ada7e43e5307fa68fcffc'}
         for name, digest in expected.items():
             self.assertEqual(hashlib.sha256((folder / name).read_bytes()).hexdigest(), digest)
         # Retain the historical method identity while checking the exact
         # currently reviewed state. Both states have independent paired oracles.
         self.assertIs(type(profile.BUILD_ONLY_ENABLED), bool)
-        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.framework.yml.inert'))
+        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.environment-diagnostic.yml.inert'))
         self.assertEqual(profile.PYTHON, PYTHON)
         self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-framework-20261012')
         repo = Path(__file__).parents[5]
