@@ -1,5 +1,7 @@
 # Disabled startup environment-key diagnostic
 
+Historical diagnostic contract: the strict-admission statements below describe the retained PR42 checkpoint. The later, still-disabled [fixed encoding-marker admission](ENCODING-MARKER-ADMISSION.md) supersedes only that key-set rule; the diagnostic schema and fixed presence Booleans remain unchanged.
+
 ## Observed limit
 
 The one approved framework attempt at `9f189aa0` stopped at `startup environment keys` in [run 38328990361](https://github.com/krahd/disk_organiser/actions/runs/38328990361). The exact bootstrap had already passed its fixed interpreter-identity gate, but had not reached dispatch/workflow validation, operational imports or owner creation. The log contains neither the key difference nor a complete interpreter-facts record. It does not establish which environment key was missing or added.
