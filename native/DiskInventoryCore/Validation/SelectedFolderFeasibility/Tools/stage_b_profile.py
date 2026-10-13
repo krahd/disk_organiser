@@ -1,5 +1,5 @@
 """Reviewed source pins for immutable run seven; execution needs final crosscheck."""
-BUILD_ONLY_ENABLED = True
+BUILD_ONLY_ENABLED = False
 EXPECTED_RUN_NUMBER = 7
 HOST_SOURCE_COMMIT = '19a2c5f6955d3732ab5cfc205a962a7f64eff1bb'
 HOST_ROWS_SHA256 = '7646f4915c190357a4d916420ebcf6a6d7e442ba9264e14f4306c39e1dbc0466'

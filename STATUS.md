@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 15:16
+Last updated: 2026-10-13 15:52
+
+## Consumed run-seven compiler result and terminal deactivation
+
+- [PR48](https://github.com/krahd/disk_organiser/pull/48) merged the reviewed immutable-seven candidate at `9f38511032e6b296ce13cdec98d95321663a55fd`, tree `0d2d7f6e9e223ff129af0dab4e3ba0a6cc6f5d83`. All twelve source/PR and six actual-main ordinary workflows passed first attempt. The [main native job](https://github.com/krahd/disk_organiser/actions/runs/38423102511/job/115385331289) retains 233 methods, six differential/six parser cases, 82 true hit/centre pairs and four Cancel phases; the [catalogue job](https://github.com/krahd/disk_organiser/actions/runs/38423102464/job/115385331954) passes thirteen journeys. No new pixel acceptance is claimed.
+- After fresh exact guards, the one connector call created the preserved `validation/owned-build-encoding-once-20261013` marker at that main. [Run 38424419438](https://github.com/krahd/disk_organiser/actions/runs/38424419438), workflow ID 382488090/number 7/attempt 1, passed startup/counter/source admission and three toolchain commands, then failed command four (`build-for-testing`, return 65). Original compiler output reports three `OpaquePointer`/`UnsafeMutablePointer<DIR>` errors at `Host/ProbeDescriptors.swift`:76, 82,90 in x86_64 compilation. Signing, signature inspection, app/UI/panel/grant execution and Stage C were not reached. The observed nine-record create history contains one new run, without a guarantee against later event delivery.
+- The verified-data upload succeeded. [The terminal evidence record](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/RUN-SEVEN-ACTIVATION.md#terminal-result-and-deactivation-2026-10-13) binds the 16,297-byte original log, 65,458-byte archive, all 20 member hashes and exact compiler streams. The packet records all four children reaped/groups retired, fixture unchanged, admission retired and fixture/workspace handles closed. Partial products and test configuration do not establish a successful build; GitHub reports archive expiry 2026-10-27T15:43:35Z.
+- This minimal cleanup sets False and removes the active build workflow while retaining immutable 7, all four consumed markers, every anchor, fourteen operational helpers and nineteen host inputs. Both experimental workflows are absent. All 402 local memory/mock methods, 19 structural checks and 6 default refusals pass; 233 native method sources remain exact. Independent review and new ordinary CI remain required. No retry, repin, new attempt or compiler repair is bundled; actual compilation is failed and later host/runtime acceptance remains open. The ambient encoding-marker risk remains unchanged.
 
 ## Conditional immutable run-seven source candidate
 
@@ -1075,4 +1082,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 15:16
+Last updated: 2026-10-13 15:52

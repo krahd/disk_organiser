@@ -35,3 +35,63 @@ After any terminal result, deactivate by restoring the Boolean False and removin
 ## Source verification
 
 All 402 memory/mock methods pass, retaining every prior 400 identity. Nineteen structural checks and six default entry refusals pass. All 233 native method sources and nineteen host inputs remain exact. This does not establish runtime effectiveness or provide new pixel evidence. Independent review is required before any source publication, and the exact operational call remains held.
+
+
+## Terminal result and deactivation (2026-10-13)
+
+The one exact connector branch creation was issued after the reviewed guards at
+`9f38511032e6b296ce13cdec98d95321663a55fd`. The preserved marker is
+`validation/owned-build-encoding-once-20261013`. The complete observed create
+history subsequently contains nine records, with one new [build run
+38424419438](https://github.com/krahd/disk_organiser/actions/runs/38424419438),
+workflow ID 382488090, number 7, attempt 1. This observation does not establish that
+a delayed extra event is impossible. Only seven remains eligible under the
+immutable gate; there is no repin, retry, rerun or marker recreation.
+
+The interpreter, encoding-marker, dispatch, counter and source gates admitted this
+run. The actual identity record reports CPython 3.12.10 at the fixed framework
+path, arm64/macOS 15.7.9, Xcode 16.4 build 16F6, SDK 15.5 and Swift 6.1.2. The first
+three bounded commands completed successfully. Command four, unsigned
+`xcodebuild build-for-testing`, returned 65. The original output reports three
+Swift type errors in `Host/ProbeDescriptors.swift`, lines 76, 82, 90, when compiling
+x86_64: `OpaquePointer` and `UnsafeMutablePointer<DIR>` do not match. This is an
+actual compiler boundary, not successful build or signing acceptance. Later
+commands, explicit ad-hoc signing and signature inspection did not run. No host,
+UI test, panel, source grant or Stage C was launched.
+
+The [job 115389924941](https://github.com/krahd/disk_organiser/actions/runs/38424419438/job/115389924941)
+failed and its verified-data upload succeeded. The packet records all four direct
+children reaped and owned groups retired, fixture unchanged, admission retired,
+and fixture/workspace handles closed. These are bounded recorded retirement
+observations, not a claim of deleting every temporary product. Partial products
+and a generated test configuration were inventoried; neither proves a valid
+built/signed app. The one failure has no recorded cleanup failures.
+
+Evidence checked against exact bytes:
+
+- Original connector-decoded job log: 16,297 bytes, SHA256
+  `c15ebcab89f3a49b03c8d08d79125828e201dcf60482bf7bdbe47ae0eb67f2a7`.
+- [Artifact 11827997292](https://github.com/krahd/disk_organiser/actions/runs/38424419438/artifacts/11827997292):
+  65,458-byte ZIP, SHA256
+  `6d6b31eade2d0a45d50ca7e35c8ee4239c61d4c7acf773f36287149b0450f70f`.
+  GitHub's reported expiry is 2026-10-27T15:43:35Z; this is not permanent archival.
+- Packet manifest: 2,366 bytes, SHA256
+  `257cf475b5e8d99056338a83c5706b35895e88fe22f9ed230de757a1756c928e`.
+  All twenty named members match their byte counts/digests; the twenty-first ZIP
+  member is this manifest. Every tool stdout/stderr digest matches its record.
+- Failing compiler stdout: 40,283 bytes, SHA256
+  `74e1a564b9722eb3e71cd79807b315c005915b80bbe9ce19397e4e3197e23627`.
+  Stderr: 900 bytes, SHA256
+  `9b830d7a8f536d68778e4489de995bf47df825c46bdbf2f87e0d58fb66d6e221`.
+
+This successor sets the profile False and removes the active build workflow.
+`EXPECTED_RUN_NUMBER = 7`, all four consumed markers, every comparison anchor,
+all fourteen operational helpers and nineteen host inputs remain exact. The
+startup diagnostic workflow remains absent. The 402 memory/mock methods,
+nineteen structural checks and six default refusals pass locally; all 233 native
+method sources remain exact. Independent source/evidence review and ordinary
+successor/main CI remain pending at this checkpoint. Earlier source/main CI
+belongs to its exact older source, not to the compiler-failed experiment or this
+cleanup. A pointer-type correction must be a separate reviewed inactive source
+change; the consumed counter 7 cannot authorise another run. Historical evidence,
+ambient optional-marker influence and all later runtime gates remain explicit.
