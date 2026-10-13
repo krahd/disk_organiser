@@ -122,3 +122,83 @@ consumed-nine assertion independently of this current ten source.
 Final source review, ordinary successor CI and any operational result are pending
 at this checkpoint. Local memory tests do not reserve ten or execute native code.
 No new source/build/signed-product/runtime acceptance is asserted here.
+
+
+## Terminal result and deactivation (2026-10-13)
+
+[PR57](https://github.com/krahd/disk_organiser/pull/57) merged the reviewed source at
+`7b93e2c6950b7504ce3ba5f3250897560a401261`, tree
+`3688bec3f70685ddd46f4105c58f96277acf71e6`. All twelve source/PR and six actual-main
+ordinary workflows passed first attempt. Source
+`a6c357f19346d25a18a01ee090d2a36ea6933bcc`, distinct PR checkout
+`081a36f7527e76d7aa692e68424de35b16744cc6` and main share that tree. Each native
+lane verifies 233+6+6, 82 true hit pairs and four Cancel phases; each browser lane
+passes thirteen journeys. Earlier ordinary UI delivery flakiness remains
+unresolved, and no new original-pixel review is claimed.
+
+Following the final payload crosscheck and fresh guards, one connector call
+created the preserved hook marker at that main SHA. The complete observed history
+then has twelve records, with one new event:
+[run 38459886396](https://github.com/krahd/disk_organiser/actions/runs/38459886396),
+stable workflow ID 382488090, number ten, attempt one. It is terminal failure;
+ten is consumed and cannot be retried, repinned or rerun. This one observed event
+does not guarantee that no delayed duplicate could ever appear.
+
+Runtime/source/counter admission and three toolchain commands passed. The actual
+facts remain CPython 3.12.10 at the fixed framework path, macOS 15.7.9/24G830,
+ARM64/image 20260907.0337.1, Xcode 16.4/16F6, SDK 15.5 and Swift 6.1.2. Tool four,
+the unsigned build-for-testing command, returned zero and its original stdout
+records `TEST BUILD SUCCEEDED`. Both host and UI-test bundle compile/link and
+universal arm64/x86_64 construction are present. No compiler error diagnostic
+appears in that stdout. This establishes the repaired async hook declarations'
+build compatibility in this invocation; it does not execute the UI tests.
+
+The next two explicit ad-hoc signing commands returned zero for the test bundle
+and runner. The seventh tool command, host signing with the fixed entitlement
+file, returned one. Its original stderr reports an unsigned code object in
+`OwnedFolderProbe.app/Contents/MacOS/OwnedFolderProbe.debug.dylib`. The explicit
+product inventory records that file. No further signing/static verification or
+signature acceptance was reached. Command-zero results for the first two signing
+steps are not a complete signed-product verification. No app, UI test, panel,
+grant, user drive or Stage C ran.
+
+The failure report calls the broad phase `prepare-or-build`; the exact tool index
+and arguments locate this failure at host signing after successful compilation.
+All seven direct children were reaped and owned groups retired. Source admission
+is retired and the fixture/workspace handles are closed, with no recorded cleanup
+failure; fixture hash is unchanged and the failure record reports unchanged
+source. These records do not prove deletion of every temporary product.
+
+### Original evidence
+
+- [Job 115511996543](https://github.com/krahd/disk_organiser/actions/runs/38459886396/job/115511996543):
+  16,304-byte original log, SHA256
+  `d6f9fcd79e19d811fac17f279c93e3106371da21fc33d7449e77edc7339ba946`.
+- [Artifact 11845800397](https://github.com/krahd/disk_organiser/actions/runs/38459886396/artifacts/11845800397):
+  231,463-byte ZIP, SHA256
+  `93a75eebd9491624ffcfb391320cdf8adff9cccd592494ab88b8e593dd55f798`.
+  It expires on 2026-10-27 at 20:05:33 UTC; no durable archive is implied.
+- All 26 manifest members and all fourteen tool streams match their recorded
+  lengths/hashes. The 3,071-byte manifest SHA256 is
+  `06d5b79d4645fcd8e209a90d1e1da405425acdd170f9b86806eb18f6a09d3f33`.
+- Successful compiler stdout: 150,728 bytes, SHA256
+  `1cd0bca5c7491995b5a429261a9b6482b76f1f13c4c33eb3b37fe624c5a5923c`.
+- Failed host-signing stderr: 362 bytes, SHA256
+  `5f2d73bfb65899bf474a6affc0ed922138f9001148813fa472e07dc0aaf8c3e0`.
+
+### Closed operational state
+
+This terminal cleanup changes only the profile Boolean to False, removes the
+active workflow and records these facts. Immutable ten and its consumed ref,
+all seven marker refs, fifteen old inert anchors, fourteen helper bodies and
+nineteen host inputs remain exact. Both experimental workflows are absent.
+All 417 memory/mock methods, nineteen structural checks and six default refusals
+pass, with 233 ordinary native method sources retained. Independent cleanup
+review and ordinary successor CI are pending at this checkpoint.
+
+Any signing-layout repair requires separate source review. Do not introduce
+blanket deep signing or sign arbitrary discovered paths. An extra owned signing
+command would require its exact allowlist/profile/budget review; no immediate
+operational retry is authorised. A future attempt or Stage C remains separately
+reviewed. Full signed-build acceptance, real-folder usability and runtime grant
+compatibility are still open.
