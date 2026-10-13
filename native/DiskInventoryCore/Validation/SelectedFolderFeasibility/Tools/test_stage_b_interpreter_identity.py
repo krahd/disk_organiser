@@ -90,7 +90,7 @@ class InterpreterIdentityTests(unittest.TestCase):
         environment, _ = dt.BootstrapTests().identity()
         environment.update(boot.STARTUP_FIXED)
         environment.update(ImageOS='macos15', ImageVersion='20260907.0337.1')
-        template = (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.explicit-self.yml.inert').read_bytes()
+        template = (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.run-nine.yml.inert').read_bytes()
         def read(name, limit, **kwargs):
             if name == boot.RELATIVE + '/Tools/stage_b_profile.py': return enabled
             if name in (profile.WORKFLOW, profile.TEMPLATE): return template
@@ -144,9 +144,9 @@ class InterpreterIdentityTests(unittest.TestCase):
         # Retain the historical method identity while checking the exact
         # currently reviewed state. Both states have independent paired oracles.
         self.assertIs(type(profile.BUILD_ONLY_ENABLED), bool)
-        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.explicit-self.yml.inert'))
+        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.run-nine.yml.inert'))
         self.assertEqual(profile.PYTHON, PYTHON)
-        self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-dir-stream-once-20261013')
+        self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-explicit-self-once-20261013')
         repo = Path(__file__).parents[5]
         active = repo / profile.WORKFLOW
         if profile.BUILD_ONLY_ENABLED:

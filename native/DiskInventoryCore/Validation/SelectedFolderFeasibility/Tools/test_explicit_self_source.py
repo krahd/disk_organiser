@@ -59,9 +59,15 @@ class ExplicitSelfSourceTests(unittest.TestCase):
                 self.assertFalse(qualification_only(changed))
 
     def testInactiveAnchorBindsCorrectedRowsAndConsumedEight(self):
-        self.assertIs(profile.BUILD_ONLY_ENABLED, False)
-        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 8)
-        self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-dir-stream-once-20261013')
+        # Reconstruct the exact inactive checkpoint; its old pin stays historical.
+        historical = (HERE/'Tools/stage_b_profile.py').read_bytes()
+        historical = historical.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
+        historical = historical.replace(b'EXPECTED_RUN_NUMBER = 9\n', b'EXPECTED_RUN_NUMBER = 8\n', 1)
+        historical = historical.replace(b'validation/owned-build-explicit-self-once-20261013', b'validation/owned-build-dir-stream-once-20261013')
+        historical = historical.replace(b'owned-selected-folder-build.run-nine.yml.inert', b'owned-selected-folder-build.explicit-self.yml.inert')
+        historical = historical.replace(b'Reviewed explicit-self host pins for immutable nine; final execution gate remains.', b'Inactive explicit-self host pins; consumed eight remains disabled.')
+        self.assertEqual(hashlib.sha256(historical).hexdigest(),
+                         'cab0811251d93ba65f19a34453f35df04bff9a2b93fd26772bacb2722c61817c')
         self.assertEqual(profile.HOST_SOURCE_COMMIT, 'b567f3468ae6f5383e5e857b58448c5042ca2836')
         rows = tuple((name, hashlib.sha256((HERE/name).read_bytes()).hexdigest())
                      for name, _ in profile.HOST_ROWS)
@@ -72,15 +78,13 @@ class ExplicitSelfSourceTests(unittest.TestCase):
         prior = (HERE/'StageB/owned-selected-folder-build.run-eight.yml.inert').read_bytes()
         self.assertEqual(hashlib.sha256(prior).hexdigest(),
                          'f8c3344760f6748f6db5d25b25d925fa0c59bd8d992a5a253b23b4a9ae33dc2f')
-        raw = (HERE/'Tools/stage_b_profile.py').read_bytes()
-        self.assertEqual(profile.TEMPLATE,
-                         'native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/owned-selected-folder-build.explicit-self.yml.inert')
         actual = (HERE/'StageB/owned-selected-folder-build.explicit-self.yml.inert').read_bytes()
         self.assertEqual(actual, prior.replace(
             b'f5620beb83272cc6c0beec27634d4732120bf45420035b98eec340cb3f27f998',
-            hashlib.sha256(raw).hexdigest().encode()))
+            hashlib.sha256(historical).hexdigest().encode()))
         repo = HERE.parents[3]
-        self.assertFalse((repo/profile.WORKFLOW).exists())
+        self.assertEqual(hashlib.sha256(actual).hexdigest(),
+                         'aae9b778a4077d0382245d32fdd51f3f00e0b2201e7ee75eed46f504fea09634')
         self.assertFalse((repo/'.github/workflows/owned-startup-key-observation.yml').exists())
 
 

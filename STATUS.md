@@ -1,6 +1,36 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 17:46
+Last updated: 2026-10-13 18:26
+
+## Immutable-nine explicit-self build-only source proposal
+
+- Selects immutable counter 9 and a new reserved reference for the reviewed
+  explicit-self host repair. Visible build history 1–8 is a prediction basis,
+  not a reservation. Fresh consumption/identity/history uncertainty stops;
+  no repin, rerun or marker recreation after an attempted call.
+- The profile, numeric job guard and strict quoted runtime argument agree.
+  A new inert comparison anchor and exact active copy change only the normalised
+  profile pin, ref and counter relative to the prior anchor. All 14 helper bodies,
+  19 host inputs, historical anchors and standalone diagnostic stay exact.
+- Adds two memory/mock regressions for exact-copy/paired-state admission and
+  nine-only duplicate-order/malformed-counter/rerun refusal. All 412 methods pass,
+  retaining 410, plus 19 source checks and six default refusals. All 233 ordinary
+  native method identities are unchanged. These local checks do not build the host.
+- PR53 source/PR checks passed all 12 first attempt. Actual-main native attempt 1
+  failed the strict checkbox event trace; one unchanged-source retry passed
+  233 + 6 + 6, 82 native hit pairs and four Cancel observations. Main's other five
+  workflows passed first attempt; browser journeys pass 13. Original failure and
+  earlier same-target evidence remain preserved; ordinary UI reliability is
+  unresolved. No timeout/assertion/event path was changed or new pixel review claimed.
+- Publication requires independent source review, existing-branch fast-forward,
+  exact source/PR/main CI and root's final payload crosscheck. No active source
+  branch creation. The proposed build has not run; counter 8 remains consumed.
+- Same 20-minute / 31-command owned temporary build-only envelope, 720 + 180-second
+  internal bounds, fixed runtime, unsigned compilation before ad-hoc sign/static
+  inspection, and terminal reviewed deactivation. No app, UI test, panel, source
+  grant, user drive, persistent access or Stage C is added. Ambient marker/value
+  influence remains a disclosed risk. See the exact contract in
+  `native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/RUN-NINE-ACTIVATION.md`.
 
 ## Inactive explicit-self host correction after run-eight cleanup
 
@@ -1110,4 +1140,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 17:46
+Last updated: 2026-10-13 18:26
