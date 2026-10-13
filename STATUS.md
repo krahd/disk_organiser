@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 18:55
+Last updated: 2026-10-13 19:18
+
+## Inactive XCTest hook correction after run-nine cleanup
+
+- [PR55](https://github.com/krahd/disk_organiser/pull/55) merged terminal deactivation at `37d53c6a120d15e9a7ac038b6f2118ee2c181a24`, tree `deb6a71ae3e2d5251f84c0721029acf4c9f115a0`. All twelve source/PR and six actual-main ordinary workflows passed first attempt. Each native lane passes 233+6+6, 82 true hit pairs and four Cancel phases; each browser lane passes thirteen journeys. Earlier pointer/cancellation reliability failures remain unresolved. No new original-pixel review is claimed.
+- The [inactive actor-hook correction](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/XCTEST-HOOK-REPAIR.md) changes only two inherited lifecycle declarations to MainActor async throwing XCTest hooks. Both hook bodies, all three experimental UI cases and other UI source bytes remain exact. The actual run-nine log established 31 isolation errors in the old synchronous hooks, after positive universal host compilation; the full build still failed and the new hooks remain uncompiled. Current Apple primary documentation supports the alternative API, without an exact 16.4 interface dump or runtime guarantee.
+- The real [host-only object](https://github.com/krahd/disk_organiser/commit/9eed307659fead2eb5e2824e0d6964277d48c6e6) is parented by inactive main and verifies all nineteen host rows. No branch moved to it; the final source commit retains it as parent. No Task wrapper, unsafe isolation, super call, body, assertion, timeout, event, proof or retirement change is made. Existing blocking UI readiness calls remain runtime-unverified.
+- This successor keeps False, consumed nine, the same consumed ref and both active experimental workflows absent. Fourteen helper bodies, eighteen other host inputs, thirteen old anchors, the historical standalone diagnostic and all six markers remain exact. The new inert anchor changes only the profile pin. Historical copy oracles bind an exact inert predecessor profile; current row/fixture assertions bind the new source. All 415 local memory/mock methods retain the previous 412, nineteen structural checks and six default refusals pass, and 233 ordinary native method sources are preserved. Final composition review and ordinary successor CI remain pending; no new operational run, app/panel/grant/drive access or Stage C is included.
 
 ## Consumed run-nine actor-isolation result and terminal cleanup
 
@@ -1173,4 +1180,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 18:55
+Last updated: 2026-10-13 19:18

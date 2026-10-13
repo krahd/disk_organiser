@@ -362,12 +362,15 @@ class RunNumberTests(unittest.TestCase):
     def testRunNineCopyChangesOnlyRefCounterAndNormalisedProfilePin(self):
         prior = (HERE.parent/'StageB/owned-selected-folder-build.explicit-self.yml.inert').read_bytes()
         self.assertEqual(hashlib.sha256(prior).hexdigest(), 'aae9b778a4077d0382245d32fdd51f3f00e0b2201e7ee75eed46f504fea09634')
-        raw = (HERE/'stage_b_profile.py').read_bytes()
+        raw = (HERE.parent/'StageB/run-nine.profile.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), 'd8936fc85ed3e1f2eeb44a48de5989218f263f452b1f10acafe471d73b98d49f')
         normal = raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
         expected = prior.replace(b'cab0811251d93ba65f19a34453f35df04bff9a2b93fd26772bacb2722c61817c', hashlib.sha256(normal).hexdigest().encode())
         expected = expected.replace(b'validation/owned-build-dir-stream-once-20261013', b'validation/owned-build-explicit-self-once-20261013')
         expected = expected.replace(b'github.run_number == 8', b'github.run_number == 9')
-        self.assertEqual((ROOT/profile.TEMPLATE).read_bytes(), expected)
+        actual = (HERE.parent/'StageB/owned-selected-folder-build.run-nine.yml.inert').read_bytes()
+        self.assertEqual(actual, expected)
+        self.assertEqual(hashlib.sha256(actual).hexdigest(), 'a9f0f0cf01fa9f5d66cbc5c9884855620af9eda6528d40c930e7a822db00abac')
         self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-explicit-self-once-20261013')
         self.assertEqual(profile.EXPECTED_RUN_NUMBER, 9)
         for enabled in (False, True):

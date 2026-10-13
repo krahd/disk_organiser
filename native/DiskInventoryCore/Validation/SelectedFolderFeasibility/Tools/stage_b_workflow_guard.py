@@ -60,5 +60,5 @@ def check(repo, enabled):
             files[relative] = path.read_bytes()
     startup = ((probe/'StageB/owned-startup-key-observation.yml.inert').read_bytes()
                if STARTUP_WORKFLOW in files else None)
-    return validate(files, baseline, (probe/'StageB/owned-selected-folder-build.run-nine.yml.inert').read_bytes(),
+    return validate(files, baseline, (probe/'StageB/owned-selected-folder-build.xctest-hooks.yml.inert').read_bytes(),
                     enabled, startup_template=startup)

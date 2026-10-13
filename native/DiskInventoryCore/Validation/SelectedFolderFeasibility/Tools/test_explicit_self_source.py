@@ -60,7 +60,8 @@ class ExplicitSelfSourceTests(unittest.TestCase):
 
     def testInactiveAnchorBindsCorrectedRowsAndConsumedEight(self):
         # Reconstruct the exact inactive checkpoint; its old pin stays historical.
-        historical = (HERE/'Tools/stage_b_profile.py').read_bytes()
+        historical = (HERE/'StageB/run-nine.profile.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(historical).hexdigest(), 'd8936fc85ed3e1f2eeb44a48de5989218f263f452b1f10acafe471d73b98d49f')
         historical = historical.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
         historical = historical.replace(b'EXPECTED_RUN_NUMBER = 9\n', b'EXPECTED_RUN_NUMBER = 8\n', 1)
         historical = historical.replace(b'validation/owned-build-explicit-self-once-20261013', b'validation/owned-build-dir-stream-once-20261013')
@@ -68,7 +69,7 @@ class ExplicitSelfSourceTests(unittest.TestCase):
         historical = historical.replace(b'Reviewed explicit-self host pins for immutable nine; final execution gate remains.', b'Inactive explicit-self host pins; consumed eight remains disabled.')
         self.assertEqual(hashlib.sha256(historical).hexdigest(),
                          'cab0811251d93ba65f19a34453f35df04bff9a2b93fd26772bacb2722c61817c')
-        self.assertEqual(profile.HOST_SOURCE_COMMIT, 'b567f3468ae6f5383e5e857b58448c5042ca2836')
+        self.assertEqual(profile.HOST_SOURCE_COMMIT, '9eed307659fead2eb5e2824e0d6964277d48c6e6')
         rows = tuple((name, hashlib.sha256((HERE/name).read_bytes()).hexdigest())
                      for name, _ in profile.HOST_ROWS)
         self.assertEqual(len(rows), 19)
