@@ -109,3 +109,72 @@ active workflow removal, immutable eight retained, every marker/anchor kept and
 truthful evidence closeout. Complete ordinary cleanup CI, normal merge and
 actual-main verification. Any later attempt or Stage C is a separate reviewed
 decision.
+
+
+## Terminal result and deactivation (2026-10-13)
+
+[PR51](https://github.com/krahd/disk_organiser/pull/51) merged normally at
+`9a248354f9c89fbc368bbc4a6691f589e00c86ae`, tree
+`9dbe004eff54cf52aa3f6035a7d2bd3ada2b2c47`. All twelve source/PR and six
+actual-main ordinary workflows passed first attempt. Actual-main original logs
+retain 233 distinct native methods, six differential/six parser cases, 82 true
+hit/centre pairs, four Cancel observations and thirteen browser journeys. Those
+checks do not compile this quarantined experimental host; no new pixel review is
+claimed for the unchanged UI.
+
+After the final payload crosscheck and fresh exact guards, one connector call
+created `validation/owned-build-dir-stream-once-20261013` at that main. The
+preserved marker and [run 38436886388](https://github.com/krahd/disk_organiser/actions/runs/38436886388)
+match workflow ID 382488090, number 8, attempt 1. The complete observed create
+history has ten records, with one new event. That observation is not proof
+against delayed extra delivery. Eight remains consumed; no retry, repin, rerun,
+later-duplicate fallback or marker recreation is authorised by this result.
+
+Startup, interpreter, optional-marker, counter and source admission passed.
+The actual identity record reports CPython 3.12.10 at the fixed framework path,
+arm64/macOS 15.7.9, Xcode 16.4 build 16F6, SDK 15.5 and Swift 6.1.2. The three
+toolchain commands succeeded. Command four, unsigned `build-for-testing`,
+returned 65. Its original output contains 39 explicit-self capture diagnostics
+in `Host/ProbeController.swift`, in the x86_64 compile group. The earlier DIR
+pointer diagnostics are absent from this log; that absence does not establish
+a complete successful compilation of the corrected host or either architecture.
+The generated configuration names both arm64 and x86_64, and the compiler log
+contains both architecture groups. An ARM runner does not itself imply a
+single-architecture build.
+
+Later explicit ad-hoc signing and signature-inspection commands were not reached.
+No app, UI test, panel, source grant, user drive or Stage C was launched. The
+verified-data upload succeeded. All four tool records report direct children
+reaped and owned groups retired. The packet records fixture unchanged, admission
+retired and fixture/workspace handles closed, with no recorded cleanup failure.
+These observations do not claim deletion of every temporary product. Partial
+products and a generated test configuration do not establish build acceptance.
+
+Exact original evidence:
+
+- [Job 115433090499](https://github.com/krahd/disk_organiser/actions/runs/38436886388/job/115433090499)
+  connector-decoded log: 16,299 bytes, SHA256
+  `ff61aed03d1dfcd48fc6d7c25614c756c56d4f4f06945aee375fb2b848374316`.
+- [Artifact 11832828320](https://github.com/krahd/disk_organiser/actions/runs/38436886388/artifacts/11832828320):
+  79,832-byte ZIP, SHA256
+  `a44aab39f664da60b6f9e5697f63b7fd2df0c8c73d955f3764cd60085ea775ef`.
+  GitHub reports expiry 2026-10-27T17:14:20Z; this is not permanent archival.
+- Manifest: 2,366 bytes, SHA256
+  `74ffb003cab5903ec46ad9ce59f526a7a29cbc4da391578dac7f3869f1bb665d`.
+  All twenty named members match their byte counts/hashes; the twenty-first ZIP
+  member is the manifest. Every tool stdout/stderr hash matches its tool record.
+- Compiler stdout: 54,640 bytes, SHA256
+  `f583fd6a02a688af7cee1cf0a860c88f40022cfc654af3e9d57783fb629b18d2`.
+  Compiler stderr: 911 bytes, SHA256
+  `90514ad623ac01703b83362462371538c2cb18d5b58a6fae7536b51b84e3ee84`.
+
+This minimal terminal cleanup sets False and removes the active build workflow.
+Immutable eight, all five consumed markers, eleven inert comparison anchors,
+fourteen operational helper bodies and nineteen host inputs remain exact. The
+startup diagnostic workflow remains absent. All 407 local memory/mock methods,
+nineteen structural checks and six default refusals pass; all 233 native method
+sources remain exact. Independent review and ordinary successor/main CI remain
+pending at this source checkpoint. The explicit-self correction must be a
+separate reviewed inactive change, without a new operational attempt inferred
+from cleanup. Historical evidence and the ambient encoding-marker residual risk
+remain unchanged.

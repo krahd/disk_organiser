@@ -1,5 +1,5 @@
 """Reviewed corrected-host pins for immutable eight; final execution gate remains."""
-BUILD_ONLY_ENABLED = True
+BUILD_ONLY_ENABLED = False
 EXPECTED_RUN_NUMBER = 8
 HOST_SOURCE_COMMIT = '93db00f686daf5acac064beadf3115cad7a36605'
 HOST_ROWS_SHA256 = '3418951d8155fe45d3e8f7731f98746f1d6eddea39d13d503ee6e110b0376d20'

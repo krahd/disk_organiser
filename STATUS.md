@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 16:48
+Last updated: 2026-10-13 17:17
+
+## Consumed run-eight compiler result and terminal deactivation
+
+- [PR51](https://github.com/krahd/disk_organiser/pull/51) merged the reviewed immutable-eight candidate at `9a248354f9c89fbc368bbc4a6691f589e00c86ae`, tree `9dbe004eff54cf52aa3f6035a7d2bd3ada2b2c47`. All twelve source/PR and six actual-main ordinary workflows passed first attempt. The [main native job](https://github.com/krahd/disk_organiser/actions/runs/38435570871/job/115428515425) retains 233 methods, six differential/six parser cases, 82 true hit/centre pairs and four Cancel phases; the [catalogue job](https://github.com/krahd/disk_organiser/actions/runs/38435570748/job/115428514505) passes thirteen journeys. No new pixel acceptance is claimed.
+- After the final crosscheck and immediate source/history/ref guards, one connector call created the preserved `validation/owned-build-dir-stream-once-20261013` marker at that main. [Run 38436886388](https://github.com/krahd/disk_organiser/actions/runs/38436886388), workflow ID 382488090/number 8/attempt 1, passed startup/counter/source admission and three toolchain commands, then failed unsigned `build-for-testing` with return 65. Its original stdout contains 39 explicit-self capture diagnostics in `Host/ProbeController.swift` in the x86_64 compile group. Prior DIR errors are absent from this log only; no complete corrected-host or architecture compilation success is inferred. Both architecture groups occur in the log. Later signing and signature inspection were not reached; no app/UI/panel/grant/user-drive or Stage C execution occurred.
+- The verified-data upload succeeded. [The terminal record](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/RUN-EIGHT-ACTIVATION.md#terminal-result-and-deactivation-2026-10-13) binds the 16,299-byte original log, 79,832-byte archive, all twenty member hashes and exact compiler streams. Four direct children were recorded reaped and their groups retired; fixture unchanged, admission retired and fixture/workspace handles closed, with no recorded cleanup failure. Partial products/configuration do not prove build acceptance or deletion of every product. Archive expiry is 2026-10-27T17:14:20Z. The complete observed create history has ten records and one new event, without a guarantee against delayed delivery.
+- This four-path cleanup sets False and removes the active build workflow, retaining immutable eight, all five markers, eleven anchors, fourteen helpers and nineteen host inputs. Both experimental workflows are absent. All 407 memory/mock methods, nineteen structural checks and six default refusals pass; 233 native method sources remain exact. Independent review and new ordinary CI remain required. No compiler repair, retry, repin or new attempt is bundled. The next explicit-self repair is a separate inactive source review; the existing ambient-marker risk and later runtime gates remain open.
 
 ## Conditional corrected-host immutable-eight candidate
 
@@ -1096,4 +1103,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 16:48
+Last updated: 2026-10-13 17:17
