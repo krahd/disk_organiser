@@ -65,7 +65,10 @@ class DebugLayoutSourceTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(historical).hexdigest(), 'd477601dc29b780da3bc3fb6fd4a1c366fac61196c88407263aa1fc66d89e9fb')
         previous = {n.targets[0].id: ast.literal_eval(n.value) for n in ast.parse(historical).body
                     if isinstance(n, ast.Assign)}
-        raw = (HERE/'Tools/stage_b_profile.py').read_bytes()
+        # Retain this exact historical composition; the new inspector profile
+        # is checked independently and does not relabel the earlier run.
+        raw = (HERE/'StageB/debug-layout.profile.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), 'f4857f38dbb1e3182c76dc94302e4d8e2d78b26b6c8259b213c4d78351de3e86')
         current = {n.targets[0].id: ast.literal_eval(n.value) for n in ast.parse(raw).body
                    if isinstance(n, ast.Assign)}
         self.assertEqual(set(current), set(previous))
@@ -88,6 +91,11 @@ class DebugLayoutSourceTests(unittest.TestCase):
         self.assertEqual(actual, prior.replace(b'd477601dc29b780da3bc3fb6fd4a1c366fac61196c88407263aa1fc66d89e9fb', hashlib.sha256(normal).hexdigest().encode()))
         self.assertEqual(current['EXPECTED_RUN_NUMBER'], 10)
         self.assertEqual(current['REF'], 'refs/heads/validation/owned-build-xctest-hooks-once-20261013')
+        live = {n.targets[0].id: ast.literal_eval(n.value) for n in ast.parse(
+            (HERE/'Tools/stage_b_profile.py').read_bytes()).body if isinstance(n, ast.Assign)}
+        self.assertEqual(live['HOST_ROWS'], current['HOST_ROWS'])
+        self.assertEqual(live['HOST_SOURCE_COMMIT'], current['HOST_SOURCE_COMMIT'])
+        current = live
         repo = HERE.parents[3]
         self.assertIs(type(current['BUILD_ONLY_ENABLED']), bool)
         if current['BUILD_ONLY_ENABLED']:
@@ -96,7 +104,7 @@ class DebugLayoutSourceTests(unittest.TestCase):
             self.assertFalse((repo/current['WORKFLOW']).exists())
         self.assertFalse((repo/'.github/workflows/owned-startup-key-observation.yml').exists())
         import stage_b_commands
-        self.assertEqual(stage_b_commands.COMMAND_COUNT, 31)
+        self.assertEqual(stage_b_commands.COMMAND_COUNT, 32)  # one reviewed static slot
 
 
 if __name__ == '__main__':

@@ -87,3 +87,13 @@ dependency closure or application runtime success. Counter ten cannot be reused;
 no new counter, trigger, app/UI/picker/grant/user-drive or Stage C is authorised
 by this source checkpoint. Existing ambient-marker and 14-day artifact-retention
 limits remain; no permanent image or build archive is implied.
+
+
+## Later inactive direct-dependency source
+
+The separately reviewed plan is implemented in the inactive [fixed static
+dependency inspector](STATIC-DEPENDENCIES.md). It adds one explicit command and
+a strict one-executable inventory requirement without adding signing targets.
+Actual corrected-layout compilation, tool availability/output and full signed
+acceptance remain unmeasured; this historical checkpoint's 31-command claim
+remains attached to its original source.

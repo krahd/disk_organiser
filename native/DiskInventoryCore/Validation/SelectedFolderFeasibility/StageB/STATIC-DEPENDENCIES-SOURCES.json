@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/man/llvm-otool.1",
+    "bytes": 10312,
+    "sha256": "dceade52f34c32756103482f8572a6cde2e69531cf85fd34b2c2dcdc5bdeef09"
+  },
+  {
+    "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/man/otool-classic.1",
+    "bytes": 7456,
+    "sha256": "d394dd994259505236aeb626f98a60de00ce8b870351dfde6b029529157457a3"
+  },
+  {
+    "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/otool/main.c",
+    "bytes": 147653,
+    "sha256": "71c33f45431e7ede37659f2a3ca01c662eead70d0bbbb898b362784d6c6dadd8"
+  },
+  {
+    "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/otool/ofile_print.c",
+    "bytes": 282914,
+    "sha256": "09dbb9d3051e18ac1409a77cf61777c5b80675f85ac37c4bc8b4128de29f4602"
+  },
+  {
+    "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/tests/test-cases/otool-classic-L/Makefile",
+    "bytes": 1213,
+    "sha256": "3a2c8d146c239c4f335808cd622ac968bac4b32e4a9e85dac89ebe5600c522e3"
+  },
+  {
+    "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/xcode/otool.xcconfig",
+    "bytes": 275,
+    "sha256": "a6f8801bbba0d250e7158b2bf0d06af3788916e6e01b3d0c682c097ed3055c17"
+  },
+  {
+    "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/xcode/public_tool.xcconfig",
+    "bytes": 1102,
+    "sha256": "43d0b4506d517379f7eb894607f0eb991d3e10c5684de88dc65c06d50f22bcd1"
+  },
+  {
+    "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/xcode/cctools.xcconfig",
+    "bytes": 5865,
+    "sha256": "54b5ea808a66428c091ababba0d9d3f1429349a621b3d33835c7962c1295da84"
+  },
+  {
+    "url": "https://github.com/apple-oss-distributions/cctools/blob/e0d56624eca2a76c2ace4c21850df9e666de4ca5/cctools.xcodeproj/project.pbxproj",
+    "bytes": 353015,
+    "sha256": "7c32d9f92a85919c95d39a33b845ded0dccbcdd7a989a9d6e31781efd00f0cca"
+  }
+]

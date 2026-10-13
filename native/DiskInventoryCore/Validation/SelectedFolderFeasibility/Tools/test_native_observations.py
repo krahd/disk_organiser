@@ -16,7 +16,16 @@ def result(args, stdout=b'', stderr=b''):
 def metadata(identifier, executable):
     return ('Executable=' + executable + '\nIdentifier=' + identifier + '\nCDHash=' + 'a' * 40 + '\nSignature=adhoc\n').encode()
 
+def dependency_output(root=ROOT):
+    # Grammar follows Apple's pinned cctools formatter; no actual tool ran.
+    path = root + '/' + no.EXECUTABLES[0]
+    return ''.join(path + ' (architecture ' + arch + '):\n' +
+                   '\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1351.100.1)\n'
+                   for arch in ('x86_64', 'arm64')).encode()
+
 def tool(arguments, **_):
+    if arguments == (no.OTOOL, '-arch', 'all', '-L', ROOT + '/' + no.EXECUTABLES[0]):
+        return result(arguments, dependency_output())
     if arguments == (no.XCODE, '-version'): return result(arguments, b'Xcode 16.4\nBuild version 16F6\n')
     if arguments[1:] == ('--sdk','macosx','--show-sdk-version'): return result(arguments,b'15.5\n')
     if arguments[1:] == ('swift','--version'): return result(arguments,b'Apple Swift version 6.1.2 (synthetic)\nTarget: arm64-apple-macosx15.0\n')

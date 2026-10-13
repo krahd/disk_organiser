@@ -14,7 +14,8 @@ import time
 import probe_contract as pc
 
 MAX_OUTPUT = 8 * 1024 * 1024
-TOOLS = {"/usr/bin/codesign", "/usr/bin/xcrun", "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild"}
+TOOLS = {"/usr/bin/codesign", "/usr/bin/xcrun", "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild",
+         "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/otool-classic"}
 
 @dataclass(frozen=True)
 class ProcessResult:

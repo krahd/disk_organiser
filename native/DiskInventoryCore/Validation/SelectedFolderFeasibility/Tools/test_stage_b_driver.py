@@ -83,22 +83,23 @@ class AdmissionTests(unittest.TestCase):
         self.assertEqual(admission.state,'retired')
 
     def testAdmittedControllerUsesAll31ExactCommandsWithParsedObservations(self):
+        # Historical method identity retained; one static slot extends the original 31.
         from test_native_observations import tool as observed_tool
         subject, inspection, _ = model(); subject.state='prepared'
         def tool(arguments, **kw):
             if 'build-for-testing' in arguments or '--force' in arguments:
                 return ec.bp.ProcessResult(arguments,b'build/sign model',b'',0,True,False,'',True)
             return observed_tool(arguments, **kw)
-        with patch.object(profile,'BUILD_ONLY_ENABLED',True), patch.object(ec,'_verify_inputs'), \
+        with patch.object(ec.no,'inspector_identity',return_value=(0,)*8),patch.object(profile,'BUILD_ONLY_ENABLED',True), patch.object(ec,'_verify_inputs'), \
              patch.object(ec,'_write_bound_configuration'), patch.object(ec.ob,'freeze',return_value=inspection.freeze), \
              patch.object(subject,'_configuration_name',return_value='Owned.xctestrun'), \
              patch.object(ec.bp,'run',side_effect=tool) as run:
             admission=ba._issue(0,lambda:1);admission.consume(profile.HOST_SOURCE_COMMIT,profile.HOST_ROWS)
             admission.attach(subject);subject._build_admission=admission
             result=subject.inspect_b()
-            self.assertEqual(run.call_count,31);self.assertEqual(admission.guard.count,31)
+            self.assertEqual(run.call_count,32);self.assertEqual(admission.guard.count,32)
             self.assertEqual(admission.state,'complete');self.assertEqual(subject.state,'inspected')
-            self.assertEqual(len(result.preparation_log_digests),31)
+            self.assertEqual(len(result.preparation_log_digests),32)
             self.assertTrue(workspace_reads := subject.workspace.read_configuration.call_args_list)
             self.assertTrue(all(call.kwargs.get('check') == admission.work_check for call in workspace_reads))
             with self.assertRaises(pc.Refusal):subject.run_c(result)
