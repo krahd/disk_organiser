@@ -122,3 +122,12 @@ frozen immutable counter/ref and complete stable-identity history, then the exac
 final trigger gate. No app/UI/panel/grant/user-drive or Stage C authority follows
 from this source change. Ambient encoding-marker influence and artifact-retention
 limits remain explicit; this does not create a permanent build/image archive.
+
+
+## Later conditional source activation
+
+[Immutable-eleven source](RUN-ELEVEN-ACTIVATION.md) proposes one bounded future
+32-command build-only attempt. The inspector bodies and policy remain unchanged.
+This inactive checkpoint's source results are not relabelled as tool execution;
+actual fixed-leaf availability/output and corrected signed-product acceptance
+remain unmeasured until a separately gated future invocation.

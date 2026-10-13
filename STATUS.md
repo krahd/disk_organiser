@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 21:03
+Last updated: 2026-10-13 21:52
+
+## Conditional immutable-eleven static-dependency build-only source
+
+- [PR60](https://github.com/krahd/disk_organiser/pull/60) merged inactive inspection at `be9fab90af00a1c66f45ab8453f5eedbfaf3457d`, tree `72f23306dc69dc72eada72add8831fe576ed70f1`. All twelve source/PR and six actual-main ordinary workflows passed first attempt. Independent review verified six original logs: each native lane retains 233+6+6, 82 true hit pairs and four Cancel phases; each browser lane passes thirteen journeys. Ordinary UI delivery flakiness remains unresolved and no new pixel or experimental tool acceptance is claimed.
+- [Immutable-eleven source](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/RUN-ELEVEN-ACTIVATION.md) binds a new static-dependencies ref, exact active/inert workflow copy and normalised profile pin. Fourteen helpers, nineteen host rows, seventeen historical anchors and seven marker refs remain exact. Historical profile/copy tests retain their earlier evidence; no operational call occurs during authoring. Complete twelve-record history currently shows build counters 1–10 at the same ID/path. Eleven is a conditional prediction, not a reservation; uncertain/changed history or prior consumption stops without repinning.
+- All 440 local memory/mock tests retain 438 and add exact eleven copy/paired-state and first-attempt duplicate-order checks. Nineteen structural checks and six default refusals pass; 233 native test sources remain unchanged. Independent final source review and ordinary exact-head CI remain pending. Existing source-branch fast-forward only, verified actual-main checks and a final exact trigger crosscheck are required before any operational call.
+- The unchanged envelope is 32 fixed commands, 720+180 seconds and a twenty-minute job. The proposed classic inspector leaf/output and corrected signed layout remain unmeasured. Strict identity, both architecture sections, complete direct dependency records and one-executable inventory may conservatively refuse. No fallback/signing-target expansion or runtime/transitive-closure claim follows. Original run-ten signing failure, ambient-marker risk and retention limits are preserved. No app/UI/panel/grant/user drive or Stage C is included; one future attempt requires terminal independently reviewed deactivation.
 
 ## Inactive architecture-complete direct-dependency source
 
@@ -1211,4 +1218,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 21:03
+Last updated: 2026-10-13 21:52
