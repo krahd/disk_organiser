@@ -57,14 +57,14 @@ final class ProbeController: NSObject, NSWindowDelegate {
         DispatchQueue(label: "org.diskorganiser.owned-selection-probe.before").async { [weak self] in
             let result: Result<ObservedDenial, Error> = Result { try ProbeMatrix.selectedDenied(fixture) }
             Task { @MainActor [weak self] in
-                guard let self, generation == token, phase == .checking else { return }
+                guard let self, self.generation == token, self.phase == .checking else { return }
                 switch result {
                 case .success(let denied):
-                    preDenial = denied
-                    if closeRequested { closeNow(); return }
-                    show(.ready, "READY_DENIED · the owned selected-file read is denied before selection.")
-                    if thenChoose { chooseFolder() }
-                case .failure(let error): fail(ProbeWork.failureCode(error))
+                    self.preDenial = denied
+                    if self.closeRequested { self.closeNow(); return }
+                    self.show(.ready, "READY_DENIED · the owned selected-file read is denied before selection.")
+                    if thenChoose { self.chooseFolder() }
+                case .failure(let error): self.fail(ProbeWork.failureCode(error))
                 }
             }
         }
@@ -87,19 +87,19 @@ final class ProbeController: NSObject, NSWindowDelegate {
             Task { @MainActor [weak self, panel] in
                 // Adopt every successful returned scope before any validation.
                 let choices = response == .OK ? panel.urls.map { ProbePanelScope(panelURL: $0) } : []
-                guard let self, generation == token, self.panel === panel else {
+                guard let self, self.generation == token, self.panel === panel else {
                     choices.forEach { $0.retire() }; return
                 }
                 self.panel = nil
-                guard !stopping, response == .OK else {
+                guard !self.stopping, response == .OK else {
                     choices.forEach { $0.retire() }
-                    afterRetirement(outcome: "panel-cancelled"); return
+                    self.afterRetirement(outcome: "panel-cancelled"); return
                 }
-                guard choices.count == 1, choices[0].matches(fixture.selected) else {
-                    choices.forEach { $0.retire() }; fail("unexpected-selection"); return
+                guard choices.count == 1, choices[0].matches(self.fixture.selected) else {
+                    choices.forEach { $0.retire() }; self.fail("unexpected-selection"); return
                 }
-                scope = choices[0]
-                show(.reviewing, "REVIEW_OWNED · one sealed folder selected. Run the bounded read or Cancel.")
+                self.scope = choices[0]
+                self.show(.reviewing, "REVIEW_OWNED · one sealed folder selected. Run the bounded read or Cancel.")
             }
         }
     }
@@ -111,23 +111,23 @@ final class ProbeController: NSObject, NSWindowDelegate {
         show(.reading, "Reading the 32-byte owned control and checking denied operations…")
         let began = operation.start(fixture: fixture, onHolding: { @Sendable [weak self, weak operation] in
             Task { @MainActor [weak self, weak operation] in
-                guard let self, let operation, generation == token, work === operation,
-                      phase == .reading, operation.isHolding else { return }
-                show(.holding, "HELD_READ · positive read passed; the worker still owns its descriptors. Finish or Cancel.")
+                guard let self, let operation, self.generation == token, self.work === operation,
+                      self.phase == .reading, operation.isHolding else { return }
+                self.show(.holding, "HELD_READ · positive read passed; the worker still owns its descriptors. Finish or Cancel.")
             }
         }, completion: { @Sendable [weak self, selected, operation] result in
             // The retained selected owner outlives the borrowed worker even if
             // its window/controller is abandoned. No cancellation closes it.
             Task { @MainActor [weak self, selected, operation] in
                 selected.retire()
-                guard let self, generation == token, work === operation else { return }
-                scope = nil; work = nil
+                guard let self, self.generation == token, self.work === operation else { return }
+                self.scope = nil; self.work = nil
                 switch result {
                 case .completed(let controls):
-                    activeDenials = controls; afterRetirement(outcome: ProbePolicy.completedOutcome(cancelAccepted: stopping))
+                    self.activeDenials = controls; self.afterRetirement(outcome: ProbePolicy.completedOutcome(cancelAccepted: self.stopping))
                 case .cancelled(let controls):
-                    activeDenials = controls; afterRetirement(outcome: "read-cancelled")
-                case .failed(let code): fail(code)
+                    self.activeDenials = controls; self.afterRetirement(outcome: "read-cancelled")
+                case .failed(let code): self.fail(code)
                 }
             }
         })
@@ -159,17 +159,17 @@ final class ProbeController: NSObject, NSWindowDelegate {
         DispatchQueue(label: "org.diskorganiser.owned-selection-probe.after").async { [weak self] in
             let result: Result<ObservedDenial, Error> = Result { try ProbeMatrix.selectedDenied(fixture) }
             Task { @MainActor [weak self] in
-                guard let self, generation == token, phase == .retiring else { return }
+                guard let self, self.generation == token, self.phase == .retiring else { return }
                 switch result {
                 case .success(let denied):
-                    guard writeReceipt(outcome: outcome, after: denied, error: nil) else {
-                        show(.failed, "FAILED: terminal signature or receipt validation")
-                        if closeRequested { closeNow() }
+                    guard self.writeReceipt(outcome: outcome, after: denied, error: nil) else {
+                        self.show(.failed, "FAILED: terminal signature or receipt validation")
+                        if self.closeRequested { self.closeNow() }
                         return
                     }
-                    show(.done, "RETIRED_DENIED · " + outcome + ". The identical selected-file read is denied again.")
-                    if closeRequested { closeNow() }
-                case .failure(let error): fail(ProbeWork.failureCode(error))
+                    self.show(.done, "RETIRED_DENIED · " + outcome + ". The identical selected-file read is denied again.")
+                    if self.closeRequested { self.closeNow() }
+                case .failure(let error): self.fail(ProbeWork.failureCode(error))
                 }
             }
         }
