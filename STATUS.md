@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 15:52
+Last updated: 2026-10-13 16:17
+
+## Inactive directory-stream type correction
+
+- [PR49](https://github.com/krahd/disk_organiser/pull/49) merged the reviewed terminal cleanup at `3ee2e6daf865a0772f723707fcf82da8037017f1`, tree `fce26c4928d7c5c20d10c80899a8a0c8efbc0315`. All twelve source/PR and six actual-main ordinary workflows passed first attempt. The [main native job](https://github.com/krahd/disk_organiser/actions/runs/38427788013/job/115401636240) retains 233 methods, six differential/six parser cases, 82 true hit/centre pairs and four Cancel phases; the [catalogue job](https://github.com/krahd/disk_organiser/actions/runs/38427787872/job/115401636264) passes thirteen journeys. No new pixel acceptance is claimed.
+- The [separate source correction](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/DIR-STREAM-TYPE-REPAIR.md) changes only the stored directory-stream element type to the `UnsafeMutablePointer<DIR>` required by the actual compiler. All remaining host bytes and ownership/error paths stay exact. The reviewed host-only object `93db00f686daf5acac064beadf3115cad7a36605` contains the exact nineteen-file host pack; the final profile binds that real object, one changed row/aggregate hash and a new hash-only inert anchor. No branch was moved to the intermediate provenance object, and it was not executed or CI-accepted.
+- All 405 local memory/mock methods pass, retaining 402 and adding three bounded source/hash/mutation oracles. Nineteen structural checks and six default refusals pass; all 233 native method sources remain exact. An initial author run failed two stale test expectations (an old source-SHA mutation became a no-op, and the prior anchor count); the corrected tests preserve strict rejection and explicitly count the new anchor. Original failure and passing logs remain separate. Independent review, ordinary successor CI and actual corrected-host compilation remain unverified at this checkpoint.
+- False, consumed counter 7, both experimental workflow absences, four consumed markers, all previous anchors and fourteen operational helper bodies are retained. Historical run-seven and standalone diagnostic evidence remains bound to its original bytes. The source correction grants no new build/sign/launch/panel/grant or drive attempt; it does not establish compiler or sandbox feasibility. No architecture/timing/ownership gate is relaxed. Ambient encoding-marker influence and later runtime gates remain explicit.
 
 ## Consumed run-seven compiler result and terminal deactivation
 
@@ -1082,4 +1089,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 15:52
+Last updated: 2026-10-13 16:17

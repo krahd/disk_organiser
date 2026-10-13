@@ -294,13 +294,15 @@ class RunNumberTests(unittest.TestCase):
         with self.assertRaises(historical.Refusal): historical.decode_profile((HERE/'stage_b_profile.py').read_bytes(), historical.PROFILE_HASH)
 
     def testRunSevenCopyChangesOnlyCounterAndNormalisedProfilePin(self):
+        # Bind the actual historical run-seven bytes, not a later host profile.
         prior = (HERE.parent/'StageB/owned-selected-folder-build.run-number.yml.inert').read_bytes()
         self.assertEqual(hashlib.sha256(prior).hexdigest(), '23597f48cad17482be7900241e1611438b0e89a9c96bf38ac7addfbcc56486cb')
-        raw = (HERE/'stage_b_profile.py').read_bytes()
-        normal = raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
-        expected = prior.replace(b'17ac4693ee3d23517f9744244b4bb7dc6fbee7322c51495d65be008464c849c1',hashlib.sha256(normal).hexdigest().encode())
+        expected = prior.replace(b'17ac4693ee3d23517f9744244b4bb7dc6fbee7322c51495d65be008464c849c1',
+                                 b'bae1acb235a50b83c25cd4b98a277290a8e0788aac405967f29788f6cdb5dfe1')
         expected = expected.replace(b'github.run_number == 0', b'github.run_number == 7')
-        self.assertEqual((ROOT/profile.TEMPLATE).read_bytes(), expected)
+        actual = (HERE.parent/'StageB/owned-selected-folder-build.run-seven.yml.inert').read_bytes()
+        self.assertEqual(actual, expected)
+        self.assertEqual(hashlib.sha256(actual).hexdigest(), '30ba204fc1a3a11e17b6abed7483b3f2b1ff992661449af01b486bc9c46a774e')
         self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-encoding-once-20261013')
 
     def testFrozenSevenIsOnlyAdmittedCounterAndRerunStillRefuses(self):

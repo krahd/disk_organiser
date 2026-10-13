@@ -310,7 +310,7 @@ class StartupOnlyObservationTests(unittest.TestCase):
             self.assertFalse((ROOT/values['WORKFLOW']).exists())
         self.assertFalse((ROOT/probe.WORKFLOW).exists())
         self.assertNotEqual(probe.REF,values['REF'])
-        self.assertEqual(len(list((HERE.parent/'StageB').glob('owned-selected-folder-build*.yml.inert'))),8)
+        self.assertEqual(len(list((HERE.parent/'StageB').glob('owned-selected-folder-build*.yml.inert'))),9)
 
 
 if __name__=='__main__':unittest.main()
