@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 import stage_b_bootstrap as boot
 import stage_b_profile as profile
+import stage_b_workflow_guard as workflow_guard
 import test_stage_b_driver as dt
 
 
@@ -139,12 +140,32 @@ class InterpreterIdentityTests(unittest.TestCase):
             'owned-selected-folder-build.create.yml.inert': '87f1bfbea213a008890e6c3fee04c7bd2ae9590e59d2f37f2ace9b174c2e02d6'}
         for name, digest in expected.items():
             self.assertEqual(hashlib.sha256((folder / name).read_bytes()).hexdigest(), digest)
-        self.assertFalse(profile.BUILD_ONLY_ENABLED)
+        # Retain the historical method identity while checking the exact
+        # currently reviewed state. Both states have independent paired oracles.
+        self.assertIs(type(profile.BUILD_ONLY_ENABLED), bool)
         self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.framework.yml.inert'))
         self.assertEqual(profile.PYTHON, PYTHON)
         self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-framework-20261012')
         repo = Path(__file__).parents[5]
-        self.assertFalse((repo / profile.WORKFLOW).exists())
+        active = repo / profile.WORKFLOW
+        if profile.BUILD_ONLY_ENABLED:
+            self.assertEqual(active.read_bytes(), (repo / profile.TEMPLATE).read_bytes())
+        else:
+            self.assertFalse(active.exists())
+
+    def testWorkflowPresenceOracleRetainsBothDisabledAndExactEnabledStates(self):
+        repo = Path(__file__).parents[5]
+        template = (repo / profile.TEMPLATE).read_bytes()
+        # Pure byte-map models: no workflow is executed or activation written.
+        self.assertTrue(workflow_guard.validate({}, {}, template, False))
+        self.assertTrue(workflow_guard.validate({profile.WORKFLOW: template}, {}, template, True))
+        for enabled, files in ((False, {profile.WORKFLOW: template}), (True, {}),
+                               (True, {profile.WORKFLOW: template + b'changed'})):
+            with self.subTest(enabled=enabled, files=list(files)), self.assertRaises(AssertionError):
+                workflow_guard.validate(files, {}, template, enabled)
+        for enabled in (None, 0, 1, 'True'):
+            with self.subTest(enabled=enabled), self.assertRaises(AssertionError):
+                workflow_guard.validate({}, {}, template, enabled)
 
 
 if __name__ == '__main__': unittest.main()
