@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 17:17
+Last updated: 2026-10-13 17:46
+
+## Inactive explicit-self host correction after run-eight cleanup
+
+- [PR52](https://github.com/krahd/disk_organiser/pull/52) merged terminal deactivation at `ea9c2987d257c20bac0988b10c9cb07b1e1ea46d`, tree `0df3de459779b602a93b1d66e484e5e9fe343716`. All twelve source/PR workflows passed first attempt. Actual-main native attempt one ran 233 methods with one failed method/two errors; its ready-state mismatch, zero cancellation observations and AppKit missing-key-binding-file exception are preserved without causal attribution. The single reviewed, unchanged-source ordinary-job rerun passed 233+6+6, 82 true hit pairs and all four Cancel phases. The other five main workflows passed first attempt; browser main passes thirteen journeys. No assertion/time/input change or new pixel claim is made.
+- The separately reviewed experimental controller repair inserts exactly 39 `self.` prefixes at the 39 measured compiler positions. Every other controller byte, all ten weak-self capture lists, five guarded bindings, five MainActor tasks and retirement order remain exact. The real [host-only object](https://github.com/krahd/disk_organiser/commit/b567f3468ae6f5383e5e857b58448c5042ca2836) changes only that file and verifies all nineteen host rows. No branch moved to the intermediate object; the final pin-chain commit retains it as parent.
+- [The source/evidence record](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/EXPLICIT-SELF-REPAIR.md) separates the failed operational compiler result, ordinary UI retry evidence and new source-only repair. Both target architectures are present in the actual earlier compiler commands; no architecture is excluded to avoid the failure. Explicit qualification preserves ownership but remains uncompiled in this source. The ordinary UI event-delivery cause is a separate unresolved reliability issue.
+- This successor keeps False, consumed eight, the same consumed ref and both active workflows absent. All five markers, eleven old anchors, fourteen operational helpers, eighteen other host inputs and historical diagnostic bytes remain exact. The new inert anchor changes only the complete profile pin. The structural source oracle was updated only from `cancelAccepted: stopping` to the exact qualified `cancelAccepted: self.stopping` after its initial stale-literal refusal, with no check removed. All 410 local memory/mock methods retain the prior 407; nineteen structural checks, six default refusals and 233 unchanged native method sources are verified. Independent final pin-chain review and ordinary successor CI remain pending. No new attempt, app/panel/grant/user-drive access or Stage C is authorised; ambient-marker and artifact-retention limits remain.
 
 ## Consumed run-eight compiler result and terminal deactivation
 
@@ -1103,4 +1110,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 17:17
+Last updated: 2026-10-13 17:46

@@ -51,7 +51,7 @@ gates = [node for node in controller_tree.body if isinstance(node, ast.FunctionD
 require(len(gates) == 2 and all(len(node.body) == 1 and isinstance(node.body[0], ast.Return) and
         isinstance(node.body[0].value, ast.Constant) and node.body[0].value.value is False for node in gates),
         "both operational controller gates remain closed")
-require('ProbePolicy.completedOutcome(cancelAccepted: stopping)' in (HERE / 'Host/ProbeController.swift').read_text(),
+require('ProbePolicy.completedOutcome(cancelAccepted: self.stopping)' in (HERE / 'Host/ProbeController.swift').read_text(),
         "visible cancellation consulted before queued success publication")
 expectation = (HERE / 'UITests/RunnerExpectation.swift').read_text()
 require('OWNED_PROBE_EXPECT_' in expectation and 'requireIdentity' in expectation and
