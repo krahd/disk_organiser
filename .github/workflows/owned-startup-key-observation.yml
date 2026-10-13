@@ -1,0 +1,56 @@
+name: One startup-key observation
+
+on:
+  create:
+
+permissions:
+  contents: read
+
+jobs:
+  startup-keys-only:
+    if: >-
+      ${{ github.event_name == 'create' &&
+          github.repository == 'krahd/disk_organiser' &&
+          github.event.ref_type == 'branch' &&
+          github.event.ref == 'validation/startup-keys-once-20261013' &&
+          github.ref == 'refs/heads/validation/startup-keys-once-20261013' }}
+    runs-on: macos-15
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        timeout-minutes: 1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          set-safe-directory: false
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+      - name: Observe startup keys once and stop
+        timeout-minutes: 1
+        env:
+          EXPECTED_DRIVER_SHA: ${{ github.sha }}
+          CREATED_REF: ${{ github.event.ref }}
+          CREATED_REF_TYPE: ${{ github.event.ref_type }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          checked_out_sha="$(/usr/bin/git rev-parse --verify HEAD)"
+          entry='native/DiskInventoryCore/Validation/SelectedFolderFeasibility/Tools/startup_key_observation.py'
+          digest="$(/usr/bin/shasum -a 256 "$entry")"
+          test "${digest%% *}" = '7e3f577e43b58053b26a1665176b7da7675e559695bcb160a67fb08976e4887d'
+          exec /usr/bin/env -i \
+            PATH=/usr/bin:/bin:/usr/sbin:/sbin LANG=C LC_ALL=C \
+            EXPECTED_DRIVER_SHA="$EXPECTED_DRIVER_SHA" \
+            CREATED_REF="$CREATED_REF" CREATED_REF_TYPE="$CREATED_REF_TYPE" \
+            GITHUB_EVENT_NAME="$GITHUB_EVENT_NAME" GITHUB_REPOSITORY="$GITHUB_REPOSITORY" \
+            GITHUB_REF="$GITHUB_REF" GITHUB_SHA="$GITHUB_SHA" \
+            CHECKED_OUT_SHA="$checked_out_sha" GITHUB_WORKFLOW_SHA="$GITHUB_WORKFLOW_SHA" \
+            GITHUB_RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" GITHUB_WORKFLOW_REF="$GITHUB_WORKFLOW_REF" \
+            GITHUB_WORKSPACE="$GITHUB_WORKSPACE" GITHUB_RUN_ID="$GITHUB_RUN_ID" \
+            ImageOS="$ImageOS" ImageVersion="$ImageVersion" \
+            /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 -I -S -B "$entry" \
+            '7e3f577e43b58053b26a1665176b7da7675e559695bcb160a67fb08976e4887d' "$EXPECTED_DRIVER_SHA" "$CREATED_REF" "$CREATED_REF_TYPE" \
+            "$GITHUB_EVENT_NAME" "$GITHUB_REPOSITORY" "$GITHUB_REF" "$GITHUB_SHA" \
+            "$checked_out_sha" "$GITHUB_WORKFLOW_SHA" "$GITHUB_RUN_ATTEMPT" \
+            "$GITHUB_WORKFLOW_REF" "$GITHUB_WORKSPACE" "$GITHUB_RUN_ID" "$ImageOS" "$ImageVersion"

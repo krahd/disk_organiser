@@ -160,6 +160,48 @@ class WorkflowTests(unittest.TestCase):
         files[guard.WORKFLOW]=template;files['.github/workflows/old.yml']=b'call manual job'
         with self.assertRaises(AssertionError):guard.validate(files,base,template,True)
 
+    def testSeparateStartupWorkflowOnlyExactBytesWithBuildFalse(self):
+        files,base,template=self.model();startup=b'exact startup template'
+        self.assertTrue(guard.validate(files,base,template,False,startup_template=startup))
+        files[guard.STARTUP_WORKFLOW]=startup
+        self.assertTrue(guard.validate(files,base,template,False,startup_template=startup))
+        for replacement in [None,b'',b'wrong',b'x'*16385,'text']:
+            with self.assertRaises(AssertionError):guard.validate(files,base,template,False,startup_template=replacement)
+
+    def testBuildAndStartupActivationCannotCoexist(self):
+        files,base,template=self.model();startup=b'exact startup template'
+        files[guard.WORKFLOW]=template;files[guard.STARTUP_WORKFLOW]=startup
+        with self.assertRaisesRegex(AssertionError,'build disabled'):
+            guard.validate(files,base,template,True,startup_template=startup)
+
+    def testStartupAllowanceDoesNotAdmitOtherCallersOrMutatedBaseline(self):
+        for path in ['.github/workflows/owned-startup-key-observation.yaml',
+                     '.github/workflows/Owned-startup-key-observation.yml',
+                     '.github/workflows/nested/owned-startup-key-observation.yml']:
+            files,base,template=self.model();files[path]=b'exact startup template'
+            with self.assertRaises(AssertionError):guard.validate(files,base,template,False,startup_template=files[path])
+        files,base,template=self.model();files[guard.STARTUP_WORKFLOW]=b'exact startup template'
+        files['.github/workflows/old.yml']=b'changed'
+        with self.assertRaises(AssertionError):guard.validate(files,base,template,False,startup_template=files[guard.STARTUP_WORKFLOW])
+
+    def testStartupCollectionUsesOnlyFixedTemplateAndKeepsOrdinaryGraph(self):
+        files,base,template=self.model();startup=b'exact startup template'
+        files[guard.QUARANTINE+'StageB/workflow-baseline.json']=json.dumps(base).encode()
+        files[guard.QUARANTINE+'StageB/owned-selected-folder-build.environment-diagnostic.yml.inert']=template
+        files[guard.QUARANTINE+'StageB/owned-startup-key-observation.yml.inert']=startup
+        files[guard.STARTUP_WORKFLOW]=startup
+        self.assertTrue(guard.check(MemoryPath(files),False))
+        files['native/DiskInventoryCore/Sources/New.swift']=b'ordinary caller'
+        with self.assertRaisesRegex(AssertionError,'ordinary native source graph changed'):
+            guard.check(MemoryPath(files),False)
+
+    def testStartupRemovalReturnsToOriginalDisabledState(self):
+        files,base,template=self.model();startup=b'exact startup template'
+        files[guard.STARTUP_WORKFLOW]=startup
+        self.assertTrue(guard.validate(files,base,template,False,startup_template=startup))
+        del files[guard.STARTUP_WORKFLOW]
+        self.assertTrue(guard.validate(files,base,template,False))
+
     def testFrozenTemplateHasOnlyReviewedManualSurface(self):
         root=Path(__file__).parents[1];raw=(root/'StageB/owned-selected-folder-build.yml.inert').read_text()
         self.assertEqual(re.findall(r'^  ([A-Za-z_-]+):$',raw,re.M),['workflow_dispatch','owned-build-only'])

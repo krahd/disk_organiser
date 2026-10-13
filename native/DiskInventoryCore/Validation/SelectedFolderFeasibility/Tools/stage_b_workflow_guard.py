@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 
 WORKFLOW = '.github/workflows/owned-selected-folder-build.yml'
+STARTUP_WORKFLOW = '.github/workflows/owned-startup-key-observation.yml'
 NATIVE = 'native/DiskInventoryCore/'
 QUARANTINE = NATIVE + 'Validation/SelectedFolderFeasibility/'
 
@@ -19,12 +20,17 @@ def ordinary_native_source(path):
             path.endswith(('.swift', '.py', '.cjs')))
 
 
-def validate(files, baseline, template, enabled):
+def validate(files, baseline, template, enabled, startup_template=None):
     if type(enabled) is not bool or type(files) is not dict or type(baseline) is not dict:
         raise AssertionError('guard inputs')
     workflows = {path for path in files if path.startswith('.github/workflows/') and path.endswith(('.yml', '.yaml'))}
     expected = {path for path in baseline if path.startswith('.github/workflows/')}
-    if workflows != expected | ({WORKFLOW} if enabled else set()):
+    startup_active = STARTUP_WORKFLOW in files
+    if startup_active and (enabled or type(startup_template) is not bytes or
+                           not 0 < len(startup_template) <= 16384 or
+                           files[STARTUP_WORKFLOW] != startup_template):
+        raise AssertionError('only exact startup observation with build disabled')
+    if workflows != expected | ({WORKFLOW} if enabled else set()) | ({STARTUP_WORKFLOW} if startup_active else set()):
         raise AssertionError('only exact designated workflow may be active')
     if ({path for path in files if ordinary_native_source(path)} !=
             {path for path in baseline if ordinary_native_source(path)}):
@@ -52,4 +58,7 @@ def check(repo, enabled):
         relative = str(path.relative_to(repo))
         if path.is_file() and ordinary_native_source(relative):
             files[relative] = path.read_bytes()
-    return validate(files, baseline, (probe/'StageB/owned-selected-folder-build.environment-diagnostic.yml.inert').read_bytes(), enabled)
+    startup = ((probe/'StageB/owned-startup-key-observation.yml.inert').read_bytes()
+               if STARTUP_WORKFLOW in files else None)
+    return validate(files, baseline, (probe/'StageB/owned-selected-folder-build.environment-diagnostic.yml.inert').read_bytes(),
+                    enabled, startup_template=startup)
