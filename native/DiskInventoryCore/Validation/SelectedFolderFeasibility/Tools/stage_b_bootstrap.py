@@ -31,7 +31,7 @@ STARTUP_IDENTITY = frozenset({
     'GITHUB_SHA', 'CHECKED_OUT_SHA', 'GITHUB_WORKFLOW_SHA', 'GITHUB_RUN_ATTEMPT',
     'GITHUB_WORKFLOW_REF', 'GITHUB_WORKSPACE', 'GITHUB_RUN_ID', 'ImageOS', 'ImageVersion'})
 STARTUP_KEYS = STARTUP_IDENTITY | STARTUP_FIXED.keys()
-# Presence only: these names are observations, never admitted exceptions.
+# Presence-only diagnostic names; the admission rule below is separate.
 STARTUP_KNOWN_SYSTEM_KEYS = ('LC_CTYPE', '__PYVENV_LAUNCHER__', '__CF_USER_TEXT_ENCODING', '_')
 STARTUP_DIAGNOSTIC_COUNT_CAP = 256
 
@@ -85,11 +85,14 @@ def startup_refusal_record(error):
 def startup_environment(environment):
     """Validate the env -i contract; copy only its explicit non-secret keys.
 
-    Unexpected inherited keys refuse before operational project imports. Values
-    are bounded here; dispatch and runner-image checks establish their identity.
+    Called after exact Darwin/interpreter admission in main. The sole optional
+    encoding marker is observed by name only, never read, copied or removed.
+    Its ambient value can still influence platform code; this is not a safety
+    or authenticity claim. All other key deviations refuse before value access.
+    Required values retain their existing bounds and later identity checks.
     """
     observed_keys = set(environment)
-    if observed_keys != STARTUP_KEYS:
+    if observed_keys != STARTUP_KEYS and observed_keys != STARTUP_KEYS | {'__CF_USER_TEXT_ENCODING'}:
         raise StartupEnvironmentRefusal(observed_keys)
     result = {name: environment[name] for name in STARTUP_KEYS}
     require(all(type(value) is str and 0 < len(value) <= 4096 and '\0' not in value

@@ -108,7 +108,12 @@ class StartupEnvironmentTests(unittest.TestCase):
         for key in boot.STARTUP_KNOWN_SYSTEM_KEYS:
             with self.subTest(key=key):
                 environment = self.environment(); environment[key] = 'SECRET-VALUE'
+                # The diagnostic itself grants nothing. Preserve this historical
+                # method identity while explicitly testing the new admission rule.
+                if key == '__CF_USER_TEXT_ENCODING': del environment['GITHUB_RUN_ID']
                 diagnostic = self.mismatch(environment).key_diagnostic
+                self.assertEqual(diagnostic['missing_expected'],
+                                 ['GITHUB_RUN_ID'] if key == '__CF_USER_TEXT_ENCODING' else [])
                 self.assertEqual(diagnostic['known_system_presence'],
                                  {name: name == key for name in boot.STARTUP_KNOWN_SYSTEM_KEYS})
                 self.assertEqual(diagnostic['unexpected_count'], 1)
@@ -213,7 +218,7 @@ class StartupEnvironmentTests(unittest.TestCase):
         self.assertNotIn('startup_environment', ast.unparse(handler))
 
     def shell(self):
-        raw=(Path(__file__).parents[1]/'StageB/owned-selected-folder-build.environment-diagnostic.yml.inert').read_text()
+        raw=(Path(__file__).parents[1]/'StageB/owned-selected-folder-build.encoding-marker.yml.inert').read_text()
         run=raw.split('        run: |\n',1)[1].split('      - name:',1)[0]
         return '\n'.join(line[10:] for line in run.splitlines())
 

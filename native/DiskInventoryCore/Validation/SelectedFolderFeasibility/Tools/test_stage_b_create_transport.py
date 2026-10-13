@@ -58,7 +58,7 @@ def condition(raw):
 
 class CreateTransportTests(unittest.TestCase):
     def raw(self):
-        return (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.environment-diagnostic.yml.inert').read_text()
+        return (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.encoding-marker.yml.inert').read_text()
 
     def testOnlyReservedBranchCreationAdmitsJobPredicate(self):
         admits = condition(self.raw()); event = dict(FIELDS)
@@ -123,7 +123,7 @@ class CreateTransportTests(unittest.TestCase):
     def testOriginalManualAnchorRemainsExactHistoricalBytes(self):
         old = (Path(__file__).parents[1] / 'StageB/owned-selected-folder-build.yml.inert').read_bytes()
         self.assertEqual(hashlib.sha256(old).hexdigest(), '75ade725601f8375028f5842060cafdcdbb8e6bc8caae7c40881027e1a13749a')
-        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.environment-diagnostic.yml.inert'))
+        self.assertTrue(profile.TEMPLATE.endswith('/owned-selected-folder-build.encoding-marker.yml.inert'))
         self.assertEqual(profile.REF, 'refs/heads/' + BRANCH)
 
     def testNewAnchorBindsEveryHelperAndHostByteWithNormalisedProfile(self):

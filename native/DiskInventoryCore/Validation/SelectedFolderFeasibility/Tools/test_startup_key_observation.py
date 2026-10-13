@@ -287,13 +287,20 @@ class StartupOnlyObservationTests(unittest.TestCase):
 
     def testExistingBuildProfileAndHistoricalAnchorsStayDisabled(self):
         raw=(HERE/'stage_b_profile.py').read_bytes()
-        self.assertEqual(hashlib.sha256(raw).hexdigest(),probe.PROFILE_HASH)
+        historical=(HERE.parent/'StageB/startup-key-observation.profile.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(historical).hexdigest(),probe.PROFILE_HASH)
+        self.assertFalse(probe.decode_profile(historical,probe.PROFILE_HASH)['BUILD_ONLY_ENABLED'])
+        # The consumed diagnostic keeps its original pin and refuses this new
+        # profile. Its executed evidence is never relabelled as current runtime.
+        self.assertNotEqual(raw,historical)
+        with self.assertRaisesRegex(probe.Refusal,'profile hash mismatch'):
+            probe.decode_profile(raw,probe.PROFILE_HASH)
         values={n.targets[0].id:ast.literal_eval(n.value) for n in ast.parse(raw).body if isinstance(n,ast.Assign)}
         self.assertIs(values['BUILD_ONLY_ENABLED'],False)
         self.assertEqual(values['REF'],'refs/heads/validation/owned-build-framework-20261012')
         self.assertFalse((ROOT/'.github/workflows/owned-selected-folder-build.yml').exists())
         self.assertNotEqual(probe.REF,values['REF'])
-        self.assertEqual(len(list((HERE.parent/'StageB').glob('owned-selected-folder-build*.yml.inert'))),4)
+        self.assertEqual(len(list((HERE.parent/'StageB').glob('owned-selected-folder-build*.yml.inert'))),5)
 
 
 if __name__=='__main__':unittest.main()

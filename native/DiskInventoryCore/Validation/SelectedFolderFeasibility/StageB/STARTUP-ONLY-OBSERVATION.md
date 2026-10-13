@@ -48,3 +48,7 @@ The retained decoded job log is 13,526 UTF-8 bytes including its initial BOM, SH
 The active diagnostic workflow is removed after this terminal result. Its inert template and entry remain exact; the build profile remains False and the build workflow absent. The source-template test now recognises both explicit reviewed repository states, still rejecting altered bytes whenever the active path exists; all template syntax, argument, hash and bounds assertions remain. All 363 memory/mock methods and nineteen structural checks pass locally, with all earlier identities retained. Ordinary exact-successor CI remains pending at this deactivation checkpoint.
 
 Keep the consumed diagnostic marker `validation/startup-keys-once-20261013` at `3389aa6d7d9dbd007e7d3c9987a82308e7c434fc`, and both previous build markers unchanged. No rerun, replacement marker or build follows from this observation.
+
+## Later disabled profile evolution
+
+The [encoding-marker source repair](ENCODING-MARKER-ADMISSION.md) changes the current build profile while retaining this consumed standalone entry and template byte-for-byte. Its original profile bytes are preserved as `startup-key-observation.profile.inert`, checked against the entry's unchanged literal hash. The unchanged decoder rejects the new current profile. This historical execution and its measured key record therefore do not become evidence for the later admission rule; no repeat observation is authorised.

@@ -1,6 +1,13 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 07:07
+Last updated: 2026-10-13 07:51
+
+## Disabled fixed encoding-marker source repair
+
+- [PR44](https://github.com/krahd/disk_organiser/pull/44) merged terminal diagnostic cleanup at `d1ea7fb5c34ab680a3cfe99fc2969403a4b2c6e3`, tree `970b8d52ed9e41b4541aacf546259566a351ffea`. All twelve source/PR and six actual-main ordinary workflows passed first attempt. The [main native job](https://github.com/krahd/disk_organiser/actions/runs/38362753560/job/115180603628) passed all 233 methods, six differential/six parser cases, 82 hit/centre pairs and four Cancel observations; the [catalogue job](https://github.com/krahd/disk_organiser/actions/runs/38362753551/job/115180603770) passed thirteen journeys. No new pixel inspection is claimed.
+- The [new inactive admission contract](native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/ENCODING-MARKER-ADMISSION.md) accepts only the original eighteen keys or those eighteen plus literal `__CF_USER_TEXT_ENCODING`, after the unchanged exact Darwin/interpreter gate. The optional value is never fetched, validated, copied or removed; the returned map contains only the eighteen required values. All other name/value refusals, downstream identity/owner gates and six-key child environment remain. Fixed-name presence diagnostics are retained. Ambient marker/value influence on platform code remains a residual risk, with no authentication or harmlessness guarantee.
+- This is a deliberate narrow source admission change, not measured build success or proof of the earlier failure's cause. All 363 earlier memory/mock method identities remain; eleven additions bring the passing local total to 374, with nineteen source checks and six default refusals. An initial focused test incorrectly expected a profile read for zero isolation flags; the corrected oracle preserves the actual earlier refusal and requires zero reads in that branch. All 233 native method sources remain exact; no new native execution occurred.
+- The changed bootstrap is re-pinned through the disabled profile and a separately hashed inert anchor. Five earlier anchors and the standalone diagnostic entry remain exact. Its original profile is retained as inert comparison data; tests require that entry's unchanged decoder to reject the new profile, preserving historical attribution. Both active workflows remain absent, the flag is False and all three consumed markers remain. Independent source review and exact successor ordinary CI are pending; no new build, signing, app, picker, grant or drive attempt is authorised by this checkpoint.
 
 ## Startup-only observation completed; diagnostic workflow removed
 
@@ -1047,4 +1054,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 07:07
+Last updated: 2026-10-13 07:51
