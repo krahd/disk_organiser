@@ -25,7 +25,7 @@ ROOT = HERE.parents[4]
 class RunNumberTests(unittest.TestCase):
     def profile(self, number=17, enabled=True):
         raw = (HERE/'stage_b_profile.py').read_bytes()
-        raw = raw.replace(b'EXPECTED_RUN_NUMBER = 0\n',
+        raw = raw.replace(('EXPECTED_RUN_NUMBER = '+str(profile.EXPECTED_RUN_NUMBER)+'\n').encode(),
                           ('EXPECTED_RUN_NUMBER = '+repr(number)+'\n').encode(), 1)
         raw = raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
         digest = hashlib.sha256(raw).hexdigest()
@@ -38,8 +38,9 @@ class RunNumberTests(unittest.TestCase):
         parsed = boot.decode_profile(raw, digest) if not profile_changed else None
         if profile_changed: raw += b'# changed after hashing\n'
         template = (ROOT/profile.TEMPLATE).read_bytes()
-        template = template.replace(b'github.run_number == 0', ('github.run_number == '+str(number)).encode())
+        template = template.replace(('github.run_number == '+str(profile.EXPECTED_RUN_NUMBER)).encode(), ('github.run_number == '+str(number)).encode())
         current = (HERE/'stage_b_profile.py').read_bytes()
+        current = current.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
         template = template.replace(hashlib.sha256(current).hexdigest().encode(), digest.encode())
         values, _ = dt.BootstrapTests().identity()
         values.update(boot.STARTUP_FIXED); values.update(ImageOS='macos15', ImageVersion='20260907.0337.1')
@@ -215,7 +216,7 @@ class RunNumberTests(unittest.TestCase):
         self.assertNotIn('GITHUB_RUN_NUMBER', boot.STARTUP_KEYS)
 
     def testSchedulerLooseNumericCoercionIsDistinctFromStrictBootstrap(self):
-        raw = (ROOT/profile.TEMPLATE).read_text().replace('github.run_number == 0', 'github.run_number == 17')
+        raw = (ROOT/profile.TEMPLATE).read_text().replace('github.run_number == '+str(profile.EXPECTED_RUN_NUMBER), 'github.run_number == 17')
         accepts = ct.condition(raw, 17)
         event = {**dict(ct.FIELDS), 'github.run_attempt': 1}
         for value in (17, 17.0, '17', '17.0', '1.7e1', ' 17 '):
@@ -229,7 +230,9 @@ class RunNumberTests(unittest.TestCase):
         self.assertIsNotNone(error); load.assert_not_called()
 
     def testSchedulerNullEmptyAndBooleanCoercionFixtures(self):
-        accepts = ct.condition((ROOT/profile.TEMPLATE).read_text(), 0)
+        raw = (ROOT/profile.TEMPLATE).read_text().replace(
+            'github.run_number == '+str(profile.EXPECTED_RUN_NUMBER), 'github.run_number == 0')
+        accepts = ct.condition(raw, 0)
         event = {**dict(ct.FIELDS), 'github.run_attempt':1}
         for value in (None, False, '', ' ', 0, '0', '-0'):
             self.assertTrue(accepts({**event, 'github.run_number':value}))
@@ -241,17 +244,25 @@ class RunNumberTests(unittest.TestCase):
     def testNumericConditionLiteralAndProfileMustAgree(self):
         raw = (ROOT/profile.TEMPLATE).read_text()
         self.assertTrue(callable(ct.condition(raw, profile.EXPECTED_RUN_NUMBER)))
-        for changed in (raw.replace('github.run_number == 0', 'github.run_number == 1'),
-                        raw.replace('github.run_number == 0', "github.run_number == '0'"),
+        for changed in (raw.replace('github.run_number == '+str(profile.EXPECTED_RUN_NUMBER), 'github.run_number == 1'),
+                        raw.replace('github.run_number == '+str(profile.EXPECTED_RUN_NUMBER), "github.run_number == '"+str(profile.EXPECTED_RUN_NUMBER)+"'"),
                         raw.replace('github.run_attempt == 1', 'github.run_attempt == 2'),
                         raw.replace('github.run_attempt == 1 &&', ''),
-                        raw.replace('github.run_number == 0', 'github.run_number >= 0')):
+                        raw.replace('github.run_number == '+str(profile.EXPECTED_RUN_NUMBER), 'github.run_number >= 0')):
             with self.assertRaises(AssertionError): ct.condition(changed, profile.EXPECTED_RUN_NUMBER)
 
     def testFrozenSourceRemainsDisabledAndUnconfiguredWithBothWorkflowsAbsent(self):
-        self.assertIs(profile.BUILD_ONLY_ENABLED, False); self.assertEqual(profile.EXPECTED_RUN_NUMBER, 0)
-        self.assertFalse((ROOT/profile.WORKFLOW).exists()); self.assertFalse((ROOT/historical.WORKFLOW).exists())
-        self.assertTrue(guard.check(ROOT, False))
+        # Retain the original disabled-zero refusal, and explicitly distinguish
+        # the later reviewed positive literal's two repository Boolean states.
+        self.assertIs(type(profile.BUILD_ONLY_ENABLED), bool)
+        self.assertIs(type(profile.EXPECTED_RUN_NUMBER), int)
+        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 7)
+        if profile.BUILD_ONLY_ENABLED:
+            self.assertEqual((ROOT/profile.WORKFLOW).read_bytes(), (ROOT/profile.TEMPLATE).read_bytes())
+        else:
+            self.assertFalse((ROOT/profile.WORKFLOW).exists())
+        self.assertFalse((ROOT/historical.WORKFLOW).exists())
+        self.assertTrue(guard.check(ROOT, profile.BUILD_ONLY_ENABLED))
         raw, digest = self.profile(0, False)
         with patch.object(boot, 'read_source', return_value=raw), it.runtime(), patch.object(boot,'load_modules') as load:
             with self.assertRaisesRegex(boot.Refusal, 'disabled'): boot.main(digest, '17')
@@ -281,6 +292,27 @@ class RunNumberTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(old).hexdigest(), historical.PROFILE_HASH)
         self.assertIs(historical.decode_profile(old, historical.PROFILE_HASH)['BUILD_ONLY_ENABLED'], False)
         with self.assertRaises(historical.Refusal): historical.decode_profile((HERE/'stage_b_profile.py').read_bytes(), historical.PROFILE_HASH)
+
+    def testRunSevenCopyChangesOnlyCounterAndNormalisedProfilePin(self):
+        prior = (HERE.parent/'StageB/owned-selected-folder-build.run-number.yml.inert').read_bytes()
+        self.assertEqual(hashlib.sha256(prior).hexdigest(), '23597f48cad17482be7900241e1611438b0e89a9c96bf38ac7addfbcc56486cb')
+        raw = (HERE/'stage_b_profile.py').read_bytes()
+        normal = raw.replace(b'BUILD_ONLY_ENABLED = True\n', b'BUILD_ONLY_ENABLED = False\n', 1)
+        expected = prior.replace(b'17ac4693ee3d23517f9744244b4bb7dc6fbee7322c51495d65be008464c849c1',hashlib.sha256(normal).hexdigest().encode())
+        expected = expected.replace(b'github.run_number == 0', b'github.run_number == 7')
+        self.assertEqual((ROOT/profile.TEMPLATE).read_bytes(), expected)
+        self.assertEqual(profile.REF, 'refs/heads/validation/owned-build-encoding-once-20261013')
+
+    def testFrozenSevenIsOnlyAdmittedCounterAndRerunStillRefuses(self):
+        for counter in ('1','2','3','4','5','6','7','8','9','1000000000'):
+            result, error, load, admit, _, _, _ = self.main(counter, number=7)
+            if counter == '7':
+                self.assertIsNone(error); self.assertEqual(result,2)
+                self.assertEqual(load.return_value.run.call_args.args[0]['run_number'],7)
+            else:
+                self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
+        _, error, load, admit, _, _, _ = self.main('7', number=7, environment={'GITHUB_RUN_ATTEMPT':'2'})
+        self.assertIsNotNone(error); load.assert_not_called(); admit.assert_not_called()
 
 
 if __name__ == '__main__': unittest.main()
