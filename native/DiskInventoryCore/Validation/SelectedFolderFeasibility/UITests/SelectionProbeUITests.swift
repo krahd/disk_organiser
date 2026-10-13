@@ -11,7 +11,8 @@ final class SelectionProbeUITests: XCTestCase {
     private var fixture: ProbeFixture!
     private var expectedIdentity: RunnerExpectation!
 
-    override func setUpWithError() throws {
+    @MainActor
+    override func setUp() async throws {
         continueAfterFailure = false
         try assertPurePolicies()
         guard ProbeSeal.fixtureSHA256.range(of: "^[0-9a-f]{64}$", options: .regularExpression) != nil,
@@ -47,7 +48,8 @@ final class SelectionProbeUITests: XCTestCase {
         XCTAssertTrue(waitStatus("READY_DENIED"))
     }
 
-    override func tearDownWithError() throws {
+    @MainActor
+    override func tearDown() async throws {
         // Cleanup never contributes an acceptance assertion. The experiment
         // driver separately observes the launched PID's bounded retirement.
         app?.terminate()
