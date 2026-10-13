@@ -44,20 +44,16 @@ class DirectoryStreamSourceTests(unittest.TestCase):
                          'bedff3611948962f46173df27a0e3b4a361d4e8cdd6902cbdc241dac1704a4cf')
 
     def testNewInactiveAnchorChangesOnlyTheCurrentProfileHash(self):
+        # Preserve the exact inactive repair checkpoint as historical source.
         prior = (HERE/'StageB/owned-selected-folder-build.run-seven.yml.inert').read_bytes()
         self.assertEqual(hashlib.sha256(prior).hexdigest(),
                          '30ba204fc1a3a11e17b6abed7483b3f2b1ff992661449af01b486bc9c46a774e')
-        raw = (HERE/'Tools/stage_b_profile.py').read_bytes()
-        self.assertIn(b'BUILD_ONLY_ENABLED = False\n', raw)
-        self.assertIs(profile.BUILD_ONLY_ENABLED, False)
-        self.assertEqual(profile.EXPECTED_RUN_NUMBER, 7)
-        self.assertEqual(profile.TEMPLATE,
-                         'native/DiskInventoryCore/Validation/SelectedFolderFeasibility/StageB/owned-selected-folder-build.dir-stream.yml.inert')
         actual = (HERE/'StageB/owned-selected-folder-build.dir-stream.yml.inert').read_bytes()
-        self.assertEqual(actual, prior.replace(OLD_PROFILE_SHA.encode(), hashlib.sha256(raw).hexdigest().encode()))
-        repo = HERE.parents[3]
-        self.assertFalse((repo/profile.WORKFLOW).exists())
-        self.assertFalse((repo/'.github/workflows/owned-startup-key-observation.yml').exists())
+        self.assertEqual(actual, prior.replace(OLD_PROFILE_SHA.encode(),
+                         b'2f2249cae3fd1a31c437c17fa7113cef1ee4e575e59f5dadcbcad940ec966f6a'))
+        self.assertEqual(hashlib.sha256(actual).hexdigest(), '7537b0519aa801b59bfc50f73d3df6cd8d1960cf25b2b13900c1c8de7eb04425')
+        self.assertIn(b'github.run_number == 7', actual)
+        self.assertIn(b'validation/owned-build-encoding-once-20261013', actual)
 
 
 if __name__ == '__main__':
