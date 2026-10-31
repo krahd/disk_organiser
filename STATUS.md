@@ -1,6 +1,12 @@
 # Disk Organiser – Project Status
 
-Last updated: 2026-10-13 21:52
+Last updated: 2026-10-31 00:46
+
+## Release pipeline security hardening (2026-10-31)
+
+- The binary release workflow now fails rather than substituting a source tarball when PyInstaller produces no executable; both macOS and Linux archive names remain unchanged.
+- Publishing workflows no longer embed GitHub credentials in clone/push remote URLs; the Homebrew step uses an ephemeral credential helper and the tag release reuses checkout authentication.
+- Static workflow edits are committed on the security branch; a full release run, target platform builds, and publishing-token rotation/scope inspection have not been verified. Do not treat this change as evidence of a successful release.
 
 ## Conditional immutable-eleven static-dependency build-only source
 
@@ -1218,4 +1224,4 @@ Current session verification:
 
 ---
 
-Last updated: 2026-10-13 21:52
+Last updated: 2026-10-31 00:46
