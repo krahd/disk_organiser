@@ -97,27 +97,21 @@ jobs:
           set -o pipefail
           . .venv/bin/activate
           mkdir -p out
-          # Capture PyInstaller output but don't abort the job if it fails
+          # Capture PyInstaller output; propagate build failures.
           pyinstaller --noconfirm --clean --onefile --name disk-organiser \
             --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_macos.log
 
       - id: package
-        name: Package macOS binary (with fallback)
+        name: Package macOS binary (required)
         run: |
+          set -euo pipefail
           mkdir -p out
-          if [ -f dist/disk-organiser ]; then
-            TARNAME=disk-organiser-${REF_NAME}-macos-$(uname -m)-bin.tar.gz
-            tar -C dist -czf out/${TARNAME} disk-organiser
-          else
-            echo "Binary not found; creating source tarball fallback"
-            TARNAME=disk-organiser-${REF_NAME}-source.tar.gz
-            # Prefer git archive when available, otherwise tar entire workspace
-            if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-              git archive --format=tar.gz -o out/${TARNAME} HEAD
-            else
-              tar -czf out/${TARNAME} .
-            fi
+          if [[ ! -s dist/disk-organiser || ! -x dist/disk-organiser ]]; then
+            echo "Required macOS executable was not built; refusing to publish a source fallback." >&2
+            exit 1
           fi
+          TARNAME=disk-organiser-${REF_NAME}-macos-$(uname -m)-bin.tar.gz
+          tar -C dist -czf out/${TARNAME} disk-organiser
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
@@ -199,26 +193,21 @@ jobs:
           set -o pipefail
           . .venv/bin/activate
           mkdir -p out
-          # Capture PyInstaller output but don't abort the job if it fails
+          # Capture PyInstaller output; propagate build failures.
           pyinstaller --noconfirm --clean --onefile --name disk-organiser \
             --add-data "backend:backend" --add-data "frontend:frontend" backend/app.py 2>&1 | tee out/pyinstaller_linux.log
 
       - id: package
-        name: Package linux binary (with fallback)
+        name: Package linux binary (required)
         run: |
+          set -euo pipefail
           mkdir -p out
-          if [ -f dist/disk-organiser ]; then
-            TARNAME=disk-organiser-${REF_NAME}-linux-$(uname -m)-bin.tar.gz
-            tar -C dist -czf out/${TARNAME} disk-organiser
-          else
-            echo "Binary not found; creating source tarball fallback"
-            TARNAME=disk-organiser-${REF_NAME}-source.tar.gz
-            if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-              git archive --format=tar.gz -o out/${TARNAME} HEAD
-            else
-              tar -czf out/${TARNAME} .
-            fi
+          if [[ ! -s dist/disk-organiser || ! -x dist/disk-organiser ]]; then
+            echo "Required linux executable was not built; refusing to publish a source fallback." >&2
+            exit 1
           fi
+          TARNAME=disk-organiser-${REF_NAME}-linux-$(uname -m)-bin.tar.gz
+          tar -C dist -czf out/${TARNAME} disk-organiser
           shasum -a 256 out/${TARNAME} | awk '{print $1}' > out/sha.txt
           echo "tar=${TARNAME}" >> $GITHUB_OUTPUT
           echo "sha=$(cat out/sha.txt)" >> $GITHUB_OUTPUT
@@ -322,7 +311,7 @@ jobs:
             echo "HOMEBREW_TAP_TOKEN not set; skipping homebrew tap update"
             exit 0
           fi
-          git clone https://x-access-token:${HOME_TAP_TOKEN}@github.com/krahd/homebrew-tap.git homebrew-tap
+          git clone https://github.com/krahd/homebrew-tap.git homebrew-tap
           cd homebrew-tap
           mkdir -p Formula
           cat > Formula/disk-organiser.rb <<RUBY
@@ -344,4 +333,4 @@ jobs:
           RUBY
           git add Formula/disk-organiser.rb
           git commit -m "disk-organiser: update formula for ${REF_NAME}" || true
-          git push origin HEAD:main
+          git -c 'credential.helper=!f() { printf "username=x-access-token\\npassword=%s\\n" "$HOME_TAP_TOKEN"; }; f' push origin HEAD:main

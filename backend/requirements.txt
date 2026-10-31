@@ -5,12 +5,12 @@ flask-cors
 redis
 rq
 gunicorn
-filelock
+filelock>=4.2.1
 xxhash
 send2trash
-Pillow>=12.3.0
+Pillow>=13.0.0
 ImageHash
-pypdf>=6.19.0
+pypdf>=6.21.4
 modelito==1.4.3
 
 
